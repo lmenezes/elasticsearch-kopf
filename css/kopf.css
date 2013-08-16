@@ -1,0 +1,403 @@
+html,body {
+  height: 100%;
+}
+
+#page-wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -60px;
+  padding: 0 0 60px;
+}
+
+#app-footer {
+	height: 75px;
+	border-top: 1px solid #f0f0f0;
+	text-align: center;
+	font-size: 11px;
+	color: #c0c0c0;
+	padding-top: 20px;
+	margin-top: 60px;
+}
+
+@media (max-width: 767px) {
+  #app-footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+.app-settings {
+	color: #000000;
+	width: 250px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.host-input {
+	width: 250px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	vertical-align: middle;
+}
+.modal-json {
+	font-size: 9px;
+	background: #ffffff;
+}
+/** Shard representation **/
+.shard {
+	text-align: center;
+	font-size: 11px;
+	display: inline-block;
+	width: 22px;
+	height: 22px;
+	border: 1px solid #000000;
+	border-radius: 4px 4px 4px 4px;
+	vertical-align: middle;
+	text-align: center;
+	line-height: 20px;
+	margin-left: 5px;
+	margin-bottom: 5px;
+}
+.shard-started {
+	background: green;
+	color: #FFFFFF;
+}
+.shard-initializing {
+	background: blue;
+}
+.shard-relocated {
+	background: yellow;
+}
+.shard-recovering {
+	background: red;
+}
+.shard-closed {
+	background: gray;
+	color: #000000;
+}
+.shard-unallocated {
+	background: gray;
+	color: #000000;
+}
+
+
+/** CLUSTER ACTIONS **/
+.cluster-action-legend {
+	font-size: 10px;
+	line-height: 10px;
+	font-weight: 400;
+	text-align: center;
+}
+
+
+
+.refresh-selector {
+	vertical-align: middle;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.big-icon {
+	font-size: 18px;
+}
+
+.hide-overflow {
+	overflow: hidden; 
+	white-space: nowrap;
+}
+.modal-title {
+	font-size: 14px;
+}
+.modal-body {
+	font-size: 12px;
+	font-weight: 400;
+}
+.modal-footer {
+	padding: 10px 10px 10px;
+	margin-top: 0px;
+}
+.modal-body {
+	padding: 12px;
+}
+.custom-modal {
+	padding-top: 200px;
+}
+
+/** Alert block **/
+.alert-block {
+	font-size: 12px;
+	font-weight: 300;
+}
+
+/** Create index modal **/
+.settings-area {
+	font-size: 9px;
+}
+
+/** Logo style **/
+.logo {
+	font-size: 20px;
+}
+
+/** Top Bar Colors with Status Info **/
+.cluster_status_red {
+	background-color: #b94a48 !important;
+	color: #f2dede !important;
+}
+.cluster_status_red_nav {
+		background-color: #f2dede !important;
+	color: #b94a48 !important;
+}
+.cluster_status_green {
+	background-color: #468847 !important;
+	color: #dff0d8 !important;
+}
+.cluster_status_green_nav {
+	background-color: #dff0d8 !important;
+	color: #468847 !important;
+}
+.cluster_status_yellow {
+	background-color: #c09853 !important;
+	color: #fcf8e3 !important;
+}
+.cluster_status_yellow_nav {
+	background-color: #fcf8e3 !important;
+	color: #c09853 !important;
+}
+ 
+/** Cluster stats box **/
+.cluster-stats-section {
+	background: #f9f9f9;
+}
+
+/** Cluster Overview **/
+.header-actions {
+	font-size: 32px;
+	text-align: center;
+	vertical-align: middle !important;
+}
+
+.header-action {
+	color: #222222;
+	font-size: 32px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+}
+a.header-action:hover {
+	color: #222222;
+	font-weight: 200;
+	text-decoration: none;
+}
+
+.header-actions-inactive {
+	color: #f0f0f0;
+}
+
+/** HEADER FOR INDICES **/
+
+.header-index-cell {
+    max-width: 230px;
+    min-width: 230px;
+	max-height: 40px !important;
+	vertical-align: top !important;
+}
+.header-index-name {
+	vertical-align: top !important;
+}
+
+.header-index-alias {
+	font-size: 11px;
+	font-style: italic;
+	color: #808080;
+	font-weight: 300;
+}
+.header-index-details {
+	font-size: 9px;
+	font-weight: 400;
+}
+.header-index-actions {
+	padding-top: 5px;
+}
+.header-index-action {
+	color: #222222;
+	font-size: 11px;
+	font-weight: 200;
+	cursor: pointer;
+}
+a.header-index-action:hover {
+	color: #222222;
+	font-size: 11px;
+	font-weight: 200;
+	text-decoration: none;
+}
+.header-index-action-mini {
+	color: #222222;
+	font-size: 9px;
+	font-weight: 200;
+}
+a.header-index-action-mini:hover {
+	color: #222222;
+	font-size: 9px;
+	font-weight: 200;
+	text-decoration: none;
+}
+
+/** ------------ **/
+.shards {
+    max-width: 230px;
+    min-width: 230px;
+	max-height: 40px !important;
+	vertical-align: top !important;
+	word-wrap:break-word;
+}
+.node_stats {
+	padding-top: 15px;
+}
+
+.node_detail {
+	color: #808080;
+	font-size: 10px;
+}
+
+.node_stat_box {
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+.node_stat_number {
+	font-size: 14px;
+	text-align: center;
+	font-weight: 500;
+}
+.node_stat_unit {
+	font-size: 7px;
+	text-align: center;
+	font-weight: normal;	
+}
+.node_stat_subtitle {
+	font-size: 9px;
+	text-align: center;
+	font-weight: 200;	
+	line-height: 10px;
+}
+
+.index_actions {
+	padding-top: 15px;
+	color: #000000;
+}
+
+
+
+.table-nonfluid {
+   width: auto;
+}
+
+body {
+	padding-top: 60px;
+}
+
+.custom-tab-content {
+	margin-top: 20px;
+}
+
+.stat_number {
+	font-size: 30px;
+	text-align: center;
+	font-weight: bold;
+}
+.stat_subtitle {
+	font-size: 20px;
+	text-align: center;
+	font-weight: 200;	
+}
+
+.node-cell {
+    max-width: 250px;
+    min-width: 250px;
+	max-height: 40px !important;
+	vertical-align: top !important;
+	white-space: nowrap;
+}
+
+.entity_settings {
+	font-size: 18px;
+}
+
+.node-badges {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.node-info {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 5px;
+}
+
+.node-detail {
+	font-size: 9px;
+	font-color: #303030 !important;
+	font-weight: normal !important;
+	padding-right: 0px;
+	text-align: left;
+}
+.entity_action {
+	font-size: 12px;
+}
+a.entity_action {
+	color: #b9b9b9;
+	text-decoration: none;
+}
+
+a.entity_action:link {
+	text-decoration:none;
+	color: #b9b9b9;
+}
+a.entity_action:visited {
+	text-decoration:none;
+	color: #b9b9b9;
+}
+a.entity_action:hover {
+	text-decoration:none;
+	color: #000000;
+}
+a.entity_action:active {
+	text-decoration:none;
+	color: #b9b9b9;
+}
+
+.double_digit_shard_image {
+	margin: 2px;
+	padding: 4px;
+	border: #707070 1px solid;
+	border-radius: 4px 4px 4px;
+	/*background-color: #96C596;*/
+}
+.single_digit_shard_image {
+	margin: 2px;
+	padding-left: 7px;
+	padding-right: 7px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border: #707070 1px solid;
+	border-radius: 4px 4px 4px;
+	/*background-color: #96C596;*/
+}
+
+.primary_shard {
+	border: #303030 1px solid;
+	/*background-color: #5cb85c;*/
+}
+
+
+/* Custom tooltip*/
+.tooltip {
+  font-size: 13px;
+} 
+.tooltip-inner {
+    background: #c0c0c0;
+    color: white;
+}

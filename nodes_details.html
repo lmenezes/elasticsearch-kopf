@@ -1,0 +1,76 @@
+<div class="row">
+<div class="col-lg-12">
+<form>
+	<fieldset>
+		<div class="form-group">
+			<label for="exampleInputEmail">Displaying {{visibleIndices().length}} out of {{cluster.indices.length}}</label>
+			<input type="text" ng-model="nodes_query" class="form-control" id="exampleInputEmail" placeholder="Search for indices">
+		</div>
+	</fieldset>
+</form>
+</div>
+</div>
+<div class="row">
+  <div class="col-lg-3 node_stats" ng-repeat="node in cluster.nodes | filter:{node.name:nodes_query}">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="thumbnail">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="col-lg-10">
+							<div><strong>{{node.name}}</strong></div>
+							<div class="node_detail">{{node.stats.hostname}}</div>
+							<div class="node_detail">{{node.transport_address}}</div>
+						</div>
+						<div class="col-lg-2">
+							<div ng-switch on="node.client">
+								<div ng-switch-when="true">
+									<div><span class="glyphicon glyphicon-search"></span></div>
+								</div>
+							    <div ng-switch-default>
+									<div><span class="{{masterBadge(node.current_master,node.master)}}"></span></div>
+									<div><span class="{{dataBadge(node.data)}}"></span></div>			        
+							    </div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row node_stats">
+					<div class="col-lg-12">
+							<div class="col-lg-4 node_stat_box">
+									<div class="node_stat_number">{{node.stats.jvm.mem.heap_used}}</div>
+									<div class="node_stat_subtitle">used heap</div>
+							</div>
+							<div class="col-lg-4 node_stat_box">
+									<div class="node_stat_number">{{node.stats.jvm.threads.count}}</div>
+									<div class="node_stat_subtitle">threads</div>
+							</div>
+							<div class="col-lg-4 node_stat_box">
+									<div class="node_stat_number">{{node.stats.os.mem.free}}</div>
+									<div class="node_stat_subtitle">free memory</div>
+							</div>
+					</div>
+					
+				</div>
+				<div class="row  node_stats">
+					<div class="col-lg-12">
+							<div class="col-lg-4 node_stat_box">
+									<div class="node_stat_number">{{node.stats.process.open_file_descriptors}}</div>
+									<div class="node_stat_subtitle">open file des.</div>
+							</div>
+							<div class="col-lg-4 node_stat_box">
+									<div class="node_stat_number">{{node.stats.os.load_average[0].toFixed(2)}}</div>
+									<div class="node_stat_subtitle">load avgerage</div>
+							</div>
+							<div class="col-lg-4 node_stat_box">
+									<div class="node_stat_number">{{node.stats.fs.data[0].available}}</div>
+									<div class="node_stat_subtitle">available</div>
+							</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+  </div>
+</div>

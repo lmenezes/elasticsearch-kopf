@@ -1,0 +1,91 @@
+<tr>
+	<th class="header-actions">
+		<div class="row">
+			<div class="col-lg-3 header-actions">
+				<a data-toggle="modal" href="#create_index" class="header-action" data-backdrop="static" data-keyboard="false">
+					<i class="icon-file-alt" ng-click='openModal()'></i>
+				</a>
+				<div class="cluster-action-legend">create</div>
+				<div class="cluster-action-legend">index</div>
+			</div>
+			<div class="col-lg-3 header-actions">
+				<a data-toggle="modal" href="#" class="header-action" data-backdrop="static" data-keyboard="false" ng-switch on="cluster.disableAllocation">
+					<i class="icon-check" ng-switch-when="true" ng-click="flipDisableAllocation(true)"></i>
+					<i class="icon-check-empty" ng-switch-when="false" ng-click="flipDisableAllocation(false)"></i>
+				</a>
+				<div class="cluster-action-legend">disable</div>
+				<div class="cluster-action-legend">allocation</div>
+			</div>
+			<div class="col-lg-3 header-actions">
+				<div ng-switch on="pagination.hasPreviousPage()">
+					<i class="icon-double-angle-left header-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+					<i class="icon-double-angle-left header-actions-inactive header-action" ng-switch-when="false"></i>
+				</div>
+				<div class="cluster-action-legend">previous</div>
+			</div>
+			<div class="col-lg-3 header-actions">
+				<div ng-switch on="pagination.hasNextPage()">
+					<i class="icon-double-angle-right header-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+					<i class="icon-double-angle-right header-actions-inactive header-action" ng-switch-when="false"></i>
+				</div>
+				<div class="cluster-action-legend">next</div>
+			</div>
+			<div ng-include src="'./create_index.html'"></div>
+		</div>
+	</th>
+	<th class="header-index-cell" ng-repeat="index in pagination.getPage()">
+		<div class="row header-index-name">
+			<div class="col-lg-12 hide-overflow">
+				<strong>{{index.name}}</strong>
+			</div>
+		</div>
+		<!-- Index metadata -->
+		<div class="row hide-overflow" ng-repeat="alias in index.aliases">
+			<div class="col-lg-12 header-index-alias"><i class="icon-tag"></i> {{alias}}</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 header-index-details">shards: {{index.num_of_shards}} + {{index.num_of_replicas.toInt() + 1}} | docs: {{index.num_docs}} | size: {{readablizeBytes(index.size)}}</div>
+		</div>
+		
+		<!-- Index actions -->
+		<div class="row header-index-actions">
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_state_change_{{index.name}}" class="header-index-action" data-backdrop="static" data-keyboard="false">
+					<span ng-click='openModal()' class="glyphicon glyphicon-folder-{{index.state}}"></span>
+				</a>
+				<div ng-include src="'./modals/confirm_state_change.html'"></div>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_optimize_{{index.name}}" class="header-index-action" title="Optimize index" data-backdrop="static" data-keyboard="false">
+					<span ng-click='openModal()' class="glyphicon glyphicon-wrench"></span>
+				</a>
+				<div ng-include src="'./modals/confirm_optimize.html'"></div>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_refresh_{{index.name}}" class="header-index-action" title="Refresh index" data-backdrop="static" data-keyboard="false">
+					<span class="glyphicon glyphicon-refresh" ng-click='openModal()'></span>
+				</a>
+				<div ng-include src="'./modals/confirm_refresh.html'"></div>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_clear_cache_{{index.name}}" class="header-index-action" title="Clear index cache" data-backdrop="static" data-keyboard="false">
+					<i class="icon-circle-blank" ng-click='openModal()'></i>
+				</a>
+				<div ng-include src="'./modals/confirm_clear_cache.html'"></div>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" ng-click='openModal()' href="#index_settings_{{index.name}}" class="header-index-action" title="Edit index settings" data-backdrop="static" data-keyboard="false">
+					<i class="icon-cogs"></i>
+				</a>
+				<div ng-include src="'./modals/index_settings.html'"></div>
+			</div>		
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_delete_{{index.name}}" class="header-index-action" title="Delete index" data-backdrop="static" data-keyboard="false">
+					<i class="glyphicon glyphicon-trash" ng-click='openModal()'></i>
+				</a>
+				<div ng-include src="'./modals/confirm_delete.html'"></div>
+			</div>	
+		</div>
+        </div>
+	</th>
+</tr>

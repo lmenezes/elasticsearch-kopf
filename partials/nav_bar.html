@@ -1,0 +1,37 @@
+<div class="navbar navbar-fixed-top cluster_status_{{cluster.status}}" ng-controller="NavbarController">
+	<div class="container">
+		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span></button>
+		<ul class="nav navbar-nav">
+			<li class="dropdown">
+				<a href="#" class="navbar-brand cluster_status_{{cluster.status}} dropdown-toggle" data-toggle="dropdown">kopf <i class="icon-caret-down"></i></a>
+				<ul class="dropdown-menu form-horizontal app-settings">
+					<li class="active refresh-selector">
+						<label class="col-lg-6 control-label">refresh rate: </label>
+						<div class="col-lg-6">
+							<select ng-model="new_refresh" class="form-control" ng-change="changeRefresh()">
+								<option value="1000">1sec</option>
+								<option value="3000">3secs</option>
+								<option value="5000">5secs</option>
+								<option value="10000">10secs</option>
+								<option value="60000">1min</option>
+							</select>
+						</div>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav">
+			<li class="active"><a href="#cluste" data-toggle="tab" class="cluster_status_{{cluster.status}}_nav"><i class="icon-sitemap"></i> {{cluster.name}}</a></li>
+		</ul>
+		<ul class="nav navbar-nav pull-right">
+			<li class="host-input">
+				<div class="input-group">
+					<input type="text" class="form-control" ng-model="new_host" placeholder="connect to a different host">
+					<span class="input-group-btn">
+						<button class="btn host-input-action cluster_status_{{cluster.status}}_nav" type="button" ng-click="connectToHost()"><i class="icon-magic" title="connect"></i></button>
+					</span>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>
