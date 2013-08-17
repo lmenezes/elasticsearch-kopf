@@ -59,29 +59,35 @@ html,body {
 	line-height: 20px;
 	margin-left: 5px;
 	margin-bottom: 5px;
+	opacity: 0.5;
+}
+.shard-primary {
+	opacity: 1;
 }
 .shard-started {
-	background: green;
+	background: #6A995C;
 	color: #FFFFFF;
 }
 .shard-initializing {
-	background: blue;
+	background: #E7E5AE;
+	color: #909090;
 }
 .shard-relocated {
-	background: yellow;
+	background: #E7E5AE;
+	color: #909090;
 }
 .shard-recovering {
-	background: red;
+	background: #E7E5AE;
+	color: #909090;
 }
 .shard-closed {
-	background: gray;
-	color: #000000;
+	background: #ECECEB;
+	color: #6B6969;
 }
 .shard-unallocated {
-	background: gray;
-	color: #000000;
+	background: #ECECEB;
+	color: #6B6969;
 }
-
 
 /** CLUSTER ACTIONS **/
 .cluster-action-legend {
