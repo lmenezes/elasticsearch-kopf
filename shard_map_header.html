@@ -1,36 +1,24 @@
 <tr>
 	<th class="header-actions">
 		<div class="row">
-			<div class="col-lg-3 header-actions">
+			<div class="col-lg-4 header-actions">
 				<a data-toggle="modal" href="#create_index" class="header-action" data-backdrop="static" data-keyboard="false">
 					<i class="icon-file-alt" ng-click='openModal()'></i>
 				</a>
-				<div class="cluster-action-legend">create</div>
-				<div class="cluster-action-legend">index</div>
 			</div>
-			<div class="col-lg-3 header-actions">
-				<a data-toggle="modal" href="#" class="header-action" data-backdrop="static" data-keyboard="false" ng-switch on="cluster.disableAllocation">
-					<i class="icon-check" ng-switch-when="true" ng-click="flipDisableAllocation(true)"></i>
-					<i class="icon-check-empty" ng-switch-when="false" ng-click="flipDisableAllocation(false)"></i>
+			<div class="col-lg-4 header-actions">
+				<a ng-switch on="cluster.disableAllocation" class="header-action">
+					<i class="icon-lock" ng-switch-when="true" ng-click="flipDisableAllocation(true)"></i>
+					<i class="icon-unlock-alt" ng-switch-when="false" ng-click="flipDisableAllocation(false)"></i>
 				</a>
-				<div class="cluster-action-legend">disable</div>
-				<div class="cluster-action-legend">allocation</div>
 			</div>
-			<div class="col-lg-3 header-actions">
-				<div ng-switch on="pagination.hasPreviousPage()">
-					<i class="icon-double-angle-left header-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
-					<i class="icon-double-angle-left header-actions-inactive header-action" ng-switch-when="false"></i>
-				</div>
-				<div class="cluster-action-legend">previous</div>
-			</div>
-			<div class="col-lg-3 header-actions">
-				<div ng-switch on="pagination.hasNextPage()">
-					<i class="icon-double-angle-right header-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
-					<i class="icon-double-angle-right header-actions-inactive header-action" ng-switch-when="false"></i>
-				</div>
-				<div class="cluster-action-legend">next</div>
+			<div class="col-lg-4 header-actions">
+				<a data-toggle="modal" href="#cluster_settings" class="header-action" data-backdrop="static" data-keyboard="false">
+					<i class="icon-cogs header-action"></i>
+				</a>
 			</div>
 			<div ng-include src="'./create_index.html'"></div>
+			<div ng-include src="'./modals/cluster_settings.html'"></div>
 		</div>
 	</th>
 	<th class="header-index-cell" ng-repeat="index in pagination.getPage()">

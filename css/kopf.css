@@ -91,7 +91,7 @@ html,body {
 
 /** CLUSTER ACTIONS **/
 .cluster-action-legend {
-	font-size: 10px;
+	font-size: 9px;
 	line-height: 10px;
 	font-weight: 400;
 	text-align: center;
@@ -197,7 +197,7 @@ a.header-action:hover {
 	text-decoration: none;
 }
 
-.header-actions-inactive {
+.inactive-action {
 	color: #f0f0f0;
 }
 
@@ -208,6 +208,7 @@ a.header-action:hover {
     min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
+	background: #f9f9f9;
 }
 .header-index-name {
 	vertical-align: top !important;
@@ -326,6 +327,7 @@ body {
 	max-height: 40px !important;
 	vertical-align: top !important;
 	white-space: nowrap;
+	background: #f9f9f9;
 }
 
 .entity_settings {
