@@ -14,7 +14,7 @@
 			</div>
 			<div class="col-lg-4 header-actions">
 				<a data-toggle="modal" href="#cluster_settings" class="header-action" data-backdrop="static" data-keyboard="false">
-					<i class="icon-cogs header-action"></i>
+					<i class="icon-cogs header-action" ng-click='openModal()'></i>
 				</a>
 			</div>
 			<div ng-include src="'./create_index.html'"></div>
@@ -24,7 +24,7 @@
 	<th class="header-index-cell" ng-repeat="index in pagination.getPage()">
 		<div class="row header-index-name">
 			<div class="col-lg-12 hide-overflow">
-				<strong>{{index.name}}</strong>
+				<strong ng-click="displayInfo(index.name,index.metadata)">{{index.name}}</strong>
 			</div>
 		</div>
 		<!-- Index metadata -->

@@ -2,121 +2,107 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Update settings for [{{index.name}}]</h4>
+				<button type="button" class="close" data-dismiss="modal" ng-click='closeModal()' aria-hidden="true">&times;</button>
+				<h3 class="modal-title">update settings for [{{index.name}}]</h3>
       		</div>
-			<form ng-controller="IndexSettingsCtrl" class="form-horizontal" role="form">
+			<form ng-controller="IndexSettingsCtrl" class="form" role="form">
 				<div class="modal-body">
 					<div ng-include src="'partials/modal_alerts.html'"></div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">number_of_replicas</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.number_of_replicas']" placeholder="">
+					<div class="row">
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label class="control-label">number_of_replicas</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.number_of_replicas']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">auto_expand_replicas</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.auto_expand_replicas']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">blocks.read_only</label>
+								<select ng-model="index.settings['index.blocks.read_only']" disabled="true" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">blocks.read</label>
+								<select ng-model="index.settings['index.blocks.read']" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">blocks.write</label>
+								<select ng-model="index.settings['index.blocks.write']" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="ccontrol-label">blocks.metadata</label>
+								<select ng-model="index.settings['index.blocks.metadata']" disabled="true" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">refresh_interval</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.refresh_interval']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">term_index_interval</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.term_index_interval']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">term_index_divisor</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.term_index_divisor']" placeholder="">
+							</div>
 						</div>
-						<label class="col-lg-4 control-label">auto_expand_replicas</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.auto_expand_replicas']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">blocks.read_only</label>
-						<div class="col-lg-2">
-							<select ng-model="index.settings['index.blocks.read_only']" disabled="true" class="form-control">
-								<option value="true">true</option>
-								<option value="false">false</option>
-							</select>
-						</div>
-						<label class="col-lg-4 control-label">blocks.read</label>
-						<div class="col-lg-2">
-							<select ng-model="index.settings['index.blocks.read']" class="form-control">
-								<option value="true">true</option>
-								<option value="false">false</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">blocks.write</label>
-						<div class="col-lg-2">
-							<select ng-model="index.settings['index.blocks.write']" class="form-control">
-								<option value="true">true</option>
-								<option value="false">false</option>
-							</select>
-						</div>
-						<label class="col-lg-4 control-label">blocks.metadata</label>
-						<div class="col-lg-2">
-							<select ng-model="index.settings['index.blocks.metadata']" disabled="true" class="form-control">
-								<option value="true">true</option>
-								<option value="false">false</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">refresh_interval</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.refresh_interval']" placeholder="">
-						</div>
-						<label class="col-lg-4 control-label">term_index_interval</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.term_index_interval']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">term_index_divisor</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.term_index_divisor']" placeholder="">
-						</div>
-						<label class="col-lg-4 control-label">translog.flush_threshold_ops</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_ops']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">translog.flush_threshold_size</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_size']" placeholder="">
-						</div>
-						<label class="col-lg-4 control-label">translog.flush_threshold_period</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_period']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">translog.disable_flush</label>
-						<div class="col-lg-2">
-							<select ng-model="index.settings['index.translog.disable_flush']" class="form-control">
-								<option value="true">true</option>
-								<option value="false">false</option>
-							</select>
-						</div>
-						<label class="col-lg-4 control-label">cache.filter.max_size</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.cache.filter.max_size']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-10 control-label">routing.allocation.total_shards_per_node</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.routing.allocation.total_shards_per_node']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">cache.filter.expire</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.cache.filter.expire']" placeholder="">
-						</div>
-
-						<label class="col-lg-4 control-label">recovery.initial_shards</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.recovery.initial_shards']" placeholder="">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-4 control-label">gc_deletes</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.gc_deletes']" placeholder="">
-						</div>
-						<label class="col-lg-4 control-label">ttl.disable_purge</label>
-						<div class="col-lg-2">
-							<input type="text" class="form-control" ng-model="index.settings['index.ttl.disable_purge']" placeholder="">
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label class="control-label">translog.disable_flush</label>
+								<select ng-model="index.settings['index.translog.disable_flush']" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">cache.filter.max_size</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.cache.filter.max_size']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">routing.allocation.total_shards_per_node</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.routing.allocation.total_shards_per_node']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">cache.filter.expire</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.cache.filter.expire']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">recovery.initial_shards</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.recovery.initial_shards']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">gc_deletes</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.gc_deletes']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">ttl.disable_purge</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.ttl.disable_purge']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">translog.flush_threshold_ops</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_ops']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">translog.flush_threshold_size</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_size']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">translog.flush_threshold_period</label>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_period']" placeholder="">
+							</div>
 						</div>
 					</div>
 				</div>

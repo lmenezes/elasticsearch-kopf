@@ -30,36 +30,38 @@
 								<div class="form-group">
 									<input type="text" ng-model="pagination.query" class="form-control" placeholder="search by index name">
 								</div>
-								<div class="form-group">
-									<div class="checkbox-inline">
-								      <label>
-								        <input type="checkbox" ng-model="pagination.data"><i class="icon-hdd"></i> data nodes
-								      </label>
-								    </div>
-									<div class="checkbox-inline">
-								      <label>
-								        <input type="checkbox" ng-model="pagination.master"><i class="icon-star-empty"></i> master nodes
-								      </label>
-								    </div>
-									<div class="checkbox-inline">
-								      <label>
-								        <input type="checkbox" ng-model="pagination.client"><i class="icon-search"></i> client nodes
-								      </label>
-								    </div>
+								<div class="row">
+									<div class="col-lg-6 form-group">
+										<div class="checkbox-inline">
+									      <label>
+									        <input type="checkbox" ng-model="pagination.data"><i class="icon-hdd"></i> data nodes
+									      </label>
+									    </div>
+										<div class="checkbox-inline">
+									      <label>
+									        <input type="checkbox" ng-model="pagination.master"><i class="icon-star-empty"></i> master nodes
+									      </label>
+									    </div>
+										<div class="checkbox-inline">
+									      <label>
+									        <input type="checkbox" ng-model="pagination.client"><i class="icon-search"></i> client nodes
+									      </label>
+									    </div>
+									</div>
+									<div class="col-lg-6" style="text-align: right;">
+										<span ng-switch on="pagination.hasPreviousPage()">
+											<i class="icon-double-angle-left" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+											<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+										</span>
+										{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
+										<span ng-switch on="pagination.hasNextPage()">
+											<i class="icon-double-angle-right" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+											<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+										</span>
+									</div>
 								</div>
 							</fieldset>
 						</form>
-						<div style="text-align: right;">
-	<span ng-switch on="pagination.hasPreviousPage()">
-		<i class="icon-double-angle-left" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
-		<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
-	</span>
-	{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
-	<span ng-switch on="pagination.hasNextPage()">
-		<i class="icon-double-angle-right" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
-		<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
-	</span>
-</div>
 						<table class="table table-bordered table-condensed table-nonfluid table-rounded">
 							<thead ng-include src="'shard_map_header.html'"></thead>
 							<tbody ng-include src="'shard_map_body.html'"></tbody>

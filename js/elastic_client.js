@@ -52,6 +52,10 @@ function updateIndexSettings(host, name, settings) {
 	return syncRequest('PUT', host + "/" + name + "/_settings", settings);	
 }
 
+function updateClusterSettings(host, settings) {
+	return syncRequest('PUT', host + "/_cluster/settings", settings);	
+}
+
 // Cluster Object. Contains all the information about the cluster
 function Cluster(state,status,nodes,health,settings) {
 	// cluster health
@@ -71,6 +75,7 @@ function Cluster(state,status,nodes,health,settings) {
 	if (typeof settings['transient'] != undefined && typeof settings['transient']['cluster.routing.allocation.disable_allocation'] != undefined) {
 		this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] === "true" ? "true" : "false";
 	}
+	this.settings = $.extend({}, settings['persistent'], settings['transient']);
 	this.name = state['cluster_name'];
 	this.master_node = state['master_node'];
 	this.nodes = Object.keys(state['nodes']).map(function(x) { 
@@ -112,6 +117,9 @@ function Cluster(state,status,nodes,health,settings) {
 function Node(node_id, node_info, node_stats) {
 	this.id = node_id;	
 	this.name = node_info['name'];
+	this.metadata = {};
+	this.metadata['info'] = node_info;
+	this.metadata['stats'] = node_stats;
 	this.transport_address = node_info['transport_address'];
 	var master = node_info['attributes']['master'] === 'false' ? false : true;
 	var data = node_info['attributes']['data'] === 'false' ? false : true;
@@ -121,7 +129,6 @@ function Node(node_id, node_info, node_stats) {
 	this.client = client || !master && !data;
 	this.current_master = false;
 	this.stats = node_stats;
-	console.log(node_stats);
 	this.setCurrentMaster=function() {
 		this.current_master = true;
 	}
@@ -132,9 +139,12 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	var index_shards = {};
 	this.shards = index_shards;
 	this.state = index_metadata['state'];
+	this.metadata = {};
 	this.aliases = index_metadata['aliases'];
 	this.settings = index_metadata['settings'];
-	this.mappings = JSON.stringify(index_metadata['mappings'], undefined, "\t");
+	this.mappings = index_metadata['mappings'];
+	this.metadata['settings'] = this.settings;
+	this.metadata['mappings'] = this.mappings;
 	this.num_of_shards = index_metadata['settings']['index.number_of_shards'];
 	this.num_of_replicas = index_metadata['settings']['index.number_of_replicas'];
 	this.state_class = index_metadata['state'] === "open" ? "success" : "active";
@@ -151,6 +161,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 				index_shards[shard_info.routing.node].push(new Shard(shard_info));
 			});
 		});
+		this.metadata['stats'] = index_status
 	}
 	// adds unassigned shards information
 	if (index_info) {

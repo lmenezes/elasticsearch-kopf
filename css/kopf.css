@@ -1,5 +1,34 @@
+.settings-section-header {
+	top: 15px;
+	left: 15px;
+	font-size: 11px;
+	font-weight: 500;
+	color: #bbb;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	padding-bottom: 15px;
+}
+.settings-section {
+	border-bottom: 1px solid #c0c0c0;
+}
+.popover {
+	z-index: 1050;
+}
+.setting-info {
+	padding-left: 5px;
+}
+
+a.setting-info:hover {
+	text-decoration: none;
+}
+
 html,body {
   height: 100%;
+}
+
+.response-pre {
+	font-size: 9px;
+	border: 0px;
 }
 
 #page-wrap {
@@ -59,7 +88,7 @@ html,body {
 	line-height: 20px;
 	margin-left: 5px;
 	margin-bottom: 5px;
-	opacity: 0.5;
+	opacity: 0.6;
 }
 .shard-primary {
 	opacity: 1;
@@ -113,7 +142,7 @@ html,body {
 	white-space: nowrap;
 }
 .modal-title {
-	font-size: 14px;
+
 }
 .modal-body {
 	font-size: 12px;
@@ -127,13 +156,16 @@ html,body {
 	padding: 12px;
 }
 .custom-modal {
-	padding-top: 200px;
+	padding-top: 20px;
+	text-align: left;
 }
 
 /** Alert block **/
 .alert-block {
 	font-size: 12px;
 	font-weight: 300;
+	padding-top: 0px;
+	padding-bottom: 0px;
 }
 
 /** Create index modal **/
@@ -143,7 +175,11 @@ html,body {
 
 /** Logo style **/
 .logo {
-	font-size: 20px;
+	font-size: 30px;
+	line-height: 30px !important;
+	padding: 0px !important;
+	padding-top: 8px !important;
+	font-weight: 100;
 }
 
 /** Top Bar Colors with Status Info **/
@@ -180,8 +216,8 @@ html,body {
 /** Cluster Overview **/
 .header-actions {
 	font-size: 32px;
-	text-align: center;
 	vertical-align: middle !important;
+	text-align: center;
 }
 
 .header-action {
@@ -209,6 +245,7 @@ a.header-action:hover {
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
+	border-bottom: 2px solid #a0a0a0;
 }
 .header-index-name {
 	vertical-align: top !important;
@@ -307,7 +344,7 @@ body {
 }
 
 .custom-tab-content {
-	margin-top: 20px;
+	
 }
 
 .stat_number {

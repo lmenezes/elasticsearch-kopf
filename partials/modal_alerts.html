@@ -1,16 +1,16 @@
 <div ng-switch on="modal.alert.level" class="alert-block">
 	<div ng-switch-when="success" class="alert alert-success">
 		 <button type="button" class="close" ng-click='modal.alert.clear()'>&times;</button>
-		<b>{{modal.alert.message}}.</b>
+		<b><i class="icon-ok big-icon"></i>{{modal.alert.message}}.</b>
 		<div ng-if="hasServerResponse">
-			{{modal.alert.response}}
+			<pre class="alert alert-success response-pre">{{modal.alert.response}}</pre>
 		</div>
 	</div>
 	<div ng-switch-when="error" class="alert alert-danger">
 		 <button type="button" class="close" ng-click='modal.alert.clear()'>&times;</button>
-		<b>{{modal.alert.message}}.</b>
+		<b><i class="icon-warning-sign"></i>{{modal.alert.message}}.</b>
 		<div ng-if="hasServerResponse()">
-			{{modal.alert.response}}
+			<pre class="alert alert-danger response-pre">{{modal.alert.response}}</pre>
 		</div>
 	</div>
 </div>

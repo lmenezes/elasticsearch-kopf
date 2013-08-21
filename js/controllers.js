@@ -68,6 +68,15 @@ function IndexSettingsCtrl($scope, $location, $timeout) {
 	}
 }
 
+function ClusterSettingsCtrl($scope, $location, $timeout) {
+	$scope.saveClusterSettings=function() {
+		var new_settings = {};
+		new_settings['transient'] = $scope.cluster.settings;
+		var response = updateClusterSettings($scope.host, JSON.stringify(new_settings, undefined, ""));
+		$scope.modal.alert = new Alert(response.success, "Cluster settings were successfully updated","Error while updating cluster settings",response.response);
+	};
+}
+
 function NavbarController($scope, $location, $timeout) {
 	
 	$scope.new_refresh = $scope.getRefresh();
