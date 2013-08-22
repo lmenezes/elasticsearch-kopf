@@ -8,18 +8,134 @@
 			<form ng-controller="IndexSettingsCtrl" class="form" role="form">
 				<div class="modal-body">
 					<div ng-include src="'partials/modal_alerts.html'"></div>
+					<div class="settings-section-header"></div>
 					<div class="row">
 						<div class="col-lg-6">
 							<div class="form-group">
 								<label class="control-label">number_of_replicas</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<input type="text" class="form-control" ng-model="index.settings['index.number_of_replicas']" placeholder="">
 							</div>
 							<div class="form-group">
+								<label class="control-label">routing.allocation.total_shards_per_node</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.routing.allocation.total_shards_per_node']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">term_index_interval</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.term_index_interval']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">index_concurrency</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.index_concurrency']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">ttl.disable_purge</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<select ng-model="index.settings['index.ttl.disable_purge']" disabled="true" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">translog.fs.type</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.fs.type']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">warmer.enabled</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.warmer.enabled']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">fail_on_merge_failure</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.fail_on_merge_failure']" placeholder="">
+							</div>
+							
+
+						</div>
+						<div class="col-lg-6">
+							<div class="form-group">
 								<label class="control-label">auto_expand_replicas</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<input type="text" class="form-control" ng-model="index.settings['index.auto_expand_replicas']" placeholder="">
 							</div>
 							<div class="form-group">
+								<label class="control-label">refresh_interval</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.refresh_interval']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">term_index_divisor</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.term_index_divisor']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">codec</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.codec']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">recovery.initial_shards</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.recovery.initial_shards']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">compound_format</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.compound_format']" placeholder="">
+							</div>
+							<div class="form-group">
+								<label class="control-label">gc_deletes</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.gc_deletes']" placeholder="">
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div class="settings-section-header">index.blocks</div>
+					<div class="row">
+						<div class="col-lg-6">
+							<div class="form-group">
 								<label class="control-label">blocks.read_only</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<select ng-model="index.settings['index.blocks.read_only']" disabled="true" class="form-control">
 									<option value="true">true</option>
 									<option value="false">false</option>
@@ -27,13 +143,21 @@
 							</div>
 							<div class="form-group">
 								<label class="control-label">blocks.read</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<select ng-model="index.settings['index.blocks.read']" class="form-control">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
 							</div>
+						</div>
+						<div class="col-lg-6">
 							<div class="form-group">
 								<label class="control-label">blocks.write</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<select ng-model="index.settings['index.blocks.write']" class="form-control">
 									<option value="true">true</option>
 									<option value="false">false</option>
@@ -41,67 +165,123 @@
 							</div>
 							<div class="form-group">
 								<label class="ccontrol-label">blocks.metadata</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<select ng-model="index.settings['index.blocks.metadata']" disabled="true" class="form-control">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
 							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div class="settings-section-header">index.translog</div>
+					<div class="row">
+						<div class="col-lg-6">
 							<div class="form-group">
-								<label class="control-label">refresh_interval</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.refresh_interval']" placeholder="">
+								<label class="control-label">translog.flush_threshold_ops</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_ops']" placeholder="">
 							</div>
 							<div class="form-group">
-								<label class="control-label">term_index_interval</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.term_index_interval']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">term_index_divisor</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.term_index_divisor']" placeholder="">
+								<label class="control-label">translog.flush_threshold_size</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_size']" placeholder="">
 							</div>
 						</div>
 						<div class="col-lg-6">
 							<div class="form-group">
+								<label class="control-label">translog.flush_threshold_period</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_period']" placeholder="">
+							</div>
+							<div class="form-group">
 								<label class="control-label">translog.disable_flush</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<select ng-model="index.settings['index.translog.disable_flush']" class="form-control">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
 							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div class="settings-section-header">index.routing.allocation</div>
+					<div class="row">
+						<div class="col-lg-6">
 							<div class="form-group">
-								<label class="control-label">cache.filter.max_size</label>
+								<label class="control-label">disable_allocation</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<select ng-model="index.settings['index.routing.allocation.disable_allocation']" disabled="true" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">disable_new_allocation</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<select ng-model="index.settings['index.routing.allocation.disable_new_allocation']" disabled="true" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label class="control-label">disable_replica_allocation</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<select ng-model="index.settings['index.routing.allocation.disable_replica_allocation']" disabled="true" class="form-control">
+									<option value="true">true</option>
+									<option value="false">false</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="control-label">node_initial_primaries_recoveries</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="node_initial_primaries_recoveries" title="">
+									<i class="icon-info-sign"></i>
+								</a>
+								<input type="text" class="form-control" ng-model="index.settings['cluster.routing.allocation.node_initial_primaries_recoveries']" placeholder="">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-body">
+					<div class="settings-section-header">index.cache</div>
+					<div class="row">
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label class="control-label">filter.max_size</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<input type="text" class="form-control" ng-model="index.settings['index.cache.filter.max_size']" placeholder="">
 							</div>
+						</div>
+						<div class="col-lg-6">
 							<div class="form-group">
-								<label class="control-label">routing.allocation.total_shards_per_node</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.routing.allocation.total_shards_per_node']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">cache.filter.expire</label>
+								<label class="control-label">filter.expire</label>
+								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+									<i class="icon-info-sign"></i>
+								</a>
 								<input type="text" class="form-control" ng-model="index.settings['index.cache.filter.expire']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">recovery.initial_shards</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.recovery.initial_shards']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">gc_deletes</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.gc_deletes']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">ttl.disable_purge</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.ttl.disable_purge']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">translog.flush_threshold_ops</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_ops']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">translog.flush_threshold_size</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_size']" placeholder="">
-							</div>
-							<div class="form-group">
-								<label class="control-label">translog.flush_threshold_period</label>
-								<input type="text" class="form-control" ng-model="index.settings['index.translog.flush_threshold_period']" placeholder="">
 							</div>
 						</div>
 					</div>
