@@ -1,19 +1,20 @@
 <tr>
-	<th class="header-actions">
+	<!-- cluster actions -->
+	<th class="cluster-map-header-cluster-actions" rowspan="2">
 		<div class="row">
-			<div class="col-lg-4 header-actions">
-				<a data-toggle="modal" href="#create_index" class="header-action" data-backdrop="static" data-keyboard="false">
+			<div class="col-lg-4">
+				<a data-toggle="modal" href="#create_index" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false">
 					<i class="icon-file-alt" ng-click='openModal()'></i>
 				</a>
 			</div>
-			<div class="col-lg-4 header-actions">
-				<a ng-switch on="cluster.disableAllocation" class="header-action">
+			<div class="col-lg-4">
+				<a ng-switch on="cluster.disableAllocation" class="cluster-map-header-cluster-action">
 					<i class="icon-lock" ng-switch-when="true" ng-click="flipDisableAllocation(true)"></i>
 					<i class="icon-unlock-alt" ng-switch-when="false" ng-click="flipDisableAllocation(false)"></i>
 				</a>
 			</div>
-			<div class="col-lg-4 header-actions">
-				<a data-toggle="modal" href="#cluster_settings" class="header-action" data-backdrop="static" data-keyboard="false">
+			<div class="col-lg-4">
+				<a data-toggle="modal" href="#cluster_settings" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false">
 					<i class="icon-cogs header-action" ng-click='openModal()'></i>
 				</a>
 			</div>
@@ -21,59 +22,73 @@
 			<div ng-include src="'./modals/cluster_settings.html'"></div>
 		</div>
 	</th>
-	<th class="header-index-cell" ng-repeat="index in pagination.getPage()">
-		<div class="row header-index-name">
-			<div class="col-lg-12 hide-overflow">
-				<strong ng-click="displayInfo(index.name,index.metadata)">{{index.name}}</strong>
+	<!-- indices -->
+	<th class="cluster-map-header-index-cell" ng-repeat="index in pagination.getPage()">
+		<!-- index name -->
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="cluster-map-header-index-name" ng-click="displayInfo(index.name,index.metadata)">{{index.name}}</div>
 			</div>
-		</div>
-		<!-- Index metadata -->
-		<div class="row hide-overflow" ng-repeat="alias in index.aliases">
-			<div class="col-lg-12 header-index-alias"><i class="icon-tag"></i> {{alias}}</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-12 header-index-details">shards: {{index.num_of_shards}} + {{index.num_of_replicas.toInt() + 1}} | docs: {{index.num_docs}} | size: {{readablizeBytes(index.size)}}</div>
-		</div>
-		
-		<!-- Index actions -->
-		<div class="row header-index-actions">
-			<div class="col-lg-2">
-				<a data-toggle="modal" href="#confirm_state_change_{{index.name}}" class="header-index-action" data-backdrop="static" data-keyboard="false">
-					<span ng-click='openModal()' class="glyphicon glyphicon-folder-{{index.state}}"></span>
-				</a>
-				<div ng-include src="'./modals/confirm_state_change.html'"></div>
-			</div>
-			<div class="col-lg-2">
-				<a data-toggle="modal" href="#confirm_optimize_{{index.name}}" class="header-index-action" title="Optimize index" data-backdrop="static" data-keyboard="false">
-					<span ng-click='openModal()' class="glyphicon glyphicon-wrench"></span>
-				</a>
-				<div ng-include src="'./modals/confirm_optimize.html'"></div>
-			</div>
-			<div class="col-lg-2">
-				<a data-toggle="modal" href="#confirm_refresh_{{index.name}}" class="header-index-action" title="Refresh index" data-backdrop="static" data-keyboard="false">
-					<span class="glyphicon glyphicon-refresh" ng-click='openModal()'></span>
-				</a>
-				<div ng-include src="'./modals/confirm_refresh.html'"></div>
-			</div>
-			<div class="col-lg-2">
-				<a data-toggle="modal" href="#confirm_clear_cache_{{index.name}}" class="header-index-action" title="Clear index cache" data-backdrop="static" data-keyboard="false">
-					<i class="icon-circle-blank" ng-click='openModal()'></i>
-				</a>
-				<div ng-include src="'./modals/confirm_clear_cache.html'"></div>
-			</div>
-			<div class="col-lg-2">
-				<a data-toggle="modal" ng-click='openModal()' href="#index_settings_{{index.name}}" class="header-index-action" title="Edit index settings" data-backdrop="static" data-keyboard="false">
-					<i class="icon-cogs"></i>
-				</a>
-				<div ng-include src="'./modals/index_settings.html'"></div>
-			</div>		
-			<div class="col-lg-2">
-				<a data-toggle="modal" href="#confirm_delete_{{index.name}}" class="header-index-action" title="Delete index" data-backdrop="static" data-keyboard="false">
-					<i class="glyphicon glyphicon-trash" ng-click='openModal()'></i>
-				</a>
-				<div ng-include src="'./modals/confirm_delete.html'"></div>
+			<div class="col-lg-12">
+				<div class="cluster-map-header-index-alias">
+					shards: {{index.num_of_shards}} + {{index.num_of_replicas.toInt() + 1}} | docs: {{index.num_docs}} | size: {{readablizeBytes(index.size)}}
+				</div>
 			</div>	
 		</div>
-        </div>
+		<!-- index info -->
+		<div class="row" ng-repeat="alias in index.aliases">
+			<div class="col-lg-12">
+				<div class="cluster-map-header-index-alias">
+					<i class="icon-tag"></i> {{alias}}
+				</div>
+			</div>
+		</div>
 	</th>
+</tr>
+<tr>
+	<td ng-repeat="index in pagination.getPage()" class="cluster-map-header-index-actions-cell">
+		<!-- index actions -->
+		<div class="row">
+			<div class="cluster-map-header-index-actions">
+				<div class="col-lg-2">
+					<a data-toggle="modal" href="#confirm_state_change_{{index.name}}" class="cluster-map-header-index-action" data-backdrop="static" data-keyboard="false">
+						<i ng-click='openModal()' class="icon-folder-{{index.state}}"></i>
+					</a>
+					<div ng-include src="'./modals/confirm_state_change.html'"></div>
+				</div>
+				<div class="col-lg-2">
+					<a data-toggle="modal" href="#confirm_optimize_{{index.name}}" class="cluster-map-header-index-action" title="Optimize index" data-backdrop="static" data-keyboard="false">
+						<i ng-click='openModal()' class="icon-wrench"></i>
+					</a>
+					<div ng-include src="'./modals/confirm_optimize.html'"></div>
+				</div>
+				<div class="col-lg-2">
+					<a data-toggle="modal" href="#confirm_refresh_{{index.name}}" class="cluster-map-header-index-action" title="Refresh index" data-backdrop="static" data-keyboard="false">
+						<i class="icon-refresh" ng-click='openModal()'></i>
+					</a>
+					<div ng-include src="'./modals/confirm_refresh.html'"></div>
+				</div>
+				<div class="col-lg-2">
+					<a data-toggle="modal" href="#confirm_clear_cache_{{index.name}}" class="cluster-map-header-index-action" title="Clear index cache" data-backdrop="static" data-keyboard="false">
+						<i class="icon-circle-blank" ng-click='openModal()'></i>
+					</a>
+					<div ng-include src="'./modals/confirm_clear_cache.html'"></div>
+				</div>
+				<div class="col-lg-2">
+					<a data-toggle="modal" ng-click='openModal()' href="#index_settings_{{index.name}}" class="cluster-map-header-index-action" title="Edit index settings" data-backdrop="static" data-keyboard="false">
+						<i class="icon-cogs"></i>
+					</a>
+					<div ng-include src="'./modals/index_settings.html'"></div>
+				</div>		
+				<div class="col-lg-2">
+					<a data-toggle="modal" href="#confirm_delete_{{index.name}}" class="cluster-map-header-index-action" title="Delete index" data-backdrop="static" data-keyboard="false">
+						<i class="icon-trash" ng-click='openModal()'></i>
+					</a>
+					<div ng-include src="'./modals/confirm_delete.html'"></div>
+				</div>	
+			</div>
+		</div>
+	</td>
 </tr>

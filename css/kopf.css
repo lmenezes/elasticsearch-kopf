@@ -1,3 +1,178 @@
+/** ############### START - global - START ############### **/
+.inactive-action {
+	color: #f0f0f0;	
+}
+/** ############### END - global - END ############### **/
+
+/** ############### START - navbar - START ############### **/
+.navbar-cluster-status-red {
+	background-color: #b94a48 !important;
+	color: #f2dede !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-red-nav {
+	background-color: #f2dede !important;
+	color: #b94a48 !important;
+}
+.navbar-cluster-status-green {
+	background-color: #468847 !important;
+	color: #dff0d8 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-green-nav {
+	background-color: #dff0d8 !important;
+	color: #468847 !important;
+}
+.navbar-cluster-status-yellow {
+	background-color: #c09853 !important;
+	color: #fcf8e3 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-yellow-nav {
+	background-color: #fcf8e3 !important;
+	color: #c09853 !important;
+}
+.navbar-logo {
+	font-size: 42px;
+	line-height: 50px !important;
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+	font-weight: 100;
+}
+.navbar-logo-action {
+	font-size: 24px;
+	font-weight: 100;
+	vertical-align: middle;
+}
+.navbar-app-settings-select {
+	height: 20px;
+	width: 65px;
+	font-size: 10px;
+}
+.navbar-app-settings {
+	color: #000000;
+	width: 250px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.navbar-host-input {
+	width: 250px;
+	padding-top: 8px;
+	vertical-align: middle;
+}
+/** ############### END - navbar - END ############### **/
+
+/** ############### START - cluster map view - START ############### **/
+.cluster-map-header-cluster-actions {
+	font-size: 32px;
+	vertical-align: middle !important;
+	text-align: center;
+	border-bottom: 0px !important;
+}
+.cluster-map-header-cluster-action {
+	color: #333333;
+	font-size: 32px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+}
+a.cluster-map-header-cluster-action {
+	color: #222222;
+	font-weight: 200;
+	text-decoration: none;
+}
+.cluster-map-header-index-cell {
+	width: 230px;
+	max-width: 230px;
+	min-width: 230px;
+	max-height: 40px !important;
+	vertical-align: top !important;
+	background: #f9f9f9;
+	border-bottom: 0px !important;
+}
+.cluster-map-header-index-name {
+	word-wrap:break-word;
+}
+.cluster-map-header-index-alias {
+	word-wrap:break-word;
+	font-size: 11px;
+	color: #666666;
+	font-weight: 300;
+}
+.cluster-map-header-index-alias {
+	word-wrap:break-word;
+	font-size: 10px;
+	color: #666666;
+	font-weight: 300;
+}
+.cluster-map-header-index-actions {
+	padding-left: 6px;
+	padding-right: 6px;
+}
+.cluster-map-header-index-action {
+	color: #333333;
+	font-size: 12px;
+	font-weight: 200;
+	cursor: pointer;
+}
+a.cluster-map-header-index-action:hover {
+	color: #333333;
+	font-size: 12px;
+	font-weight: 200;
+	text-decoration: none;
+}
+.cluster-map-node-types {
+	padding-top: 5px;
+	padding-left: 0px;
+}
+.cluster-map-node-type {
+	padding-left: 15px !important;
+}
+.cluster-map-node-cell {
+	width: 220px;
+	max-height: 40px !important;
+	vertical-align: top !important;
+	white-space: nowrap;
+	background: #f9f9f9;
+}
+.cluster-map-node-badges {
+	display: inline-block;
+	vertical-align: top;
+}
+.cluster-map-node-detail {
+	font-size: 9px;
+	font-color: #303030 !important;
+	font-weight: normal !important;
+	padding-right: 0px;
+	text-align: left;
+}
+.cluster-map-node-stat {
+	font-size: 9px;
+	font-color: #303030 !important;
+	font-weight: 500 !important;
+	padding-right: 0px;
+	text-align: left;
+}
+.cluster-map-shards {
+	padding-top: 3px;
+}
+.cluster-map-pagination {
+	padding-top: 5px;
+	font-weight: 400;
+}
+.cluster-map-header-index-actions-cell {
+	border-bottom: 0px !important;
+	border-top: 0px !important;
+	background: #f9f9f9;
+}
+.cluster-map-header-empty {
+	border-bottom: 0px !important;
+	border-top: 0px !important;
+}
+/** ############### END - cluster map view - END ############### **/
+
+
+
 .settings-section-header {
 	top: 15px;
 	left: 15px;
@@ -58,18 +233,6 @@ html,body {
   }
 }
 
-.app-settings {
-	color: #000000;
-	width: 250px;
-	padding-left: 10px;
-	padding-right: 10px;
-}
-.host-input {
-	width: 250px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	vertical-align: middle;
-}
 .modal-json {
 	font-size: 9px;
 	background: #ffffff;
@@ -173,40 +336,9 @@ html,body {
 	font-size: 9px;
 }
 
-/** Logo style **/
-.logo {
-	font-size: 30px;
-	line-height: 30px !important;
-	padding: 0px !important;
-	padding-top: 8px !important;
-	font-weight: 100;
-}
 
-/** Top Bar Colors with Status Info **/
-.cluster_status_red {
-	background-color: #b94a48 !important;
-	color: #f2dede !important;
-}
-.cluster_status_red_nav {
-		background-color: #f2dede !important;
-	color: #b94a48 !important;
-}
-.cluster_status_green {
-	background-color: #468847 !important;
-	color: #dff0d8 !important;
-}
-.cluster_status_green_nav {
-	background-color: #dff0d8 !important;
-	color: #468847 !important;
-}
-.cluster_status_yellow {
-	background-color: #c09853 !important;
-	color: #fcf8e3 !important;
-}
-.cluster_status_yellow_nav {
-	background-color: #fcf8e3 !important;
-	color: #c09853 !important;
-}
+
+
  
 /** Cluster stats box **/
 .cluster-stats-section {
@@ -231,10 +363,6 @@ a.header-action:hover {
 	color: #222222;
 	font-weight: 200;
 	text-decoration: none;
-}
-
-.inactive-action {
-	color: #f0f0f0;
 }
 
 /** HEADER FOR INDICES **/
@@ -358,23 +486,12 @@ body {
 	font-weight: 200;	
 }
 
-.node-cell {
-    max-width: 250px;
-    min-width: 250px;
-	max-height: 40px !important;
-	vertical-align: top !important;
-	white-space: nowrap;
-	background: #f9f9f9;
-}
 
 .entity_settings {
 	font-size: 18px;
 }
 
-.node-badges {
-	display: inline-block;
-	vertical-align: top;
-}
+
 
 .node-info {
 	display: inline-block;
@@ -382,13 +499,7 @@ body {
 	margin-left: 5px;
 }
 
-.node-detail {
-	font-size: 9px;
-	font-color: #303030 !important;
-	font-weight: normal !important;
-	padding-right: 0px;
-	text-align: left;
-}
+
 .entity_action {
 	font-size: 12px;
 }
