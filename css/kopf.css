@@ -1,3 +1,33 @@
+/** beautiful-json **/
+.json-content {
+	font-size: 11px;
+	font-weight: 400;
+	color: #666;
+}
+.json-property {
+	font-weight: 500;
+}
+.json-number {
+	color: #B627B6;
+}
+.json-string {
+	color: #2DB669;
+}
+.json-boolean {
+	color: #2525CC;
+}
+.json-null {
+	color: gray;
+}
+.json-object {
+	padding-left: 20px;
+}
+.json-visible {
+	height: auto;
+}
+.json-collapsed {
+	display: none;
+}
 /** ############### START - global - START ############### **/
 .inactive-action {
 	color: #f0f0f0;	
@@ -20,16 +50,17 @@ h4 {
 /** ############### END - global - END ############### **/
 
 /** ############### START - navbar - START ############### **/
-.navbar-cluster-status-red {
-	background-color: #b94a48 !important;
-	color: #f2dede !important;
+.navbar-cluster-status-green {
+	background-color: #468847 !important;
+	color: #dff0d8 !important;
 	border-bottom: 0px;
 }
-.navbar-cluster-status-red-nav {
-	background-color: #f2dede !important;
-	color: #b94a48 !important;
+.navbar-cluster-status-green > li.active > a {
+	background-color: #dff0d8 !important;
+	color: #468847 !important;
+	border-bottom: 0px;
 }
-.navbar-cluster-status-green {
+.navbar-cluster-status-green > li > a {
 	background-color: #468847 !important;
 	color: #dff0d8 !important;
 	border-bottom: 0px;
@@ -37,8 +68,19 @@ h4 {
 .navbar-cluster-status-green-nav {
 	background-color: #dff0d8 !important;
 	color: #468847 !important;
+	border-bottom: 0px;
 }
 .navbar-cluster-status-yellow {
+	background-color: #c09853 !important;
+	color: #fcf8e3 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-yellow > li.active > a {
+	background-color: #fcf8e3 !important;
+	color: #c09853 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-yellow > li > a {
 	background-color: #c09853 !important;
 	color: #fcf8e3 !important;
 	border-bottom: 0px;
@@ -46,6 +88,27 @@ h4 {
 .navbar-cluster-status-yellow-nav {
 	background-color: #fcf8e3 !important;
 	color: #c09853 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-red {
+	background-color: #b94a48 !important;
+	color: #f2dede !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-red > li.active > a {
+	background-color: #f2dede !important;
+	color: #b94a48 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-red > li > a {
+	background-color: #b94a48 !important;
+	color: #f2dede !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status-red-nav {
+	background-color: #f2dede !important;
+	color: #b94a48 !important;
+	border-bottom: 0px;
 }
 .navbar-logo {
 	font-size: 42px;
@@ -247,6 +310,18 @@ a.cluster-map-header-index-action:hover {
 }
 /** ############### END - modals - END ############### **/
 
+/** ############### START - rest client - START ############### **/
+.rest-client-body {
+	padding-top: 20px;
+}
+.rest-client-request-url {
+	width: 500px;
+}
+.rest-client-request-body {
+	font-size: 12px;
+	margin-top: 20px;
+}
+/** ############### END - rest client - END ############### **/
 
 
 

@@ -1,3 +1,81 @@
+function hideShow(id) {
+	if ($("#" + id).hasClass("json-visible")) {
+		$("#" + id).removeClass("json-visible");
+		$("#" + id).addClass("json-collapsed");
+		$("#" + id).prev().addClass("icon-expand-alt");
+		$("#" + id).prev().removeClass("icon-collapse-alt");
+
+	} else {
+		$("#" + id).addClass("json-visible");
+		$("#" + id).removeClass("json-collapsed");
+		$("#" + id).prev().removeClass("icon-expand-alt");
+		$("#" + id).prev().addClass("icon-collapse-alt");
+		
+	}
+}
+var collapseJsonId = 0;
+function beautifulJson(data) {
+	collapseJsonId = 0;
+	return beautifulJsonObject(data);
+}
+
+
+function beautifulJsonObject(data) {
+	var is_array = data instanceof Array;
+	var open_container = is_array ? '[' : '{';
+	var close_container = is_array ? ']' : '}';
+	collapseJsonId += 1;
+	var content = open_container + " <i class=\"icon-collapse-alt\" onclick=\"hideShow('collapse_json" + collapseJsonId + "')\"></i><div class=\"json-visible json-object\" id=\"collapse_json" + collapseJsonId + "\">";
+	if (data instanceof Array) {
+		data.forEach(function(x) { 
+			if (data[data.length -1] == x) {
+				content += '<div class=\"json-content\"">' + formatValue(x)+ '</div>';
+			} else {
+				content += '<div class=\"json-content\"">' + formatValue(x)+ ',</div>';	
+			}
+		});	
+	} else {
+		var properties = Object.keys(data);
+		properties.map(function(x) { 
+			if (properties[properties.length - 1] == x) { // dont add the comma
+				content += '<div class=\"json-content\""><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ '</div>';
+			} else {
+				content += '<div class=\"json-content\""><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ ',</div>';	
+			}
+		});		
+	}
+	content += "</div> " + close_container;
+	return content;
+}
+
+function formatValue(value) {
+	if (typeof value === 'boolean' || typeof value === 'number') {
+		return "<span class=\"json-" + (typeof value) + "\">"+value+"</span>";
+	} else {
+		if (typeof value === 'string') {
+			return "<span class=\"json-" + (typeof value) + "\">\""+value+"\"</span>";
+		}
+		if (value == null) {
+			return "<span class\"json-content json-null\">null</span>";
+		} else {
+			return beautifulJsonObject(value);
+		}
+	}
+}
+
+
+
+
+//Type	Result
+//Undefined	"undefined"
+//Null	"object"
+
+//Host object (provided by the JS environment)	Implementation-dependent
+//Function object (implements [[Call]] in ECMA-262 terms)	"function"
+//E4X XML object	"xml"
+//E4X XMLList object	"xml"
+//Any other object	"object"
+
 function CreateIndexCtrl($scope, $location, $timeout) {
 	$scope.mapping = '';
 	$scope.shards = '';
@@ -87,6 +165,20 @@ function NavbarController($scope, $location, $timeout) {
 	
 	$scope.changeRefresh=function() {
 		$scope.setRefresh($scope.new_refresh);
+	}
+}
+function Request() {
+	this.url = '';
+	this.method = 'GET';
+	this.body = ''
+}
+function RestCtrl($scope, $location, $timeout) {
+	$scope.request = new Request();
+	$scope.sendRequest=function() {
+		var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
+		//$scope.response = JSON.stringify(response.response, undefined, 4);
+		var content = beautifulJson(response.response);
+		$('#wasDaFuck').html(content);
 	}
 }
 

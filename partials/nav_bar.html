@@ -26,8 +26,9 @@
 				</ul>
 			</li>
 		</ul>
-		<ul class="nav navbar-nav">
-			<li class="active"><a href="#cluste" data-toggle="tab" class="navbar-cluster-status-{{cluster.status}}-nav"><i class="icon-sitemap"></i> {{cluster.name}}</a></li>
+		<ul class="nav navbar-nav navbar-cluster-status-{{cluster.status}}">
+			<li class=""><a href="#cluster" data-toggle="tab" class=""><i class="icon-sitemap"></i> {{cluster.name}}</a></li>
+			<li class="active"><a href="#rest" data-toggle="tab" class=""><i class="icon-edit"></i> rest client</a></li>
 		</ul>
 		<ul class="nav navbar-nav pull-right">
 			<li class="navbar-host-input">
