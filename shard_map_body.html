@@ -12,7 +12,9 @@
 			</div>
 			<div class="col-lg-10">
 				<div class="row">
-					<div class="col-lg-12"><strong ng-click="displayInfo(node.name + ' node stats',node.metadata)">{{node.name}}</strong></div>
+					<div class="col-lg-12">
+						<div class="cluster-map-node-name" ng-click="displayInfo(node.name + ' node stats',node.metadata)">dafdsfadfadfasdfadsfasdfadfasdfaafdfas</div>
+					</div>
 				</div>
 				<div class="row">
 					<div class="col-lg-12">
@@ -21,8 +23,10 @@
 					</div>
 				</div>
 				<div class="row">
-						<div class="col-lg-5"><span class="cluster-map-node-stat">load avg.: {{node.stats.os.load_average[0].toFixed(2)}}</span></div>
-						<div class="col-lg-7"><span class="cluster-map-node-stat">used heap: {{node.stats.jvm.mem.heap_used}}</span></div>
+						<div class="col-lg-12">
+							<span class="cluster-map-node-stat">load avg: {{node.stats.os.load_average[0].toFixed(2)}}</span>
+							<span class="cluster-map-node-stat">used heap: {{node.stats.jvm.mem.heap_used}}</span>
+						</div>
 					</div>
 				</div>
 			</div>

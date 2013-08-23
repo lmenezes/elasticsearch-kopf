@@ -121,6 +121,10 @@ a.cluster-map-header-index-action:hover {
 	font-weight: 200;
 	text-decoration: none;
 }
+.cluster-map-node-name {
+	word-wrap:break-word;
+	font-weight: 500;
+}
 .cluster-map-node-types {
 	padding-top: 5px;
 	padding-left: 0px;
@@ -130,9 +134,9 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-cell {
 	width: 220px;
+	max-width: 220px;
 	max-height: 40px !important;
 	vertical-align: top !important;
-	white-space: nowrap;
 	background: #f9f9f9;
 }
 .cluster-map-node-badges {
@@ -140,6 +144,7 @@ a.cluster-map-header-index-action:hover {
 	vertical-align: top;
 }
 .cluster-map-node-detail {
+	word-wrap: break-word;
 	font-size: 9px;
 	font-color: #303030 !important;
 	font-weight: normal !important;
