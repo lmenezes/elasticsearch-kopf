@@ -225,11 +225,27 @@ a.cluster-map-header-index-action:hover {
 /** ############### END - cluster map view - END ############### **/
 
 
+/** ############### START - modals - START ############### **/
+.modal-title {
 
+}
+.modal-body {
+	font-size: 12px;
+	font-weight: 400;
+	padding: 12px;
+	
+}
+.modal-footer {
+	padding: 10px 10px 10px;
+	margin-top: 0px;
+}
 
-
-
-
+.custom-modal {
+	padding-top: 20px;
+	text-align: left;
+	word-break: break-word;
+}
+/** ############### END - modals - END ############### **/
 
 
 
@@ -368,24 +384,7 @@ html,body {
 	overflow: hidden; 
 	white-space: nowrap;
 }
-.modal-title {
 
-}
-.modal-body {
-	font-size: 12px;
-	font-weight: 400;
-}
-.modal-footer {
-	padding: 10px 10px 10px;
-	margin-top: 0px;
-}
-.modal-body {
-	padding: 12px;
-}
-.custom-modal {
-	padding-top: 20px;
-	text-align: left;
-}
 
 /** Alert block **/
 .alert-block {

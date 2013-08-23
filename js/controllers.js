@@ -116,6 +116,7 @@ function GlobalController($scope, $location, $timeout) {
 	
 	$scope.closeModal=function(){
 		setTimeout(function() { $scope.modal.active = false; }, 300);
+		$scope.modal.alert = null; // clear alerts
 	}
 	
 	$scope.readablizeBytes=function(bytes) {
