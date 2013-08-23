@@ -17,6 +17,10 @@ function ServerResponse(success, response) {
 	this.response = response;
 }
 
+function shutdownNode(host,node_id) {
+	return syncRequest('POST',host + "/_cluster/nodes/" + node_id + "/_shutdown", {});
+}
+
 function openIndex(host,index) {
 	return syncRequest('POST', host + "/" + index + "/_open", {});
 }
@@ -92,14 +96,17 @@ function Cluster(state,status,nodes,health,settings) {
 	var count = 0;
 	var unassigned_shards = 0;
 	var total_size = 0;
+	var num_docs = 0;
 	this.indices = Object.keys(iMetadata).map(
 		function(x) { 
 			var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
 			unassigned_shards += index.unassigned.length;
 			total_size += parseInt(index.total_size);
+			num_docs += index.num_docs;
 			return index;
 		 }
 	).sort(compareIndices);
+	this.num_docs = num_docs;
 	this.unassigned_shards = unassigned_shards;
 	this.total_indices = this.indices.length;
 	this.shards = status['_shards']['total'];

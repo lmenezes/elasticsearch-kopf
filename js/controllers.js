@@ -156,6 +156,10 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 		}
 	}());
 	
+	$scope.shutdownNode=function(node_id) {
+		return shutdownNode($scope.host,node_id);
+	}
+	
 	$scope.getNodes=function() {
 		return $scope.cluster.getNodes($scope.pagination.data,$scope.pagination.master,$scope.pagination.client);
 	}
