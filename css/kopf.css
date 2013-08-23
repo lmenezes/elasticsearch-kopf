@@ -2,6 +2,18 @@
 .inactive-action {
 	color: #f0f0f0;	
 }
+h1 {
+	color: #666;
+}
+h2 {
+	color: #666;
+}
+h3 {
+	color: #666;
+}
+h4 {
+	color: #666;
+}
 /** ############### END - global - END ############### **/
 
 /** ############### START - navbar - START ############### **/
@@ -92,6 +104,7 @@ a.cluster-map-header-cluster-action {
 }
 .cluster-map-header-index-name {
 	word-wrap:break-word;
+	font-weight: 500;
 }
 .cluster-map-header-index-alias {
 	word-wrap:break-word;
@@ -174,9 +187,53 @@ a.cluster-map-header-index-action:hover {
 	border-bottom: 0px !important;
 	border-top: 0px !important;
 }
+.cluster-map-stats-section {
+	background: #f9f9f9;
+	text-align: justify;
+	padding-left: 15px;
+	padding-right: 15px;
+	border: 1px solid #dddddd;
+	border-radius: 3px 3px 3px 3px;
+	height: 50px;
+	margin-bottom: 40px;
+	margin-top: 40px;
+}
+.cluster-map-stat-block {
+	display: inline-block;
+	padding-top: 3px;
+}
+.cluster-map-stats-section:after {
+	content: "";
+	width: 100%;
+	display: inline-block;
+}
+.cluster-map-stat-number {
+	color: #666;
+	font-size: 28px;
+	text-align: center;
+	font-weight: 600;
+}
+.cluster-map-stat-description {
+	color: #666;
+	font-size: 18px;
+	text-align: center;
+	font-weight: 200;
+}
+
 /** ############### END - cluster map view - END ############### **/
 
 
+
+
+
+
+
+
+
+
+
+
+/** END OF REFACTORED AREA!!! **/
 
 .settings-section-header {
 	top: 15px;
@@ -345,10 +402,6 @@ html,body {
 
 
  
-/** Cluster stats box **/
-.cluster-stats-section {
-	background: #f9f9f9;
-}
 
 /** Cluster Overview **/
 .header-actions {
@@ -478,17 +531,6 @@ body {
 
 .custom-tab-content {
 	
-}
-
-.stat_number {
-	font-size: 30px;
-	text-align: center;
-	font-weight: bold;
-}
-.stat_subtitle {
-	font-size: 20px;
-	text-align: center;
-	font-weight: 200;	
 }
 
 

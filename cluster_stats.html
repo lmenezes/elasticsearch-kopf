@@ -1,40 +1,26 @@
-<div class="panel cluster-stats-section">
-	<div class="row">
-		<div class="col-lg-2">
-			<div class="thumbnail">
-			 	<div class="stat_number">{{cluster.number_of_nodes}}</div>
-				<div class="stat_subtitle"><small>nodes</small></div>
-			</div>
-		</div>
-		<div class="col-lg-2">
-			<div class="thumbnail">
-			 	<div class="stat_number">{{cluster.total_indices}}</div>
-				<div class="stat_subtitle"><small>indices</small></div>
-			</div>
-		</div>
-		<div class="col-lg-2">
-			<div class="thumbnail">
-		 		<div class="stat_number"><small>{{cluster.shards}}</small></div>
-				<div class="stat_subtitle"><small>total shards</small></div>
-			</div>
-		</div>
-		<div class="col-lg-2">
-			<div class="thumbnail">
-			 	<div class="stat_number">{{cluster.failed_shards}}</div>
-				<div class="stat_subtitle"><small>failed shards</small></div>
-			</div>
-		</div>
-		<div class="col-lg-2">
-			<div class="thumbnail">
-			 	<div class="stat_number">{{cluster.unassigned_shards}}</div>
-				<div class="stat_subtitle"><small>unassigned shards</small></div>
-			</div>
-		</div>
-		<div class="col-lg-2">
-			<div class="thumbnail">
-			 	<div class="stat_number">{{readablizeBytes(cluster.total_size)}}</div>
-				<div class="stat_subtitle"><small>total size</small></div>
-			</div>
-		</div>
-	</div>
+<div class="cluster-map-stats-section">
+	<span class="cluster-map-stat-block">
+	 	<span class="cluster-map-stat-number">{{cluster.number_of_nodes}}</span>
+		<span class="cluster-map-stat-description"><small>nodes</small></span>
+	</span>
+	<span class="cluster-map-stat-block">
+	 	<span class="cluster-map-stat-number">{{cluster.total_indices}}</span>
+		<span class="cluster-map-stat-description"><small>indices</small></span>
+	</span>
+	<span class="cluster-map-stat-block">
+		<span class="cluster-map-stat-number"><small>{{cluster.shards}}</small></span>
+		<span class="cluster-map-stat-description"><small>total shards</small></span>
+	</span>
+	<span class="cluster-map-stat-block">
+	 	<span class="cluster-map-stat-number">{{cluster.failed_shards}}</span>
+		<span class="cluster-map-stat-description"><small>failed shards</small></span>
+	</span>
+	<span class="cluster-map-stat-block">
+	 	<span class="cluster-map-stat-number">{{cluster.unassigned_shards}}</span>
+		<span class="cluster-map-stat-description"><small>unassigned shards</small></span>
+	</span>
+	<span class="cluster-map-stat-block">
+	 	<span class="cluster-map-stat-number">{{readablizeBytes(cluster.total_size)}}</span>
+		<span class="cluster-map-stat-description"><small>total size</small></span>
+	</span>
 </div>
