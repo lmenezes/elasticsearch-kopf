@@ -1,32 +1,44 @@
-<h2>rest client</h2>
+<div class="col-lg-12">
+<h2>rest client interface</h2>
+</div>
 <div class="rest-client-body">
-	<div class="row">
-		<div class="col-lg-12">
-			<form class="form-inline" role="form">
-				<div class="form-group">
-					<input type="url" ng-model="request.url" class="form-control rest-client-request-url" placeholder="complete url">
-				</div>
-				<div class="form-group">
-					<select ng-model="request.method" class="form-control">
-						<option value="GET" selected="selected">GET</option>
-						<option value="PUT">PUT</option>
-						<option value="POST">POST</option>
-						<option value="DELETE">DELETE</option>
-					</select>
-				</div>
-				<button type="submit" class="btn btn-default" ng-click="sendRequest()">send</button>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12">
-				<textarea class="form-control rest-client-request-body" rows="3"></textarea>
-			</div>
-		</div>
-	</form>
-</div>
-<div class="row">
 	<div class="col-lg-12">
-		<pre class="modal-json response-pre">{{response}}</pre>
+			<div class="row">
+				<form class="form-inline" role="form">
+					<div class="col-lg-6">
+						<div><select ng-model="request.method" class="form-control input-sm rest-client-request-method">
+							<option value="GET" selected="selected">GET</option>
+							<option value="PUT">PUT</option>
+							<option value="POST">POST</option>
+							<option value="DELETE">DELETE</option>
+						</select>
+						<span class="rest-client-request-url">
+							<input type="url" ng-model="request.url" class="form-control input-sm" placeholder="complete url (e.g.: http://localhost:9200/index/type/_search)"></input>
+						</span></div>
+						<div class="rest-client-body">
+							<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="sendRequest()"><i class="icon-bolt"></i> execute</button>
+							<span class="request-client-request-body-options">
+							 <select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="log()">
+					         	<option value="">load request body from template</option>
+					         </select>
+						 </span>
+						</div>
+					</div>
+					<div class="col-lg-6"></div>
+				</form>
+			</div>
+		</div>
+<div class="rest-client-body">
+		<div class="col-lg-12">
+			<div class="row">
+				<div class="col-lg-6">
+					<div><textarea class="form-control rest-client-request-body" ng-model="request.body" rows="30"></textarea></div>
+				</div>
+				<div class="col-lg-6">
+					<div id="rest-client-response" class="rest-client-response"></div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div id="wasDaFuck"></div>
-</div>
+
+

@@ -312,14 +312,36 @@ a.cluster-map-header-index-action:hover {
 
 /** ############### START - rest client - START ############### **/
 .rest-client-body {
-	padding-top: 20px;
+	padding-top: 10px;
 }
 .rest-client-request-url {
-	width: 500px;
+	overflow: hidden;
+	display: block;
+}
+.rest-client-request-method {
+	width: 90px;
+	float: right;
+	margin-left: 10px;
+}
+.rest-client-execute {
+	float: right;
+	margin-left: 10px;
+	line-height: 12px;
 }
 .rest-client-request-body {
 	font-size: 12px;
 	margin-top: 20px;
+}
+.rest-client-response {
+	border: 1px solid #cccccc;
+	border-radius: 3px 3px 3px 3px;
+	padding: 5px;
+	min-height: 524px;
+	margin-top: 20px;
+}
+.request-client-request-body-options {
+	overflow: hidden;
+	display: block;
 }
 /** ############### END - rest client - END ############### **/
 

@@ -16,7 +16,7 @@ function hideShow(id) {
 var collapseJsonId = 0;
 function beautifulJson(data) {
 	collapseJsonId = 0;
-	return beautifulJsonObject(data);
+	return '<div class=\"json-content\"">' + beautifulJsonObject(data) + '</div>';
 }
 
 
@@ -29,18 +29,18 @@ function beautifulJsonObject(data) {
 	if (data instanceof Array) {
 		data.forEach(function(x) { 
 			if (data[data.length -1] == x) {
-				content += '<div class=\"json-content\"">' + formatValue(x)+ '</div>';
+				content += '<div>' + formatValue(x)+ '</div>';
 			} else {
-				content += '<div class=\"json-content\"">' + formatValue(x)+ ',</div>';	
+				content += '<div>' + formatValue(x)+ ',</div>';	
 			}
 		});	
 	} else {
 		var properties = Object.keys(data);
 		properties.map(function(x) { 
 			if (properties[properties.length - 1] == x) { // dont add the comma
-				content += '<div class=\"json-content\""><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ '</div>';
+				content += '<div><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ '</div>';
 			} else {
-				content += '<div class=\"json-content\""><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ ',</div>';	
+				content += '<div><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ ',</div>';	
 			}
 		});		
 	}
@@ -62,19 +62,6 @@ function formatValue(value) {
 		}
 	}
 }
-
-
-
-
-//Type	Result
-//Undefined	"undefined"
-//Null	"object"
-
-//Host object (provided by the JS environment)	Implementation-dependent
-//Function object (implements [[Call]] in ECMA-262 terms)	"function"
-//E4X XML object	"xml"
-//E4X XMLList object	"xml"
-//Any other object	"object"
 
 function CreateIndexCtrl($scope, $location, $timeout) {
 	$scope.mapping = '';
@@ -176,10 +163,23 @@ function RestCtrl($scope, $location, $timeout) {
 	$scope.request = new Request();
 	$scope.sendRequest=function() {
 		var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
-		//$scope.response = JSON.stringify(response.response, undefined, 4);
-		var content = beautifulJson(response.response);
-		$('#wasDaFuck').html(content);
+		if (response.success) {
+			var content = beautifulJson(response.response);
+			$('#rest-client-response').html(content);
+			$scope.setAlert(null);
+		} else {
+			$scope.setAlert(new Alert(false, "", "Error while executing request", response.response));
+			$('#rest-client-response').html('');
+		}
 	}
+	$scope.templates = [
+		{'key':"search + filter + facets + +highlight + sort",'value':JSON.stringify(JSON.parse('{ "query" : { "term" : { "field" : "value" } }, "filter" : { "term" : { "field_name" : "value" } }, "facets" : { "facet_name" : { "terms" : { "field" : "field_name" } } }, "sort" : [ { "field_name" : {"order" : "asc"} } ], "highlight" : { "fields" : { "field_name" : {"fragment_size" : 150, "number_of_fragments" : 3} } }, "from" : 0, "size" : 10 }'), undefined, 4)},
+		{'key':"bool query",'value':JSON.stringify(JSON.parse('{"query" : { "bool" : { "must" : { "term" : { "field" : "value" } }, "must_not" : { "term" : { "field" : "value" } }, "should" : [ {"term" : { "field" : "value" }} ], "minimum_should_match" : 1, "boost" : 1.0 } } }'), undefined, 4)},
+		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
+		{'key':"ids query",'value':JSON.stringify(JSON.parse('{"query": { "ids" : { "type" : "document_type", "values" : ["1", "2","3"] } } }'), undefined, 4)},
+		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
+		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)}
+	];
 }
 
 /* Main controller, all should inherit from this */
