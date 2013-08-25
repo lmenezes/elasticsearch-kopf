@@ -329,15 +329,14 @@ a.cluster-map-header-index-action:hover {
 	line-height: 12px;
 }
 .rest-client-request-body {
-	font-size: 12px;
+	font-size: 11px;
 	margin-top: 20px;
 }
 .rest-client-response {
 	border: 1px solid #cccccc;
 	border-radius: 3px 3px 3px 3px;
 	padding: 5px;
-	min-height: 524px;
-	margin-top: 20px;
+	min-height: 614px;
 }
 .request-client-request-body-options {
 	overflow: hidden;

@@ -168,7 +168,10 @@ function RestCtrl($scope, $location, $timeout) {
 			$('#rest-client-response').html(content);
 			$scope.setAlert(null);
 		} else {
-			$scope.setAlert(new Alert(false, "", "Error while executing request", response.response));
+			var parsed = JSON.parse(response.response['responseText']);
+			console.log(parsed);
+			var alert = new Alert(false, "", "Error while executing request", parsed);
+			$scope.setAlert(alert);
 			$('#rest-client-response').html('');
 		}
 	}
@@ -244,7 +247,8 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	(function loadClusterState() {
     	$timeout(loadClusterState, $scope.getRefresh());
 		if ($scope.modal.active == false) { // only refreshes if no modal is active
-    		$scope.setCluster(getClusterState($scope.host));
+			var is_current_view = $('#cluster_option').hasClass('active');
+    		$scope.setCluster(getCluster($scope.host,is_current_view));
 			$scope.pagination.setResults($scope.cluster.indices);
 		}
 	}());
@@ -316,7 +320,7 @@ function Alert(success, success_message, error_message, response) {
 		this.message = error_message;
 	}
 	if (response != null) {
-		this.response = JSON.stringify(response, undefined, " ");
+		this.response = JSON.stringify(response, undefined, 4);
 	}
 	this.hasServerResponse=function() {
 		return this.response != null;

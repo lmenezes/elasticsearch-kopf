@@ -1,10 +1,14 @@
-function getClusterState(host) {
-	var cluster_state = syncRequest('GET',host+"/_cluster/state", {}).response;
-	var cluster_status = syncRequest('GET',host+"/_status", {}).response;
-	var nodes_stats = syncRequest('GET',host+"/_cluster/nodes/stats?all=true", {}).response;
+function getCluster(host, full_information) {
 	var cluster_health = syncRequest('GET',host+"/_cluster/health", {}).response;
-	var settings = syncRequest('GET',host+"/_cluster/settings", {}).response;
-	return new Cluster(cluster_state,cluster_status,nodes_stats,cluster_health,settings);
+	if (full_information) {
+		var cluster_state = syncRequest('GET',host+"/_cluster/state", {}).response;
+		var nodes_stats = syncRequest('GET',host+"/_cluster/nodes/stats?all=true", {}).response;
+		var cluster_status = syncRequest('GET',host+"/_status", {}).response;
+		var settings = syncRequest('GET',host+"/_cluster/settings", {}).response;
+		return new Cluster(cluster_health, cluster_state,cluster_status,nodes_stats,settings);
+	} else {
+		return new Cluster(cluster_health, null,null,null,null);
+	}
 }
 function flipDisableShardAllocation(host,current_state) {
 	var new_state = current_state == true ? "false" : "true";
@@ -61,9 +65,10 @@ function updateClusterSettings(host, settings) {
 }
 
 // Cluster Object. Contains all the information about the cluster
-function Cluster(state,status,nodes,health,settings) {
+function Cluster(health, state,status,nodes,settings) {
 	// cluster health
 	this.status = health['status'];
+	this.name = health['cluster_name'];
 	this.timed_out = health['timed_out'];
 	this.number_of_nodes = health['number_of_nodes'];
 	this.number_of_data_nodes = health['number_of_data_nodes'];
@@ -72,52 +77,53 @@ function Cluster(state,status,nodes,health,settings) {
 	this.relocating_shards = health['relocating_shards'];
 	this.initializing_shards = health['initializing_shards'];
 	this.unassigned_shards = health['unassigned_shards'];
-	this.disableAllocation = "false";
-	if (typeof settings['persistent'] != undefined && typeof settings['persistent']['disable_allocation'] != undefined) {
-		this.disableAllocation = settings['persistent']['disable_allocation'];
-	}
-	if (typeof settings['transient'] != undefined && typeof settings['transient']['cluster.routing.allocation.disable_allocation'] != undefined) {
-		this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] === "true" ? "true" : "false";
-	}
-	this.settings = $.extend({}, settings['persistent'], settings['transient']);
-	this.name = state['cluster_name'];
-	this.master_node = state['master_node'];
-	this.nodes = Object.keys(state['nodes']).map(function(x) { 
-		var node = new Node(x,state['nodes'][x],nodes['nodes'][x]);
-		if (node.id === state['master_node']) {
-			node.setCurrentMaster();
+	if (state != null && status != null && nodes != null && settings != null) {
+		this.disableAllocation = "false";
+		if (typeof settings['persistent'] != undefined && typeof settings['persistent']['disable_allocation'] != undefined) {
+			this.disableAllocation = settings['persistent']['disable_allocation'];
 		}
-		return node;
-	}).sort(compareNodes);
-
-	var iMetadata = state['metadata']['indices'];
-	var iRoutingTable = state['routing_table']['indices'];
-	var iStatus = status['indices'];
-	var count = 0;
-	var unassigned_shards = 0;
-	var total_size = 0;
-	var num_docs = 0;
-	this.indices = Object.keys(iMetadata).map(
-		function(x) { 
-			var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
-			unassigned_shards += index.unassigned.length;
-			total_size += parseInt(index.total_size);
-			num_docs += index.num_docs;
-			return index;
-		 }
-	).sort(compareIndices);
-	this.num_docs = num_docs;
-	this.unassigned_shards = unassigned_shards;
-	this.total_indices = this.indices.length;
-	this.shards = status['_shards']['total'];
-	this.failed_shards = status['_shards']['failed'];
-	this.successful_shards = status['_shards']['successful'];
-	this.total_size = total_size;
-	this.getNodes=function(data, master, client) { 
-		return $.map(this.nodes,function(n) { 
-			return (data && n.data || master && n.master || client && n.client) ? n : null;
-		});
-	};
+		if (typeof settings['transient'] != undefined && typeof settings['transient']['cluster.routing.allocation.disable_allocation'] != undefined) {
+			this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] === "true" ? "true" : "false";
+		}
+		this.settings = $.extend({}, settings['persistent'], settings['transient']);
+		this.master_node = state['master_node'];
+		this.nodes = Object.keys(state['nodes']).map(function(x) { 
+			var node = new Node(x,state['nodes'][x],nodes['nodes'][x]);
+			if (node.id === state['master_node']) {
+				node.setCurrentMaster();
+			}
+			return node;
+		}).sort(compareNodes);
+    	
+		var iMetadata = state['metadata']['indices'];
+		var iRoutingTable = state['routing_table']['indices'];
+		var iStatus = status['indices'];
+		var count = 0;
+		var unassigned_shards = 0;
+		var total_size = 0;
+		var num_docs = 0;
+		this.indices = Object.keys(iMetadata).map(
+			function(x) { 
+				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+				unassigned_shards += index.unassigned.length;
+				total_size += parseInt(index.total_size);
+				num_docs += index.num_docs;
+				return index;
+			 }
+		).sort(compareIndices);
+		this.num_docs = num_docs;
+		this.unassigned_shards = unassigned_shards;
+		this.total_indices = this.indices.length;
+		this.shards = status['_shards']['total'];
+		this.failed_shards = status['_shards']['failed'];
+		this.successful_shards = status['_shards']['successful'];
+		this.total_size = total_size;
+		this.getNodes=function(data, master, client) { 
+			return $.map(this.nodes,function(n) { 
+				return (data && n.data || master && n.master || client && n.client) ? n : null;
+			});
+		};
+	}
 }
 
 // Represents an ElasticSearch node
