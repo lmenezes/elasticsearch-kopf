@@ -1,14 +1,23 @@
 function getCluster(host, full_information, callback) {
-	$.when(
-	$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}}),
-	$.ajax({ type: 'GET', url: host+"/_cluster/state", dataType: 'json', data: {}}),
-	$.ajax({ type: 'GET', url: host+"/_cluster/nodes/stats?all=true", dataType: 'json', data: {}}),
-	$.ajax({ type: 'GET', url: host+"/_status", dataType: 'json', data: {}}),
-	$.ajax({ type: 'GET', url: host+"/_cluster/settings", dataType: 'json', data: {}})).done(
-		function(cluster_health,cluster_state,nodes_stats,cluster_status,settings) {
-			callback(new Cluster(cluster_health[0], cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
-		}
-	);
+	if (full_information) {
+		$.when(
+		$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}})).done(
+			function(cluster_health) {
+				callback(new Cluster(cluster_health[0], null,null,null,null));
+			}
+		);
+	} else {
+		$.when(
+		$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}}),
+		$.ajax({ type: 'GET', url: host+"/_cluster/state", dataType: 'json', data: {}}),
+		$.ajax({ type: 'GET', url: host+"/_cluster/nodes/stats?all=true", dataType: 'json', data: {}}),
+		$.ajax({ type: 'GET', url: host+"/_status", dataType: 'json', data: {}}),
+		$.ajax({ type: 'GET', url: host+"/_cluster/settings", dataType: 'json', data: {}})).done(
+			function(cluster_health,cluster_state,nodes_stats,cluster_status,settings) {
+				callback(new Cluster(cluster_health[0], cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+			}
+		);
+	}
 }
 function flipDisableShardAllocation(host,current_state) {
 	var new_state = current_state == true ? "false" : "true";
