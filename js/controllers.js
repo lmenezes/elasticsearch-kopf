@@ -262,8 +262,10 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
     	$timeout(loadClusterState, $scope.getRefresh());
 		if ($scope.modal.active == false) { // only refreshes if no modal is active
 			var is_current_view = $('#cluster_option').hasClass('active');
-    		$scope.setCluster(getCluster($scope.host,is_current_view));
-			$scope.pagination.setResults($scope.cluster.indices);
+			getCluster($scope.host,is_current_view, function(cluster) {
+	    		$scope.setCluster(cluster);
+				$scope.pagination.setResults($scope.cluster.indices);
+			});
 		}
 	}());
 	

@@ -1,14 +1,14 @@
-function getCluster(host, full_information) {
-	var cluster_health = syncRequest('GET',host+"/_cluster/health", {}).response;
-	if (full_information) {
-		var cluster_state = syncRequest('GET',host+"/_cluster/state", {}).response;
-		var nodes_stats = syncRequest('GET',host+"/_cluster/nodes/stats?all=true", {}).response;
-		var cluster_status = syncRequest('GET',host+"/_status", {}).response;
-		var settings = syncRequest('GET',host+"/_cluster/settings", {}).response;
-		return new Cluster(cluster_health, cluster_state,cluster_status,nodes_stats,settings);
-	} else {
-		return new Cluster(cluster_health, null,null,null,null);
-	}
+function getCluster(host, full_information, callback) {
+	$.when(
+	$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}}),
+	$.ajax({ type: 'GET', url: host+"/_cluster/state", dataType: 'json', data: {}}),
+	$.ajax({ type: 'GET', url: host+"/_cluster/nodes/stats?all=true", dataType: 'json', data: {}}),
+	$.ajax({ type: 'GET', url: host+"/_status", dataType: 'json', data: {}}),
+	$.ajax({ type: 'GET', url: host+"/_cluster/settings", dataType: 'json', data: {}})).done(
+		function(cluster_health,cluster_state,nodes_stats,cluster_status,settings) {
+			callback(new Cluster(cluster_health[0], cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+		}
+	);
 }
 function flipDisableShardAllocation(host,current_state) {
 	var new_state = current_state == true ? "false" : "true";
