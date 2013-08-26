@@ -159,6 +159,11 @@ function Request() {
 	this.method = 'GET';
 	this.body = ''
 }
+
+function AliasesCtrl($scope, $location, $timeout) {
+	
+}
+
 function RestCtrl($scope, $location, $timeout) {
 	$scope.request = new Request();
 	$scope.sendRequest=function() {
@@ -168,11 +173,16 @@ function RestCtrl($scope, $location, $timeout) {
 			$('#rest-client-response').html(content);
 			$scope.setAlert(null);
 		} else {
-			var parsed = JSON.parse(response.response['responseText']);
-			console.log(parsed);
-			var alert = new Alert(false, "", "Error while executing request", parsed);
-			$scope.setAlert(alert);
-			$('#rest-client-response').html('');
+			try {
+				var parsed = JSON.parse(response.response['responseText']);
+				var alert = new Alert(false, "", "Error while executing request", parsed);
+				$scope.setAlert(alert);
+				$('#rest-client-response').html('');
+			} catch (err) {
+				var alert = new Alert(false, "", "Executing this request did not return a valid JSON", response.response['responseText']);
+				$scope.setAlert(alert);
+				$('#rest-client-response').html('');
+			}
 		}
 	}
 	$scope.templates = [
@@ -192,6 +202,10 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.cluster = null;
+	
+	$scope.isActive=function(tab) {
+		return $('#' + tab).hasClass('active');
+	}
 	
 	$scope.setHost=function(host) {
 		$scope.host = host;
