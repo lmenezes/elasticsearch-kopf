@@ -1,9 +1,9 @@
-<div class="navbar navbar-fixed-top navbar-cluster-status-{{cluster.status}}" ng-controller="NavbarController">
+<div class="navbar navbar-fixed-top navbar-cluster-status-{{cluster_health.status}}" ng-controller="NavbarController">
 	<div class="container">
 		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span></button>
 		<ul class="nav navbar-nav">
 			<li class="dropdown">
-				<a href="#" class="navbar-brand navbar-cluster-status-{{cluster.status}} dropdown-toggle navbar-logo" data-toggle="dropdown">kopf <i class="icon-caret-down navbar-logo-action"></i></a>
+				<a href="#" class="navbar-brand navbar-cluster-status-{{cluster_health.status}} dropdown-toggle navbar-logo" data-toggle="dropdown">kopf <i class="icon-caret-down navbar-logo-action"></i></a>
 				<ul class="dropdown-menu form-horizontal navbar-app-settings">
 					<form class="form-inline" role="form">
 						<li class="active refresh-selector">
@@ -26,8 +26,8 @@
 				</ul>
 			</li>
 		</ul>
-		<ul class="nav navbar-nav navbar-cluster-status-{{cluster.status}}">
-			<li class="active" id="cluster_option"><a href="#cluster" data-toggle="tab" class=""><i class="icon-sitemap"></i> {{cluster.name}}</a></li>
+		<ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}}">
+			<li class="active" id="cluster_option"><a href="#cluster" data-toggle="tab" class=""><i class="icon-sitemap"></i> {{cluster_health.name}}</a></li>
 			<li class="" id="rest_option"><a href="#rest" data-toggle="tab" class=""><i class="icon-edit"></i> rest client</a></li>
 			<li class="" id="aliases_option"><a href="#aliases" data-toggle="tab" class=""><i class="icon-tags"></i> aliases</a></li>
 		</ul>
@@ -36,7 +36,7 @@
 				<div class="input-group">
 					<input type="text" class="form-control" ng-model="new_host" placeholder="connect to a different host">
 					<span class="input-group-btn">
-						<button class="btn host-input-action navbar-cluster-status-{{cluster.status}}-nav" type="button" ng-click="connectToHost()"><i class="icon-magic" title="connect"></i></button>
+						<button class="btn host-input-action navbar-cluster-status-{{cluster_health.status}}-nav" type="button" ng-click="connectToHost()"><i class="icon-magic" title="connect"></i></button>
 					</span>
 				</div>
 			</li>

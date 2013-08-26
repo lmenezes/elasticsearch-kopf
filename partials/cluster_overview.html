@@ -1,49 +1,53 @@
 <h2>cluster overview</h2>
-<div ng-include src="'cluster_stats.html'"></div>
-<h4>filter indices</h4>
-<div class="row">
-	<div class="col-lg-10">
-		<form class="form-inline" role="form">
-			<div class="row">
-				<div class="col-lg-6 form-group">
-					<input type="text" ng-model="pagination.query" class="form-control" placeholder="filter by index name">
-				</div>
-				<div class="col-lg-6 cluster-map-node-types">
-					<div class="checkbox cluster-map-node-type">
-						<label>
-							<input type="checkbox" ng-model="pagination.data"> <i class="icon-hdd"></i> data nodes
-						</label>
+<div ng-switch on="isReady">
+	<div ng-switch-when="true">
+		<div ng-include src="'cluster_stats.html'"></div>
+		<h4>filter indices</h4>
+		<div class="row">
+			<div class="col-lg-10">
+				<form class="form-inline" role="form">
+					<div class="row">
+						<div class="col-lg-6 form-group">
+							<input type="text" ng-model="pagination.query" class="form-control" placeholder="filter by index name">
+						</div>
+						<div class="col-lg-6 cluster-map-node-types">
+							<div class="checkbox cluster-map-node-type">
+								<label>
+									<input type="checkbox" ng-model="pagination.data"> <i class="icon-hdd"></i> data nodes
+								</label>
+							</div>
+							<div class="checkbox cluster-map-node-type">
+					    	  <label>
+					    	    <input type="checkbox" ng-model="pagination.master"> <i class="icon-star-empty"></i> master nodes
+					    	  </label>
+					    	</div>
+							<div class="checkbox cluster-map-node-type">
+					    	  <label>
+					    	    <input type="checkbox" ng-model="pagination.client"> <i class="icon-search"></i> client nodes
+					    	  </label>
+					    	</div>
+						</div>
 					</div>
-					<div class="checkbox cluster-map-node-type">
-			    	  <label>
-			    	    <input type="checkbox" ng-model="pagination.master"> <i class="icon-star-empty"></i> master nodes
-			    	  </label>
-			    	</div>
-					<div class="checkbox cluster-map-node-type">
-			    	  <label>
-			    	    <input type="checkbox" ng-model="pagination.client"> <i class="icon-search"></i> client nodes
-			    	  </label>
-			    	</div>
+				</form>
+			</div>
+			<div class="col-lg-2" style="text-align: right;">
+				<div class="cluster-map-pagination">
+					<span ng-switch on="pagination.hasPreviousPage()">
+						<i class="icon-double-angle-left" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+						<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+					</span>
+					{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
+					<span ng-switch on="pagination.hasNextPage()">
+						<i class="icon-double-angle-right" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+						<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+					</span>
 				</div>
 			</div>
-		</form>
-	</div>
-	<div class="col-lg-2" style="text-align: right;">
-		<div class="cluster-map-pagination">
-			<span ng-switch on="pagination.hasPreviousPage()">
-				<i class="icon-double-angle-left" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
-				<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
-			</span>
-			{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
-			<span ng-switch on="pagination.hasNextPage()">
-				<i class="icon-double-angle-right" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
-				<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
-			</span>
 		</div>
+		<br>
+		<table class="table table-bordered table-condensed table-nonfluid table-rounded">
+			<thead ng-include src="'shard_map_header.html'"></thead>
+			<tbody ng-include src="'shard_map_body.html'"></tbody>
+		</table>
 	</div>
 </div>
-<br>
-<table class="table table-bordered table-condensed table-nonfluid table-rounded">
-	<thead ng-include src="'shard_map_header.html'"></thead>
-	<tbody ng-include src="'shard_map_body.html'"></tbody>
-</table>

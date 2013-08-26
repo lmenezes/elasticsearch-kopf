@@ -1,24 +1,23 @@
-function getCluster(host, full_information, callback) {
-	if (full_information) {
-		$.when(
-		$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}})).done(
-			function(cluster_health) {
-				callback(new Cluster(cluster_health[0], null,null,null,null));
-			}
-		);
-	} else {
-		$.when(
-		$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}}),
+function getClusterHealth(host, callback) {
+	$.when(
+	$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}})).done(
+		function(cluster_health) {
+			callback(new ClusterHealth(cluster_health));
+		}
+	);
+}
+function getClusterDetail(host, callback) {
+	$.when(
 		$.ajax({ type: 'GET', url: host+"/_cluster/state", dataType: 'json', data: {}}),
 		$.ajax({ type: 'GET', url: host+"/_cluster/nodes/stats?all=true", dataType: 'json', data: {}}),
 		$.ajax({ type: 'GET', url: host+"/_status", dataType: 'json', data: {}}),
 		$.ajax({ type: 'GET', url: host+"/_cluster/settings", dataType: 'json', data: {}})).done(
-			function(cluster_health,cluster_state,nodes_stats,cluster_status,settings) {
-				callback(new Cluster(cluster_health[0], cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+			function(cluster_state,nodes_stats,cluster_status,settings) {
+				callback(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
 			}
 		);
-	}
-}
+} 
+
 function flipDisableShardAllocation(host,current_state) {
 	var new_state = current_state == true ? "false" : "true";
 	var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":new_state	}};
@@ -73,19 +72,13 @@ function updateClusterSettings(host, settings) {
 	return syncRequest('PUT', host + "/_cluster/settings", settings);	
 }
 
-// Cluster Object. Contains all the information about the cluster
-function Cluster(health, state,status,nodes,settings) {
-	// cluster health
+function ClusterHealth(health) {
 	this.status = health['status'];
 	this.name = health['cluster_name'];
-	this.timed_out = health['timed_out'];
-	this.number_of_nodes = health['number_of_nodes'];
-	this.number_of_data_nodes = health['number_of_data_nodes'];
-	this.active_primary_shards = health['active_primary_shards'];
-	this.active_shards = health['active_shards'];
-	this.relocating_shards = health['relocating_shards'];
-	this.initializing_shards = health['initializing_shards'];
-	this.unassigned_shards = health['unassigned_shards'];
+}
+
+// Cluster Object. Contains all the information about the cluster
+function Cluster(state,status,nodes,settings) {
 	if (state != null && status != null && nodes != null && settings != null) {
 		this.disableAllocation = "false";
 		if (typeof settings['persistent'] != undefined && typeof settings['persistent']['disable_allocation'] != undefined) {
@@ -96,14 +89,16 @@ function Cluster(health, state,status,nodes,settings) {
 		}
 		this.settings = $.extend({}, settings['persistent'], settings['transient']);
 		this.master_node = state['master_node'];
+		var num_nodes = 0;
 		this.nodes = Object.keys(state['nodes']).map(function(x) { 
 			var node = new Node(x,state['nodes'][x],nodes['nodes'][x]);
+			num_nodes += 1;
 			if (node.id === state['master_node']) {
 				node.setCurrentMaster();
 			}
 			return node;
 		}).sort(compareNodes);
-    	
+    	this.number_of_nodes = num_nodes;
 		var iMetadata = state['metadata']['indices'];
 		var iRoutingTable = state['routing_table']['indices'];
 		var iStatus = status['indices'];

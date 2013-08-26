@@ -201,7 +201,14 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
-	$scope.cluster = null;
+	$scope.cluster_health = null; // cluster health should be refresh at all moments
+	
+	(function loadClusterHealth() {
+    	$timeout(loadClusterHealth, $scope.refresh);
+			getClusterHealth($scope.host, function(cluster) {
+	    		$scope.cluster_health = cluster;
+		});
+	}());
 	
 	$scope.isActive=function(tab) {
 		return $('#' + tab).hasClass('active');
@@ -248,9 +255,6 @@ function GlobalController($scope, $location, $timeout) {
 		$('#modal_info').modal({show:true,backdrop:false});
 	}
 	
-	$scope.setCluster=function(cluster) {
-		$scope.cluster = cluster;
-	}
 	$scope.setAlert=function(alert) {
 		$scope.alert = alert;
 	}
@@ -258,16 +262,24 @@ function GlobalController($scope, $location, $timeout) {
 
 function ClusterOverviewCtrl($scope, $location, $timeout) {
 	$scope.pagination= new Pagination(1,"", []);
+	
+	$scope.cluster = null;
+	
 	(function loadClusterState() {
     	$timeout(loadClusterState, $scope.getRefresh());
-		if ($scope.modal.active == false) { // only refreshes if no modal is active
-			var is_current_view = $('#cluster_option').hasClass('active');
-			getCluster($scope.host,is_current_view, function(cluster) {
-	    		$scope.setCluster(cluster);
-				$scope.pagination.setResults($scope.cluster.indices);
+		var is_current_view = ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
+		if ($scope.modal.active == false && is_current_view) { // only refreshes if no modal is active
+			getClusterDetail($scope.host, function(cluster) {
+	    		$scope.cluster = cluster;
+				$scope.pagination.setResults(cluster.indices);
+				$scope.isReady = true;
 			});
 		}
 	}());
+	
+	$scope.ready=function() {
+		return $scope.cluster != null;
+	}
 	
 	$scope.shutdownNode=function(node_id) {
 		return shutdownNode($scope.host,node_id);
