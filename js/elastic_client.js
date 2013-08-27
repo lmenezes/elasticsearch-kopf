@@ -18,6 +18,28 @@ function getClusterDetail(host, callback) {
 		);
 } 
 
+function fetchAliases(host) {
+	var response = syncRequest('GET', host + "/_aliases",{}).response;
+	return new Aliases(response);
+}
+
+function Aliases(aliases_info) {
+	var indices  = []
+	var aliases_map = {};
+	Object.keys(aliases_info).forEach(function(index) {
+		indices.push(index);
+		var indexAliases = aliases_info[index]['aliases'];
+		Object.keys(indexAliases).forEach(function(alias) {
+			if (typeof aliases_map[alias] == 'undefined') {
+				aliases_map[alias] = [];
+			}
+			aliases_map[alias].push(index);
+		});
+	});
+	this.indices = indices;
+	this.info = aliases_map;
+}
+
 function flipDisableShardAllocation(host,current_state) {
 	var new_state = current_state == true ? "false" : "true";
 	var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":new_state	}};

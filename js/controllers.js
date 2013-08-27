@@ -154,6 +154,7 @@ function NavbarController($scope, $location, $timeout) {
 		$scope.setRefresh($scope.new_refresh);
 	}
 }
+
 function Request() {
 	this.url = '';
 	this.method = 'GET';
@@ -161,11 +162,54 @@ function Request() {
 }
 
 function AliasesCtrl($scope, $location, $timeout) {
+
+	$scope.new_alias = '';
+	$scope.aliases = null;
+	$scope.new_index = {};
 	
+	$scope.addAlias=function() {
+		$scope.aliases.info[$scope.new_alias] = [];
+		$scope.new_alias = '';
+	}
+	
+	$scope.addIndexToAlias=function(target_alias) {
+		if (typeof $scope.new_index[target_alias] != 'undefined' && $scope.new_index[target_alias].length > 0) {
+			$.each($scope.aliases.info,function(alias,indices) {
+				if (alias === target_alias) {
+					if (indices.indexOf($scope.new_index[alias]) == -1) {
+						$scope.aliases.info[alias].push($scope.new_index[alias]);
+						$scope.new_index[alias] = '';
+					}
+				} 
+			});
+		}
+	}
+	
+	$scope.removeAlias=function(alias) {
+		delete $scope.aliases.info[alias];
+	}
+	
+	$scope.removeAliasFromIndex=function(index, alias) {
+		$scope.aliases.info[alias].splice($scope.aliases.info[alias].indexOf(index),1);
+	}
+	
+	$scope.mergeAliases=function() {
+
+	}
+	$scope.loadAliases=function() {
+		$scope.originalAliases = fetchAliases($scope.host);
+		$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
+	}
+	
+    $scope.$on('loadAliasesEvent', function() {
+		$scope.loadAliases();
+    });
+
 }
 
 function RestCtrl($scope, $location, $timeout) {
 	$scope.request = new Request();
+	
 	$scope.sendRequest=function() {
 		var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
 		if (response.success) {
@@ -202,13 +246,17 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.cluster_health = null; // cluster health should be refresh at all moments
-	
+
 	(function loadClusterHealth() {
     	$timeout(loadClusterHealth, $scope.refresh);
 			getClusterHealth($scope.host, function(cluster) {
 	    		$scope.cluster_health = cluster;
 		});
 	}());
+	
+	$scope.emitLoadAliases=function() {
+		$scope.$broadcast('loadAliasesEvent', {});
+	}
 	
 	$scope.isActive=function(tab) {
 		return $('#' + tab).hasClass('active');
@@ -272,7 +320,6 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 			getClusterDetail($scope.host, function(cluster) {
 	    		$scope.cluster = cluster;
 				$scope.pagination.setResults(cluster.indices);
-				$scope.isReady = true;
 			});
 		}
 	}());

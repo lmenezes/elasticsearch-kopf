@@ -1,29 +1,36 @@
-<div class="col-lg-12">
-<h2>rest client interface</h2>
-</div>
-<div class="rest-client-body">
+<div ng-controller="RestCtrl">
 	<div class="col-lg-12">
+		<h2>rest client interface</h2>
+	</div>
+	<div class="rest-client-body">
+		<div class="col-lg-12">
 			<div class="row">
 				<form class="form-inline" role="form">
 					<div class="col-lg-6">
-						<div><select ng-model="request.method" class="form-control input-sm rest-client-request-method">
-							<option value="GET" selected="selected">GET</option>
-							<option value="PUT">PUT</option>
-							<option value="POST">POST</option>
-							<option value="DELETE">DELETE</option>
-						</select>
-						<span class="rest-client-request-url">
-							<input type="url" ng-model="request.url" class="form-control input-sm" placeholder="complete url (e.g.: http://localhost:9200/index/type/_search)"></input>
-						</span></div>
-						<div class="rest-client-body">
-							<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="sendRequest()"><i class="icon-bolt"></i> execute</button>
-							<span class="request-client-request-body-options">
-							 <select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="log()">
-					         	<option value="">load request body from template</option>
-					         </select>
-						 </span>
+						<div>
+							<select ng-model="request.method" class="form-control input-sm rest-client-request-method">
+								<option value="GET" selected="selected">GET</option>
+								<option value="PUT">PUT</option>
+								<option value="POST">POST</option>
+								<option value="DELETE">DELETE</option>
+							</select>
+							<span class="rest-client-request-url">
+								<input type="url" ng-model="request.url" class="form-control input-sm" placeholder="complete url (e.g.: http://localhost:9200/index/type/_search)">
+							</span>
 						</div>
-						<div><textarea class="form-control rest-client-request-body" ng-model="request.body" rows="34"></textarea></div>
+						<div class="rest-client-body">
+							<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="sendRequest()">
+								<i class="icon-bolt"></i> execute
+							</button>
+							<span class="request-client-request-body-options">
+								<select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="log()">
+					         		<option value="">load request body from template</option>
+								</select>
+							</span>
+						</div>
+						<div>
+							<textarea class="form-control rest-client-request-body" ng-model="request.body" rows="34"></textarea>
+						</div>
 					</div>
 					<div class="col-lg-6">
 						<div id="rest-client-response" class="rest-client-response"></div>
@@ -31,3 +38,5 @@
 				</form>
 			</div>
 		</div>
+	</div>
+</div>
