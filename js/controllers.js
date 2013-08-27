@@ -194,8 +194,33 @@ function AliasesCtrl($scope, $location, $timeout) {
 	}
 	
 	$scope.mergeAliases=function() {
-
+		var deletes = [];
+		var adds = [];
+		Object.keys($scope.aliases.info).forEach(function(alias) {
+//			console.log("checking [" + alias + "]")
+			var indices = $scope.aliases.info[alias];
+			indices.forEach(function(index) {
+//				console.log("checking [" + index + "]")
+//				console.log($scope.originalAliases.info);
+				if (typeof $scope.originalAliases.info[alias] == 'undefined' || $scope.originalAliases.info[alias].indexOf(index) == -1) {
+					adds.push({'alias':alias,'index':index});
+				} 
+			});
+		});
+		Object.keys($scope.originalAliases.info).forEach(function(alias) {
+			var indices = $scope.originalAliases.info[alias];
+			indices.forEach(function(index) {
+				// if alias didnt exist in original aliases, all alias x index need to be added
+				if (typeof $scope.aliases.info[alias] == 'undefined' || $scope.aliases.info[alias].indexOf(index) == -1) {
+					deletes.push({'alias':alias,'index':index});
+				} 
+			});
+		});
+		var response = updateAliases($scope.host,adds,deletes);
+		$scope.loadAliases();
+		$scope.setAlert(new Alert(response.success, "Aliases were successfully updated","Error while updating aliases",response.response));
 	}
+	
 	$scope.loadAliases=function() {
 		$scope.originalAliases = fetchAliases($scope.host);
 		$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);

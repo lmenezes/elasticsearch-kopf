@@ -23,6 +23,18 @@ function fetchAliases(host) {
 	return new Aliases(response);
 }
 
+function updateAliases(host,add_aliases,remove_aliases) {
+	var data = {};
+	data['actions'] = [];
+	add_aliases.forEach(function(add_info) {
+		data['actions'].push({'add':add_info});
+	});
+	remove_aliases.forEach(function(add_info) {
+		data['actions'].push({'remove':add_info});
+	});
+	return syncRequest('POST', host + "/_aliases",JSON.stringify(data, undefined, ""));
+}
+
 function Aliases(aliases_info) {
 	var indices  = []
 	var aliases_map = {};
