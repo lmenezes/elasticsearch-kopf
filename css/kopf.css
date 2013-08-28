@@ -452,13 +452,13 @@ html,body {
 }
 
 #app-footer {
-	height: 75px;
 	border-top: 1px solid #f0f0f0;
 	text-align: center;
 	font-size: 11px;
 	color: #c0c0c0;
-	padding-top: 20px;
-	margin-top: 60px;
+	margin-top: 20px;
+	padding-top: 10px;
+	margin-bottom: 20px;
 }
 
 @media (max-width: 767px) {
