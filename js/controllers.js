@@ -168,8 +168,10 @@ function AliasesCtrl($scope, $location, $timeout) {
 	$scope.new_index = {};
 	
 	$scope.addAlias=function() {
-		$scope.aliases.info[$scope.new_alias] = [];
-		$scope.new_alias = '';
+		if (typeof $scope.new_alias != 'undefined' && $scope.new_alias.trim().length > 0) {
+			$scope.aliases.info[$scope.new_alias] = [];
+			$scope.new_alias = '';
+		}
 	}
 	
 	$scope.addIndexToAlias=function(target_alias) {
@@ -197,11 +199,8 @@ function AliasesCtrl($scope, $location, $timeout) {
 		var deletes = [];
 		var adds = [];
 		Object.keys($scope.aliases.info).forEach(function(alias) {
-//			console.log("checking [" + alias + "]")
 			var indices = $scope.aliases.info[alias];
 			indices.forEach(function(index) {
-//				console.log("checking [" + index + "]")
-//				console.log($scope.originalAliases.info);
 				if (typeof $scope.originalAliases.info[alias] == 'undefined' || $scope.originalAliases.info[alias].indexOf(index) == -1) {
 					adds.push({'alias':alias,'index':index});
 				} 
