@@ -157,6 +157,11 @@ function NavbarController($scope, $location, $timeout) {
 	$scope.changeTab=function() {
 		$scope.clearAlert();
 	}
+	
+	$scope.selectAliasesTab=function() {
+		$scope.clearAlert();
+		$scope.broadcastMessage('loadAliasesEvent', {});
+	}
 }
 
 function Request() {
@@ -282,8 +287,8 @@ function GlobalController($scope, $location, $timeout) {
 		});
 	}());
 	
-	$scope.emitLoadAliases=function() {
-		$scope.$broadcast('loadAliasesEvent', {});
+	$scope.broadcastMessage=function(message,args) {
+		$scope.$broadcast(message,args);
 	}
 	
 	$scope.isActive=function(tab) {
