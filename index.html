@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app ng-controller="GlobalController">
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 
@@ -16,7 +16,7 @@
 		<script src="./js/controllers.js"></script>
 		<script src="./js/elastic_client.js"></script>
   	</head>
-	<body>
+	<body ng-app ng-controller="GlobalController">
 		<div ng-include src="'partials/modal_info.html'"></div>
 		<div id="page-wrap">
 			<div ng-include src="'partials/nav_bar.html'"></div>

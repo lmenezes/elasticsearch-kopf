@@ -300,11 +300,10 @@ function GlobalController($scope, $location, $timeout) {
 	}
 
 	$scope.openModal=function(){
-		$scope.modal.active = true;
+		
 	}
 	
 	$scope.closeModal=function(){
-		setTimeout(function() { $scope.modal.active = false; }, 300);
 		$scope.modal.alert = null; // clear alerts
 	}
 	
@@ -331,6 +330,10 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.setAlert=function(alert) {
 		$scope.alert = alert;
 	}
+	
+	$scope.isInModal=function() {
+		return ($('.modal-backdrop').length > 0);
+	}
 }
 
 function ClusterOverviewCtrl($scope, $location, $timeout) {
@@ -340,12 +343,17 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	(function loadClusterState() {
     	$timeout(loadClusterState, $scope.getRefresh());
-		var is_current_view = ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
-		if ($scope.modal.active == false && is_current_view) { // only refreshes if no modal is active
-			getClusterDetail($scope.host, function(cluster) {
-	    		$scope.cluster = cluster;
-				$scope.pagination.setResults(cluster.indices);
-			});
+		// avoids requesting when info is not viewable
+		if (!$scope.isInModal()) {
+			var is_current_view = ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
+			if (is_current_view) { // only refreshes if no modal is active
+				getClusterDetail($scope.host, function(cluster) {
+					if (!$scope.isInModal()) {
+						$scope.cluster = cluster;
+						$scope.pagination.setResults(cluster.indices);
+					}
+				});
+			}
 		}
 	}());
 	
