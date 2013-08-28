@@ -218,8 +218,9 @@ a.cluster-map-header-index-action:hover {
 	font-weight: 500;
 }
 .cluster-map-node-types {
-	padding-top: 3px;
+	padding-top: 5px;
 	padding-left: 0px;
+	font-size: 12px;
 }
 .cluster-map-node-type {
 	padding-left: 15px !important;
