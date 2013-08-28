@@ -153,6 +153,10 @@ function NavbarController($scope, $location, $timeout) {
 	$scope.changeRefresh=function() {
 		$scope.setRefresh($scope.new_refresh);
 	}
+
+	$scope.changeTab=function() {
+		$scope.clearAlert();
+	}
 }
 
 function Request() {
@@ -302,6 +306,10 @@ function GlobalController($scope, $location, $timeout) {
 		
 	}
 	
+	$scope.clearAlert=function() {
+		$scope.alert = null;
+	}
+	
 	$scope.closeModal=function(){
 		$scope.modal.alert = null; // clear alerts
 	}
@@ -314,10 +322,6 @@ function GlobalController($scope, $location, $timeout) {
 		} else {
 			return 0;
 		}
-	}
-	
-	$scope.getRefresh=function() {
-		return $scope.refresh;
 	}
 
 	$scope.displayInfo=function(title,info) {
