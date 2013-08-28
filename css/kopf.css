@@ -47,6 +47,12 @@ h3 {
 h4 {
 	color: #666;
 }
+.modal-open {
+	margin-right: 0px !important;
+}
+.navbar-fixed-top {
+	margin-right: 0px !important;
+}
 /** ############### END - global - END ############### **/
 
 /** ############### START - navbar - START ############### **/
