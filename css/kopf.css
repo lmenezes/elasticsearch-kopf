@@ -267,7 +267,7 @@ a.cluster-map-header-index-action:hover {
 	border-radius: 3px 3px 3px 3px;
 	height: 50px;
 	margin-bottom: 40px;
-	margin-top: 40px;
+	margin-top: 20px;
 }
 .cluster-map-stat-block {
 	display: inline-block;
@@ -404,6 +404,9 @@ a.cluster-map-header-index-action:hover {
 	padding-right: 3px;
 	padding-top: 2px;
 	padding-bottom: 2px;
+}
+.aliases-section {
+	padding-top: 10px;
 }
 /** END OF REFACTORED AREA!!! **/
 
