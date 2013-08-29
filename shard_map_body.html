@@ -9,7 +9,8 @@
 				</div>
 				<div><i ng-class="{true:'icon-search',false:''}[node.client]" title="client node"></i></div>
 				<div><i ng-class="{true:'icon-hdd',false:''}[node.data]" title="data node"></i></div>
-				<div><i class="icon-power-off normal-action" ng-click="shutdownNode(node.id)" title="shutdown node"></i></div>
+				<div><a data-toggle="modal" href="#confirm_shutdown_{{node.id}}" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action"><i class="icon-power-off normal-action" title="shutdown node" ng-click="openModal()"></i></a></div>
+				<div ng-include src="'./modals/confirm_shutdown.html'"></div>
 			</div>
 			<div class="col-lg-10">
 				<div class="row">
