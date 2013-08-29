@@ -1,9 +1,12 @@
-function getClusterHealth(host, callback) {
+function getClusterHealth(host, callback_success, callback_error) {
 	$.when(
-	$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}})).done(
-		function(cluster_health) {
-			callback(new ClusterHealth(cluster_health));
-		}
+		$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}})).then(
+			function(cluster_health) {
+				callback_success(new ClusterHealth(cluster_health));
+			},
+			function(cluster_health) {
+				callback_error(cluster_health);
+			}
 	);
 }
 function getClusterDetail(host, callback) {

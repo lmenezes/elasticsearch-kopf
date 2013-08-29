@@ -4,8 +4,8 @@
 			<div class="modal-header">
 				<!--button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button-->
 				<h4 class="modal-title" ng-switch on="index.state">
-					<div ng-switch-when="open">Are you sure you want to close index[{{index.name}}]?</div>
-					<div ng-switch-when="close">Are you sure you want to open index[{{index.name}}]?</div>
+					<div ng-switch-when="open">Are you sure you want to close index <b>{{index.name}}</b>?</div>
+					<div ng-switch-when="close">Are you sure you want to open index <b>{{index.name}}</b>?</div>
 				</h4>
       		</div>
       		<div class="modal-body" ng-switch on="index.state">
@@ -21,7 +21,15 @@
       		</div>
       		<div class="modal-footer">
         		<button type="button" class="btn btn-default btn-small" data-dismiss="modal" ng-click='closeModal()' >Close</button>
-        		<button type="button" class="btn btn-primary btn-small" data-dismiss="modal"ng-click='switchIndexState(index.name,index.state)'>Confirm</button>
+				<span ng-switch on="index.state">
+        			<button type="button" ng-switch-when="open" class="btn btn-primary" data-dismiss="modal" ng-click='switchIndexState(index.name,index.state)'>
+						<i class="icon-folder-close"></i> Close
+					</button>
+        			<button type="button" ng-switch-when="close" class="btn btn-primary" data-dismiss="modal" ng-click='switchIndexState(index.name,index.state)'>
+						<i class="icon-folder-open"></i> Open
+					</button>
+				</span>
+				</h4>
       		</div>
     	</div>
   	</div>

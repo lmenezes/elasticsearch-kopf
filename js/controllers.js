@@ -147,6 +147,7 @@ function NavbarController($scope, $location, $timeout) {
 	$scope.new_refresh = $scope.getRefresh();
 	
 	$scope.connectToHost=function() {
+		$scope.setClusterHealth();
 		$scope.setHost($scope.new_host);
 	}
 	
@@ -282,10 +283,26 @@ function GlobalController($scope, $location, $timeout) {
 
 	(function loadClusterHealth() {
     	$timeout(loadClusterHealth, $scope.refresh);
-			getClusterHealth($scope.host, function(cluster) {
-	    		$scope.cluster_health = cluster;
-		});
+		getClusterHealth($scope.host, 
+			function(cluster) {
+				if ($scope.cluster_health == null) {
+					$scope.clearAlert();
+				}
+				$scope.cluster_health = cluster;
+			},
+			function(error_response) {
+				$scope.alert = new Alert(false, "","Error connecting to [" + $scope.host + "]",error_response);
+			}
+		);
 	}());
+	
+	$scope.hasConnection=function() {
+		return $scope.cluster_health != null;
+	}
+	
+	$scope.setClusterHealth=function(cluster_health) {
+		$scope.cluster_health = cluster_health;
+	}
 	
 	$scope.broadcastMessage=function(message,args) {
 		$scope.$broadcast(message,args);
@@ -349,21 +366,49 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.cluster = null;
 	
+	$scope.force_refresh = false;
+	
 	(function loadClusterState() {
-    	$timeout(loadClusterState, $scope.getRefresh());
-		// avoids requesting when info is not viewable
-		if (!$scope.isInModal()) {
-			var is_current_view = ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
-			if (is_current_view) { // only refreshes if no modal is active
-				getClusterDetail($scope.host, function(cluster) {
-					if (!$scope.isInModal()) {
-						$scope.cluster = cluster;
-						$scope.pagination.setResults(cluster.indices);
+		
+		$scope.updateCluster=function() {
+			// avoids requesting when info is not viewable
+			if (!$scope.isInModal()) { // only refreshes if no modal is active
+				var is_current_view = ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
+				if (is_current_view) {
+					getClusterDetail($scope.host, function(cluster) {
+						if (!$scope.isInModal()) {
+							$scope.$apply(function() { // forces view refresh
+								$scope.cluster = cluster;
+								$scope.pagination.setResults(cluster.indices);
+							});
+							$scope.force_refresh = false;
+						} else {
+							if ($scope.force_refresh) {
+								$scope.forceRefresh();
+							}
+						}
+					});
+				} else {
+					if ($scope.force_refresh) {
+						$scope.forceRefresh();
 					}
-				});
+				}
+			} else {
+				if ($scope.force_refresh) {
+					$scope.forceRefresh();
+				}
 			}
 		}
+		if (!$scope.force_refresh) {
+			$timeout(loadClusterState, $scope.getRefresh());	
+		}
+		$scope.updateCluster();
 	}());
+	
+	$scope.forceRefresh=function() {
+		$scope.force_refresh = true;
+		$timeout(function() { $scope.updateCluster() }, 100);
+	}
 	
 	$scope.ready=function() {
 		return $scope.cluster != null;
@@ -387,6 +432,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 		var response = deleteIndex($scope.host,index);
 		$scope.setAlert(new Alert(response.success, "Index was successfully deleted", "Error while deleting index", response.response));
 		$scope.closeModal();
+		$scope.forceRefresh();
 	}
 	
 	$scope.clearCache=function(index) {
@@ -419,6 +465,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 			$scope.setAlert(new Alert(response.success,"Index was successfully closed","Error while closing index",response.response));
 		}
 		$scope.closeModal();
+		$scope.forceRefresh();
 	}
 }
 

@@ -64,6 +64,24 @@ h4 {
 /** ############### END - global - END ############### **/
 
 /** ############### START - navbar - START ############### **/
+.navbar-cluster-status- {
+	background-color: #ccc !important;
+	color: #666 !important;
+}
+.navbar-cluster-status- > li.active > a {
+	background-color: #666 !important;
+	color: #ccc !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status- > li > a {
+	background-color: #ccc !important;
+	color: #666 !important;
+	border-bottom: 0px;
+}
+.navbar-cluster-status--nav {
+	background-color: #666 !important;
+	color: #ccc !important;
+}
 .navbar-cluster-status-green {
 	background-color: #468847 !important;
 	color: #dff0d8 !important;
