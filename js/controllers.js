@@ -284,7 +284,11 @@ function RestCtrl($scope, $location, $timeout) {
 
 /* Main controller, all should inherit from this */
 function GlobalController($scope, $location, $timeout) {
-	$scope.host = "http://" + $location.host() + ":" + $location.port();
+	if ($location.host() == "") {
+		$scope.host = "http://localhost:9200";
+	} else {
+		$scope.host = "http://" + $location.host() + ":" + $location.port();
+	}
 	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
