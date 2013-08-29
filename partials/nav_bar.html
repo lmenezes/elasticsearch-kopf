@@ -46,12 +46,6 @@
 				<a href="#aliases" data-toggle="tab" class=""><i class="icon-tags"></i> aliases</a>
 			</li>
 		</ul>
-		<ul class="nav navbar-nav">
-			<li class="navbar-host-input" ng-switch on="cluster_health.name == null">
-				<span ng-switch-when="true">trying to connect to [{{host}}]</span>
-				<span ng-switch-default="false">connected to [{{cluster_health.name}}] @ [{{host}}]</span>
-			</li>
-		</ul>
 		<ul class="nav navbar-nav pull-right">
 			<li class="navbar-host-input">
 				<div class="input-group">

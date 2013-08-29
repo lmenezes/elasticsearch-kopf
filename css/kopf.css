@@ -29,6 +29,14 @@
 	display: none;
 }
 /** ############### START - global - START ############### **/
+.connection-status-console {
+	float:right;
+	text-align: right;
+	font-size: 10px;
+	color: #CCC;
+	font-variant:small-caps;
+	font-weight: 200;
+}
 .inactive-action {
 	color: #f0f0f0;	
 }
