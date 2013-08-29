@@ -96,6 +96,9 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 			}
 			var response = createIndex("http://" + $location.host() + ":" + $location.port(),$scope.name, JSON.stringify(settings, undefined, "  "));
 			$scope.modal.alert = new Alert(response.success, 'Index successfully created', 'Error while creating index', response);
+			if (response.success) {
+				$scope.broadcastMessage('refreshClusterView', {});
+			}
 		}
 		} catch(err) {
 			$scope.modal.alert = new Alert(false, "", "Invalid JSON for settings", null);
@@ -128,6 +131,9 @@ function IndexSettingsCtrl($scope, $location, $timeout) {
 				});
 				var response = updateIndexSettings($scope.host, x.name, JSON.stringify(new_settings, undefined, ""));
 				$scope.modal.alert = new Alert(response.success, "Index settings were successfully updated","Error while updating index settings",response.response);
+				if (response.success) {
+					$scope.broadcastMessage('refreshClusterView', {});
+				}
 			}
 		});
 	}
@@ -139,6 +145,9 @@ function ClusterSettingsCtrl($scope, $location, $timeout) {
 		new_settings['transient'] = $scope.cluster.settings;
 		var response = updateClusterSettings($scope.host, JSON.stringify(new_settings, undefined, ""));
 		$scope.modal.alert = new Alert(response.success, "Cluster settings were successfully updated","Error while updating cluster settings",response.response);
+		if (response.success) {
+			$scope.broadcastMessage('refreshClusterView', {});
+		}
 	};
 }
 
@@ -324,16 +333,8 @@ function GlobalController($scope, $location, $timeout) {
 		return $scope.refresh;
 	}
 
-	$scope.openModal=function(){
-		
-	}
-	
 	$scope.clearAlert=function() {
 		$scope.alert = null;
-	}
-	
-	$scope.closeModal=function(){
-		$scope.modal.alert = null; // clear alerts
 	}
 	
 	$scope.readablizeBytes=function(bytes) {
@@ -382,28 +383,32 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 								$scope.pagination.setResults(cluster.indices);
 							});
 							$scope.force_refresh = false;
-						} else {
-							if ($scope.force_refresh) {
-								$scope.forceRefresh();
-							}
-						}
+						} 
 					});
-				} else {
-					if ($scope.force_refresh) {
-						$scope.forceRefresh();
-					}
-				}
-			} else {
-				if ($scope.force_refresh) {
-					$scope.forceRefresh();
-				}
+				} 
+			}
+			if ($scope.force_refresh) {
+				$scope.forceRefresh();
 			}
 		}
-		if (!$scope.force_refresh) {
-			$timeout(loadClusterState, $scope.getRefresh());	
-		}
+		$timeout(loadClusterState, $scope.getRefresh());	
 		$scope.updateCluster();
 	}());
+	
+	
+    $scope.$on('refreshClusterView', function() {
+		$scope.forceRefresh();
+    });
+	
+	$scope.openModal=function(){
+		
+	}
+	$scope.closeModal=function(force_refresh){
+		$scope.modal.alert = null;
+		if (force_refresh) {
+			$scope.forceRefresh();
+		}
+	}
 	
 	$scope.forceRefresh=function() {
 		$scope.force_refresh = true;
@@ -425,26 +430,25 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	$scope.optimizeIndex=function(index){
 		var response = optimizeIndex($scope.host,index);
 		$scope.setAlert(new Alert(response.success, "Index was successfully optimized", "Error while optimizing index", response.response));
-		$scope.closeModal();
+		$scope.closeModal(false);
 	}
 	
 	$scope.deleteIndex=function(index){
 		var response = deleteIndex($scope.host,index);
 		$scope.setAlert(new Alert(response.success, "Index was successfully deleted", "Error while deleting index", response.response));
-		$scope.closeModal();
-		$scope.forceRefresh();
+		$scope.closeModal(true);
 	}
 	
 	$scope.clearCache=function(index) {
 		var response = clearCache($scope.host,index);
 		$scope.setAlert(new Alert(response.success, "Index cache was successfully cleared","Error while clearing index cache", response.response));
-		$scope.closeModal();
+		$scope.closeModal(false);
 	}
 
 	$scope.refreshIndex=function(index){
 		var response = refreshIndex($scope.host,index);
 		$scope.setAlert(new Alert(response.success, "Index was successfully refreshed","Error while refreshing index", response.response));
-		$scope.closeModal();
+		$scope.closeModal(false);
 	}
 	
 	$scope.flipDisableAllocation=function(current_state) {
@@ -454,6 +458,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 		} else {
 			$scope.setAlert(new Alert(response.response,"Shard allocation was disabled","Error while disabling shard allocation", response.response));			
 		}
+		$scope.forceRefresh();
 	}
 	
 	$scope.switchIndexState=function(index,state) {
@@ -464,8 +469,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 			var response =closeIndex($scope.host,index);			
 			$scope.setAlert(new Alert(response.success,"Index was successfully closed","Error while closing index",response.response));
 		}
-		$scope.closeModal();
-		$scope.forceRefresh();
+		$scope.closeModal(true);
 	}
 }
 
