@@ -223,12 +223,6 @@ a.cluster-map-header-cluster-action {
 }
 .cluster-map-header-index-alias {
 	word-wrap:break-word;
-	font-size: 11px;
-	color: #666666;
-	font-weight: 300;
-}
-.cluster-map-header-index-alias {
-	word-wrap:break-word;
 	font-size: 10px;
 	color: #666666;
 	font-weight: 300;
@@ -537,8 +531,8 @@ html,body {
 	display: inline-block;
 	width: 22px;
 	height: 22px;
-	border: 1px solid #000000;
-	border-radius: 4px 4px 4px 4px;
+	border: 1px solid #666;
+	border-radius: 1px 1px 1px 1px;
 	vertical-align: middle;
 	text-align: center;
 	line-height: 20px;
