@@ -1,6 +1,6 @@
 <div ng-controller="ClusterOverviewCtrl" ng-show="hasConnection()">
 	<h2>cluster administration</h2>
-	<div ng-include src="'cluster_stats.html'"></div>
+	<div ng-include src="'modals/cluster_stats.html'"></div>
 	<div class="row">
 		<div class="col-lg-10">
 			<form class="form-inline" role="form">
@@ -44,7 +44,7 @@
 	</div>
 	<br>
 	<table class="table table-bordered table-condensed table-nonfluid table-rounded">
-		<thead ng-include src="'shard_map_header.html'"></thead>
-		<tbody ng-include src="'shard_map_body.html'"></tbody>
+		<thead ng-include src="'partials/shard_map_header.html'"></thead>
+		<tbody ng-include src="'partials/shard_map_body.html'"></tbody>
 	</table>
 </div>
