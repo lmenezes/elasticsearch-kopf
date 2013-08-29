@@ -22,6 +22,6 @@ Install on a ElasticSearch instance:
 Screenshots
 ------------
 
-![cluster overview](/cluster_view.png)
-![rest client](/rest_client.png)
-![aliases management](/aliases.png)
+![cluster overview](/imgs/cluster_view.png)
+![rest client](/imgs/rest_client.png)
+![aliases management](/imgs/aliases.png)
