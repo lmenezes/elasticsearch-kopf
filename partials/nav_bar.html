@@ -9,9 +9,10 @@
 						<li class="active refresh-selector">
 							<div class="row">
 								<div class="col-lg-6">
-									refresh rate: 
+									<h5>refresh rate:</h5>
 								</div>
 								<div class="col-lg-6">
+									<h5>
 									<select ng-model="new_refresh" class="form-control navbar-app-settings-select" ng-change="changeRefresh()">
 										<option value="1000">1sec</option>
 										<option value="3000">3secs</option>
@@ -19,6 +20,14 @@
 										<option value="10000">10secs</option>
 										<option value="60000">1min</option>
 									</select>
+								</h5>
+								</div>
+							</div>
+						</li>
+						<li class="active refresh-selector">
+							<div class="row">
+								<div class="col-lg-12">
+									<h5>found a bug? <a href="https://github.com/lmenezes/elasticsearch-kopf/issues" target="_blank"><i class="icon-bug"></i> report it <i class="icon-bug"></i></a></h5>
 								</div>
 							</div>
 						</li>

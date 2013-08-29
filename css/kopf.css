@@ -55,6 +55,16 @@ h4 {
 	font-variant:small-caps;
 	font-weight: 200;
 }
+h5 {
+	color: #666;
+	font-variant:small-caps;
+	font-weight: 200;
+}
+h6 {
+	color: #666;
+	font-variant:small-caps;
+	font-weight: 200;
+}
 .modal-open {
 	margin-right: 0px !important;
 }
@@ -557,8 +567,8 @@ html,body {
 
 .refresh-selector {
 	vertical-align: middle;
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 .big-icon {
 	font-size: 18px;
