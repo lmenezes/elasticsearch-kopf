@@ -26,6 +26,13 @@ function fetchAliases(host) {
 	return new Aliases(response);
 }
 
+function analyzeByField(host, index, type, field, text) {
+	return syncRequest('GET', host + "/" + index + "/_analyze?field=" + type +"."+field,{'text':text});
+}
+function analyzeByAnalyzer(host, index, analyzer, text) {
+	return syncRequest('GET', host + "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text});
+}
+
 function updateAliases(host,add_aliases,remove_aliases) {
 	var data = {};
 	data['actions'] = [];
@@ -36,6 +43,10 @@ function updateAliases(host,add_aliases,remove_aliases) {
 		data['actions'].push({'remove':add_info});
 	});
 	return syncRequest('POST', host + "/_aliases",JSON.stringify(data, undefined, ""));
+}
+
+function getClusterState(host) {
+	return syncRequest('GET',host+"/_cluster/state",{});
 }
 
 function Aliases(aliases_info) {

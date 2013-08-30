@@ -167,6 +167,11 @@ function NavbarController($scope, $location, $timeout) {
 	$scope.changeTab=function() {
 		$scope.clearAlert();
 	}
+	$scope.selectAnalysisTab=function() {
+		$scope.clearAlert();
+		$scope.broadcastMessage('loadAnalysisEvent', {});
+	}
+	
 	
 	$scope.selectAliasesTab=function() {
 		$scope.clearAlert();
@@ -282,6 +287,85 @@ function RestCtrl($scope, $location, $timeout) {
 	];
 }
 
+function AnalysisCtrl($scope, $location, $timeout) {
+	
+	$scope.indices = {};
+	$scope.field_index = '';
+	$scope.field_type = '';
+	$scope.field_field = '';
+	$scope.field_text = '';
+	$scope.field_tokens = [];
+	
+	// By analyzer
+	$scope.analyzer_index = '';
+	$scope.analyzer_analyzer = '';
+	$scope.analyzer_text = '';
+	
+	$scope.analyzeByField=function() {
+		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
+			var response = analyzeByField($scope.host,$scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text);
+			$scope.field_tokens = response.response['tokens'];
+		}
+	}
+	
+	$scope.analyzeByAnalyzer=function() {
+		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
+			var response = analyzeByAnalyzer($scope.host,$scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text);
+			if (response.success) {
+				$scope.analyzer_tokens = response.response['tokens'];				
+			} else {
+				$scope.setAlert(new Alert(false, "","Error while analyzing text",response.response));
+			}
+		}
+	}
+	
+	$scope.getTypes=function() {
+		if (typeof $scope.indices[$scope.field_index] != 'undefined') {
+			return $scope.indices[$scope.field_index]['types'];
+		}
+	}
+	
+	$scope.getAnalyzers=function() {
+		if (typeof $scope.indices[$scope.analyzer_index]  != 'undefined') {
+			return $scope.indices[$scope.analyzer_index]['analyzers'];
+		}
+	}
+
+	$scope.getFields=function() {
+		if (typeof $scope.indices[$scope.field_index] != 'undefined') {
+			return $scope.indices[$scope.field_index]['types'][$scope.field_type];
+		} 
+	}	
+	
+    $scope.$on('loadAnalysisEvent', function() {
+		var response = getClusterState($scope.host);
+		Object.keys(response.response['metadata']['indices']).forEach(function(index) {
+			$scope.indices[index] = {};
+			var indexData = response.response['metadata']['indices'][index]['mappings'];
+			$scope.indices[index]['types'] = {};
+			Object.keys(indexData).forEach(function(type) {
+				$scope.indices[index]['types'][type] = [];
+			Object.keys(indexData[type]['properties']).forEach(function(property) {
+				$scope.indices[index]['types'][type].push(property);
+			})
+			});
+			
+			var indexSettings = response.response['metadata']['indices'][index]['settings'];
+			$scope.indices[index]['analyzers'] = [];
+			Object.keys(indexSettings).forEach(function(setting) {
+				if (setting.indexOf('index.analysis.analyzer') == 0) {
+					var analyzer = setting.substring('index.analysis.analyzer.'.length);
+					analyzer = analyzer.substring(0,analyzer.indexOf("."));
+					if ($.inArray(analyzer, $scope.indices[index]['analyzers']) == -1) {
+						$scope.indices[index]['analyzers'].push(analyzer);
+					}
+				}
+			});
+			
+		});
+    });
+}
+
 /* Main controller, all should inherit from this */
 function GlobalController($scope, $location, $timeout) {
 	if ($location.host() == "") {
@@ -304,6 +388,7 @@ function GlobalController($scope, $location, $timeout) {
 				$scope.cluster_health = cluster;
 			},
 			function(error_response) {
+				$scope.cluster_health = null;
 				$scope.alert = new Alert(false, "","Error connecting to [" + $scope.host + "]",error_response);
 			}
 		);

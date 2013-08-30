@@ -1,0 +1,93 @@
+<div ng-controller="AnalysisCtrl" ng-show="hasConnection()">
+	<h2>analysis</h2>
+	<div class="analysis-section">
+		<table class="table table-striped table-bordered">
+			<tr>
+				<td class="analysis-origin-cell form-horizontal">
+					<h5>analyze by field type</h5>
+					<div class="form-group">
+					  <label class="col-lg-3 control-label">index</label>
+					  <div class="col-lg-9">
+						<select class="form-control input-sm" ng-model="field_index" ng-options="index as index for (index , value) in indices">
+						</select>
+					  </div>
+					</div>
+					<div class="form-group">
+					  <label class="col-lg-3 control-label">type</label>
+					  <div class="col-lg-9">
+  						<select class="form-control input-sm" ng-model="field_type" ng-options="type as type for (type , value) in getTypes()">
+  						</select>
+					  </div>
+					</div>
+					<div class="form-group">
+					  <label class="col-lg-3 control-label">field</label>
+					  <div class="col-lg-9">
+  						<select class="form-control input-sm" ng-model="field_field" ng-options="field for field in getFields()">
+  						</select>
+					  </div>
+					</div>
+				</td>
+				<td>
+					<h5>&nbsp;</h5>
+					<div>
+						<i class="icon-puzzle-piece aliases-remove-new-alias-action" ng-click="analyzeByField()"></i>
+						<span class="aliases-new-alias-input">
+							<input type="text" class="form-control input-sm" placeholder="text to analyze" ng-model="field_text">
+						</span>
+					</div>
+					<div class="analysis-tokens">
+						<div ng-repeat="token in field_tokens" class="analysis-token" >
+							<div class="analysis-token-token">
+								{{token['token']}}
+							</div>
+							<div class="analysis-token-info">
+								<b>start</b>: {{token['start_offset']}} <b>end</b>: {{token['end_offset']}} <b>pos</b>: {{token['position']}}
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="analysis-origin-cell form-horizontal">
+					<h5>analyze by analyzer</h5>
+					<div class="form-group">
+					  <label class="col-lg-3 control-label">index</label>
+					  <div class="col-lg-9">
+						<select class="form-control input-sm" ng-model="analyzer_index" ng-options="index as index for (index , value) in indices">
+						</select>
+					  </div>
+					</div>
+					<div class="form-group">
+					  <label class="col-lg-3 control-label">analyzer</label>
+					  <div class="col-lg-9">
+						<select class="form-control input-sm" ng-model="analyzer_analyzer" ng-options="analyzer for analyzer in getAnalyzers()">
+						</select>
+					  </div>
+					</div>
+				</td>
+				<td>
+					<h5>&nbsp;</h5>
+					<div>
+						<i class="icon-puzzle-piece aliases-remove-new-alias-action" ng-click="analyzeByAnalyzer()"></i>
+						<span class="aliases-new-alias-input">
+							<input type="text" class="form-control input-sm" placeholder="text to analyze" ng-model="analyzer_text">
+						</span>
+					</div>
+					<div class="analysis-tokens">
+						<div ng-repeat="token in analyzer_tokens" class="analysis-token" >
+							<div class="analysis-token-token">
+								{{token['token']}}
+							</div>
+							<div class="analysis-token-info">
+								<b>start</b>: {{token['start_offset']}} <b>end</b>: {{token['end_offset']}} <b>pos</b>: {{token['position']}}
+							</div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+
+

@@ -402,9 +402,9 @@ a.cluster-map-node-action {
 
 /** ALIASES **/
 .aliases-index-alias {
-	background: #B1CCE4;
+	background: #E7EEF5;
 	border: 1px solid #333;
-	border-radius: 5px 5px 5px 5px;
+	border-radius: 2px 2px 2px 2px;
 	font-size: 12px;
 	margin-right: 10px;
 	padding-left: 3px;
@@ -458,7 +458,47 @@ a.cluster-map-node-action {
 .aliases-section {
 	padding-top: 10px;
 }
+/** START ### analysis ### START **/
+.analysis-section {
+	padding-top: 10px;
+}
+.analysis-origin-cell {
+	width: 250px;
+	max-width: 250px;
+	min-width: 250px;
+	font-size: 12px;
+	font-variant: small-caps;
+	font-weight: 300;
+	color: #666;
+}
+
+.analysis-tokens {
+
+}
+.analysis-token {
+	background: #E7EEF5;
+	border: 1px solid #333;
+	border-radius: 1px 1px 1px 1px;
+	margin-right: 10px;
+	padding-left: 2px;
+	padding-right: 2px;
+	margin-top: 5px;
+	float: left;
+}
+.analysis-token-token {
+	font-size:10px;
+	text-align: center;
+	font-weight: 500;
+}
+.analysis-token-info {
+	font-size:7px;
+	display: inline;
+	font-weight: 300;
+}
+/** END ### analysis ### END **/
+
 /** END OF REFACTORED AREA!!! **/
+
 
 .settings-section-header {
 	top: 15px;
