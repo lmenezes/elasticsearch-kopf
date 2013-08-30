@@ -249,6 +249,10 @@ function AliasesCtrl($scope, $location, $timeout) {
 		$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
 	}
 	
+	$scope.$on('hostChanged',function() {
+		$scope.loadAliases();
+	});
+	
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
     });
@@ -337,7 +341,15 @@ function AnalysisCtrl($scope, $location, $timeout) {
 		} 
 	}	
 	
+	$scope.$on('hostChanged',function() {
+		$scope.loadAnalysisData();
+	});
+	
     $scope.$on('loadAnalysisEvent', function() {
+		$scope.loadAnalysisData();
+    });
+	
+	$scope.loadAnalysisData=function() {
 		var response = getClusterState($scope.host);
 		Object.keys(response.response['metadata']['indices']).forEach(function(index) {
 			$scope.indices[index] = {};
@@ -363,7 +375,7 @@ function AnalysisCtrl($scope, $location, $timeout) {
 			});
 			
 		});
-    });
+	}
 }
 
 /* Main controller, all should inherit from this */
@@ -412,6 +424,7 @@ function GlobalController($scope, $location, $timeout) {
 	
 	$scope.setHost=function(host) {
 		$scope.host = host;
+		$scope.broadcastMessage('hostChanged',{});
 	}
 	
 	$scope.setRefresh=function(refresh) {
