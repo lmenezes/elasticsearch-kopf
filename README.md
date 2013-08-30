@@ -1,7 +1,7 @@
 elasticsearch kopf
 =======================
 
-kopf is a simple web administration tool for ElasticSearch[(http://elasticsearch.org)] written in JavaScript + AngularJS + jQuery + Twitter bootstrap.
+kopf is a simple web administration tool for [ElasticSearch](http://elasticsearch.org) written in JavaScript + AngularJS + jQuery + Twitter bootstrap.
 
 it offers an easy way of performing common tasks on an elasticsearch cluster. not every single API is covered by this plugin, but it does offer a rest client which allows you to explore the full potential of the ElasticSearch API.
 
@@ -14,7 +14,7 @@ Run locally:
     cd elasticsearch-kopf
     open index.html
     
-* ps: local execution doesn't work with Chrome(and maybe others)[(http://docs.angularjs.org/api/ng.directive:ngInclude)].
+ps: local execution doesn't work with Chrome(and maybe other browsers). See more [here](http://docs.angularjs.org/api/ng.directive:ngInclude).
     
 
 Install on a ElasticSearch instance:
