@@ -496,6 +496,18 @@ a.cluster-map-node-action {
 	font-weight: 300;
 }
 /** END ### analysis ### END **/
+/** START ### diagnosis ### START **/
+.diagnosis-gist-link {
+	font-size: 11px;
+}
+.diagnosis-gist-description {
+	font-size: 12px;
+	color: #666;
+}
+.diagnosis-gist-share {
+	margin-left: 10px;
+}
+/** END ### diagnosis ### END **/
 
 /** END OF REFACTORED AREA!!! **/
 

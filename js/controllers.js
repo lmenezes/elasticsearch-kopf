@@ -348,6 +348,60 @@ function AliasesCtrl($scope, $location, $timeout) {
 
 }
 
+function DiagnosisCtrl($scope,$location,$timeout) {
+	$scope.shared_url = '';
+    $scope.$on('loadDiagnosisEvent', function() {
+		$scope.loadDiagnosis();
+    });
+	
+	$scope.loadDiagnosis=function() {
+		$scope.nodes = getNodes($scope.host);
+	}
+	
+	$scope.shareClusterInfo=function() {
+		$scope.share_url = '';
+		var diagnosis = getClusterDiagnosis($scope.host,
+			function(state, stats, hot_threads) {
+				var gist = {};
+				gist['description'] = 'Cluster information delivered by kopf';
+				gist['public'] = true;
+				gist['files'] = {};
+				gist['files']['state'] = {'content': JSON.stringify(state, undefined, 4),'indent':'2', 'language':'JSON'};
+				gist['files']['stats'] = {'content': JSON.stringify(stats, undefined, 4),'indent':'2', 'language':'JSON'} ;
+				gist['files']['hot_threads'] = {'content':hot_threads,'indent':'2', 'language':'JSON'};
+				var response = $scope.publishGist(gist);
+				if (response.success) {
+					$scope.setAlert(new Alert(true, "Cluster information successfully shared", null));
+					$scope.shared_url = response.response.html_url;
+				} else {
+					$scope.setAlert(new Alert(false, "Error while creating Gist", response.response));
+				}
+			},
+			function(failed_request) {
+				$scope.setAlert(new Alert(false, "Error while retrieving cluster information", failed_request.responseText));
+			}
+		);
+	}
+	
+	$scope.diagnosisCluster=function(state, stats) {
+		
+	}
+	
+	$scope.publishGist=function(gist) {
+		var data = JSON.stringify(gist, undefined, 4);
+		var response = null;
+		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
+			.done(function(r) { 
+				response = new ServerResponse(true,r);
+			})
+			.fail(function(r) {
+				response = new ServerResponse(false,r);
+			});
+		;
+		return response;
+	}
+}
+
 function RestCtrl($scope, $location, $timeout) {
 	$scope.request = new Request();
 	
@@ -501,7 +555,7 @@ function GlobalController($scope, $location, $timeout) {
 			},
 			function(error_response) {
 				$scope.cluster_health = null;
-				$scope.alert = new Alert(false, "","Error connecting to [" + $scope.host + "]",error_response);
+				$scope.alert = new Alert(false, "Error connecting to [" + $scope.host + "]",error_response);
 			}
 		);
 	}());
@@ -755,4 +809,24 @@ function ModalControls() {
 
 function isDefined(value) {
 	return typeof value != 'undefined';
+}
+
+function ClusterDiagnostic() {
+	this.diagnostic = [];
+}
+
+function NodeDiskSizeCheck(node_info) {
+	
+}
+
+function NodeSwapCheck(node_id, node_info) {
+	var message = null;
+	if (node_info['os']['swap']['used_in_bytes']) {
+		message = "Node [" + node_info['name'] + "] is swapping [" + node_info['os']['swap']['used'] + "]";
+	}
+}
+
+function Diagnostic(critical, message) {
+	this.critical = critical;
+	this.message = message;
 }
