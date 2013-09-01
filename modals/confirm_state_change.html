@@ -22,10 +22,10 @@
       		<div class="modal-footer">
         		<button type="button" class="btn btn-default btn-small" data-dismiss="modal" ng-click='closeModal()' >Close</button>
 				<span ng-switch on="index.state">
-        			<button type="button" ng-switch-when="open" class="btn btn-primary" data-dismiss="modal" ng-click='switchIndexState(index.name,index.state)'>
+        			<button type="button" ng-switch-when="open" class="btn btn-primary" data-dismiss="modal" ng-click='closeIndex(index.name)'>
 						<i class="icon-folder-close"></i> Close
 					</button>
-        			<button type="button" ng-switch-when="close" class="btn btn-primary" data-dismiss="modal" ng-click='switchIndexState(index.name,index.state)'>
+        			<button type="button" ng-switch-when="close" class="btn btn-primary" data-dismiss="modal" ng-click='openIndex(index.name)'>
 						<i class="icon-folder-open"></i> Open
 					</button>
 				</span>

@@ -639,8 +639,11 @@ html,body {
 	font-weight: 300;
 	padding-top: 0px;
 	padding-bottom: 0px;
+	text-align: left;
 }
-
+.alert-server-response {
+	padding-top: 25px;
+}
 /** Create index modal **/
 .settings-area {
 	font-size: 9px;
