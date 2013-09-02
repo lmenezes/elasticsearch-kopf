@@ -187,6 +187,14 @@ function compareIndices(a,b) { // TODO: take into account index properties?
 	return a.name.localeCompare(b.name);
 }
 
+function getNodesStats(host) {
+	var response = syncRequest('GET',host+"/_nodes/stats?all=true",{});
+	if (!response.success) {
+		throw response.response;
+	}
+	return response.response;
+}
+
 function syncRequest(method, url, data) {
 	var response;
 	$.ajax({

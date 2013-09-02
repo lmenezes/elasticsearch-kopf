@@ -383,8 +383,10 @@ function DiagnosisCtrl($scope,$location,$timeout) {
 		);
 	}
 	
-	$scope.diagnosisCluster=function(state, stats) {
-		
+	$scope.diagnosisCluster=function() {
+		var response = getNodesStats($scope.host);
+		var issues = new ClusterDiagnostic().diagnosis(response);
+		console.log(issues);
 	}
 	
 	$scope.publishGist=function(gist) {
@@ -812,17 +814,39 @@ function isDefined(value) {
 }
 
 function ClusterDiagnostic() {
-	this.diagnostic = [];
+	this.node_checks = [];
+	this.node_checks.push(new NodeSwapCheck()); //node swap
+	
+	this.diagnosis=function(nodes_stats) {
+		var nodes = nodes_stats['nodes'];
+		var issues = [];
+		var node_checks = this.node_checks;
+		Object.keys(nodes).forEach(function(node_id) {
+			var node_info = nodes[node_id];
+			node_checks.forEach(function(node_check) {
+				var diagnostic = node_check.check(node_id,node_info);
+				if (diagnostic != null) {
+					issues.push(diagnostic);
+				}
+			})
+		});
+		return issues;
+	}
 }
 
 function NodeDiskSizeCheck(node_info) {
 	
 }
 
-function NodeSwapCheck(node_id, node_info) {
-	var message = null;
-	if (node_info['os']['swap']['used_in_bytes']) {
-		message = "Node [" + node_info['name'] + "] is swapping [" + node_info['os']['swap']['used'] + "]";
+function NodeSwapCheck() {
+	this.critical = false;
+	
+	this.check=function(node_id,node_info) {
+		var diagnostic = null;
+		if (node_info['os']['swap']['used_in_bytes'] >= 0) {
+			diagnostic = new Diagnostic(this.critical,"Node [" + node_info['name'] + "] is swapping: [" + node_info['os']['swap']['used'] + "]");
+		}
+		return diagnostic;		
 	}
 }
 
