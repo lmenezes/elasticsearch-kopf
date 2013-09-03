@@ -32,7 +32,7 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 				}
 				var response = createIndex($scope.host,$scope.name, JSON.stringify(settings, undefined, ""));
 				$scope.modal.alert = new Alert(true, 'Index successfully created', response);
-				$scope.broadcastMessage('refreshClusterView', {});
+				$scope.broadcastMessage('forceRefresh', {});
 			}
 		} catch(error) {
 			$scope.modal.alert = new Alert(false, "Error while creating index", error);
@@ -43,7 +43,6 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 function ClusterOverviewCtrl($scope, $location, $timeout) {
 	$scope.pagination= new Pagination(1,"", []);
 	$scope.cluster = null;
-	$scope.force_refresh = false;
 	
 	(function loadClusterState() {
 		
@@ -51,7 +50,8 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 			return ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
 		}
 		
-		$scope.updateCluster=function() {
+		$scope.updateCluster=function(is_forced_refresh) {
+			var forced_refresh = is_forced_refresh;
 			if (!$scope.isInModal()) { // only refreshes if no modal is active
 				if ($scope.isCurrentView()) {
 					getClusterDetail($scope.host, function(cluster) {
@@ -60,17 +60,26 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 								$scope.cluster = cluster;
 								$scope.pagination.setResults(cluster.indices);
 							});
-							$scope.force_refresh = false;
-						} 
+							forced_refresh = false;
+						} else {
+							if (forced_refresh) {
+								$scope.forcedRefresh();
+							}
+						}
 					});
-				} 
-			}
-			if ($scope.force_refresh) {
-				$scope.forceRefresh();
+				} else {
+					if (forced_refresh) {
+						$scope.forcedRefresh();
+					}
+				}
+			} else {
+				if (forced_refresh) {
+					$scope.forcedRefresh();
+				}
 			}
 		}
 		$timeout(loadClusterState, $scope.getRefresh());	
-		$scope.updateCluster();
+		$scope.updateCluster(false);
 	}());
 	
 	
@@ -78,20 +87,20 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 		return $scope.cluster.getNodes($scope.pagination.data,$scope.pagination.master,$scope.pagination.client);
 	}
 	
-    $scope.$on('refreshClusterView', function() {
-		$scope.forceRefresh();
+    $scope.$on('forceRefresh', function() {
+		$scope.forcedRefresh();
     });
 	
-	$scope.closeModal=function(force_refresh){
-		$scope.modal.alert = null;
-		if (force_refresh) {
-			$scope.forceRefresh();
-		}
+	// not to mistake with forceRefresh, which invokes a global refresh
+	$scope.forcedRefresh=function() {
+		$timeout(function() { $scope.updateCluster(true) }, 100);
 	}
 	
-	$scope.forceRefresh=function() {
-		$scope.force_refresh = true;
-		$timeout(function() { $scope.updateCluster() }, 100);
+	$scope.closeModal=function(forced_refresh){
+		$scope.modal.alert = null;
+		if (forced_refresh) {
+			$scope.forceRefresh(); // broadcasts so every controller gets the forceRefresg
+		}
 	}
 	
 	// actions invoked from view
@@ -211,7 +220,7 @@ function IndexSettingsCtrl($scope, $location, $timeout) {
 					});
 					var response = updateIndexSettings($scope.host, index.name, JSON.stringify(new_settings, undefined, ""));
 					$scope.modal.alert = new Alert(true, "Index settings were successfully updated", response.response);
-					$scope.broadcastMessage('refreshClusterView', {});
+					$scope.broadcastMessage('forceRefresh', {});
 				}
 			});
 		} catch (error) {
@@ -227,7 +236,7 @@ function ClusterSettingsCtrl($scope, $location, $timeout) {
 			new_settings['transient'] = $scope.cluster.settings;
 			var response = updateClusterSettings($scope.host, JSON.stringify(new_settings, undefined, ""));
 			$scope.modal.alert = new Alert(true, "Cluster settings were successfully updated",response.response);
-			$scope.broadcastMessage('refreshClusterView', {});
+			$scope.broadcastMessage('forceRefresh', {});
 		} catch (error) {
 			$scope.modal.alert = new Alert(false, "Error while updating cluster settings",error);
 		}
@@ -237,11 +246,39 @@ function ClusterSettingsCtrl($scope, $location, $timeout) {
 function NavbarController($scope, $location, $timeout) {
 	
 	$scope.new_refresh = $scope.getRefresh();
+	$scope.cluster_health = null;
 	
-	$scope.connectToHost=function() {
+	(function loadClusterHealth() {
+		
+		$scope.updateClusterHealth=function() {
+			getClusterHealth($scope.host, 
+				function(cluster) {
+					if ($scope.cluster_health == null) {
+						$scope.clearAlert();
+					}
+					$scope.cluster_health = cluster;
+					$scope.setConnected(true);
+				},
+				function(error_response) {
+					$scope.cluster_health = null;
+					$scope.setConnected(false);
+					$scope.alert = new Alert(false, "Error connecting to [" + $scope.host + "]",error_response);
+				}
+			);
+		}
+		
+    	$timeout(loadClusterHealth, $scope.refresh);
+		$scope.updateClusterHealth();
+	}());
+	
+    $scope.$on('forceRefresh', function() {
+		$scope.updateClusterHealth();
+    });
+	
+    $scope.connectToHost=function() {
 		if (isDefined($scope.new_host) && $scope.new_host.length > 0) {
-			$scope.setClusterHealth();
-			$scope.setHost($scope.new_host);			
+			$scope.setHost($scope.new_host);
+			$scope.updateClusterHealth();
 		}
 	}
 	
@@ -386,7 +423,6 @@ function DiagnosisCtrl($scope,$location,$timeout) {
 	$scope.diagnosisCluster=function() {
 		var response = getNodesStats($scope.host);
 		var issues = new ClusterDiagnostic().diagnosis(response);
-		console.log(issues);
 	}
 	
 	$scope.publishGist=function(gist) {
@@ -540,36 +576,24 @@ function GlobalController($scope, $location, $timeout) {
 	} else {
 		$scope.host = "http://" + $location.host() + ":" + $location.port();
 	}
-	
 	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
-	$scope.cluster_health = null;
+	$scope.is_connected = false;
 
-	(function loadClusterHealth() {
-    	$timeout(loadClusterHealth, $scope.refresh);
-		getClusterHealth($scope.host, 
-			function(cluster) {
-				if ($scope.cluster_health == null) {
-					$scope.clearAlert();
-				}
-				$scope.cluster_health = cluster;
-			},
-			function(error_response) {
-				$scope.cluster_health = null;
-				$scope.alert = new Alert(false, "Error connecting to [" + $scope.host + "]",error_response);
-			}
-		);
-	}());
-	
+	// should be called when an action could change status/topology of cluster
+	$scope.forceRefresh=function() {
+		$scope.broadcastMessage('forceRefresh',{});
+	}
+
 	$scope.hasConnection=function() {
-		return $scope.cluster_health != null;
+		return $scope.is_connected;
 	}
 	
-	$scope.setClusterHealth=function(cluster_health) {
-		$scope.cluster_health = cluster_health;
+	$scope.setConnected=function(status) {
+		$scope.is_connected = status;
 	}
-	
+
 	$scope.broadcastMessage=function(message,args) {
 		$scope.$broadcast(message,args);
 	}
