@@ -137,7 +137,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	$scope.clearCache=function(index) {
 		try {
 			var response = clearCache($scope.host,index);
-			$scope.setAlert(new Alert(true, "Index cache was successfully clearedd", response.response));
+			$scope.setAlert(new Alert(true, "Index cache was successfully cleared", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while clearing index cache", error));	
 		}
@@ -278,6 +278,7 @@ function NavbarController($scope, $location, $timeout) {
     $scope.connectToHost=function() {
 		if (isDefined($scope.new_host) && $scope.new_host.length > 0) {
 			$scope.setHost($scope.new_host);
+			$scope.cluster_health = null;
 			$scope.updateClusterHealth();
 		}
 	}
@@ -442,25 +443,43 @@ function DiagnosisCtrl($scope,$location,$timeout) {
 
 function RestCtrl($scope, $location, $timeout) {
 	$scope.request = new Request();
+	$scope.validation_error = null;
+	$scope.request.url = $scope.host + "/_search";
 	
-	$scope.sendRequest=function() {
-		$('#rest-client-response').html('');
-		$scope.clearAlert();
+	$scope.formatBody=function() {
 		try {
-			var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
-			if (response.success) {
-				var content = beautifulJson(response.response);
-				$('#rest-client-response').html(content);
-			} else {
-				try {
-					var content = beautifulJson(JSON.parse(response.response.responseText));
-					$('#rest-client-response').html(content);
-				} catch (error) {
-					$scope.setAlert(new Alert(false, "Request did not return a valid JSON", response.response.responseText));
-				}
+			if (notEmpty($scope.request.body)) {
+				$scope.validation_error = null;
+				var bodyObject = JSON.parse($scope.request.body);
+				var formattedBody = JSON.stringify(bodyObject,undefined,4);
+				$scope.request.body = formattedBody;
 			}
 		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while executing request", error));
+			$scope.validation_error = error.toString();
+		}
+	}
+	
+	$scope.sendRequest=function() {
+		$scope.formatBody();
+		$scope.clearAlert();
+		$('#rest-client-response').html('');
+		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
+			try {
+				var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
+				if (response.success) {
+					var content = beautifulJson(response.response);
+					$('#rest-client-response').html(content);
+				} else {
+					try {
+						var content = beautifulJson(JSON.parse(response.response.responseText));
+						$('#rest-client-response').html(content);
+					} catch (error) {
+						$scope.setAlert(new Alert(false, "Request did not return a valid JSON", response.response.responseText));
+					}
+				}
+			} catch (error) {
+				$scope.setAlert(new Alert(false, "Error while executing request", error));
+			}
 		}
 	}
 	// maybe allow storing queries in ES? would need some kind of security
@@ -571,6 +590,8 @@ function AnalysisCtrl($scope, $location, $timeout) {
 }
 
 function GlobalController($scope, $location, $timeout) {
+	$scope.version = "0.1";
+	
 	if ($location.host() == "") { // when opening from filesystem
 		$scope.host = "http://localhost:9200";
 	} else {
@@ -604,6 +625,7 @@ function GlobalController($scope, $location, $timeout) {
 	
 	$scope.setHost=function(host) {
 		$scope.host = host;
+		$scope.setConnected(false);
 		$scope.broadcastMessage('hostChanged',{});
 	}
 	
@@ -631,7 +653,7 @@ function GlobalController($scope, $location, $timeout) {
 
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
-		$scope.modal.info = JSON.stringify(info, undefined, 4);
+		$scope.modal.info = beautifulJson(info);
 		$('#modal_info').modal({show:true,backdrop:false});
 	}
 	
@@ -663,7 +685,7 @@ var collapseJsonId = 0;
 
 function beautifulJson(data) {
 	collapseJsonId = 0;
-	return '<div class=\"json-content\"">' + beautifulJsonObject(data) + '</div>';
+	return '<div class=\"json-content\">' + beautifulJsonObject(data) + '</div>';
 }
 
 function beautifulJsonObject(data) {
@@ -835,6 +857,10 @@ function ModalControls() {
 
 function isDefined(value) {
 	return typeof value != 'undefined';
+}
+
+function notEmpty(value) {
+	return isDefined(value) && value != null && value.trim().length > 0;
 }
 
 function ClusterDiagnostic() {

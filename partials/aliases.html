@@ -5,26 +5,26 @@
 			<tr ng-repeat="(alias, indices) in aliases.info">
 				<td class="aliases-alias-cell">
 					<div>
-						<i class="icon-remove-circle aliases-remove-alias-action" ng-click="removeAlias(alias)"></i>
+						<i class="icon-remove-circle aliases-remove-alias-action normal-action" ng-click="removeAlias(alias)" title="remove alias for all indices"></i>
 						<span class="aliases-new-alias-input">
-							<i class="icon-tag"></i> {{alias}}
+							<i class="icon-tag"></i> <span class="aliases-alias">{{alias}}</span>
 						</span>
 					</div>
 				</td>
 				<td>
 					<span ng-repeat="index in indices" class="aliases-index-alias">
-						{{index}} <i class="icon-remove-circle" ng-click="removeAliasFromIndex(index,alias)"></i>
+						{{index}} <i class="icon-remove-circle normal-action" ng-click="removeAliasFromIndex(index,alias)" title="dissociate alias from index"></i>
 					</span>
-					<span class="aliases-new-index">
+					<span class="aliases-new-index" title="associate alias with index">
 						<select class="aliases-add-index-input" ng-model="new_index[alias]" ng-options="index for index in aliases.indices">
 						</select>
-						<i class="icon-plus-sign aliases-add-index-action" ng-click="addIndexToAlias(alias);"></i>
+						<i class="icon-plus-sign aliases-add-index-action normal-action" ng-click="addIndexToAlias(alias);"></i>
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td class="aliases-alias-cell">
-					<i class="icon-plus-sign aliases-remove-new-alias-action" ng-click="addAlias();"></i>
+					<i class="icon-plus-sign aliases-remove-new-alias-action normal-action" ng-click="addAlias();" title="create new alias"></i>
 					<span class="aliases-new-alias-input">
 						<input type="text" class="form-control input-sm" placeholder="create new alias" ng-model="new_alias">
 					</span>

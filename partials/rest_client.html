@@ -28,6 +28,12 @@
 						<div>
 							<textarea class="form-control rest-client-request-body" ng-model="request.body" rows="34"></textarea>
 						</div>
+						<div class="rest-client-format-body">
+							<span class="rest-body-validation-error">{{validation_error}}</span>
+							<button type="submit" class="btn btn-default rest-client-execute input-sm" ng-click="formatBody()">
+								<i class="icon-align-left"></i> format body
+							</button>
+						</div>
 					</div>
 					<div class="col-lg-6">
 						<div id="rest-client-response" class="rest-client-response"></div>

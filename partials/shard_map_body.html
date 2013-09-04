@@ -2,10 +2,9 @@
 	<td class="cluster-map-node-cell">
 		<div class="row">
 			<div class="col-lg-1" class="cluster-map-node-badges">
-				<div ng-switch on="node.master">
-					<div ng-switch-when="true">
-						<i ng-class="{true:'icon-star',false:'icon-star-empty'}[node.current_master]" title="master node"></i>
-					</div>
+				<div ng-show="node.master">
+					<div ng-show="node.current_master"><i class="icon-star" title="current master"></i></div>
+					<div ng-show="!node.current_master"><i class="icon-star-empty" title="master eligible"></i></div>
 				</div>
 				<div><i ng-class="{true:'icon-search',false:''}[node.client]" title="client node"></i></div>
 				<div><i ng-class="{true:'icon-hdd',false:''}[node.data]" title="data node"></i></div>
@@ -15,7 +14,7 @@
 			<div class="col-lg-10">
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="cluster-map-node-name normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)">{{node.name}}</div>
+						<div class="cluster-map-node-name normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)" title="view node stats">{{node.name}}</div>
 					</div>
 				</div>
 				<div class="row">
@@ -26,8 +25,8 @@
 				</div>
 				<div class="row">
 						<div class="col-lg-12">
-							<span class="cluster-map-node-stat">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
-							<span class="cluster-map-node-stat">heap: {{node.stats.jvm.mem.heap_used}}/{{node.stats.jvm.mem.heap_committed}}</span>
+							<span class="cluster-map-node-stat" title="current load average">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
+							<span class="cluster-map-node-stat" title="used heap / commited heap">heap: {{node.stats.jvm.mem.heap_used}}/{{node.stats.jvm.mem.heap_committed}}</span>
 						</div>
 					</div>
 				</div>

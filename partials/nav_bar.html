@@ -1,66 +1,78 @@
-<div class="navbar navbar-fixed-top navbar-cluster-status-{{cluster_health.status}}" ng-controller="NavbarController">
-	<div class="container">
-		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span></button>
-		<ul class="nav navbar-nav">
-			<li class="dropdown">
-				<a href="#" class="navbar-brand navbar-cluster-status-{{cluster_health.status}} dropdown-toggle navbar-logo" data-toggle="dropdown">kopf <i class="icon-caret-down navbar-logo-action"></i></a>
-				<ul class="dropdown-menu form-horizontal navbar-app-settings">
-					<form class="form-inline" role="form">
-						<li class="active refresh-selector">
-							<div class="row">
-								<div class="col-lg-6">
-									<h5>refresh rate:</h5>
+<div ng-controller="NavbarController">
+	<div class="navbar navbar-fixed-top navbar-cluster-status-{{cluster_health.status}}">
+		<div class="container">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span></button>
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="#" class="navbar-brand navbar-cluster-status-{{cluster_health.status}} dropdown-toggle navbar-logo" data-toggle="dropdown">kopf <i class="icon-caret-down navbar-logo-action"></i></a>
+					<ul class="dropdown-menu form-horizontal navbar-app-settings">
+						<form class="form-inline" role="form">
+							<li class="active navbar-menu-section">
+								<div class="row">
+									<div class="col-lg-6">
+										<span class="navbar-menu-item">refresh rate:</span>
+									</div>
+									<div class="col-lg-6">
+										<select ng-model="new_refresh" class="form-control navbar-app-settings-select" ng-change="changeRefresh()">
+											<option value="1000">1sec</option>
+											<option value="3000">3secs</option>
+											<option value="5000">5secs</option>
+											<option value="10000">10secs</option>
+											<option value="60000">1min</option>
+										</select>
+									</div>
 								</div>
-								<div class="col-lg-6">
-									<h5>
-									<select ng-model="new_refresh" class="form-control navbar-app-settings-select" ng-change="changeRefresh()">
-										<option value="1000">1sec</option>
-										<option value="3000">3secs</option>
-										<option value="5000">5secs</option>
-										<option value="10000">10secs</option>
-										<option value="60000">1min</option>
-									</select>
-								</h5>
+							</li>
+							<li class="divider"></li>
+							<li class="active navbar-menu-section">
+								<div class="row">
+									<div class="col-lg-12">
+										<span class="navbar-menu-item">kopf v{{version}} - found a bug? <a href="https://github.com/lmenezes/elasticsearch-kopf/issues" target="_blank">report it!</a></span>
+									</div>
 								</div>
-							</div>
-						</li>
-						<li class="active refresh-selector">
-							<div class="row">
-								<div class="col-lg-12">
-									<h5>found a bug? <a href="https://github.com/lmenezes/elasticsearch-kopf/issues" target="_blank"><i class="icon-bug"></i> report it <i class="icon-bug"></i></a></h5>
-								</div>
-							</div>
-						</li>
-					</form>
-				</ul>
-			</li>
-		</ul>
-		<ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}}">
-			<li class="active" id="cluster_option" ng-click="changeTab()">
-				<a href="#cluster" data-toggle="tab"><i class="icon-sitemap"></i> cluster</a>
-			</li>
-			<li class="" id="rest_option" ng-click="changeTab()">
-				<a href="#rest" data-toggle="tab" class=""><i class="icon-edit"></i> rest</a>
-			</li>
-			<li class="" id="aliases_option" ng-click="selectAliasesTab()">
-				<a href="#aliases" data-toggle="tab" class=""><i class="icon-tags"></i> aliases</a>
-			</li>
-			<li class="" id="analysis_option" ng-click="selectAnalysisTab()">
-				<a href="#analysis" data-toggle="tab" class=""><i class="icon-puzzle-piece"></i> analysis</a>
-			</li>
-			<!--li class="" id="diagnosis_option" ng-click="selectDiagnosisTab()">
-				<a href="#diagnosis" data-toggle="tab" class=""><i class="icon-user-md"></i> diagnosis</a>
-			</li-->
-		</ul>
-		<ul class="nav navbar-nav pull-right">
-			<li class="navbar-host-input">
-				<div class="input-group">
-					<input type="text" class="form-control" ng-model="new_host" placeholder="connect to a different host">
-					<span class="input-group-btn">
-						<button class="btn host-input-action navbar-cluster-status-{{cluster_health.status}}-nav" type="button" ng-click="connectToHost()"><i class="icon-magic" title="connect"></i></button>
-					</span>
+							</li>
+
+						</form>
+					</ul>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}}">
+				<li class="active" id="cluster_option" ng-click="changeTab()">
+					<a href="#cluster" data-toggle="tab"><i class="icon-sitemap"></i> cluster</a>
+				</li>
+				<li class="" id="rest_option" ng-click="changeTab()">
+					<a href="#rest" data-toggle="tab" class=""><i class="icon-edit"></i> rest</a>
+				</li>
+				<li class="" id="aliases_option" ng-click="selectAliasesTab()">
+					<a href="#aliases" data-toggle="tab" class=""><i class="icon-tags"></i> aliases</a>
+				</li>
+				<li class="" id="analysis_option" ng-click="selectAnalysisTab()">
+					<a href="#analysis" data-toggle="tab" class=""><i class="icon-puzzle-piece"></i> analysis</a>
+				</li>
+				<!--li class="" id="diagnosis_option" ng-click="selectDiagnosisTab()">
+					<a href="#diagnosis" data-toggle="tab" class=""><i class="icon-user-md"></i> diagnosis</a>
+				</li-->
+			</ul>
+			<ul class="nav navbar-nav pull-right">
+				<li class="navbar-host-input">
+					<div class="input-group">
+						<input type="text" class="form-control" ng-model="new_host" placeholder="connect to a different host">
+						<span class="input-group-btn">
+							<button class="btn host-input-action navbar-cluster-status-{{cluster_health.status}}-nav" type="button" ng-click="connectToHost()"><i class="icon-magic" title="connect"></i></button>
+						</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="container app-container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="connection-status-console" ng-switch on="hasConnection()">
+					<span ng-switch-when="false">trying to connect to [{{host}}]</span>
+					<span ng-switch-default="true">connected to <b>{{cluster_health.name}}</b> @ <b>{{host}}</b></span>
 				</div>
-			</li>
-		</ul>
+			</div>
+		</div>
 	</div>
 </div>

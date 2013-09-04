@@ -276,12 +276,12 @@ function Shard(shard_info) {
 
 function Cluster(state,status,nodes,settings) {
 	if (state != null && status != null && nodes != null && settings != null) {
-		this.disableAllocation = "false";
+		this.disableAllocation = false;
 		if (isDefined(settings['persistent']) && isDefined(settings['persistent']['disable_allocation'])) {
-			this.disableAllocation = settings['persistent']['disable_allocation'];
+			this.disableAllocation = settings['persistent']['disable_allocation'] == "true" ? true : false;
 		}
 		if (isDefined(settings['transient']) && isDefined(settings['transient']['cluster.routing.allocation.disable_allocation'])) {
-			this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] === "true" ? "true" : "false";
+			this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] == "true" ? true : false;
 		}
 		this.settings = $.extend({}, settings['persistent'], settings['transient']);
 		this.master_node = state['master_node'];
@@ -325,7 +325,6 @@ function Cluster(state,status,nodes,settings) {
 		};
 	}
 }
-
 
 function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;

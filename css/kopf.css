@@ -3,6 +3,7 @@
 	font-size: 11px;
 	font-weight: 400;
 	color: #666;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .json-property {
 	font-weight: 500;
@@ -187,6 +188,16 @@ h6 {
 	width: 250px;
 	padding-top: 8px;
 	vertical-align: middle;
+}
+.navbar-menu-item {
+	font-size: 13px;
+	color: #666;
+	font-weight: 300;
+}
+.navbar-menu-section {
+	vertical-align: middle;
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 /** ############### END - navbar - END ############### **/
 
@@ -394,6 +405,15 @@ a.cluster-map-node-action {
 	padding: 5px;
 	min-height: 614px;
 }
+.rest-client-format-body {
+	margin-top: 10px;
+}
+.rest-body-validation-error {
+	color: red;
+	padding-top: 5px;
+	font-size: 12px;
+	font-weight: 300;
+}
 .request-client-request-body-options {
 	overflow: hidden;
 	display: block;
@@ -458,6 +478,11 @@ a.cluster-map-node-action {
 .aliases-section {
 	padding-top: 10px;
 }
+.aliases-alias {
+	font-weight: 300;
+	font-size: 12px;
+}
+
 /** START ### analysis ### START **/
 .analysis-section {
 	padding-top: 10px;
@@ -628,13 +653,6 @@ html,body {
 	text-align: center;
 }
 
-
-
-.refresh-selector {
-	vertical-align: middle;
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
 .big-icon {
 	font-size: 18px;
 }
