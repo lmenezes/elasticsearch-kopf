@@ -1,5 +1,5 @@
 function createIndex(host, name, settings) {
-	var response = syncRequest('PUT', host + "/" + name, settings);
+	var response = syncRequest('POST', host + "/" + name, settings);
 	if (!response.success) {
 		throw response.response;
 	}
@@ -376,7 +376,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.size = has_status ? index_status['index']['primary_size_in_bytes'] : 0;
 	this.total_size = has_status ? index_status['index']['size_in_bytes'] : 0;
 	this.settingsAsString=function() {
-		return JSON.stringify(this.settings, undefined, "  ");
+		return hierachyJson(JSON.stringify(this.settings, undefined, ""));
 	}
 }
 

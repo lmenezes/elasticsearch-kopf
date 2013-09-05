@@ -20,8 +20,8 @@
 								<input type="text" ng-model="replicas" class="form-control input-sm" placeholder="# of replicas" type="number">
 							</div>
 							<div class="col-lg-6">
-								<select ng-model="mapping" ng-options="i.settingsAsString() as i.name for i in pagination.results" class="form-control input-sm">
-						        	<option value="">Load settings from an existing index<option>
+								<select ng-model="settings" ng-options="i.settingsAsString() as i.name for i in pagination.results" class="form-control input-sm">
+						        	<option value="">load settings from an existing index<option>
 								</select>
 							</div>
 						</div>
@@ -29,8 +29,8 @@
 
 			        <h6 class="">Index settings</h6>
 					<div class="form-group">
-				        <textarea class="form-control settings-area" ng-model="mapping" rows="20">
-				        	{{mapping}}
+				        <textarea class="form-control settings-area" ng-model="settings" rows="20">
+				        	{{settings}}
 				        </textarea>
 					</div>
 				</fieldset>
@@ -40,7 +40,7 @@
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click='closeModal()' >Back</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click='closeModal()'>Back</button>
         <button type="button" class="btn btn-primary" ng-click='createIndex()'>Create</button>
       </div>
     </div><!-- /.modal-content -->

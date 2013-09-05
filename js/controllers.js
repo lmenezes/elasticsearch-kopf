@@ -1,5 +1,5 @@
 function CreateIndexCtrl($scope, $location, $timeout) {
-	$scope.mapping = '';
+	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
@@ -12,13 +12,13 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 				var settings = {};
 				if ($scope.mapping.trim().length > 0) {
 					try {
-						settings = JSON.parse($scope.mapping, null);
+						settings = JSON.parse($scope.settings);
 					} catch (error) {
 						throw "Invalid JSON: " + error;
 					}
 				} 
 				if (!isDefined(settings['settings'])) {
-					settings['settings'] = {};
+					settings = {"settings":settings};
 				} 
 				if (!isDefined(settings['settings']['index'])) {
 					settings['settings']['index'] = {};
@@ -37,6 +37,13 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 		} catch(error) {
 			$scope.modal.alert = new Alert(false, "Error while creating index", error);
 		}
+	}
+	
+	$scope.prepareCreateIndex=function() {
+		$scope.settings = '';
+		$scope.shards = '';
+		$scope.name = '';
+		$scope.replicas = '';
 	}
 }
 
@@ -903,4 +910,35 @@ function NodeSwapCheck() {
 function Diagnostic(critical, message) {
 	this.critical = critical;
 	this.message = message;
+}
+
+function hierachyJson(json) {
+	var jsonObject = JSON.parse(json);
+	var resultObject = {};
+	Object.keys(jsonObject).forEach(function(key) {
+		var parts = key.split(".");
+		var property = null;
+		var reference = resultObject;
+		var previous = null;
+		for (var i = 0; i<parts.length; i++) {
+			if (i == parts.length - 1) {
+				if (isNaN(parts[i])) {
+					reference[parts[i]] = jsonObject[key];	
+				} else {
+					if (!(previous[property] instanceof Array)) {
+						previous[property] = [];
+					}
+					previous[property].push(jsonObject[key]);
+				}
+			} else {
+				property = parts[i];
+				if (!isDefined(reference[property])) {
+					reference[property] = {};
+				}
+				previous = reference;
+				reference = reference[property];
+			}
+		}
+	});
+	return JSON.stringify(resultObject,undefined,4);
 }
