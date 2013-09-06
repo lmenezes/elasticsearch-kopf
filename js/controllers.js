@@ -10,7 +10,7 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 				$scope.modal.alert = new Alert(false, "You must specify a valid index name", null);	
 			} else {
 				var settings = {};
-				if ($scope.mapping.trim().length > 0) {
+				if ($scope.settings.trim().length > 0) {
 					try {
 						settings = JSON.parse($scope.settings);
 					} catch (error) {
