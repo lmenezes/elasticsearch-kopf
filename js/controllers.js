@@ -1,3 +1,4 @@
+var jsonTree = new JSONTree();
 function CreateIndexCtrl($scope, $location, $timeout) {
 	$scope.settings = '';
 	$scope.shards = '';
@@ -474,11 +475,11 @@ function RestCtrl($scope, $location, $timeout) {
 			try {
 				var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
 				if (response.success) {
-					var content = beautifulJson(response.response);
+					var content = jsonTree.create(response.response);
 					$('#rest-client-response').html(content);
 				} else {
 					try {
-						var content = beautifulJson(JSON.parse(response.response.responseText));
+						var content = jsonTree.create(JSON.parse(response.response.responseText));
 						$('#rest-client-response').html(content);
 					} catch (error) {
 						$scope.setAlert(new Alert(false, "Request did not return a valid JSON", response.response.responseText));
@@ -660,7 +661,7 @@ function GlobalController($scope, $location, $timeout) {
 
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
-		$scope.modal.info = beautifulJson(info);
+		$scope.modal.info = jsonTree.create(info);
 		$('#modal_info').modal({show:true,backdrop:false});
 	}
 	
@@ -670,71 +671,6 @@ function GlobalController($scope, $location, $timeout) {
 	
 	$scope.isInModal=function() {
 		return ($('.modal-backdrop').length > 0);
-	}
-}
-
-function hideShow(id) {
-	if ($("#" + id).hasClass("json-visible")) {
-		$("#" + id).removeClass("json-visible");
-		$("#" + id).addClass("json-collapsed");
-		$("#" + id).prev().addClass("icon-expand-alt");
-		$("#" + id).prev().removeClass("icon-collapse-alt");
-	} else {
-		$("#" + id).addClass("json-visible");
-		$("#" + id).removeClass("json-collapsed");
-		$("#" + id).prev().removeClass("icon-expand-alt");
-		$("#" + id).prev().addClass("icon-collapse-alt");
-		
-	}
-}
-
-var collapseJsonId = 0;
-
-function beautifulJson(data) {
-	collapseJsonId = 0;
-	return '<div class=\"json-content\">' + beautifulJsonObject(data) + '</div>';
-}
-
-function beautifulJsonObject(data) {
-	var is_array = data instanceof Array;
-	var open_container = is_array ? '[' : '{';
-	var close_container = is_array ? ']' : '}';
-	collapseJsonId += 1;
-	var content = open_container + " <i class=\"icon-collapse-alt\" onclick=\"hideShow('collapse_json" + collapseJsonId + "')\"></i><div class=\"json-visible json-object\" id=\"collapse_json" + collapseJsonId + "\">";
-	if (data instanceof Array) {
-		data.forEach(function(x) { 
-			if (data[data.length -1] == x) {
-				content += '<div>' + formatValue(x)+ '</div>';
-			} else {
-				content += '<div>' + formatValue(x)+ ',</div>';	
-			}
-		});	
-	} else {
-		var properties = Object.keys(data);
-		properties.map(function(x) { 
-			if (properties[properties.length - 1] == x) { // dont add the comma
-				content += '<div><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ '</div>';
-			} else {
-				content += '<div><span class="json-property">"'+x+"</span> : " + formatValue(data[x])+ ',</div>';	
-			}
-		});		
-	}
-	content += "</div> " + close_container;
-	return content;
-}
-
-function formatValue(value) {
-	if (typeof value === 'boolean' || typeof value === 'number') {
-		return "<span class=\"json-" + (typeof value) + "\">"+value+"</span>";
-	} else {
-		if (typeof value === 'string') {
-			return "<span class=\"json-" + (typeof value) + "\">\""+value+"\"</span>";
-		}
-		if (value == null) {
-			return "<span class\"json-content json-null\">null</span>";
-		} else {
-			return beautifulJsonObject(value);
-		}
 	}
 }
 
