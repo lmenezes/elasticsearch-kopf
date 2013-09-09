@@ -113,6 +113,10 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	// actions invoked from view
 	
+	$scope.displayClusterHealth=function() {
+		$scope.broadcastMessage('loadClusterHealth',{});
+	}
+	
 	$scope.shutdownNode=function(node_id) {
 		try {
 			var response = shutdownNode($scope.host,node_id);
@@ -394,58 +398,52 @@ function AliasesCtrl($scope, $location, $timeout) {
 
 }
 
-function DiagnosisCtrl($scope,$location,$timeout) {
+function ClusterHealthCtrl($scope,$location,$timeout) {
 	$scope.shared_url = '';
-    $scope.$on('loadDiagnosisEvent', function() {
-		$scope.loadDiagnosis();
+	$scope.cluster_health = {};
+	$scope.state = '';
+	
+    $scope.$on('loadClusterHealth', function() {
+		$scope.cluster_health = null; // otherwise we see past version, then new
+		$scope.state = ''; // informs about loading state
     });
 	
-	$scope.loadDiagnosis=function() {
-		$scope.nodes = getNodes($scope.host);
-	}
-	
-	$scope.shareClusterInfo=function() {
-		$scope.share_url = '';
-		var diagnosis = getClusterDiagnosis($scope.host,
+	$scope.loadClusterHealth=function() {
+		var cluster_health = null;
+		$scope.cluster_health = null; // otherwise we see past version, then new
+		$scope.state = "loading cluster health state. this could take a few moments..."
+		getClusterDiagnosis($scope.host,
 			function(state, stats, hot_threads) {
-				var gist = {};
-				gist['description'] = 'Cluster information delivered by kopf';
-				gist['public'] = true;
-				gist['files'] = {};
-				gist['files']['state'] = {'content': JSON.stringify(state, undefined, 4),'indent':'2', 'language':'JSON'};
-				gist['files']['stats'] = {'content': JSON.stringify(stats, undefined, 4),'indent':'2', 'language':'JSON'} ;
-				gist['files']['hot_threads'] = {'content':hot_threads,'indent':'2', 'language':'JSON'};
-				var response = $scope.publishGist(gist);
-				if (response.success) {
-					$scope.setAlert(new Alert(true, "Cluster information successfully shared", null));
-					$scope.shared_url = response.response.html_url;
-				} else {
-					$scope.setAlert(new Alert(false, "Error while creating Gist", response.response));
-				}
+				cluster_health = {};
+				cluster_health['state'] = JSON.stringify(state, undefined, 4);
+				cluster_health['stats'] = JSON.stringify(stats, undefined, 4);
+				cluster_health['hot_threads'] = hot_threads;
+				$scope.cluster_health = cluster_health;
+				$scope.state = '';
 			},
 			function(failed_request) {
-				$scope.setAlert(new Alert(false, "Error while retrieving cluster information", failed_request.responseText));
+				$scope.state = '';
+				$scope.modal.alert = new Alert(false, "Error while retrieving cluster health information", failed_request.responseText);
+		});
+	}
+
+	$scope.publishClusterHealth=function() {
+		var gist = {};
+		gist['description'] = 'Cluster information delivered by kopf';
+		gist['public'] = true;
+		gist['files'] = {};
+		gist['files']['state'] = {'content': $scope.cluster_health['state'],'indent':'2', 'language':'JSON'};
+		gist['files']['stats'] = {'content': $scope.cluster_health['stats'],'indent':'2', 'language':'JSON'} ;
+		gist['files']['hot_threads'] = {'content':$scope.cluster_health['hot_threads'],'indent':'2', 'language':'JSON'};
+		var data = JSON.stringify(gist, undefined, 4);
+		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
+			.done(function(response) { 
+				$scope.modal.alert = new Alert(true, "Cluster health information successfully shared", "Gist available at : " + response.html_url);
+			})
+			.fail(function(response) {
+				$scope.modal.alert = new Alert(false, "Error while publishing Gist", response.responseText);
 			}
 		);
-	}
-	
-	$scope.diagnosisCluster=function() {
-		var response = getNodesStats($scope.host);
-		var issues = new ClusterDiagnostic().diagnosis(response);
-	}
-	
-	$scope.publishGist=function(gist) {
-		var data = JSON.stringify(gist, undefined, 4);
-		var response = null;
-		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
-			.done(function(r) { 
-				response = new ServerResponse(true,r);
-			})
-			.fail(function(r) {
-				response = new ServerResponse(false,r);
-			});
-		;
-		return response;
 	}
 }
 
@@ -804,48 +802,6 @@ function isDefined(value) {
 
 function notEmpty(value) {
 	return isDefined(value) && value != null && value.trim().length > 0;
-}
-
-function ClusterDiagnostic() {
-	this.node_checks = [];
-	this.node_checks.push(new NodeSwapCheck()); //node swap
-	
-	this.diagnosis=function(nodes_stats) {
-		var nodes = nodes_stats['nodes'];
-		var issues = [];
-		var node_checks = this.node_checks;
-		Object.keys(nodes).forEach(function(node_id) {
-			var node_info = nodes[node_id];
-			node_checks.forEach(function(node_check) {
-				var diagnostic = node_check.check(node_id,node_info);
-				if (diagnostic != null) {
-					issues.push(diagnostic);
-				}
-			})
-		});
-		return issues;
-	}
-}
-
-function NodeDiskSizeCheck(node_info) {
-	
-}
-
-function NodeSwapCheck() {
-	this.critical = false;
-	
-	this.check=function(node_id,node_info) {
-		var diagnostic = null;
-		if (node_info['os']['swap']['used_in_bytes'] >= 0) {
-			diagnostic = new Diagnostic(this.critical,"Node [" + node_info['name'] + "] is swapping: [" + node_info['os']['swap']['used'] + "]");
-		}
-		return diagnostic;		
-	}
-}
-
-function Diagnostic(critical, message) {
-	this.critical = critical;
-	this.message = message;
 }
 
 function hierachyJson(json) {

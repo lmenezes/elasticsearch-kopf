@@ -2,22 +2,28 @@
 	<!-- cluster actions -->
 	<th class="cluster-map-header-cluster-actions" rowspan="2">
 		<div class="row">
-			<div class="col-lg-4">
+			<div class="col-lg-3">
 				<a data-toggle="modal" href="#create_index" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false" ng-click="prepareCreateIndex()">
 					<i class="icon-file-alt" title="create new index"></i>
 				</a>
 			</div>
-			<div class="col-lg-4">
+			<div class="col-lg-3">
 				<a class="cluster-map-header-cluster-action">
 					<i class="icon-lock" ng-show="cluster.disableAllocation" ng-click="enableAllocation()" title="enabled shard allocation"></i>
 					<i class="icon-unlock-alt" ng-show="!cluster.disableAllocation" ng-click="disableAllocation()" title="disable shard allocation"></i>
 				</a>
 			</div>
-			<div class="col-lg-4">
+			<div class="col-lg-3">
 				<a data-toggle="modal" href="#cluster_settings" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false">
 					<i class="icon-cogs header-action" title="cluster settings"></i>
 				</a>
 			</div>
+			<div class="col-lg-3">
+				<a data-toggle="modal" href="#cluster_health" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false">
+					<i class="icon-stethoscope header-action" title="cluster health information" ng-click="displayClusterHealth()"></i>
+				</a>
+			</div>
+			<div ng-include src="'./modals/cluster_health.html'"></div>
 			<div ng-include src="'./modals/create_index.html'"></div>
 			<div ng-include src="'./modals/cluster_settings.html'"></div>
 		</div>
