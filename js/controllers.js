@@ -324,9 +324,13 @@ function AliasesCtrl($scope, $location, $timeout) {
 	$scope.new_index = {};
 	
 	$scope.addAlias=function() {
-		if (isDefined($scope.new_alias) && $scope.new_alias.trim().length > 0) {
-			$scope.aliases.info[$scope.new_alias] = [];
-			$scope.new_alias = '';
+		if (isDefined($scope.new_alias) && $scope.new_alias.trim().length > 0) { // valid alias
+			if (!isDefined($scope.aliases.info[$scope.new_alias])) { // not existing alias
+				$scope.aliases.info[$scope.new_alias] = [];
+				$scope.new_alias = '';	
+			} else {
+				$scope.setAlert(new Alert(false, "Alias already exists",null));
+			}
 		}
 	}
 	
