@@ -601,7 +601,7 @@ function GlobalController($scope, $location, $timeout) {
 	if ($location.host() == "") { // when opening from filesystem
 		$scope.host = "http://localhost:9200";
 	} else {
-		$scope.host = "http://" + $location.host() + ":" + $location.port();
+		$scope.host = $location.protocol() + "://" + $location.host() + ":" + $location.port();
 	}
 	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
