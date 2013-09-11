@@ -2,14 +2,14 @@
 	<div ng-switch-when="success" class="alert alert-success">
 		 <button type="button" class="close" ng-click='alert.clear()'>&times;</button>
 		<b><i class="icon-ok big-icon"></i> {{alert.message}}.</b>
-		<div ng-if="alert.hasServerResponse()">
+		<div ng-show="alert.hasServerResponse()">
 			<pre class="alert alert-success response-pre">{{alert.response}}</pre>
 		</div>
 	</div>
 	<div ng-switch-when="error" class="alert alert-danger">
 		 <button type="button" class="close" ng-click='alert.clear()'>&times;</button>
 		<b><i class="icon-warning-sign"></i> {{alert.message}}.</b>
-		<div ng-if="alert.hasServerResponse()">
+		<div ng-show="alert.hasServerResponse()">
 			<pre class="alert alert-danger response-pre">{{alert.response}}</pre>
 		</div>
 	</div>
