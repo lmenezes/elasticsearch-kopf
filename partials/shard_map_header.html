@@ -44,10 +44,17 @@
 			</div>	
 		</div>
 		<!-- index info -->
-		<div class="row" ng-repeat="alias in index.aliases">
+		<div ng-show="index.total_aliases <= 5" class="row" ng-repeat="alias in index.visibleAliases()">
 			<div class="col-lg-12">
 				<div class="cluster-map-header-index-alias">
 					<i class="icon-tag"></i> {{alias}}
+				</div>
+			</div>
+		</div>
+		<div ng-show="index.total_aliases > 5" class="row">
+			<div class="col-lg-12">
+				<div class="cluster-map-header-index-alias">
+					<i class="icon-tags"></i> {{index.total_aliases}} total aliases
 				</div>
 			</div>
 		</div>

@@ -333,6 +333,10 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.state = index_metadata['state'];
 	this.metadata = {};
 	this.aliases = index_metadata['aliases'];
+	this.total_aliases = isDefined(index_metadata['aliases']) ? index_metadata['aliases'].length : 0;
+	this.visibleAliases=function() {
+		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
+	}
 	this.settings = index_metadata['settings'];
 	this.mappings = index_metadata['mappings'];
 	this.metadata['settings'] = this.settings;
