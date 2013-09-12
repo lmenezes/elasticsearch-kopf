@@ -92,7 +92,9 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	
 	$scope.getNodes=function() {
-		return $scope.cluster.getNodes($scope.pagination.data,$scope.pagination.master,$scope.pagination.client);
+		if ($scope.cluster != null) {
+			return $scope.cluster.getNodes($scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
+		}
 	}
 	
     $scope.$on('forceRefresh', function() {
