@@ -227,7 +227,7 @@ function ClusterHealth(health) {
 }
 
 function Aliases(aliases_info) {
-	var indices  = []
+	var indices  = [];
 	var aliases_map = {};
 	Object.keys(aliases_info).forEach(function(index) {
 		indices.push(index);
