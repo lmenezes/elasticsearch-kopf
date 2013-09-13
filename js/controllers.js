@@ -324,7 +324,7 @@ function AliasesCtrl($scope, $location, $timeout) {
 	$scope.new_alias = '';
 	$scope.aliases = null;
 	$scope.new_index = {};
-	$scope.pagination= new AliasesPagination(1,"", []);
+	$scope.pagination= new AliasesPagination(1, []);
 	
 	$scope.addAlias=function() {
 		if (isDefined($scope.new_alias) && $scope.new_alias.trim().length > 0) { // valid alias
@@ -711,13 +711,16 @@ function Alert(success, message, response) {
 	}
 }
 
-function AliasesPagination(page, query, results) {
+function AliasesPagination(page, results) {
 	this.page = page;
 	this.page_size = 10;
 	this.results = results;
-	this.query = query;
-	this.second_query = "";
+	this.alias_query = "";
+	this.index_query = "";
+	this.past_alias_query = null;
+	this.past_index_query = null;
 	this.total = 0;
+	this.cached_results = null;
 	
 	this.firstResult=function() {
 		if (Object.keys(this.getResults()).length > 0) {
@@ -750,8 +753,7 @@ function AliasesPagination(page, query, results) {
 	}
 	
 	this.current_page=function() {
-		if (this.query != this.previous_query) {
-			this.previous_query = this.query;
+		if (this.alias_query != this.past_alias_query || this.index_query != this.past_index_query) {
 			this.page = 1;
 		}
 		return this.page;
@@ -776,40 +778,50 @@ function AliasesPagination(page, query, results) {
 	
 	this.setResults=function(results) {
 		this.results = results;
+		this.cached_results = null; // forces recalculation
 	}
 	
 	this.total=function() {
 		return Object.keys(this.getResults()).length;
 	}
+	
 	this.getResults=function() {
-		var query = this.query;
-		var second_query = this.second_query;
-		var results = this.results;
 		var matchingResults = {};
-		Object.keys(results).forEach(function(alias) {
-			if (isDefined(query) && query.length > 0) {
-				if (alias.indexOf(query) != -1) {
-					if (isDefined(second_query) && second_query.length > 0) {
+		var filters_changed = (this.alias_query != this.past_alias_query || this.index_query != this.past_index_query);
+		if (filters_changed || this.cached_results == null) { // if filters changed or no cached, calculate
+			var alias_query = this.alias_query;
+			var index_query = this.index_query;
+			var results = this.results;
+			Object.keys(results).forEach(function(alias) {
+				if (isDefined(alias_query) && alias_query.length > 0) {
+					if (alias.indexOf(alias_query) != -1) {
+						if (isDefined(index_query) && index_query.length > 0) {
+							results[alias].forEach(function(index) {
+								if (index.indexOf(index_query) != -1) {
+									matchingResults[alias] = results[alias];
+								}
+							});
+						} else {
+							matchingResults[alias] = results[alias];
+						}
+					} 
+				} else {
+					if (isDefined(index_query) && index_query.length > 0) {
 						results[alias].forEach(function(index) {
-							if (index.indexOf(second_query) != -1) {
+							if (index.indexOf(index_query) != -1) {
 								matchingResults[alias] = results[alias];
 							}
 						});
+					} else {
+						matchingResults[alias] = results[alias];
 					}
-				} 
-			} else {
-				if (isDefined(second_query) && second_query.length > 0) {
-					results[alias].forEach(function(index) {
-						if (index.indexOf(second_query) != -1) {
-							matchingResults[alias] = results[alias];
-						}
-					});
-				} else {
-					matchingResults[alias] = results[alias];
 				}
-			}
-		});
-		return matchingResults;
+			});
+			this.cached_results = matchingResults;
+			this.past_alias_query = this.alias_query;
+			this.past_index_query = this.index_query;
+		} 
+		return this.cached_results;
 	}
 }
 
