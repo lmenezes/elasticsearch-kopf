@@ -1,19 +1,34 @@
 var jsonTree = new JSONTree();
+
 function CreateIndexCtrl($scope, $location, $timeout) {
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
+	$scope.editor = ace.edit("index-settings-editor");
+	$scope.editor.setFontSize("11px");
+	$scope.editor.setTheme("ace/theme/kopf");
+	$scope.editor.getSession().setMode("ace/mode/json");
 	
+	$scope.updateEditor=function() {
+		$scope.editor.setValue($scope.settings,1);
+		$scope.editor.gotoLine(0,0,false);
+	}
+	
+    $scope.$on('prepareCreateIndex', function() {
+		$scope.prepareCreateIndex();
+    });
+
 	$scope.createIndex=function() {
 		try {
 			if ($scope.name.trim().length == 0) {
 				$scope.modal.alert = new Alert(false, "You must specify a valid index name", null);	
 			} else {
 				var settings = {};
-				if ($scope.settings.trim().length > 0) {
+				var editor_content = $scope.editor.getValue();
+				if (editor_content.trim().length > 0) {
 					try {
-						settings = JSON.parse($scope.settings);
+						settings = JSON.parse(editor_content);
 					} catch (error) {
 						throw "Invalid JSON: " + error;
 					}
@@ -41,7 +56,8 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 	}
 	
 	$scope.prepareCreateIndex=function() {
-		$scope.settings = '';
+		$scope.settings = "";
+		$scope.editor.setValue("{}");
 		$scope.shards = '';
 		$scope.name = '';
 		$scope.replicas = '';
@@ -114,6 +130,10 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	}
 	
 	// actions invoked from view
+	
+	$scope.prepareCreateIndex=function() {
+		$scope.broadcastMessage('prepareCreateIndex',{});
+	}
 	
 	$scope.displayClusterHealth=function() {
 		$scope.broadcastMessage('loadClusterHealth',{});
@@ -456,17 +476,29 @@ function ClusterHealthCtrl($scope,$location,$timeout) {
 }
 
 function RestCtrl($scope, $location, $timeout) {
+	$scope.editor = ace.edit("rest-client-editor");
+	$scope.editor.setFontSize("11px");
+	$scope.editor.setTheme("ace/theme/kopf");
+	$scope.editor.getSession().setMode("ace/mode/json");
+	
 	$scope.request = new Request();
 	$scope.validation_error = null;
 	$scope.request.url = $scope.host + "/_search";
 	
+	$scope.updateEditor=function() {
+		$scope.editor.setValue($scope.request.body,1);
+		$scope.editor.gotoLine(0,0,false);
+	}
+	
 	$scope.formatBody=function() {
+		var query = $scope.editor.getValue();
 		try {
-			if (notEmpty($scope.request.body)) {
+			if (notEmpty(query)) {
 				$scope.validation_error = null;
-				var bodyObject = JSON.parse($scope.request.body);
+				var bodyObject = JSON.parse(query);
 				var formattedBody = JSON.stringify(bodyObject,undefined,4);
-				$scope.request.body = formattedBody;
+				$scope.editor.setValue(formattedBody,0);
+				$scope.editor.gotoLine(0,0,false);
 			}
 		} catch (error) {
 			$scope.validation_error = error.toString();
@@ -479,7 +511,7 @@ function RestCtrl($scope, $location, $timeout) {
 		$('#rest-client-response').html('');
 		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
 			try {
-				var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
+				var response = syncRequest($scope.request.method,$scope.request.url,$scope.editor.getValue());
 				if (response.success) {
 					var content = jsonTree.create(response.response);
 					$('#rest-client-response').html(content);

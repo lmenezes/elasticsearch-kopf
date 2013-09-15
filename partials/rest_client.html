@@ -20,14 +20,12 @@
 								<i class="icon-bolt"></i> execute
 							</button>
 							<span class="request-client-request-body-options">
-								<select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="log()">
+								<select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="updateEditor()">
 					         		<option value="">load request body from template</option>
 								</select>
 							</span>
 						</div>
-						<div>
-							<textarea class="form-control rest-client-request-body" ng-model="request.body" rows="34"></textarea>
-						</div>
+						<div id="rest-client-editor" class="kopf-ace-editor rest-client-editor"></div>
 						<div class="rest-client-format-body">
 							<span class="rest-body-validation-error">{{validation_error}}</span>
 							<button type="submit" class="btn btn-default rest-client-execute input-sm" ng-click="formatBody()">

@@ -1,3 +1,13 @@
+/** ############### START - ACE editor - START ############### **/
+.kopf-ace-editor { 
+	width: auto;
+	margin-top: 20px;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+}
+/** ############### END - ACE editor - END ############### **/
+
 /* properties for expand icon */
 .json-object-expand {
 	display: inline-block;
@@ -18,10 +28,10 @@
 }
 /* global properties for json object */
 .json-content {
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: 400;
 	color: #666;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-family: "Lucida Console", Monaco, monospace;
 }
 /* json property name style */
 .json-property {
@@ -385,8 +395,13 @@ a.cluster-map-node-action {
 	text-align: center;
 	font-weight: 200;
 }
-
 /** ############### END - cluster map view - END ############### **/
+
+/** ############### START - create index - START ############### **/
+.create-index-editor {
+	height: 424px;
+}
+/** ############### END - create index - END ############### **/
 
 
 /** ############### START - modals - START ############### **/
@@ -451,6 +466,9 @@ a.cluster-map-node-action {
 .request-client-request-body-options {
 	overflow: hidden;
 	display: block;
+}
+.rest-client-editor {
+	height: 524px;
 }
 /** ############### END - rest client - END ############### **/
 
