@@ -2,7 +2,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Are you sure you want to shutdown node <b>{{node.name}}</b>?</h4>
+				<i class="icon-remove-circle modal-close-icon" data-dismiss="modal" ng-click='closeModal()' style="float: right;"></i>
+				<h4 class="modal-title">are you sure you want to shutdown node {{node.name}}?</h4>
       		</div>
       		<div class="modal-body">
 				<p>Shutting down a node will make all data stored in this node inaccessible, unless this data is replicated across other nodes.</p>

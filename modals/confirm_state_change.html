@@ -2,10 +2,10 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<!--button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button-->
+				<i class="icon-remove-circle modal-close-icon" data-dismiss="modal" ng-click='closeModal()' style="float: right;"></i>
 				<h4 class="modal-title" ng-switch on="index.state">
-					<div ng-switch-when="open">Are you sure you want to close index <b>{{index.name}}</b>?</div>
-					<div ng-switch-when="close">Are you sure you want to open index <b>{{index.name}}</b>?</div>
+					<div ng-switch-when="open">are you sure you want to close index {{index.name}}?</div>
+					<div ng-switch-when="close">are you sure you want to open index {{index.name}}?</div>
 				</h4>
       		</div>
       		<div class="modal-body" ng-switch on="index.state">

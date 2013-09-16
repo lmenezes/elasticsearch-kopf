@@ -342,7 +342,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.metadata['settings'] = this.settings;
 	this.metadata['mappings'] = this.mappings;
 	this.num_of_shards = index_metadata['settings']['index.number_of_shards'];
-	this.num_of_replicas = index_metadata['settings']['index.number_of_replicas'];
+	this.num_of_replicas = parseInt(index_metadata['settings']['index.number_of_replicas']);
 	this.state_class = index_metadata['state'] === "open" ? "success" : "active";
 	this.visible = true;
 	var unassigned = [];

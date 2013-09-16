@@ -33,13 +33,15 @@
 		<!-- index name -->
 		<div class="row">
 			<div class="col-lg-12">
-				<div class="cluster-map-header-index-name normal-action" ng-click="displayInfo(index.name,index.metadata)" title="view index information">{{index.name}}</div>
+				<div class="cluster-map-header-index-name normal-action" ng-click="displayInfo('settings for index ' + index.name,index.metadata)" title="view index information">{{index.name}}</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="cluster-map-header-index-alias">
-					shards: {{index.num_of_shards}} + {{index.num_of_replicas.toInt() + 1}} | docs: {{index.num_docs}} | size: {{readablizeBytes(index.size)}}
+					<span title="{{index.num_of_shards}} shards and {{index.num_of_replicas}} replicas">shards: {{index.num_of_shards}} * {{index.num_of_replicas + 1}} |</span>
+					<span title="{{index.num_docs}} docs, {{index.max_doc}} max docs, {{index.deleted_docs}} deleted docs">docs: {{index.num_docs}} |</span> 
+					<span title="size: {{readablizeBytes(index.size)}}, total size: {{readablizeBytes(index.total_size)}}">size: {{readablizeBytes(index.size)}}</span>
 				</div>
 			</div>	
 		</div>

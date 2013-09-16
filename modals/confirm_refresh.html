@@ -2,7 +2,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Are you sure you want to refresh index <b>{{index.name}}</b>?</h4>
+				<i class="icon-remove-circle modal-close-icon" data-dismiss="modal" ng-click='closeModal()' style="float: right;"></i>
+				<h4 class="modal-title">are you sure you want to refresh index {{index.name}}?</h4>
       		</div>
       		<div class="modal-body">
 				<p>Refreshing an index makes all operations performed since the last refresh available for search</p>

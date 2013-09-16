@@ -74,6 +74,13 @@
 	display: none;
 }
 /** ############### START - global - START ############### **/
+.modal-close-icon {
+	float: right;
+	font-size: 22px;
+	color: #666;
+	padding-top: 3px;
+	cursor: pointer;
+}
 .connection-status-console {
 	float:right;
 	text-align: right;
@@ -91,32 +98,32 @@
 h1 {
 	color: #666;
 	font-variant:small-caps;
-	font-weight: 200;
+	font-weight: 400;
 }
 h2 {
 	color: #666;
 	font-variant:small-caps;
-	font-weight: 200;
+	font-weight: 400;
 }
 h3 {
 	color: #666;
 	font-variant:small-caps;
-	font-weight: 200;
+	font-weight: 500;
 }
 h4 {
 	color: #666;
 	font-variant:small-caps;
-	font-weight: 200;
+	font-weight: 500;
 }
 h5 {
 	color: #666;
 	font-variant:small-caps;
-	font-weight: 200;
+	font-weight: 500;
 }
 h6 {
 	color: #666;
 	font-variant:small-caps;
-	font-weight: 200;
+	font-weight: 500;
 }
 .modal-open {
 	margin-right: 0px !important;
