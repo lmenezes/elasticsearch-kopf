@@ -6,7 +6,7 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 	$scope.replicas = '';
 	$scope.name = '';
 	$scope.editor = ace.edit("index-settings-editor");
-	$scope.editor.setFontSize("11px");
+	$scope.editor.setFontSize("10px");
 	$scope.editor.setTheme("ace/theme/kopf");
 	$scope.editor.getSession().setMode("ace/mode/json");
 	
@@ -477,7 +477,7 @@ function ClusterHealthCtrl($scope,$location,$timeout) {
 
 function RestCtrl($scope, $location, $timeout) {
 	$scope.editor = ace.edit("rest-client-editor");
-	$scope.editor.setFontSize("11px");
+	$scope.editor.setFontSize("10px");
 	$scope.editor.setTheme("ace/theme/kopf");
 	$scope.editor.getSession().setMode("ace/mode/json");
 	
