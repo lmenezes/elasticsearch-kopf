@@ -1,65 +1,66 @@
 <div ng-controller="AliasesCtrl" ng-show="hasConnection()">
 	<h2>aliases management</h2>
-
-	<div class="row">
-		<div class="col-lg-10">
-			<form class="form-inline" role="form">
-				<div class="row">
-					<div class="col-lg-6 form-group">
-						<input type="text" ng-model="pagination.alias_query" class="form-control input-sm" placeholder="filter by alias name">
+	<div class="aliases-section">
+		<div class="row">
+			<div class="col-lg-10">
+				<form class="form-inline" role="form">
+					<div class="row">
+						<div class="col-lg-6 form-group">
+							<input type="text" ng-model="pagination.alias_query" class="form-control input-sm" placeholder="filter by alias name">
+						</div>
+						<div class="col-lg-6 form-group">
+							<input type="text" ng-model="pagination.index_query" class="form-control input-sm" placeholder="filter by index name">
+						</div>
 					</div>
-					<div class="col-lg-6 form-group">
-						<input type="text" ng-model="pagination.index_query" class="form-control input-sm" placeholder="filter by index name">
-					</div>
+				</form>
+			</div>
+			<div class="col-lg-2" style="text-align: right;">
+				<div class="cluster-map-pagination">
+					<span ng-switch on="pagination.hasPreviousPage()">
+						<i class="icon-double-angle-left normal-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+						<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+					</span>
+					{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
+					<span ng-switch on="pagination.hasNextPage()">
+						<i class="icon-double-angle-right normal-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+						<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+					</span>
 				</div>
-			</form>
-		</div>
-		<div class="col-lg-2" style="text-align: right;">
-			<div class="cluster-map-pagination">
-				<span ng-switch on="pagination.hasPreviousPage()">
-					<i class="icon-double-angle-left normal-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
-					<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
-				</span>
-				{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
-				<span ng-switch on="pagination.hasNextPage()">
-					<i class="icon-double-angle-right normal-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
-					<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
-				</span>
 			</div>
 		</div>
-	</div>
-	<div class="aliases-section">
-		<table class="table table-striped table-bordered">
-			<tr ng-repeat="(alias, indices) in pagination.getPage()">
-				<td class="aliases-alias-cell">
-					<div>
-						<i class="icon-remove-circle aliases-remove-alias-action normal-action" ng-click="removeAlias(alias)" title="remove alias for all indices"></i>
-						<span class="aliases-new-alias-input">
-							<i class="icon-tag"></i> <span class="aliases-alias">{{alias}}</span>
+		<div class="aliases-section">
+			<table class="table table-striped table-bordered">
+				<tr ng-repeat="(alias, indices) in pagination.getPage()">
+					<td class="aliases-alias-cell">
+						<div>
+							<i class="icon-remove-circle aliases-remove-alias-action normal-action" ng-click="removeAlias(alias)" title="remove alias for all indices"></i>
+							<span class="aliases-new-alias-input">
+								<i class="icon-tag"></i> <span class="aliases-alias">{{alias}}</span>
+							</span>
+						</div>
+					</td>
+					<td>
+						<span ng-repeat="index in indices" class="aliases-index-alias">
+							{{index}} <i class="icon-remove-circle normal-action" ng-click="removeAliasFromIndex(index,alias)" title="dissociate alias from index"></i>
 						</span>
-					</div>
-				</td>
-				<td>
-					<span ng-repeat="index in indices" class="aliases-index-alias">
-						{{index}} <i class="icon-remove-circle normal-action" ng-click="removeAliasFromIndex(index,alias)" title="dissociate alias from index"></i>
-					</span>
-					<span class="aliases-new-index" title="associate alias with index">
-						<select class="aliases-add-index-input" ng-model="new_index[alias]" ng-options="index for index in aliases.indices">
-						</select>
-						<i class="icon-plus-sign aliases-add-index-action normal-action" ng-click="addIndexToAlias(alias);"></i>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td class="aliases-alias-cell">
-					<i class="icon-plus-sign aliases-remove-new-alias-action normal-action" ng-click="addAlias();" title="create new alias"></i>
-					<span class="aliases-new-alias-input">
-						<input type="text" class="form-control input-sm" placeholder="create new alias" ng-model="new_alias">
-					</span>
-				</td>
-				<td></td>
-			</tr>
-		</table>
-		<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="mergeAliases()"><i class="icon-ok"></i> save</button>
+						<span class="aliases-new-index" title="associate alias with index">
+							<select class="aliases-add-index-input" ng-model="new_index[alias]" ng-options="index for index in aliases.indices">
+							</select>
+							<i class="icon-plus-sign aliases-add-index-action normal-action" ng-click="addIndexToAlias(alias);"></i>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="aliases-alias-cell">
+						<i class="icon-plus-sign aliases-remove-new-alias-action normal-action" ng-click="addAlias();" title="create new alias"></i>
+						<span class="aliases-new-alias-input">
+							<input type="text" class="form-control input-sm" placeholder="create new alias" ng-model="new_alias">
+						</span>
+					</td>
+					<td></td>
+				</tr>
+			</table>
+			<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="mergeAliases()"><i class="icon-ok"></i> save</button>
+		</div>
 	</div>
 </div>
