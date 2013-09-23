@@ -710,6 +710,11 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.isInModal=function() {
 		return ($('.modal-backdrop').length > 0);
 	}
+	
+	$scope.getCurrentTime=function() {
+		var d = new Date(); 
+		return ('0' + d.getHours()).slice(-2) + ":" + ('0' + d.getMinutes()).slice(-2) + ":" + ('0' + d.getSeconds()).slice(-2);
+	}
 }
 
 function Request() {

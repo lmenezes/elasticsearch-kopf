@@ -66,8 +66,8 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="connection-status-console" ng-switch on="hasConnection()">
-					<span ng-switch-when="false">trying to connect to [{{host}}]</span>
-					<span ng-switch-default="true">connected to <b>{{cluster_health.name}}</b> @ <b>{{host}}</b></span>
+					<span ng-switch-when="false">[{{getCurrentTime()}}]: trying to connect to [{{host}}]</span>
+					<span ng-switch-default="true">[{{getCurrentTime()}}]: connected to <b>{{cluster_health.name}}</b> @ <b>{{host}}</b></span>
 				</div>
 			</div>
 		</div>
