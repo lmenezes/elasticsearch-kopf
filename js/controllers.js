@@ -481,9 +481,10 @@ function RestCtrl($scope, $location, $timeout) {
 	$scope.editor.setTheme("ace/theme/kopf");
 	$scope.editor.getSession().setMode("ace/mode/json");
 	
-	$scope.request = new Request();
+	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
-	$scope.request.url = $scope.host + "/_search";
+	$scope.history = [];
+	$scope.history_request = null;
 	
 	$scope.updateEditor=function() {
 		$scope.editor.setValue($scope.request.body,1);
@@ -499,10 +500,19 @@ function RestCtrl($scope, $location, $timeout) {
 				var formattedBody = JSON.stringify(bodyObject,undefined,4);
 				$scope.editor.setValue(formattedBody,0);
 				$scope.editor.gotoLine(0,0,false);
+				$scope.request.body = formattedBody;
 			}
 		} catch (error) {
 			$scope.validation_error = error.toString();
 		}
+	}
+	
+	$scope.loadHistoryRequest=function() {
+		$scope.request.url = $scope.history_request.url;
+		$scope.request.body = $scope.history_request.body;
+		$scope.request.method = $scope.history_request.method;
+		$scope.updateEditor();
+		$scope.history_request = null;
 	}
 	
 	$scope.sendRequest=function() {
@@ -511,10 +521,11 @@ function RestCtrl($scope, $location, $timeout) {
 		$('#rest-client-response').html('');
 		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
 			try {
-				var response = syncRequest($scope.request.method,$scope.request.url,$scope.editor.getValue());
+				var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
 				if (response.success) {
 					var content = jsonTree.create(response.response);
 					$('#rest-client-response').html(content);
+					$scope.history.push(new Request($scope.request.url,$scope.request.method,$scope.request.body));
 				} else {
 					try {
 						var content = jsonTree.create(JSON.parse(response.response.responseText));
@@ -530,7 +541,7 @@ function RestCtrl($scope, $location, $timeout) {
 	}
 	// maybe allow storing queries in ES? would need some kind of security
 	$scope.templates = [
-		{'key':"search + filter + facets + +highlight + sort",'value':JSON.stringify(JSON.parse('{ "query" : { "term" : { "field" : "value" } }, "filter" : { "term" : { "field_name" : "value" } }, "facets" : { "facet_name" : { "terms" : { "field" : "field_name" } } }, "sort" : [ { "field_name" : {"order" : "asc"} } ], "highlight" : { "fields" : { "field_name" : {"fragment_size" : 150, "number_of_fragments" : 3} } }, "from" : 0, "size" : 10 }'), undefined, 4)},
+		{'key':"search + filter + facets + highlight + sort",'value':JSON.stringify(JSON.parse('{ "query" : { "term" : { "field" : "value" } }, "filter" : { "term" : { "field_name" : "value" } }, "facets" : { "facet_name" : { "terms" : { "field" : "field_name" } } }, "sort" : [ { "field_name" : {"order" : "asc"} } ], "highlight" : { "fields" : { "field_name" : {"fragment_size" : 150, "number_of_fragments" : 3} } }, "from" : 0, "size" : 10 }'), undefined, 4)},
 		{'key':"bool query",'value':JSON.stringify(JSON.parse('{"query" : { "bool" : { "must" : { "term" : { "field" : "value" } }, "must_not" : { "term" : { "field" : "value" } }, "should" : [ {"term" : { "field" : "value" }} ], "minimum_should_match" : 1, "boost" : 1.0 } } }'), undefined, 4)},
 		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
 		{'key':"ids query",'value':JSON.stringify(JSON.parse('{"query": { "ids" : { "type" : "document_type", "values" : ["1", "2","3"] } } }'), undefined, 4)},
@@ -675,6 +686,10 @@ function GlobalController($scope, $location, $timeout) {
 		$scope.broadcastMessage('hostChanged',{});
 	}
 	
+	$scope.getHost=function() {
+		return $scope.host;
+	}
+	
 	$scope.setRefresh=function(refresh) {
 		$scope.refresh = refresh;
 	}
@@ -717,10 +732,10 @@ function GlobalController($scope, $location, $timeout) {
 	}
 }
 
-function Request() {
-	this.url = '';
-	this.method = 'GET';
-	this.body = ''
+function Request(url, method, body) {
+	this.url = url;
+	this.method = method;
+	this.body = body;
 	
 	this.clear=function() {
 		this.url = '';

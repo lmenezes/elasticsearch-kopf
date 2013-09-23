@@ -5,6 +5,9 @@
 				<form class="form-inline" role="form">
 					<div class="col-lg-6">
 						<div>
+							<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="sendRequest()">
+								<i class="icon-bolt"></i> send
+							</button>
 							<select ng-model="request.method" class="form-control input-sm rest-client-request-method">
 								<option value="GET" selected="selected">GET</option>
 								<option value="PUT">PUT</option>
@@ -16,14 +19,22 @@
 							</span>
 						</div>
 						<div class="rest-client-body">
-							<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="sendRequest()">
-								<i class="icon-bolt"></i> execute
-							</button>
-							<span class="request-client-request-body-options">
-								<select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="updateEditor()">
-					         		<option value="">load request body from template</option>
-								</select>
-							</span>
+							<div class="row">
+								<div class="col-lg-6">
+									<span class="request-client-request-body-options">
+										<select ng-model="request.body" class="form-control input-sm" ng-options="t.value as t.key for t in templates" ng-change="updateEditor()">
+							         		<option value="">load request from template</option>
+										</select>
+									</span>
+								</div>
+								<div class="col-lg-6">
+									<span class="request-client-request-body-options">
+										<select ng-model="history_request" class="form-control input-sm" ng-options="h.body for h in history" ng-change="loadHistoryRequest()">
+							         		<option value="">load request from history</option>
+										</select>
+									</span>
+								</div>
+							</div>
 						</div>
 						<div id="rest-client-editor" class="kopf-ace-editor rest-client-editor"></div>
 						<div class="rest-client-format-body">
