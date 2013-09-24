@@ -350,7 +350,8 @@ function AliasesCtrl($scope, $location, $timeout) {
 		if (isDefined($scope.new_alias) && $scope.new_alias.trim().length > 0) { // valid alias
 			if (!isDefined($scope.aliases.info[$scope.new_alias])) { // not existing alias
 				$scope.aliases.info[$scope.new_alias] = [];
-				$scope.new_alias = '';	
+				$scope.new_alias = '';
+				$scope.pagination.setResults($scope.aliases.info);
 			} else {
 				$scope.setAlert(new Alert(false, "Alias already exists",null));
 			}
@@ -372,6 +373,7 @@ function AliasesCtrl($scope, $location, $timeout) {
 	
 	$scope.removeAlias=function(alias) {
 		delete $scope.aliases.info[alias];
+		$scope.pagination.setResults($scope.aliases.info);
 	}
 	
 	$scope.removeAliasFromIndex=function(index, alias) {
@@ -872,7 +874,7 @@ function AliasesPagination(page, results) {
 			this.cached_results = matchingResults;
 			this.past_alias_query = this.alias_query;
 			this.past_index_query = this.index_query;
-		} 
+		}
 		return this.cached_results;
 	}
 }
