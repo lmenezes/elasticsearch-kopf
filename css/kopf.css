@@ -481,7 +481,7 @@ a.cluster-map-node-action {
 
 /** ALIASES **/
 .aliases-index-alias {
-	background: #E7EEF5;
+	background: #FFFFFF;
 	border: 1px solid #333;
 	border-radius: 2px 2px 2px 2px;
 	font-size: 12px;
@@ -490,6 +490,7 @@ a.cluster-map-node-action {
 	padding-right: 3px;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	margin-top: 3px;
 }
 .aliases-alias-cell {
 	width: 250px;
@@ -497,8 +498,13 @@ a.cluster-map-node-action {
 	min-width: 250px;
 }
 .aliases-new-alias-input {
-	overflow: hidden;
-	display: block;
+
+
+}
+
+.aliases-save-changes {
+	margin-top: 20px;
+	text-align: right;
 }
 
 .aliases-remove-alias-action {
@@ -540,6 +546,9 @@ a.cluster-map-node-action {
 .aliases-alias {
 	font-weight: 300;
 	font-size: 12px;
+}
+.alias-remove-index {
+	float: right;
 }
 
 /** START ### analysis ### START **/

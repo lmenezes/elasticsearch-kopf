@@ -341,33 +341,31 @@ function NavbarController($scope, $location, $timeout) {
 }
 
 function AliasesCtrl($scope, $location, $timeout) {
-	$scope.new_alias = '';
 	$scope.aliases = null;
 	$scope.new_index = {};
 	$scope.pagination= new AliasesPagination(1, []);
-	
+
 	$scope.addAlias=function() {
-		if (isDefined($scope.new_alias) && $scope.new_alias.trim().length > 0) { // valid alias
-			if (!isDefined($scope.aliases.info[$scope.new_alias])) { // not existing alias
-				$scope.aliases.info[$scope.new_alias] = [];
-				$scope.new_alias = '';
-				$scope.pagination.setResults($scope.aliases.info);
-			} else {
-				$scope.setAlert(new Alert(false, "Alias already exists",null));
+		try {
+			$scope.new_alias.validate();
+			
+			// if alias already exists, check if its already associated with index
+			if (isDefined($scope.aliases.info[$scope.new_alias.alias])) { 
+				var aliases = $scope.aliases.info[$scope.new_alias.alias];
+				$.each(aliases,function(i, alias) {
+					if (alias.index === $scope.new_alias.index) {
+						throw "Alias is already associated with this index";
+					} 
+				});
+			} else { 
+				$scope.aliases.info[$scope.new_alias.alias] = [];
 			}
-		}
-	}
-	
-	$scope.addIndexToAlias=function(target_alias) {
-		if (isDefined($scope.new_index[target_alias]) && $scope.new_index[target_alias].length > 0) {
-			$.each($scope.aliases.info,function(alias,indices) {
-				if (alias === target_alias) {
-					if (indices.indexOf($scope.new_index[alias]) == -1) {
-						$scope.aliases.info[alias].push($scope.new_index[alias]);
-						$scope.new_index[alias] = '';
-					}
-				} 
-			});
+			$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
+			$scope.new_alias = new Alias();
+			$scope.pagination.setResults($scope.aliases.info);
+			$scope.setAlert(null);
+		} catch (error) {
+			$scope.setAlert(new Alert(false, error ,null));
 		}
 	}
 	
@@ -376,28 +374,62 @@ function AliasesCtrl($scope, $location, $timeout) {
 		$scope.pagination.setResults($scope.aliases.info);
 	}
 	
-	$scope.removeAliasFromIndex=function(index, alias) {
-		$scope.aliases.info[alias].splice($scope.aliases.info[alias].indexOf(index),1);
+	$scope.removeAliasFromIndex=function(index, alias_name) {
+		var aliases = $scope.aliases.info[alias_name];
+		var removeIndex = null;
+		for (var i = 0; i < aliases.length; i++) {
+			if (alias_name === aliases[i].alias) {
+				removeIndex = i;
+			}
+		}
+		if (removeIndex != null) {
+			$scope.aliases.info[alias_name].splice(removeIndex,1);
+		}
 	}
 	
 	$scope.mergeAliases=function() {
 		try {
 			var deletes = [];
 			var adds = [];
-			Object.keys($scope.aliases.info).forEach(function(alias) {
-				var indices = $scope.aliases.info[alias];
-				indices.forEach(function(index) {
-					if (!isDefined($scope.originalAliases.info[alias]) || $scope.originalAliases.info[alias].indexOf(index) == -1) {
-						adds.push({'alias':alias,'index':index});
+			Object.keys($scope.aliases.info).forEach(function(alias_name) {
+				var aliases = $scope.aliases.info[alias_name];
+				aliases.forEach(function(alias) {
+					// if alias didnt exist, just add it
+					if (!isDefined($scope.originalAliases.info[alias_name])) { 
+						adds.push(alias);
+					} else { 
+						var originalAliases = $scope.originalAliases.info[alias_name];
+						var addAlias = true;
+						for (var i = 0; i < originalAliases.length; i++) {
+							if (originalAliases[i].equals(alias)) {
+								addAlias = false;
+								break;
+							}
+						}
+						if (addAlias) {
+							adds.push(alias);
+						}
 					} 
 				});
 			});
-			Object.keys($scope.originalAliases.info).forEach(function(alias) {
-				var indices = $scope.originalAliases.info[alias];
-				indices.forEach(function(index) {
-					if (!isDefined($scope.aliases.info[alias]) || $scope.aliases.info[alias].indexOf(index) == -1) {
-						deletes.push({'alias':alias,'index':index});
-					} 
+			Object.keys($scope.originalAliases.info).forEach(function(alias_name) {
+				var aliases = $scope.originalAliases.info[alias_name];
+				aliases.forEach(function(alias) {
+					if (!isDefined($scope.aliases.info[alias.alias])) {
+						deletes.push(alias);
+					} else {
+						var newAliases = $scope.aliases.info[alias_name];
+						var removeAlias = true;
+						for (var i = 0; i < newAliases.length; i++) {
+							if (alias.index === newAliases[i].index && alias.equals(newAliases[i])) {
+								removeAlias = false;
+								break;
+							}
+						}
+						if (removeAlias) {
+							deletes.push(alias);
+						}
+					}
 				});
 			});
 			var response = updateAliases($scope.host,adds,deletes);
@@ -410,11 +442,12 @@ function AliasesCtrl($scope, $location, $timeout) {
 	
 	$scope.loadAliases=function() {
 		try {
+			$scope.new_alias = new Alias();
 			$scope.originalAliases = fetchAliases($scope.host);
 			$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
 			$scope.pagination.setResults($scope.aliases.info);
 		} catch (error) {
-			$scope.setAlert(new Alert(false,"","Error while fetching aliases",error));
+			$scope.setAlert(new Alert(false,"Error while fetching aliases",error));
 		}
 	}
 	
@@ -832,7 +865,8 @@ function AliasesPagination(page, results) {
 	
 	this.setResults=function(results) {
 		this.results = results;
-		this.cached_results = null; // forces recalculation
+		// forces recalculation of page
+		this.cached_results = null; 
 	}
 	
 	this.total=function() {
@@ -846,28 +880,28 @@ function AliasesPagination(page, results) {
 			var alias_query = this.alias_query;
 			var index_query = this.index_query;
 			var results = this.results;
-			Object.keys(results).forEach(function(alias) {
+			Object.keys(results).forEach(function(alias_name) {
 				if (isDefined(alias_query) && alias_query.length > 0) {
-					if (alias.indexOf(alias_query) != -1) {
+					if (alias_name.indexOf(alias_query) != -1) {
 						if (isDefined(index_query) && index_query.length > 0) {
-							results[alias].forEach(function(index) {
-								if (index.indexOf(index_query) != -1) {
-									matchingResults[alias] = results[alias];
+							results[alias_name].forEach(function(alias) {
+								if (alias.index.indexOf(index_query) != -1) {
+									matchingResults[alias_name] = results[alias_name];
 								}
 							});
 						} else {
-							matchingResults[alias] = results[alias];
+							matchingResults[alias_name] = results[alias_name];
 						}
 					} 
 				} else {
 					if (isDefined(index_query) && index_query.length > 0) {
-						results[alias].forEach(function(index) {
-							if (index.indexOf(index_query) != -1) {
-								matchingResults[alias] = results[alias];
+						results[alias_name].forEach(function(alias) {
+							if (alias.index.indexOf(index_query) != -1) {
+								matchingResults[alias_name] = results[alias_name];
 							}
 						});
 					} else {
-						matchingResults[alias] = results[alias];
+						matchingResults[alias_name] = results[alias_name];
 					}
 				}
 			});

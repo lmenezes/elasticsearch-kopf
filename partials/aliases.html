@@ -30,37 +30,64 @@
 		</div>
 		<div class="aliases-section">
 			<table class="table table-striped table-bordered">
-				<tr ng-repeat="(alias, indices) in pagination.getPage()">
-					<td class="aliases-alias-cell">
-						<div>
-							<i class="icon-remove-circle aliases-remove-alias-action normal-action" ng-click="removeAlias(alias)" title="remove alias for all indices"></i>
+					<tr>
+						<td class="aliases-alias-cell"><i class="icon-tag"></i> alias name</th>
+						<td><i class="icon-pushpin"></i> target indices</th>
+					</tr>
+					<tr ng-repeat="(alias_name, aliases) in pagination.getPage()">
+						<td>
+							<i class="icon-remove-circle aliases-remove-alias-action normal-action" ng-click="removeAlias(alias_name)" title="remove alias for all indices"></i>
 							<span class="aliases-new-alias-input">
-								<i class="icon-tag"></i> <span class="aliases-alias">{{alias}}</span>
+								<span class="aliases-alias">{{alias_name}}</span>
 							</span>
-						</div>
-					</td>
-					<td>
-						<span ng-repeat="index in indices" class="aliases-index-alias">
-							{{index}} <i class="icon-remove-circle normal-action" ng-click="removeAliasFromIndex(index,alias)" title="dissociate alias from index"></i>
-						</span>
-						<span class="aliases-new-index" title="associate alias with index">
-							<select class="aliases-add-index-input" ng-model="new_index[alias]" ng-options="index for index in aliases.indices">
-							</select>
-							<i class="icon-plus-sign aliases-add-index-action normal-action" ng-click="addIndexToAlias(alias);"></i>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td class="aliases-alias-cell">
-						<i class="icon-plus-sign aliases-remove-new-alias-action normal-action" ng-click="addAlias();" title="create new alias"></i>
-						<span class="aliases-new-alias-input">
-							<input type="text" class="form-control input-sm" placeholder="create new alias" ng-model="new_alias">
-						</span>
-					</td>
-					<td></td>
-				</tr>
+						</td>
+						<td>
+							<div class="col-lg-9">
+								<div ng-repeat="alias in aliases" class="aliases-index-alias">
+									<span><b>index: </b>{{alias.index}}</span>,
+									<span><b>filter: </b>{{alias.filter}}</span>,
+									<span><b>index_routing: </b>{{alias.index_routing}}</span>,
+									<span><b>search_routing: </b>{{alias.search_routing}}</span>
+									<span ng-click="removeAliasFromIndex(alias.index,alias.alias)" class="normal-action alias-remove-index">
+										<i class="icon-remove-circle"  title="dissociate alias from index"></i>
+									</span>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="row">
+								<div class="col-lg-2">
+									<input type="text" class="form-control input-sm" placeholder="alias" ng-model="new_alias.alias">
+								</div>
+								<div class="col-lg-3">
+									<input type="text" class="form-control input-sm" placeholder="filter" ng-model="new_alias.filter">
+								</div>
+								<div class="col-lg-2">
+									<input type="text" class="form-control input-sm" placeholder="index_routing value" ng-model="new_alias.index_routing">
+								</div>
+								<div class="col-lg-2">
+									<input type="text" class="form-control input-sm" placeholder="search_routing value" ng-model="new_alias.search_routing">
+								</div>
+								<div class="col-lg-2">
+									<select class="form-control input-sm" ng-model="new_alias.index" ng-options="i for i in aliases.indices">
+										<option value="">select index</option>
+									</select>
+								</div>
+								<div class="col-lg-1">
+									<button type="submit" class="btn btn-primary btn-sm" ng-click="addAlias()"><i class="icon-plus-sign"></i> add</button>
+								</div>
+							</div>
+						</td>
+					</tr>
 			</table>
-			<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="mergeAliases()"><i class="icon-ok"></i> save</button>
+			
+			<div class="aliases-save-changes">
+				<button type="submit" class="btn btn-primary" ng-click="mergeAliases()">
+					<i class="icon-ok"></i> save changes
+				</button>
+			</div>
 		</div>
 	</div>
 </div>

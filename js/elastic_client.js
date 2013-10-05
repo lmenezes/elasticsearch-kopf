@@ -146,12 +146,15 @@ function analyzeByAnalyzer(host, index, analyzer, text) {
 
 function updateAliases(host,add_aliases,remove_aliases) {
 	var data = {};
+	if (add_aliases.length == 0 && remove_aliases.length == 0) {
+		throw "No changes were made: nothing to save";
+	}
 	data['actions'] = [];
-	add_aliases.forEach(function(add_info) {
-		data['actions'].push({'add':add_info});
+	remove_aliases.forEach(function(alias) {
+		data['actions'].push({'remove':alias.info()});
 	});
-	remove_aliases.forEach(function(add_info) {
-		data['actions'].push({'remove':add_info});
+	add_aliases.forEach(function(alias) {
+		data['actions'].push({'add':alias.info()});
 	});
 	var response = syncRequest('POST', host + "/_aliases",JSON.stringify(data, undefined, ""));
 	if (!response.success) {
@@ -230,17 +233,66 @@ function Aliases(aliases_info) {
 	var indices  = [];
 	var aliases_map = {};
 	Object.keys(aliases_info).forEach(function(index) {
-		indices.push(index);
+		indices.push(index); // fills list of available indices
 		var indexAliases = aliases_info[index]['aliases'];
-		Object.keys(indexAliases).forEach(function(alias) {
+		Object.keys(indexAliases).forEach(function(alias) { // group aliases per alias name
 			if (!isDefined(aliases_map[alias])) {
 				aliases_map[alias] = [];
 			}
-			aliases_map[alias].push(index);
+			var alias_instance = new Alias(alias, index, indexAliases[alias]['filter'], indexAliases[alias]['index_routing'],indexAliases[alias]['search_routing']);
+			aliases_map[alias].push(alias_instance);
 		});
 	});
 	this.indices = indices;
 	this.info = aliases_map;
+}
+
+function Alias(alias, index, filter, index_routing, search_routing) {
+	this.alias = alias != null ? alias.toLowerCase() : "";
+	this.index = index != null ? index.toLowerCase() : "";
+	this.filter = filter;
+	this.index_routing = index_routing;
+	this.search_routing = search_routing;
+	
+	this.validate=function() {
+		if (this.alias == null || this.alias.trim().length == 0) {
+			throw "Alias must have a non empty name";
+		}
+		if (this.index == null || this.index.trim().length == 0) {
+			throw "Alias must have a valid index name";
+		}
+	}
+	
+	this.equals=function(other_alias) {
+		var equal = 
+		(this.alias === other_alias.alias) &&
+		(this.index === other_alias.index) &&
+		(this.filter === other_alias.filter) &&
+		(this.index_routing === other_alias.index_routing) &&
+		(this.search_routing === other_alias.search_routing);
+		return equal;
+	}
+
+	this.info=function() {
+		var info = {};
+		info['index'] = this.index;
+		info['alias'] = this.alias;
+		
+		if (this.filter != null) {
+			if (typeof this.filter == 'string') {
+				info['filter'] = JSON.parse(this.filter);
+			} else {
+				info['filter'] = this.filter;
+			}
+		}
+		if (this.index_routing != null && this.index_routing.trim().length > 0) {
+			info['index_routing'] = this.index_routing;
+		}
+		if (this.search_routing != null && this.search_routing.trim().length > 0) {
+			info['search_routing'] = this.search_routing;
+		}
+		return info; 
+	}
 }
 
 function Node(node_id, node_info, node_stats) {
