@@ -498,8 +498,8 @@ a.cluster-map-node-action {
 	min-width: 250px;
 }
 .aliases-new-alias-input {
-
-
+	overflow: hidden;
+	display: block;
 }
 
 .aliases-save-changes {
@@ -587,6 +587,10 @@ a.cluster-map-node-action {
 	font-size:7px;
 	display: inline;
 	font-weight: 300;
+}
+.analysis-text-input {
+	overflow: hidden;
+	display: block;
 }
 /** END ### analysis ### END **/
 /** START ### diagnosis ### START **/
