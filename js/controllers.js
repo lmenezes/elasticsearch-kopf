@@ -46,7 +46,7 @@ function CreateIndexCtrl($scope, $location, $timeout) {
 				if (!isDefined(index_settings['number_of_replicas']) && $scope.replicas.length > 0) {
 					index_settings['number_of_replicas'] = $scope.replicas;
 				}
-				var response = createIndex($scope.host,$scope.name, JSON.stringify(settings, undefined, ""));
+				var response = $scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""));
 				$scope.modal.alert = new Alert(true, 'Index successfully created', response);
 				$scope.broadcastMessage('forceRefresh', {});
 			}
@@ -78,7 +78,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 			var forced_refresh = is_forced_refresh;
 			if (!$scope.isInModal()) { // only refreshes if no modal is active
 				if ($scope.isCurrentView()) {
-					getClusterDetail($scope.host, function(cluster) {
+					$scope.client.getClusterDetail(function(cluster) {
 						if (!$scope.isInModal()) {
 							$scope.$apply(function() { // forces view refresh
 								$scope.cluster = cluster;
@@ -141,7 +141,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.shutdownNode=function(node_id) {
 		try {
-			var response = shutdownNode($scope.host,node_id);
+			var response = $scope.client.shutdownNode(node_id);
 			$scope.setAlert(new Alert(true,"Node [" + node_id + "] successfully shutdown",response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false,"Error while shutting down node",error));
@@ -150,7 +150,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 
 	$scope.optimizeIndex=function(index){
 		try {
-			var response = optimizeIndex($scope.host,index);
+			var response = $scope.client.optimizeIndex(index);
 			$scope.setAlert(new Alert(true, "Index was successfully optimized", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while optimizing index", error));
@@ -160,7 +160,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.deleteIndex=function(index){
 		try {
-			var response = deleteIndex($scope.host,index);
+			var response = $scope.client.deleteIndex(index);
 			$scope.setAlert(new Alert(true, "Index was successfully deleted", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while deleting index", error));	
@@ -170,7 +170,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.clearCache=function(index) {
 		try {
-			var response = clearCache($scope.host,index);
+			var response = $scope.client.clearCache(index);
 			$scope.setAlert(new Alert(true, "Index cache was successfully cleared", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while clearing index cache", error));	
@@ -180,7 +180,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 
 	$scope.refreshIndex=function(index){
 		try {
-			var response = refreshIndex($scope.host,index);
+			var response = $scope.client.refreshIndex(index);
 			$scope.setAlert(new Alert(true, "Index was successfully refreshed", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while refreshing index", error));	
@@ -190,7 +190,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.enableAllocation=function() {
 		try {
-			var response = enableShardAllocation($scope.host);
+			var response = $scope.client.enableShardAllocation();
 			$scope.setAlert(new Alert(true, "Shard allocation was successfully enabled", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while enabling shard allocation", error));	
@@ -200,7 +200,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.disableAllocation=function(current_state) {
 		try {
-			var response = disableShardAllocation($scope.host);
+			var response = $scope.client.disableShardAllocation();
 			$scope.setAlert(new Alert(true, "Shard allocation was successfully disabled", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while disabling shard allocation", error));	
@@ -210,7 +210,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.closeIndex=function(index) {
 		try {
-			var response = closeIndex($scope.host,index);
+			var response = $scope.client.closeIndex(index);
 			$scope.setAlert(new Alert(true, "Index was successfully closed", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while closing index", error));	
@@ -220,7 +220,7 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	
 	$scope.openIndex=function(index) {
 		try {
-			var response = openIndex($scope.host,index);
+			var response = $scope.client.openIndex(index);
 			$scope.setAlert(new Alert(true, "Index was successfully opened", response.response));
 		} catch (error) {
 			$scope.setAlert(new Alert(false, "Error while opening index", error));	
@@ -252,7 +252,7 @@ function IndexSettingsCtrl($scope, $location, $timeout) {
 							new_settings[setting] = index.settings[setting];
 						}
 					});
-					var response = updateIndexSettings($scope.host, index.name, JSON.stringify(new_settings, undefined, ""));
+					var response = $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""));
 					$scope.modal.alert = new Alert(true, "Index settings were successfully updated", response.response);
 					$scope.broadcastMessage('forceRefresh', {});
 				}
@@ -268,7 +268,7 @@ function ClusterSettingsCtrl($scope, $location, $timeout) {
 		try {
 			var new_settings = {};
 			new_settings['transient'] = $scope.cluster.settings;
-			var response = updateClusterSettings($scope.host, JSON.stringify(new_settings, undefined, ""));
+			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""));
 			$scope.modal.alert = new Alert(true, "Cluster settings were successfully updated",response.response);
 			$scope.broadcastMessage('forceRefresh', {});
 		} catch (error) {
@@ -285,7 +285,7 @@ function NavbarController($scope, $location, $timeout) {
 	(function loadClusterHealth() {
 		
 		$scope.updateClusterHealth=function() {
-			getClusterHealth($scope.host, 
+			$scope.client.getClusterHealth( 
 				function(cluster) {
 					if ($scope.cluster_health == null) {
 						$scope.clearAlert();
@@ -432,7 +432,7 @@ function AliasesCtrl($scope, $location, $timeout) {
 					}
 				});
 			});
-			var response = updateAliases($scope.host,adds,deletes);
+			var response = $scope.client.updateAliases(adds,deletes);
 			$scope.loadAliases();
 			$scope.setAlert(new Alert(true, "Aliases were successfully updated",response.response));
 		} catch (error) {
@@ -443,7 +443,7 @@ function AliasesCtrl($scope, $location, $timeout) {
 	$scope.loadAliases=function() {
 		try {
 			$scope.new_alias = new Alias();
-			$scope.originalAliases = fetchAliases($scope.host);
+			$scope.originalAliases = $scope.client.fetchAliases();
 			$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
 			$scope.pagination.setResults($scope.aliases.info);
 		} catch (error) {
@@ -475,7 +475,7 @@ function ClusterHealthCtrl($scope,$location,$timeout) {
 		var cluster_health = null;
 		$scope.cluster_health = null; // otherwise we see past version, then new
 		$scope.state = "loading cluster health state. this could take a few moments..."
-		getClusterDiagnosis($scope.host,
+		$scope.client.getClusterDiagnosis(
 			function(state, stats, hot_threads) {
 				cluster_health = {};
 				cluster_health['state'] = JSON.stringify(state, undefined, 4);
@@ -556,7 +556,7 @@ function RestCtrl($scope, $location, $timeout) {
 		$('#rest-client-response').html('');
 		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
 			try {
-				var response = syncRequest($scope.request.method,$scope.request.url,$scope.request.body);
+				var response = $scope.client.executeRequest($scope.request.method,$scope.request.url,$scope.request.body);
 				if (response.success) {
 					var content = jsonTree.create(response.response);
 					$('#rest-client-response').html(content);
@@ -603,7 +603,7 @@ function AnalysisCtrl($scope, $location, $timeout) {
 	$scope.analyzeByField=function() {
 		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
 			try {
-				$scope.field_tokens = analyzeByField($scope.host,$scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text);
+				$scope.field_tokens = $scope.client.analyzeByField($scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text);
 				$scope.clearAlert();
 			} catch (error) {
 				$scope.field_tokens = null;
@@ -615,7 +615,7 @@ function AnalysisCtrl($scope, $location, $timeout) {
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
 			try {
-				$scope.analyzer_tokens = analyzeByAnalyzer($scope.host,$scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text);
+				$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text);
 				$scope.clearAlert();
 			} catch (error) {
 				$scope.analyzer_tokens = null;
@@ -652,7 +652,7 @@ function AnalysisCtrl($scope, $location, $timeout) {
 	
 	$scope.loadAnalysisData=function() {
 		try {
-			var response = getClusterState($scope.host);
+			var response = $scope.client.getClusterState();
 			Object.keys(response.response['metadata']['indices']).forEach(function(index) {
 				$scope.indices[index] = {};
 				var indexData = response.response['metadata']['indices'][index]['mappings'];
@@ -683,11 +683,39 @@ function AnalysisCtrl($scope, $location, $timeout) {
 
 function GlobalController($scope, $location, $timeout) {
 	$scope.version = "0.1";
+	$scope.username = null;
+	$scope.password = null;
+	
+	$scope.setConnected=function(status) {
+		$scope.is_connected = status;
+	}
+
+	$scope.broadcastMessage=function(message,args) {
+		$scope.$broadcast(message,args);
+	}
+	
+	$scope.setHost=function(url) {
+		var exp = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
+		// expected: "http://user:password@host", "http", "user", "password", "host"]
+		var url_parts = exp.exec(url);
+		if (url_parts != null) {
+			$scope.host = url_parts[1] + "://" + url_parts[4];
+			$scope.username = url_parts[2];
+			$scope.password = url_parts[3];
+		} else {
+			$scope.username = null;
+			$scope.password = null;
+			$scope.host = url;
+		}
+		$scope.setConnected(false);
+		$scope.broadcastMessage('hostChanged',{});
+		$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
+	}
 	
 	if ($location.host() == "") { // when opening from filesystem
-		$scope.host = "http://localhost:9200";
+		$scope.setHost("http://localhost:9200");
 	} else {
-		$scope.host = $location.protocol() + "://" + $location.host() + ":" + $location.port();
+		$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());
 	}
 	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
@@ -703,22 +731,8 @@ function GlobalController($scope, $location, $timeout) {
 		return $scope.is_connected;
 	}
 	
-	$scope.setConnected=function(status) {
-		$scope.is_connected = status;
-	}
-
-	$scope.broadcastMessage=function(message,args) {
-		$scope.$broadcast(message,args);
-	}
-	
 	$scope.isActive=function(tab) {
 		return $('#' + tab).hasClass('active');
-	}
-	
-	$scope.setHost=function(host) {
-		$scope.host = host;
-		$scope.setConnected(false);
-		$scope.broadcastMessage('hostChanged',{});
 	}
 	
 	$scope.getHost=function() {

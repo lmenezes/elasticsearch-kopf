@@ -1,219 +1,371 @@
-function createIndex(host, name, settings) {
-	var response = syncRequest('POST', host + "/" + name, settings);
-	if (!response.success) {
-		throw response.response;
+function ElasticClient(host,username,password) {
+	this.host = host;
+	this.username = username;
+	this.password = password;
+	
+	this.createIndex=function(name, settings) {
+		var response = this.syncRequest('POST', "/" + name, settings);
+		if (!response.success) {
+			throw response.response;
+		}
+		return response.response;
 	}
-	return response.response;
-}
 
-function enableShardAllocation(host) {
-	var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":false }};
-	var response = syncRequest('PUT', host + "/_cluster/settings",JSON.stringify(new_settings, undefined, ""));
-	if (!response.success) {
-		throw response.response;
+	this.enableShardAllocation=function() {
+		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":false }};
+		var response = this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""));
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function disableShardAllocation(host) {
-	var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":true }};
-	var response = syncRequest('PUT', host + "/_cluster/settings",JSON.stringify(new_settings, undefined, ""));
-	if (!response.success) {
-		throw response.response;
+	this.disableShardAllocation=function() {
+		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":true }};
+		var response = this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""));
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function getClusterState(host) {
-	var response = syncRequest('GET',host+"/_cluster/state",{});
-	if (!response.success) {
-		throw response.response;
+	this.getClusterState=function() {
+		var response = this.syncRequest('GET', "/_cluster/state",{});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function shutdownNode(host,node_id) {
-	var response = syncRequest('POST',host + "/_cluster/nodes/" + node_id + "/_shutdown", {});
-	if (!response.success) {
-		throw response.response;
+	this.shutdownNode=function(node_id) {
+		var response = this.syncRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function openIndex(host,index) {
-	var response = syncRequest('POST', host + "/" + index + "/_open", {});
-	if (!response.success) {
-		throw response.response;
+	this.openIndex=function(index) {
+		var response = this.syncRequest('POST', "/" + index + "/_open", {});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function optimizeIndex(host,index) {
-	var response = syncRequest('POST',host + "/" + index + "/_optimize", {});
-	if (!response.success) {
-		throw response.response;
+	this.optimizeIndex=function(index) {
+		var response = this.syncRequest('POST', "/" + index + "/_optimize", {});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function clearCache(host,index) {
-	var response = syncRequest('POST',host + "/" + index + "/_cache/clear", {});
-	if (!response.success) {
-		throw response.response;
+	this.clearCache=function(index) {
+		var response = this.syncRequest('POST', "/" + index + "/_cache/clear", {});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function closeIndex(host,index) {
-	var response = syncRequest('POST', host + "/" + index + "/_close", {});
-	if (!response.success) {
-		throw response.response;
+	this.closeIndex=function(index) {
+		var response = this.syncRequest('POST', "/" + index + "/_close", {});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function refreshIndex(host,index) {
-	var response = syncRequest('POST', host + "/" + index + "/_refresh", {});
-	if (!response.success) {
-		throw response.response;
+	this.refreshIndex=function(index) {
+		var response = this.syncRequest('POST', "/" + index + "/_refresh", {});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function deleteIndex(host, name) {
-	var response = syncRequest('DELETE', host + "/" + name);
-	if (!response.success) {
-		throw response.response;
+	this.deleteIndex=function( name) {
+		var response = this.syncRequest('DELETE', "/" + name);
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function updateIndexSettings(host, name, settings) {
-	var response = syncRequest('PUT', host + "/" + name + "/_settings", settings);
-	if (!response.success) {
-		throw response.response;
+	this.updateIndexSettings=function( name, settings) {
+		var response = this.syncRequest('PUT', "/" + name + "/_settings", settings);
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function updateClusterSettings(host, settings) {
-	var response = syncRequest('PUT', host + "/_cluster/settings", settings);
-	if (!response.success) {
-		throw response.response;
+	this.updateClusterSettings=function( settings) {
+		var response = this.syncRequest('PUT', "/_cluster/settings", settings);
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	return response;
-}
 
-function getNodes(host) {
-	var nodes = [];
-	var response = syncRequest('GET', host + "/_cluster/state",{});
-	if (!response.success) {
-		throw response.response;
+	this.getNodes=function() {
+		var nodes = [];
+		var response = this.syncRequest('GET', "/_cluster/state",{});
+		if (!response.success) {
+			throw response.response;
+		}
+		Object.keys(response.response['nodes']).forEach(function(node_id) {
+			nodes.push(new Node(node_id,response.response['nodes'][node_id]));
+		});
+		return nodes;
 	}
-	Object.keys(response.response['nodes']).forEach(function(node_id) {
-		nodes.push(new Node(node_id,response.response['nodes'][node_id]));
-	});
-	return nodes;
-}
 
-function fetchAliases(host) {
-	var response = syncRequest('GET', host + "/_aliases",{});
-	if (!response.success) {
-		throw response.response;
+	this.fetchAliases=function() {
+		var response = this.syncRequest('GET', "/_aliases",{});
+		if (!response.success) {
+			throw response.response;
+		}
+		return new Aliases(response.response);		
 	}
-	return new Aliases(response.response);		
-}
 
-function analyzeByField(host, index, type, field, text) {
-	var response = syncRequest('GET', host + "/" + index + "/_analyze?field=" + type +"."+field,{'text':text});
-	if (!response.success) {
-		throw response.response;
+	this.analyzeByField=function( index, type, field, text) {
+		var response = this.syncRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response.response['tokens'].map(function (token) {
+			return new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
+		});
 	}
-	return response.response['tokens'].map(function (token) {
-		return new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
-	});
-}
 
-function analyzeByAnalyzer(host, index, analyzer, text) {
-	var response = syncRequest('GET', host + "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text});
-	if (!response.success) {
-		throw response.response;
+	this.analyzeByAnalyzer=function( index, analyzer, text) {
+		var response = this.syncRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response.response['tokens'].map(function (token) {
+			new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
+		});
 	}
-	return response.response['tokens'].map(function (token) {
-		new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
-	});
-}
 
-function updateAliases(host,add_aliases,remove_aliases) {
-	var data = {};
-	if (add_aliases.length == 0 && remove_aliases.length == 0) {
-		throw "No changes were made: nothing to save";
+	this.updateAliases=function(add_aliases,remove_aliases) {
+		var data = {};
+		if (add_aliases.length == 0 && remove_aliases.length == 0) {
+			throw "No changes were made: nothing to save";
+		}
+		data['actions'] = [];
+		remove_aliases.forEach(function(alias) {
+			data['actions'].push({'remove':alias.info()});
+		});
+		add_aliases.forEach(function(alias) {
+			data['actions'].push({'add':alias.info()});
+		});
+		var response = this.syncRequest('POST', "/_aliases",JSON.stringify(data, undefined, ""));
+		if (!response.success) {
+			throw response.response;
+		}
+		return response;
 	}
-	data['actions'] = [];
-	remove_aliases.forEach(function(alias) {
-		data['actions'].push({'remove':alias.info()});
-	});
-	add_aliases.forEach(function(alias) {
-		data['actions'].push({'add':alias.info()});
-	});
-	var response = syncRequest('POST', host + "/_aliases",JSON.stringify(data, undefined, ""));
-	if (!response.success) {
-		throw response.response;
-	}
-	return response;
-}
 
-function compareNodes(a,b) { // TODO: take into account node specs?
-	if (b.current_master) {
-		return 1;
+	this.compareNodes=function(a,b) { // TODO: take into account node specs?
+		if (b.current_master) {
+			return 1;
+		}
+		if (a.current_master) {
+			return -1;
+		}
+		if (b.master && !a.master) {
+			return 1;
+		} 
+		if (a.master && !b.master) {
+			return -1;
+		}
+	
+		if (b.data && !a.data) {
+			return 1;
+		} 
+		if (a.data && !b.data) {
+			return -1;
+		}
+		return a.name.localeCompare(b.name);
 	}
-	if (a.current_master) {
-		return -1;
+
+	this.compareIndices=function(a,b) { // TODO: take into account index properties?
+		return a.name.localeCompare(b.name);
 	}
-	if (b.master && !a.master) {
-		return 1;
-	} 
-	if (a.master && !b.master) {
-		return -1;
+
+	this.getNodesStats=function() {
+		var response = this.syncRequest('GET', "/_nodes/stats?all=true",{});
+		if (!response.success) {
+			throw response.response;
+		}
+		return response.response;
 	}
 	
-	if (b.data && !a.data) {
-		return 1;
+	this.syncRequest=function(method, path, data) {
+		var url = this.host + path;
+		return this.executeRequest(method,url,this.username,this.password,data);
+	}
+	
+	this.createAuthToken=function(username,password) {
+		var auth = null;
+		if (username != null && password != null) {
+			auth = "Basic " + window.btoa(username + ":" + password);
+		}
+		return auth;
+	}
+	
+	this.executeRequest=function(method, url, username, password, data) {
+		var response;
+		var auth = this.createAuthToken(username,password);
+		$.ajax({
+		    type: method,
+		    url: url,
+		    dataType: 'json',
+			beforeSend: function(xhr) { 
+				if (auth != null) {
+					xhr.setRequestHeader("Authorization", auth);
+				} 
+			},
+		    success: function(r) { 
+				response = new ServerResponse(true,r) 
+			},
+			error: function(r) { 
+				response = new ServerResponse(false,r) 
+			},
+		    data: data,
+		    async: false
+		});
+		return response;
+	}
+
+	/** ####### END OF REFACTORED AREA ####### **/
+
+	this.getClusterHealth=function(callback_success, callback_error) {
+		var url = this.host + "/_cluster/health";
+		var auth = this.createAuthToken(this.username,this.password);
+		$.when(
+			$.ajax({ 
+				type: 'GET', 
+				url: url, 
+				dataType: 'json', 
+				data: {},
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				},
+			})).then(
+				function(cluster_health) {
+					callback_success(new ClusterHealth(cluster_health));
+				},
+				function(cluster_health) {
+					callback_error(cluster_health);
+				}
+		);
+	}
+
+	this.getClusterDetail=function(callback) {
+		var host = this.host;
+		var auth = this.createAuthToken(this.username,this.password);
+		$.when(
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_cluster/state", 
+				dataType: 'json', 
+				data: {},
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				}
+			}),
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_cluster/nodes/stats?all=true", 
+				dataType: 'json', 
+				data: {}, 
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				}
+			}),
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_status", 
+				dataType: 'json', 
+				data: {}, 
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					}
+				}
+			}),
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_cluster/settings", 
+				dataType: 'json', 
+				data: {}, 
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				}
+			})
+		).done(
+			function(cluster_state,nodes_stats,cluster_status,settings) {
+				callback(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+			}
+		);
 	} 
-	if (a.data && !b.data) {
-		return -1;
+
+	this.getClusterDiagnosis=function(callback_success,callback_error) {
+		var host = this.host;
+		var auth = this.createAuthToken(this.username,this.password);
+		$.when(
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_cluster/state", 
+				dataType: 'json', 
+				data: {},
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				}
+			}),
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_cluster/nodes/stats?all=true", 
+				dataType: 'json', 
+				data: {},
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				}
+			}),
+			$.ajax({ 
+				type: 'GET', 
+				url: host+"/_nodes/hot_threads", 
+				data: {},
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				}
+			})
+		).then(
+				function(state, stats, hot_threads) {
+					callback_success(state[0], stats[0], hot_threads[0]);
+				},
+				function(failed_request) {
+					callback_error(failed_request);
+				}
+			);
 	}
-	return a.name.localeCompare(b.name);
-}
-
-function compareIndices(a,b) { // TODO: take into account index properties?
-	return a.name.localeCompare(b.name);
-}
-
-function getNodesStats(host) {
-	var response = syncRequest('GET',host+"/_nodes/stats?all=true",{});
-	if (!response.success) {
-		throw response.response;
-	}
-	return response.response;
-}
-
-function syncRequest(method, url, data) {
-	var response;
-	$.ajax({
-	    type: method,
-	    url: url,
-	    dataType: 'json',
-	    success: function(r) { 
-			response = new ServerResponse(true,r) 
-		},
-		error: function(r) { 
-			response = new ServerResponse(false,r) 
-		},
-	    data: data,
-	    async: false
-	});
-	return response;
 }
 
 /** TYPES **/
@@ -253,7 +405,7 @@ function Alias(alias, index, filter, index_routing, search_routing) {
 	this.filter = filter;
 	this.index_routing = index_routing;
 	this.search_routing = search_routing;
-	
+
 	this.validate=function() {
 		if (this.alias == null || this.alias.trim().length == 0) {
 			throw "Alias must have a non empty name";
@@ -262,7 +414,7 @@ function Alias(alias, index, filter, index_routing, search_routing) {
 			throw "Alias must have a valid index name";
 		}
 	}
-	
+
 	this.equals=function(other_alias) {
 		var equal = 
 		(this.alias === other_alias.alias) &&
@@ -277,7 +429,7 @@ function Alias(alias, index, filter, index_routing, search_routing) {
 		var info = {};
 		info['index'] = this.index;
 		info['alias'] = this.alias;
-		
+	
 		if (this.filter != null) {
 			if (typeof this.filter == 'string') {
 				info['filter'] = JSON.parse(this.filter);
@@ -310,7 +462,7 @@ function Node(node_id, node_info, node_stats) {
 	this.client = client || !master && !data;
 	this.current_master = false;
 	this.stats = node_stats;
-	
+
 	this.setCurrentMaster=function() {
 		this.current_master = true;
 	}
@@ -345,7 +497,7 @@ function Cluster(state,status,nodes,settings) {
 				node.setCurrentMaster();
 			}
 			return node;
-		}).sort(compareNodes);
+		}).sort(this.compareNodes);
     	this.number_of_nodes = num_nodes;
 		var iMetadata = state['metadata']['indices'];
 		var iRoutingTable = state['routing_table']['indices'];
@@ -362,7 +514,7 @@ function Cluster(state,status,nodes,settings) {
 				num_docs += index.num_docs;
 				return index;
 			 }
-		).sort(compareIndices);
+		).sort(this.compareIndices);
 		this.num_docs = num_docs;
 		this.unassigned_shards = unassigned_shards;
 		this.total_indices = this.indices.length;
@@ -439,44 +591,4 @@ function Index(index_name,index_info, index_metadata, index_status) {
 function ServerResponse(success, response) {
 	this.success = success;
 	this.response = response;
-}
-/** ####### END OF REFACTORED AREA ####### **/
-
-function getClusterHealth(host, callback_success, callback_error) {
-	$.when(
-		$.ajax({ type: 'GET', url: host+"/_cluster/health", dataType: 'json', data: {}})).then(
-			function(cluster_health) {
-				callback_success(new ClusterHealth(cluster_health));
-			},
-			function(cluster_health) {
-				callback_error(cluster_health);
-			}
-	);
-}
-
-function getClusterDetail(host, callback) {
-	$.when(
-		$.ajax({ type: 'GET', url: host+"/_cluster/state", dataType: 'json', data: {}}),
-		$.ajax({ type: 'GET', url: host+"/_cluster/nodes/stats?all=true", dataType: 'json', data: {}}),
-		$.ajax({ type: 'GET', url: host+"/_status", dataType: 'json', data: {}}),
-		$.ajax({ type: 'GET', url: host+"/_cluster/settings", dataType: 'json', data: {}})).done(
-			function(cluster_state,nodes_stats,cluster_status,settings) {
-				callback(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
-			}
-		);
-} 
-
-function getClusterDiagnosis(host,callback_success,callback_error) {
-	$.when(
-		$.ajax({ type: 'GET', url: host+"/_cluster/state", dataType: 'json', data: {}}),
-		$.ajax({ type: 'GET', url: host+"/_cluster/nodes/stats?all=true", dataType: 'json', data: {}}),
-		$.ajax({ type: 'GET', url: host+"/_nodes/hot_threads", data: {}})
-	).then(
-			function(state, stats, hot_threads) {
-				callback_success(state[0], stats[0], hot_threads[0]);
-			},
-			function(failed_request) {
-				callback_error(failed_request);
-			}
-		);
 }
