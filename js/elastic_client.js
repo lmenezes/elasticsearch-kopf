@@ -3,153 +3,99 @@ function ElasticClient(host,username,password) {
 	this.username = username;
 	this.password = password;
 	
-	this.createIndex=function(name, settings) {
-		var response = this.syncRequest('POST', "/" + name, settings);
-		if (!response.success) {
-			throw response.response;
-		}
-		return response.response;
+	this.createIndex=function(name, settings, callback_success, callback_error) {
+		this.syncRequest('POST', "/" + name, settings, callback_success, callback_error);
 	}
 
-	this.enableShardAllocation=function() {
+	this.enableShardAllocation=function(callback_success, callback_error) {
 		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":false }};
-		var response = this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""));
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+		this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	}
 
-	this.disableShardAllocation=function() {
+	this.disableShardAllocation=function(callback_success, callback_error) {
 		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":true }};
-		var response = this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""));
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+		this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	}
 
-	this.getClusterState=function() {
-		var response = this.syncRequest('GET', "/_cluster/state",{});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.getClusterState=function(callback_success, callback_error) {
+		this.syncRequest('GET', "/_cluster/state",{}, callback_success, callback_error);
 	}
 
-	this.shutdownNode=function(node_id) {
-		var response = this.syncRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.shutdownNode=function(node_id, callback_success, callback_error) {
+		this.syncRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
 	}
 
-	this.openIndex=function(index) {
-		var response = this.syncRequest('POST', "/" + index + "/_open", {});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.openIndex=function(index, callback_success, callback_error) {
+		this.syncRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
 	}
 
-	this.optimizeIndex=function(index) {
-		var response = this.syncRequest('POST', "/" + index + "/_optimize", {});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.optimizeIndex=function(index, callback_success, callback_error) {
+		this.syncRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
 	}
 
-	this.clearCache=function(index) {
-		var response = this.syncRequest('POST', "/" + index + "/_cache/clear", {});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.clearCache=function(index, callback_success, callback_error) {
+		this.syncRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
 	}
 
-	this.closeIndex=function(index) {
-		var response = this.syncRequest('POST', "/" + index + "/_close", {});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.closeIndex=function(index, callback_success, callback_error) {
+		this.syncRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
 	}
 
-	this.refreshIndex=function(index) {
-		var response = this.syncRequest('POST', "/" + index + "/_refresh", {});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.refreshIndex=function(index, callback_success, callback_error) {
+		this.syncRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
 	}
 
-	this.deleteIndex=function( name) {
-		var response = this.syncRequest('DELETE', "/" + name);
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.deleteIndex=function(name, callback_success, callback_error) {
+		this.syncRequest('DELETE', "/" + name, {}, callback_success, callback_error);
 	}
 
-	this.updateIndexSettings=function( name, settings) {
-		var response = this.syncRequest('PUT', "/" + name + "/_settings", settings);
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.updateIndexSettings=function(name, settings, callback_success, callback_error) {
+		this.syncRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
 	}
 
-	this.updateClusterSettings=function( settings) {
-		var response = this.syncRequest('PUT', "/_cluster/settings", settings);
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+	this.updateClusterSettings=function(settings, callback_success, callback_error) {
+		this.syncRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
 	}
 
-	this.getNodes=function() {
+	this.getNodes=function(callback_success, callback_error) {
 		var nodes = [];
-		var response = this.syncRequest('GET', "/_cluster/state",{});
-		if (!response.success) {
-			throw response.response;
+		var createNodes = function(response) {
+			Object.keys(response.response['nodes']).forEach(function(node_id) {
+				nodes.push(new Node(node_id,response.response['nodes'][node_id]));
+			});
+			callback_success(nodes);
 		}
-		Object.keys(response.response['nodes']).forEach(function(node_id) {
-			nodes.push(new Node(node_id,response.response['nodes'][node_id]));
-		});
-		return nodes;
+		this.syncRequest('GET', "/_cluster/state", {}, createNodes, callback_error);
 	}
 
-	this.fetchAliases=function() {
-		var response = this.syncRequest('GET', "/_aliases",{});
-		if (!response.success) {
-			throw response.response;
+	this.fetchAliases=function(callback_success, callback_error) {
+		var createAliases=function(response) {
+			callback_success(new Aliases(response));
 		}
-		return new Aliases(response.response);		
+		this.syncRequest('GET', "/_aliases",{},createAliases, callback_error);
 	}
 
-	this.analyzeByField=function( index, type, field, text) {
-		var response = this.syncRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text});
-		if (!response.success) {
-			throw response.response;
+	this.analyzeByField=function(index, type, field, text, callback_success, callback_error) {
+		var buildTokens=function(response) {
+			var tokens = response['tokens'].map(function (token) {
+				return new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
+			});
+			callback_success(tokens);	
 		}
-		return response.response['tokens'].map(function (token) {
-			return new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
-		});
+		this.syncRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
 	}
 
-	this.analyzeByAnalyzer=function( index, analyzer, text) {
-		var response = this.syncRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text});
-		if (!response.success) {
-			throw response.response;
+	this.analyzeByAnalyzer=function(index, analyzer, text, callback_success, callback_error) {
+		var buildTokens=function(response) {
+			var tokens = response['tokens'].map(function (token) {
+				return new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
+			});
+			callback_success(tokens);	
 		}
-		return response.response['tokens'].map(function (token) {
-			new Token(token['token'],token['start_offset'],token['end_offset'],token['position']);
-		});
+		this.syncRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
 	}
 
-	this.updateAliases=function(add_aliases,remove_aliases) {
+	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
 		var data = {};
 		if (add_aliases.length == 0 && remove_aliases.length == 0) {
 			throw "No changes were made: nothing to save";
@@ -161,24 +107,17 @@ function ElasticClient(host,username,password) {
 		add_aliases.forEach(function(alias) {
 			data['actions'].push({'add':alias.info()});
 		});
-		var response = this.syncRequest('POST', "/_aliases",JSON.stringify(data, undefined, ""));
-		if (!response.success) {
-			throw response.response;
-		}
-		return response;
+		this.syncRequest('POST', "/_aliases",JSON.stringify(data, undefined, ""), callback_success, callback_error);
+		
 	}
 
-	this.getNodesStats=function() {
-		var response = this.syncRequest('GET', "/_nodes/stats?all=true",{});
-		if (!response.success) {
-			throw response.response;
-		}
-		return response.response;
+	this.getNodesStats=function(callback_success, callback_error) {
+		this.syncRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
 	}
 	
-	this.syncRequest=function(method, path, data) {
+	this.syncRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
-		return this.executeRequest(method,url,this.username,this.password,data);
+		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
 	}
 	
 	this.createAuthToken=function(username,password) {
@@ -189,28 +128,27 @@ function ElasticClient(host,username,password) {
 		return auth;
 	}
 	
-	this.executeRequest=function(method, url, username, password, data) {
-		var response;
+	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {
 		var auth = this.createAuthToken(username,password);
-		$.ajax({
-		    type: method,
-		    url: url,
-		    dataType: 'json',
-			beforeSend: function(xhr) { 
-				if (auth != null) {
-					xhr.setRequestHeader("Authorization", auth);
-				} 
+		$.when(
+			$.ajax({
+		    	type: method,
+				url: url,
+				dataType: 'jsonp',
+				beforeSend: function(xhr) { 
+					if (auth != null) {
+						xhr.setRequestHeader("Authorization", auth);
+					} 
+				},
+				data: data
+		})).then(
+			function(r) { 
+				callback_success(r); 
 			},
-		    success: function(r) { 
-				response = new ServerResponse(true,r) 
-			},
-			error: function(r) { 
-				response = new ServerResponse(false,r) 
-			},
-		    data: data,
-		    async: false
-		});
-		return response;
+			function(error) {
+				callback_error(error); 
+			}
+		 );
 	}
 
 	/** ####### END OF REFACTORED AREA ####### **/
@@ -222,7 +160,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: url, 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -239,14 +177,14 @@ function ElasticClient(host,username,password) {
 		);
 	}
 
-	this.getClusterDetail=function(callback) {
+	this.getClusterDetail=function(callback_success, callback_error) {
 		var host = this.host;
 		var auth = this.createAuthToken(this.username,this.password);
 		$.when(
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/state", 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -257,7 +195,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/nodes/stats?all=true", 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {}, 
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -268,7 +206,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_status", 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {}, 
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -279,7 +217,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/settings", 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {}, 
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -289,7 +227,10 @@ function ElasticClient(host,username,password) {
 			})
 		).done(
 			function(cluster_state,nodes_stats,cluster_status,settings) {
-				callback(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+			},
+			function(error) {
+				callback_error(error);
 			}
 		);
 	} 
@@ -301,7 +242,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/state", 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -312,7 +253,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/nodes/stats?all=true", 
-				dataType: 'json', 
+				dataType: 'jsonp', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -587,7 +528,3 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	}
 }
 
-function ServerResponse(success, response) {
-	this.success = success;
-	this.response = response;
-}

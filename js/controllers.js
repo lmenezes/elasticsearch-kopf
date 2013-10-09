@@ -20,38 +20,39 @@ function CreateIndexCtrl($scope, $location, $timeout) {
     });
 
 	$scope.createIndex=function() {
-		try {
-			if ($scope.name.trim().length == 0) {
-				$scope.modal.alert = new Alert(false, "You must specify a valid index name", null);	
-			} else {
-				var settings = {};
-				var editor_content = $scope.editor.getValue();
-				if (editor_content.trim().length > 0) {
-					try {
-						settings = JSON.parse(editor_content);
-					} catch (error) {
-						throw "Invalid JSON: " + error;
-					}
-				} 
-				if (!isDefined(settings['settings'])) {
-					settings = {"settings":settings};
-				} 
-				if (!isDefined(settings['settings']['index'])) {
-					settings['settings']['index'] = {};
-				} 
-				var index_settings = settings['settings']['index'];
-				if (!isDefined(index_settings['number_of_shards']) && $scope.shards.length > 0) {
-					index_settings['number_of_shards'] = $scope.shards;
+		if ($scope.name.trim().length == 0) {
+			$scope.modal.alert = new Alert(false, "You must specify a valid index name", null);	
+		} else {
+			var settings = {};
+			var editor_content = $scope.editor.getValue();
+			if (editor_content.trim().length > 0) {
+				try {
+					settings = JSON.parse(editor_content);
+				} catch (error) {
+					throw "Invalid JSON: " + error;
 				}
-				if (!isDefined(index_settings['number_of_replicas']) && $scope.replicas.length > 0) {
-					index_settings['number_of_replicas'] = $scope.replicas;
-				}
-				var response = $scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""));
-				$scope.modal.alert = new Alert(true, 'Index successfully created', response);
-				$scope.broadcastMessage('forceRefresh', {});
+			} 
+			if (!isDefined(settings['settings'])) {
+				settings = {"settings":settings};
+			} 
+			if (!isDefined(settings['settings']['index'])) {
+				settings['settings']['index'] = {};
+			} 
+			var index_settings = settings['settings']['index'];
+			if (!isDefined(index_settings['number_of_shards']) && $scope.shards.length > 0) {
+				index_settings['number_of_shards'] = $scope.shards;
 			}
-		} catch(error) {
-			$scope.modal.alert = new Alert(false, "Error while creating index", error);
+			if (!isDefined(index_settings['number_of_replicas']) && $scope.replicas.length > 0) {
+				index_settings['number_of_replicas'] = $scope.replicas;
+			}
+			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
+				function(response) {
+					$scope.modal.alert = new Alert(true, 'Index successfully created', response);
+					$scope.broadcastMessage('forceRefresh', {});					
+				}, function(error) { 
+					$scope.modal.alert = new Alert(false, "Error while creating index", error);
+				}
+			);
 		}
 	}
 	
@@ -91,7 +92,11 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 									$scope.forcedRefresh();
 								}
 							}
-						});
+						},
+						function(error) {
+							// alert?
+						}
+					);
 					} else {
 						if (forced_refresh) {
 							$scope.forcedRefresh();
@@ -142,92 +147,116 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 	}
 	
 	$scope.shutdownNode=function(node_id) {
-		try {
-			var response = $scope.client.shutdownNode(node_id);
-			$scope.setAlert(new Alert(true,"Node [" + node_id + "] successfully shutdown",response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false,"Error while shutting down node",error));
-		}
+		var response = $scope.client.shutdownNode(node_id,
+			function(response) {
+				$scope.setAlert(new Alert(true,"Node [" + node_id + "] successfully shutdown", response));
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false,"Error while shutting down node",error));
+			}
+		);
 	}
 
 	$scope.optimizeIndex=function(index){
-		try {
-			var response = $scope.client.optimizeIndex(index);
-			$scope.setAlert(new Alert(true, "Index was successfully optimized", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while optimizing index", error));
-		}
-		$scope.closeModal(false);
+		var response = $scope.client.optimizeIndex(index, 
+			function(response) {
+				$scope.setAlert(new Alert(true, "Index was successfully optimized", response));
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while optimizing index", error));
+			}				
+		);
 	}
 	
-	$scope.deleteIndex=function(index){
-		try {
-			var response = $scope.client.deleteIndex(index);
-			$scope.setAlert(new Alert(true, "Index was successfully deleted", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while deleting index", error));	
-		}
-		$scope.closeModal(true);
+	$scope.deleteIndex=function(index) {
+		var response = $scope.client.deleteIndex(index, 
+			function(response) {
+				$scope.setAlert(new Alert(true, "Index was successfully deleted", response));
+				$scope.closeModal(true);
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while deleting index", error));
+				$scope.closeModal(true);
+			}	
+		);
 	}
 	
 	$scope.clearCache=function(index) {
-		try {
-			var response = $scope.client.clearCache(index);
-			$scope.setAlert(new Alert(true, "Index cache was successfully cleared", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while clearing index cache", error));	
-		}
-		$scope.closeModal(false);
+		var response = $scope.client.clearCache(index,
+			function(response) {
+				$scope.setAlert(new Alert(true, "Index cache was successfully cleared", response));
+				$scope.closeModal(false);		
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while clearing index cache", error));
+				$scope.closeModal(false);
+			}
+		);
 	}
 
 	$scope.refreshIndex=function(index){
-		try {
-			var response = $scope.client.refreshIndex(index);
-			$scope.setAlert(new Alert(true, "Index was successfully refreshed", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while refreshing index", error));	
-		}
-		$scope.closeModal(false);
+		var response = $scope.client.refreshIndex(index, 
+			function(response) {
+				$scope.setAlert(new Alert(true, "Index was successfully refreshed", response));
+				$scope.closeModal(false);
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while refreshing index", error));	
+				$scope.closeModal(false);
+			}
+		);
 	}
 	
 	$scope.enableAllocation=function() {
-		try {
-			var response = $scope.client.enableShardAllocation();
-			$scope.setAlert(new Alert(true, "Shard allocation was successfully enabled", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while enabling shard allocation", error));	
-		}
-		$scope.forceRefresh();
+		var response = $scope.client.enableShardAllocation(
+			function(response) {
+				$scope.setAlert(new Alert(true, "Shard allocation was successfully enabled", response));
+				$scope.forceRefresh();
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while enabling shard allocation", error));	
+				$scope.forceRefresh();
+			}
+		);
 	}
 	
 	$scope.disableAllocation=function(current_state) {
-		try {
-			var response = $scope.client.disableShardAllocation();
-			$scope.setAlert(new Alert(true, "Shard allocation was successfully disabled", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while disabling shard allocation", error));	
-		}
-		$scope.forceRefresh();
+		var response = $scope.client.disableShardAllocation(
+			function(response) {
+				$scope.setAlert(new Alert(true, "Shard allocation was successfully disabled", response));
+				$scope.forceRefresh();
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while disabling shard allocation", error));	
+				$scope.forceRefresh();
+			}
+		);
 	}
 	
 	$scope.closeIndex=function(index) {
-		try {
-			var response = $scope.client.closeIndex(index);
-			$scope.setAlert(new Alert(true, "Index was successfully closed", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while closing index", error));	
-		}
-		$scope.closeModal(true);
+		var response = $scope.client.closeIndex(index, 
+			function(response) {
+				$scope.setAlert(new Alert(true, "Index was successfully closed", response));
+				$scope.closeModal(true);
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while closing index", error));	
+				$scope.closeModal(true);
+			}
+		);
 	}
 	
 	$scope.openIndex=function(index) {
-		try {
-			var response = $scope.client.openIndex(index);
-			$scope.setAlert(new Alert(true, "Index was successfully opened", response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while opening index", error));	
-		}
-		$scope.closeModal(true);
+		var response = $scope.client.openIndex(index,
+			function(response) {
+				$scope.setAlert(new Alert(true, "Index was successfully opened", response));
+				$scope.closeModal(true);
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while opening index", error));
+				$scope.closeModal(true);
+			}
+		);
 	}
 }
 
@@ -245,37 +274,41 @@ function IndexSettingsCtrl($scope, $location, $timeout) {
 	 'index.recovery.initial_shards', 'index.gc_deletes', 'index.ttl.disable_purge'];
 
 	$scope.saveSettings=function(index_name) {
-		try {
-			$scope.cluster.indices.forEach(function(index) { 
-				if (index.name === index_name) {
-					var new_settings = {};
-					allowed_properties.forEach(function(setting) {
-						if (isDefined(index.settings[setting]) && index.settings[setting].length > 0) {
-							new_settings[setting] = index.settings[setting];
-						}
-					});
-					var response = $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""));
-					$scope.modal.alert = new Alert(true, "Index settings were successfully updated", response.response);
-					$scope.broadcastMessage('forceRefresh', {});
-				}
-			});
-		} catch (error) {
-			$scope.modal.alert = new Alert(false, "Error while updating index settings", error);
-		}
+		$scope.cluster.indices.forEach(function(index) { 
+			if (index.name === index_name) {
+				var new_settings = {};
+				allowed_properties.forEach(function(setting) {
+					if (isDefined(index.settings[setting]) && index.settings[setting].length > 0) {
+						new_settings[setting] = index.settings[setting];
+					}
+				});
+				$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
+					function(response) {
+						$scope.modal.alert = new Alert(true, "Index settings were successfully updated", response);
+						$scope.broadcastMessage('forceRefresh', {});
+					},
+					function(error) {
+						$scope.modal.alert = new Alert(false, "Error while updating index settings", error);
+					}
+				);
+			}
+		});
 	}
 }
 
 function ClusterSettingsCtrl($scope, $location, $timeout) {
 	$scope.saveClusterSettings=function() {
-		try {
 			var new_settings = {};
 			new_settings['transient'] = $scope.cluster.settings;
-			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""));
-			$scope.modal.alert = new Alert(true, "Cluster settings were successfully updated",response.response);
-			$scope.broadcastMessage('forceRefresh', {});
-		} catch (error) {
-			$scope.modal.alert = new Alert(false, "Error while updating cluster settings",error);
-		}
+			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
+				function(response) {
+					$scope.modal.alert = new Alert(true, "Cluster settings were successfully updated",response);
+					$scope.broadcastMessage('forceRefresh', {});
+				}, 
+				function(error) {
+					$scope.modal.alert = new Alert(false, "Error while updating cluster settings",error);
+				}
+		);
 	}
 }
 
@@ -350,7 +383,6 @@ function AliasesCtrl($scope, $location, $timeout) {
 	$scope.addAlias=function() {
 		try {
 			$scope.new_alias.validate();
-			
 			// if alias already exists, check if its already associated with index
 			if (isDefined($scope.aliases.info[$scope.new_alias.alias])) { 
 				var aliases = $scope.aliases.info[$scope.new_alias.alias];
@@ -390,67 +422,72 @@ function AliasesCtrl($scope, $location, $timeout) {
 	}
 	
 	$scope.mergeAliases=function() {
-		try {
-			var deletes = [];
-			var adds = [];
-			Object.keys($scope.aliases.info).forEach(function(alias_name) {
-				var aliases = $scope.aliases.info[alias_name];
-				aliases.forEach(function(alias) {
-					// if alias didnt exist, just add it
-					if (!isDefined($scope.originalAliases.info[alias_name])) { 
-						adds.push(alias);
-					} else { 
-						var originalAliases = $scope.originalAliases.info[alias_name];
-						var addAlias = true;
-						for (var i = 0; i < originalAliases.length; i++) {
-							if (originalAliases[i].equals(alias)) {
-								addAlias = false;
-								break;
-							}
-						}
-						if (addAlias) {
-							adds.push(alias);
-						}
-					} 
-				});
-			});
-			Object.keys($scope.originalAliases.info).forEach(function(alias_name) {
-				var aliases = $scope.originalAliases.info[alias_name];
-				aliases.forEach(function(alias) {
-					if (!isDefined($scope.aliases.info[alias.alias])) {
-						deletes.push(alias);
-					} else {
-						var newAliases = $scope.aliases.info[alias_name];
-						var removeAlias = true;
-						for (var i = 0; i < newAliases.length; i++) {
-							if (alias.index === newAliases[i].index && alias.equals(newAliases[i])) {
-								removeAlias = false;
-								break;
-							}
-						}
-						if (removeAlias) {
-							deletes.push(alias);
+		var deletes = [];
+		var adds = [];
+		Object.keys($scope.aliases.info).forEach(function(alias_name) {
+			var aliases = $scope.aliases.info[alias_name];
+			aliases.forEach(function(alias) {
+				// if alias didnt exist, just add it
+				if (!isDefined($scope.originalAliases.info[alias_name])) { 
+					adds.push(alias);
+				} else { 
+					var originalAliases = $scope.originalAliases.info[alias_name];
+					var addAlias = true;
+					for (var i = 0; i < originalAliases.length; i++) {
+						if (originalAliases[i].equals(alias)) {
+							addAlias = false;
+							break;
 						}
 					}
-				});
+					if (addAlias) {
+						adds.push(alias);
+					}
+				} 
 			});
-			var response = $scope.client.updateAliases(adds,deletes);
-			$scope.loadAliases();
-			$scope.setAlert(new Alert(true, "Aliases were successfully updated",response.response));
-		} catch (error) {
-			$scope.setAlert(new Alert(false, "Error while updating aliases",error));
-		}
+		});
+		Object.keys($scope.originalAliases.info).forEach(function(alias_name) {
+			var aliases = $scope.originalAliases.info[alias_name];
+			aliases.forEach(function(alias) {
+				if (!isDefined($scope.aliases.info[alias.alias])) {
+					deletes.push(alias);
+				} else {
+					var newAliases = $scope.aliases.info[alias_name];
+					var removeAlias = true;
+					for (var i = 0; i < newAliases.length; i++) {
+						if (alias.index === newAliases[i].index && alias.equals(newAliases[i])) {
+							removeAlias = false;
+							break;
+						}
+					}
+					if (removeAlias) {
+						deletes.push(alias);
+					}
+				}
+			});
+		});
+		$scope.client.updateAliases(adds,deletes, 
+			function(response) {
+				$scope.loadAliases();
+				$scope.setAlert(new Alert(true, "Aliases were successfully updated",response));
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false, "Error while updating aliases",error));
+			}
+		);
 	}
 	
 	$scope.loadAliases=function() {
-		try {
-			$scope.new_alias = new Alias();
-			$scope.originalAliases = $scope.client.fetchAliases();
-			$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
-			$scope.pagination.setResults($scope.aliases.info);
-		} catch (error) {
-			$scope.setAlert(new Alert(false,"Error while fetching aliases",error));
-		}
+		$scope.new_alias = new Alias();
+		$scope.client.fetchAliases(
+			function(aliases) {
+				$scope.originalAliases = aliases;
+				$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
+				$scope.pagination.setResults($scope.aliases.info);
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false,"Error while fetching aliases",error));		
+			}
+		);
 	}
 	
 	$scope.$on('hostChanged',function() {
@@ -506,7 +543,7 @@ function ClusterHealthCtrl($scope,$location,$timeout) {
 				$scope.modal.alert = new Alert(true, "Cluster health information successfully shared", "Gist available at : " + response.html_url);
 			})
 			.fail(function(response) {
-				$scope.modal.alert = new Alert(false, "Error while publishing Gist", response.responseText);
+				$scope.modal.alert = new Alert(false, "Error while publishing Gist", responseText);
 			}
 		);
 	}
@@ -558,19 +595,22 @@ function RestCtrl($scope, $location, $timeout) {
 		$('#rest-client-response').html('');
 		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
 			try {
-				var response = $scope.client.executeRequest($scope.request.method,$scope.request.url,$scope.request.body);
-				if (response.success) {
-					var content = jsonTree.create(response.response);
-					$('#rest-client-response').html(content);
-					$scope.history.push(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-				} else {
-					try {
-						var content = jsonTree.create(JSON.parse(response.response.responseText));
+				// TODO: deal with basic auth here
+				$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
+					function(response) {
+						var content = jsonTree.create(response);
 						$('#rest-client-response').html(content);
-					} catch (error) {
-						$scope.setAlert(new Alert(false, "Request did not return a valid JSON", response.response.responseText));
+						$scope.history.push(new Request($scope.request.url,$scope.request.method,$scope.request.body));	
+					},
+					function(error) {
+						try {
+							var content = jsonTree.create(JSON.parse(response.responseText));
+							$('#rest-client-response').html(content);
+						} catch (error) {
+							$scope.setAlert(new Alert(false, "Request did not return a valid JSON", response.responseText));
+						}
 					}
-				}
+				);
 			} catch (error) {
 				$scope.setAlert(new Alert(false, "Error while executing request", error));
 			}
@@ -604,25 +644,33 @@ function AnalysisCtrl($scope, $location, $timeout) {
 	
 	$scope.analyzeByField=function() {
 		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
-			try {
-				$scope.field_tokens = $scope.client.analyzeByField($scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text);
-				$scope.clearAlert();
-			} catch (error) {
-				$scope.field_tokens = null;
-				$scope.setAlert(new Alert(false, "Error while analyzing text", error));
-			}
+			$scope.field_tokens = null;
+			$scope.client.analyzeByField($scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text, 
+				function(response) {
+					$scope.field_tokens = response;
+					$scope.clearAlert();
+				},
+				function(error) {
+					$scope.field_tokens = null;
+					$scope.setAlert(new Alert(false, "Error while analyzing text", error));
+				}
+			);
 		}
 	}
 	
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
-			try {
-				$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text);
-				$scope.clearAlert();
-			} catch (error) {
-				$scope.analyzer_tokens = null;
-				$scope.setAlert(new Alert(false, "Error while analyzing text", error));
-			}
+			$scope.field_tokens = null;
+			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text,
+				function(response) {
+					$scope.field_tokens = response;
+					$scope.clearAlert();
+				},
+				function(error) {
+					$scope.field_tokens = null;
+					$scope.setAlert(new Alert(false, "Error while analyzing text", error));
+				}
+			);
 		}
 	}
 	
@@ -653,33 +701,35 @@ function AnalysisCtrl($scope, $location, $timeout) {
     });
 	
 	$scope.loadAnalysisData=function() {
-		try {
-			var response = $scope.client.getClusterState();
-			Object.keys(response.response['metadata']['indices']).forEach(function(index) {
-				$scope.indices[index] = {};
-				var indexData = response.response['metadata']['indices'][index]['mappings'];
-				$scope.indices[index]['types'] = {};
-				Object.keys(indexData).forEach(function(type) {
-					$scope.indices[index]['types'][type] = [];
-					Object.keys(indexData[type]['properties']).forEach(function(property) {
-						$scope.indices[index]['types'][type].push(property);
+		$scope.client.getClusterState(
+			function(response) {
+				Object.keys(response['metadata']['indices']).forEach(function(index) {
+					$scope.indices[index] = {};
+					var indexData = response['metadata']['indices'][index]['mappings'];
+					$scope.indices[index]['types'] = {};
+					Object.keys(indexData).forEach(function(type) {
+						$scope.indices[index]['types'][type] = [];
+						Object.keys(indexData[type]['properties']).forEach(function(property) {
+							$scope.indices[index]['types'][type].push(property);
+						});
+					});
+					var indexSettings = response['metadata']['indices'][index]['settings'];
+					$scope.indices[index]['analyzers'] = [];
+					Object.keys(indexSettings).forEach(function(setting) {
+						if (setting.indexOf('index.analysis.analyzer') == 0) {
+							var analyzer = setting.substring('index.analysis.analyzer.'.length);
+							analyzer = analyzer.substring(0,analyzer.indexOf("."));
+							if ($.inArray(analyzer, $scope.indices[index]['analyzers']) == -1) {
+								$scope.indices[index]['analyzers'].push(analyzer);
+							}
+						}
 					});
 				});
-				var indexSettings = response.response['metadata']['indices'][index]['settings'];
-				$scope.indices[index]['analyzers'] = [];
-				Object.keys(indexSettings).forEach(function(setting) {
-					if (setting.indexOf('index.analysis.analyzer') == 0) {
-						var analyzer = setting.substring('index.analysis.analyzer.'.length);
-						analyzer = analyzer.substring(0,analyzer.indexOf("."));
-						if ($.inArray(analyzer, $scope.indices[index]['analyzers']) == -1) {
-							$scope.indices[index]['analyzers'].push(analyzer);
-						}
-					}
-				});
-			});
-		} catch (error) {
-			$scope.setAlert(new Alert(false,"Error while reading analyzers information from cluster", error));
-		}
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false,"Error while reading analyzers information from cluster", error));
+			}
+		);
 	}
 }
 
