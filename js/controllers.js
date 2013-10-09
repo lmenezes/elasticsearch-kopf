@@ -75,30 +75,32 @@ function ClusterOverviewCtrl($scope, $location, $timeout) {
 		}
 		
 		$scope.updateCluster=function(is_forced_refresh) {
-			var forced_refresh = is_forced_refresh;
-			if (!$scope.isInModal()) { // only refreshes if no modal is active
-				if ($scope.isCurrentView()) {
-					$scope.client.getClusterDetail(function(cluster) {
-						if (!$scope.isInModal()) {
-							$scope.$apply(function() { // forces view refresh
-								$scope.cluster = cluster;
-								$scope.pagination.setResults(cluster.indices);
-							});
-							forced_refresh = false;
-						} else {
-							if (forced_refresh) {
-								$scope.forcedRefresh();
+			if ($scope.hasConnection()) {
+				var forced_refresh = is_forced_refresh;
+				if (!$scope.isInModal()) { // only refreshes if no modal is active
+					if ($scope.isCurrentView()) {
+						$scope.client.getClusterDetail(function(cluster) {
+							if (!$scope.isInModal()) {
+								$scope.$apply(function() { // forces view refresh
+									$scope.cluster = cluster;
+									$scope.pagination.setResults(cluster.indices);
+								});
+								forced_refresh = false;
+							} else {
+								if (forced_refresh) {
+									$scope.forcedRefresh();
+								}
 							}
+						});
+					} else {
+						if (forced_refresh) {
+							$scope.forcedRefresh();
 						}
-					});
+					}
 				} else {
 					if (forced_refresh) {
 						$scope.forcedRefresh();
 					}
-				}
-			} else {
-				if (forced_refresh) {
-					$scope.forcedRefresh();
 				}
 			}
 		}
