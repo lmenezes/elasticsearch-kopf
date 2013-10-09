@@ -168,33 +168,6 @@ function ElasticClient(host,username,password) {
 		return response;
 	}
 
-	this.compareNodes=function(a,b) { // TODO: take into account node specs?
-		if (b.current_master) {
-			return 1;
-		}
-		if (a.current_master) {
-			return -1;
-		}
-		if (b.master && !a.master) {
-			return 1;
-		} 
-		if (a.master && !b.master) {
-			return -1;
-		}
-	
-		if (b.data && !a.data) {
-			return 1;
-		} 
-		if (a.data && !b.data) {
-			return -1;
-		}
-		return a.name.localeCompare(b.name);
-	}
-
-	this.compareIndices=function(a,b) { // TODO: take into account index properties?
-		return a.name.localeCompare(b.name);
-	}
-
 	this.getNodesStats=function() {
 		var response = this.syncRequest('GET', "/_nodes/stats?all=true",{});
 		if (!response.success) {
@@ -466,6 +439,29 @@ function Node(node_id, node_info, node_stats) {
 	this.setCurrentMaster=function() {
 		this.current_master = true;
 	}
+	
+	this.compare=function(other) { // TODO: take into account node specs?
+		if (other.current_master) {
+			return 1;
+		}
+		if (this.current_master) {
+			return -1;
+		}
+		if (other.master && !this.master) {
+			return 1;
+		} 
+		if (this.master && !other.master) {
+			return -1;
+		}
+
+		if (other.data && !this.data) {
+			return 1;
+		} 
+		if (this.data && !other.data) {
+			return -1;
+		}
+		return this.name.localeCompare(other.name);
+	}
 }
 
 function Shard(shard_info) {
@@ -497,7 +493,7 @@ function Cluster(state,status,nodes,settings) {
 				node.setCurrentMaster();
 			}
 			return node;
-		}).sort(this.compareNodes);
+		}).sort(function(a,b) { return a.compare(b) });
     	this.number_of_nodes = num_nodes;
 		var iMetadata = state['metadata']['indices'];
 		var iRoutingTable = state['routing_table']['indices'];
@@ -514,7 +510,7 @@ function Cluster(state,status,nodes,settings) {
 				num_docs += index.num_docs;
 				return index;
 			 }
-		).sort(this.compareIndices);
+		).sort(function(a,b) { return a.compare(b) });
 		this.num_docs = num_docs;
 		this.unassigned_shards = unassigned_shards;
 		this.total_indices = this.indices.length;
@@ -585,6 +581,9 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.total_size = has_status ? index_status['index']['size_in_bytes'] : 0;
 	this.settingsAsString=function() {
 		return hierachyJson(JSON.stringify(this.settings, undefined, ""));
+	}
+	this.compare=function(b) { // TODO: take into account index properties?
+		return this.name.localeCompare(b.name);
 	}
 }
 
