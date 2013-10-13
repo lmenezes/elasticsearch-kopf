@@ -141,10 +141,7 @@ function ElasticClient(host,username,password) {
 						xhr.setRequestHeader("Authorization", auth);
 					} 
 				},
-				data: data,
-				xhrFields: {
-					withCredentials: true
-				}
+				data: data
 		})).then(
 			function(r) { 
 				callback_success(r); 
