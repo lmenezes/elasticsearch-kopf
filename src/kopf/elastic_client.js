@@ -49,33 +49,9 @@ function ElasticClient(host,username,password) {
 		this.syncRequest('DELETE', "/" + name, {}, callback_success, callback_error);
 	}
 
-	// TODO: would be nice to use same method as others, but idx/_settings
-	// will complain with the added callback parameter
 	this.updateIndexSettings=function(name, settings, callback_success, callback_error) {
 		this.syncRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
-		var url = this.host + "/" + name + "/_settings";
-		var auth = this.createAuthToken(username,password);
-		$.ajax({
-			type: 'PUT',
-			url: url,
-			dataType: 'jsonp',
-			beforeSend: function(xhr) { 
-				if (auth != null) {
-					xhr.setRequestHeader("Authorization", auth);
-				} 
-			},
-			data: settings,
-			jsonp: false,
-			complete: function(response) {
-				if (response.status == 200) {
-					callback_success(JSON.parse(response.responseText));
-				} else {
-					callback_error(JSON.parse(response.responseText));
-				}
-			}
-		});
 	}
-
 
 	this.updateClusterSettings=function(settings, callback_success, callback_error) {
 		this.syncRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
@@ -154,17 +130,21 @@ function ElasticClient(host,username,password) {
 	
 	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {
 		var auth = this.createAuthToken(username,password);
+		var dataType = method == 'GET' ? 'jsonp' : 'json';
 		$.when(
 			$.ajax({
-		    	type: method,
+				type: method,
 				url: url,
-				dataType: 'jsonp',
+				dataType: dataType,
 				beforeSend: function(xhr) { 
 					if (auth != null) {
 						xhr.setRequestHeader("Authorization", auth);
 					} 
 				},
-				data: data
+				data: data,
+				xhrFields: {
+					withCredentials: true
+				}
 		})).then(
 			function(r) { 
 				callback_success(r); 
@@ -182,9 +162,9 @@ function ElasticClient(host,username,password) {
 		var auth = this.createAuthToken(this.username,this.password);
 		$.when(
 			$.ajax({ 
-				type: 'GET', 
-				url: url, 
-				dataType: 'jsonp', 
+				type: 'GET',
+				url: url,
+				dataType: 'jsonp',
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {

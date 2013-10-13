@@ -1,0 +1,25 @@
+{
+  "name": "elasticsearch-kopf",
+  "version": "0.2.0-SNAPSHOT",
+  "description": "kopf - simple web administration tool for ElasticSearch",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lmenezes/elasticsearch-kopf.git"
+  },
+  "author": "Leonardo Menezes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lmenezes/elasticsearch-kopf/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-contrib-clean": "~0.5.0"
+  }
+}
