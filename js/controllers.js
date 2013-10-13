@@ -604,10 +604,10 @@ function RestCtrl($scope, $location, $timeout) {
 					},
 					function(error) {
 						try {
-							var content = jsonTree.create(JSON.parse(response.responseText));
+							var content = jsonTree.create(JSON.parse(error));
 							$('#rest-client-response').html(content);
-						} catch (error) {
-							$scope.setAlert(new Alert(false, "Request did not return a valid JSON", response.responseText));
+						} catch (invalid_json) {
+							$scope.setAlert(new Alert(false, "Request did not return a valid JSON", error));
 						}
 					}
 				);
