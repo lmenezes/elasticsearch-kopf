@@ -760,8 +760,8 @@ function GlobalController($scope, $location, $timeout) {
 			$scope.host = url;
 		}
 		$scope.setConnected(false);
-		$scope.broadcastMessage('hostChanged',{});
 		$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
+		$scope.broadcastMessage('hostChanged',{});
 	}
 	
 	if ($location.host() == "") { // when opening from filesystem
