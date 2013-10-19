@@ -6,6 +6,15 @@ module.exports = function(grunt) {
 				src: ['dist']
 			}
 		},
+		watch: {
+		  scripts: {
+		    files: ['src/kopf/*.*'],
+		    tasks: ['build'],
+		    options: {
+		      spawn: false,
+		    },
+		  },
+		},
 		copy: {
 			main: {
 				files: [
@@ -61,6 +70,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.registerTask('build', ['clean', 'copy', 'concat']);
 	grunt.registerTask('server', ['clean', 'copy', 'concat','connect:server']);
 
