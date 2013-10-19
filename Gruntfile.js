@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 		},
 		watch: {
 		  scripts: {
-		    files: ['src/kopf/*.*'],
+		    files: ['src/kopf/**/*.*','src/kopf/*.*'],
 		    tasks: ['build'],
 		    options: {
 		      spawn: false,
@@ -43,8 +43,18 @@ module.exports = function(grunt) {
 			},
 			appjs: {
 				src: [
+					'src/kopf/elastic_client.js',
 					'src/kopf/controllers.js',
-					'src/kopf/elastic_client.js'
+					'src/kopf/controllers/aliases.js',
+					'src/kopf/controllers/analysis.js',
+					'src/kopf/controllers/cluster_health.js',
+					'src/kopf/controllers/cluster_overview.js',
+					'src/kopf/controllers/cluster_settings.js',
+					'src/kopf/controllers/create_index.js',
+					'src/kopf/controllers/global.js',
+					'src/kopf/controllers/index_settings.js',
+					'src/kopf/controllers/navbar.js',
+					'src/kopf/controllers/rest.js'
 				],
 				dest: 'dist/kopf.js'
 			},

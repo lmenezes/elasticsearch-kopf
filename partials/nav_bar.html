@@ -37,16 +37,16 @@
 				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}}">
-				<li class="active" id="cluster_option" ng-click="changeTab()">
+				<li class="active" id="cluster_option" ng-click="selectTab()">
 					<a href="#cluster" data-toggle="tab"><i class="icon-sitemap"></i> cluster</a>
 				</li>
-				<li class="" id="rest_option" ng-click="changeTab()">
+				<li class="" id="rest_option" ng-click="selectTab()">
 					<a href="#rest" data-toggle="tab" class=""><i class="icon-edit"></i> rest</a>
 				</li>
-				<li class="" id="aliases_option" ng-click="selectAliasesTab()">
+				<li class="" id="aliases_option" ng-click="selectTab('loadAliasesEvent')">
 					<a href="#aliases" data-toggle="tab" class=""><i class="icon-tags"></i> aliases</a>
 				</li>
-				<li class="" id="analysis_option" ng-click="selectAnalysisTab()">
+				<li class="" id="analysis_option" ng-click="selectTab('loadAnalysisEvent')">
 					<a href="#analysis" data-toggle="tab" class=""><i class="icon-puzzle-piece"></i> analysis</a>
 				</li>
 			</ul>

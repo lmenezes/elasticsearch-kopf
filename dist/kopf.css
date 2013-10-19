@@ -134,9 +134,14 @@ h6 {
 /** ############### END - global - END ############### **/
 
 /** ############### START - navbar - START ############### **/
+.navbar {
+	height: 38px !important;
+	min-height: 38px !important;
+}
 .navbar-cluster-status- {
 	background-color: #ccc !important;
 	color: #666 !important;
+	height: 38px !important;
 }
 .navbar-cluster-status- > li.active > a {
 	background-color: #666 !important;
@@ -213,16 +218,19 @@ h6 {
 	border-bottom: 0px;
 }
 .navbar-logo {
-	font-size: 42px;
-	line-height: 50px !important;
+	font-size: 38px;
+	font-variant: small-caps;
+	line-height: 32px !important;
 	padding-top: 0px !important;
 	padding-bottom: 0px !important;
 	font-weight: 100;
+	vertical-align: middle;
 }
 .navbar-logo-action {
 	font-size: 24px;
 	font-weight: 100;
 	vertical-align: middle;
+	font-variant: normal;
 }
 .navbar-app-settings-select {
 	height: 25px;
@@ -237,7 +245,7 @@ h6 {
 }
 .navbar-host-input {
 	width: 250px;
-	padding-top: 8px;
+	padding-top: 2px;
 	vertical-align: middle;
 }
 .navbar-menu-item {
@@ -249,6 +257,15 @@ h6 {
 	vertical-align: middle;
 	padding-top: 4px;
 	padding-bottom: 4px;
+}
+.navbar-nav > li {
+	height: 38px !important;
+}
+.navbar-nav > li > a {
+	height: 38px !important;
+	line-height: 36px;
+	padding-top: 0px;
+	padding-bottom:0px;
 }
 /** ############### END - navbar - END ############### **/
 
@@ -892,7 +909,7 @@ a.header-index-action-mini:hover {
 }
 
 body {
-	padding-top: 60px;
+	padding-top: 38px;
 }
 
 .custom-tab-content {
