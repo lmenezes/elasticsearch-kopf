@@ -1373,6 +1373,11 @@ function GlobalController($scope, $location, $timeout) {
 		$scope.$broadcast(message,args);
 	}
 	
+	$scope.readParameter=function(name){
+	    var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+		return (results != null) ? results[1] : null;
+	}
+	
 	$scope.setHost=function(url) {
 		var exp = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
 		// expected: "http://user:password@host", "http", "user", "password", "host"]
@@ -1394,8 +1399,13 @@ function GlobalController($scope, $location, $timeout) {
 	if ($location.host() == "") { // when opening from filesystem
 		$scope.setHost("http://localhost:9200");
 	} else {
-		$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());
-	}
+		var location = $scope.readParameter('location');
+		if (location != null) {
+			$scope.setHost(location);
+		} else {
+			$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
+		}
+ 	}
 	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
