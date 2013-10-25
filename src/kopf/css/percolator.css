@@ -1,0 +1,13 @@
+.percolator-table-header {
+	font-size: 12px;
+	font-weight: 800;
+}
+.percolator-table-body {
+	font-size: 12px;
+	color: #666666;
+}
+.percolator-remove-icon {
+	color: red;
+	float: right;
+	line-height: 18px;
+}

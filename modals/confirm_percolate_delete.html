@@ -1,0 +1,17 @@
+<div class="modal fade custom-modal" id="confirm_percolate_delete_{{q.type}}_{{q.id}}">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<i class="icon-remove-circle modal-close-icon" data-dismiss="modal" ng-click='closeModal()' style="float: right;"></i>
+				<h4 class="modal-title">are you sure you want to delete query {{q.id}} for index {{q.type}}?</h4>
+      		</div>
+      		<div class="modal-body">
+				<pre>{{q.sourceAsJSON()}}</pre>
+      		</div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-default" data-dismiss="modal" ng-click='closeModal()' >Back</button>
+	          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click='deletePercolatorQuery(q.type, q.id)'><i class="icon-wrench"></i> Delete</button>
+	        </div>
+    	</div>
+  	</div>
+</div>

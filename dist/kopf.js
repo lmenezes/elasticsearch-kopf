@@ -115,6 +115,15 @@ function ElasticClient(host,username,password) {
 		this.syncRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
 	}
 	
+	this.fetchPercolateQueries=function(type, body, callback_success, callback_error) {
+		var path = isDefined(type) ? "/_percolator/" + type + "/_search" : "/_percolator/_search";
+		this.syncRequest('POST', path , body,callback_success, callback_error);
+	}
+	
+	this.deletePercolatorQuery=function(type, id, callback_success, callback_error) {
+		this.syncRequest('DELETE', "/_percolator/" + type + "/" + id, {}, callback_success, callback_error);
+	}
+	
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
@@ -529,7 +538,58 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	}
 }
 
-
+function ClusterState(cluster_state) {
+	var start = new Date().getTime();
+	
+	this.getIndices=function() {
+		return Object.keys(this.indices);
+	}
+	
+	this.getTypes=function(index) {
+		if (typeof this.indices[index] != 'undefined') {
+			return Object.keys(this.indices[index]['types']);
+		}
+	}
+	
+	this.getAnalyzers=function(index) {
+		if (typeof this.indices[index] != 'undefined') {
+			return this.indices[index]['analyzers'];
+		}
+	}
+	
+	this.getFields=function(index, type) {
+		if (typeof this.indices[index] != 'undefined') {
+			return this.indices[index]['types'][type];
+		}
+	} 
+	
+	var indices = {};
+	
+	Object.keys(cluster_state['metadata']['indices']).forEach(function(index) {
+		indices[index] = {};
+		var indexData = cluster_state['metadata']['indices'][index]['mappings'];
+		indices[index]['types'] = {};
+		Object.keys(indexData).forEach(function(type) {
+			indices[index]['types'][type] = [];
+			Object.keys(indexData[type]['properties']).forEach(function(property) {
+				indices[index]['types'][type].push(property);
+			});
+		});
+		var indexSettings = cluster_state['metadata']['indices'][index]['settings'];
+		indices[index]['analyzers'] = [];
+		Object.keys(indexSettings).forEach(function(setting) {
+			if (setting.indexOf('index.analysis.analyzer') == 0) {
+				var analyzer = setting.substring('index.analysis.analyzer.'.length);
+				analyzer = analyzer.substring(0,analyzer.indexOf("."));
+				if ($.inArray(analyzer, indices[index]['analyzers']) == -1) {
+					indices[index]['analyzers'].push(analyzer);
+				}
+			}
+		});
+	});
+	
+	this.indices = indices;
+}
 var jsonTree = new JSONTree();
 
 function Request(url, method, body) {
@@ -809,6 +869,7 @@ function hierachyJson(json) {
 	});
 	return JSON.stringify(resultObject,undefined,4);
 }
+var kopf = angular.module('kopf', []);
 function AliasesController($scope, $location, $timeout) {
 	$scope.aliases = null;
 	$scope.new_index = {};
@@ -934,7 +995,7 @@ function AliasesController($scope, $location, $timeout) {
 
 }
 function AnalysisController($scope, $location, $timeout) {
-	$scope.indices = {};
+	$scope.indices = null;
 
 	// by index
 	$scope.field_index = '';
@@ -982,21 +1043,21 @@ function AnalysisController($scope, $location, $timeout) {
 	}
 	
 	$scope.getTypes=function() {
-		if (isDefined($scope.indices[$scope.field_index])) {
-			return $scope.indices[$scope.field_index]['types'];
+		if ($scope.cluster_state != null) {
+			return $scope.cluster_state.getTypes($scope.field_index);
 		}
 	}
 	
 	$scope.getAnalyzers=function() {
-		if (isDefined($scope.indices[$scope.analyzer_index])) {
-			return $scope.indices[$scope.analyzer_index]['analyzers'];
+		if ($scope.cluster_state != null) {
+			return $scope.cluster_state.getAnalyzers($scope.analyzer_index);
 		}
 	}
 
 	$scope.getFields=function() {
-		if (isDefined($scope.indices[$scope.field_index])) {
-			return $scope.indices[$scope.field_index]['types'][$scope.field_type];
-		} 
+		if ($scope.cluster_state != null) {
+			return $scope.cluster_state.getFields($scope.field_index,$scope.field_type);
+		}
 	}	
 	
 	$scope.$on('hostChanged',function() {
@@ -1010,28 +1071,9 @@ function AnalysisController($scope, $location, $timeout) {
 	$scope.loadAnalysisData=function() {
 		$scope.client.getClusterState(
 			function(response) {
-				Object.keys(response['metadata']['indices']).forEach(function(index) {
-					$scope.indices[index] = {};
-					var indexData = response['metadata']['indices'][index]['mappings'];
-					$scope.indices[index]['types'] = {};
-					Object.keys(indexData).forEach(function(type) {
-						$scope.indices[index]['types'][type] = [];
-						Object.keys(indexData[type]['properties']).forEach(function(property) {
-							$scope.indices[index]['types'][type].push(property);
-						});
-					});
-					var indexSettings = response['metadata']['indices'][index]['settings'];
-					$scope.indices[index]['analyzers'] = [];
-					Object.keys(indexSettings).forEach(function(setting) {
-						if (setting.indexOf('index.analysis.analyzer') == 0) {
-							var analyzer = setting.substring('index.analysis.analyzer.'.length);
-							analyzer = analyzer.substring(0,analyzer.indexOf("."));
-							if ($.inArray(analyzer, $scope.indices[index]['analyzers']) == -1) {
-								$scope.indices[index]['analyzers'].push(analyzer);
-							}
-						}
-					});
-				});
+				var start = new Date().getTime();
+				$scope.cluster_state = new ClusterState(response);
+				$scope.indices = $scope.cluster_state.getIndices();
 			},
 			function(error) {
 				$scope.setAlert(new Alert(false,"Error while reading analyzers information from cluster", error));
@@ -1631,4 +1673,117 @@ function RestController($scope, $location, $timeout) {
 		{'key':"ids query",'value':JSON.stringify(JSON.parse('{"query": { "ids" : { "type" : "document_type", "values" : ["1", "2","3"] } } }'), undefined, 4)},
 		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
 	];
+}
+function PercolatorController($scope, $location, $timeout) {
+	$scope.total = 0;
+	$scope.queries = [];
+	$scope.page = 1;
+	$scope.filter = "";
+	$scope.id = "";
+	
+	$scope.index;
+	$scope.indices = [];
+	$scope.new_query = new PercolateQuery("","","");
+	
+	
+    $scope.$on('loadPercolatorEvent', function() {
+		$scope.loadPercolatorQueries();
+		$scope.loadIndices();
+    });
+	
+	$scope.hasNextPage=function() {
+		return $scope.page * 10 < $scope.total;
+	}
+	
+	$scope.hasPreviousPage=function() {
+		return $scope.page > 1;
+	}
+	
+	$scope.firstResult=function() {
+		return $scope.total > 0 ? ($scope.page - 1) * 10  + 1 : 0;
+	}
+	
+	$scope.lastResult=function() {
+		return $scope.hasNextPage() ? $scope.page * 10 : $scope.total;
+	}
+	
+	$scope.parseSearchParams=function() {
+		var queries = [];
+		if ($scope.id.trim().length > 0) {
+			queries.push({"term":{"_id":$scope.id}});
+		}
+		if ($scope.filter.trim().length > 0) {
+			var filter = JSON.parse($scope.filter);
+			Object.keys(filter).forEach(function(field) {
+				var q = {};
+				q[field] = filter[field];
+				queries.push({"term": q});
+			});
+		}
+		return queries;
+	}
+	
+	$scope.deletePercolatorQuery=function(type, id) {
+		console.log($scope.queries);
+		$scope.client.deletePercolatorQuery(type, id,
+			function(response) {
+				$scope.setAlert(new Alert(true,"Query successfully deleted", response));
+				$scope.queries = $scope.queries.filter(function(q) { 
+					return q.id != id || q.type != type; 
+					}
+				);
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false,"Error while deleting query", error));
+			}
+		);
+	}
+	
+	$scope.loadPercolatorQueries=function() {
+		var params = {};
+		try {
+			var queries = $scope.parseSearchParams();
+			if (queries.length > 0) {
+				params['query'] = {"bool": {"must": queries}};
+			}
+			params['from'] = (($scope.page - 1) * 10);
+			$scope.client.fetchPercolateQueries($scope.index, JSON.stringify(params),
+				function(response) {
+					$scope.total = response['hits']['total'];
+					$scope.queries = response['hits']['hits'].map(function(q) { return new PercolateQuery(q); });
+				},
+				function(error) {
+					$scope.setAlert(new Alert(false,"Error while reading loading percolate queries", error));
+				}
+			);
+		} catch (error) {
+			$scope.setAlert(new Alert(false,"Filter is not a valid JSON"));
+			return;
+		}
+	}
+	
+	$scope.loadIndices=function() {
+		$scope.client.getClusterState(
+			function(response) {
+				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
+			},
+			function(error) {
+				$scope.setAlert(new Alert(false,"Error while reading loading cluster state", error));
+			}
+		);
+	}
+}
+
+function PercolateQuery(query_info) {
+	this.type = query_info['_type'];
+	this.id = query_info['_id'];
+	this.source = query_info['_source'];
+	
+	this.sourceAsJSON=function() {
+		try {
+			return JSON.stringify(this.source,undefined, 2);
+		} catch (error) {
+
+		}
+	}
 }

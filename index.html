@@ -13,7 +13,7 @@
 		<script src="dist/kopf.js" type="text/javascript" charset="utf-8"></script>
 		
   	</head>
-	<body ng-app ng-controller="GlobalController">
+	<body ng-app="kopf" ng-controller="GlobalController">
 		<div ng-include src="'partials/modal_info.html'"></div>
 		<div id="page-wrap">
 			<div ng-include src="'partials/nav_bar.html'"></div>
@@ -24,6 +24,7 @@
 					<div class="tab-pane" id="rest" ng-include src="'partials/rest_client.html'"></div>
 					<div class="tab-pane" id="aliases" ng-include src="'partials/aliases.html'"></div>
 					<div class="tab-pane" id="analysis" ng-include src="'partials/analysis.html'"></div>
+					<div class="tab-pane" id="percolator" ng-include src="'partials/percolator.html'"></div>
 				</div>
 			</div>
 		</div>

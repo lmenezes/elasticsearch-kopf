@@ -115,6 +115,15 @@ function ElasticClient(host,username,password) {
 		this.syncRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
 	}
 	
+	this.fetchPercolateQueries=function(type, body, callback_success, callback_error) {
+		var path = isDefined(type) ? "/_percolator/" + type + "/_search" : "/_percolator/_search";
+		this.syncRequest('POST', path , body,callback_success, callback_error);
+	}
+	
+	this.deletePercolatorQuery=function(type, id, callback_success, callback_error) {
+		this.syncRequest('DELETE', "/_percolator/" + type + "/" + id, {}, callback_success, callback_error);
+	}
+	
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
@@ -529,3 +538,55 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	}
 }
 
+function ClusterState(cluster_state) {
+	var start = new Date().getTime();
+	
+	this.getIndices=function() {
+		return Object.keys(this.indices);
+	}
+	
+	this.getTypes=function(index) {
+		if (typeof this.indices[index] != 'undefined') {
+			return Object.keys(this.indices[index]['types']);
+		}
+	}
+	
+	this.getAnalyzers=function(index) {
+		if (typeof this.indices[index] != 'undefined') {
+			return this.indices[index]['analyzers'];
+		}
+	}
+	
+	this.getFields=function(index, type) {
+		if (typeof this.indices[index] != 'undefined') {
+			return this.indices[index]['types'][type];
+		}
+	} 
+	
+	var indices = {};
+	
+	Object.keys(cluster_state['metadata']['indices']).forEach(function(index) {
+		indices[index] = {};
+		var indexData = cluster_state['metadata']['indices'][index]['mappings'];
+		indices[index]['types'] = {};
+		Object.keys(indexData).forEach(function(type) {
+			indices[index]['types'][type] = [];
+			Object.keys(indexData[type]['properties']).forEach(function(property) {
+				indices[index]['types'][type].push(property);
+			});
+		});
+		var indexSettings = cluster_state['metadata']['indices'][index]['settings'];
+		indices[index]['analyzers'] = [];
+		Object.keys(indexSettings).forEach(function(setting) {
+			if (setting.indexOf('index.analysis.analyzer') == 0) {
+				var analyzer = setting.substring('index.analysis.analyzer.'.length);
+				analyzer = analyzer.substring(0,analyzer.indexOf("."));
+				if ($.inArray(analyzer, indices[index]['analyzers']) == -1) {
+					indices[index]['analyzers'].push(analyzer);
+				}
+			}
+		});
+	});
+	
+	this.indices = indices;
+}

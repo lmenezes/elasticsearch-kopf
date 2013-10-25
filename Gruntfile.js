@@ -45,6 +45,7 @@ module.exports = function(grunt) {
 				src: [
 					'src/kopf/elastic_client.js',
 					'src/kopf/controllers.js',
+					'src/kopf/kopf.js',
 					'src/kopf/controllers/aliases.js',
 					'src/kopf/controllers/analysis.js',
 					'src/kopf/controllers/cluster_health.js',
@@ -54,13 +55,16 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/global.js',
 					'src/kopf/controllers/index_settings.js',
 					'src/kopf/controllers/navbar.js',
-					'src/kopf/controllers/rest.js'
+					'src/kopf/controllers/rest.js',
+					'src/kopf/controllers/percolator.js',
 				],
 				dest: 'dist/kopf.js'
 			},
 			appcss: {
 				src: [
 					'src/kopf/kopf.css',
+					'src/kopf/css/percolator.css',
+					'src/kopf/css/common.css'
 				],
 				dest: 'dist/kopf.css'
 			},

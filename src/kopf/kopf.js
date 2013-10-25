@@ -1,0 +1,1 @@
+var kopf = angular.module('kopf', []);
