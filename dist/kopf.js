@@ -1691,6 +1691,16 @@ function PercolatorController($scope, $location, $timeout) {
 		$scope.loadIndices();
     });
 	
+	$scope.previousPage=function() {
+		$scope.page -= 1;
+		$scope.loadPercolatorQueries();
+	}
+	
+	$scope.nextPage=function() {
+		$scope.page += 1;
+		$scope.loadPercolatorQueries();
+	}
+	
 	$scope.hasNextPage=function() {
 		return $scope.page * 10 < $scope.total;
 	}
