@@ -11,3 +11,7 @@
 	float: right;
 	line-height: 18px;
 }
+
+.percolator-query-editor {
+	height: 450px;
+}

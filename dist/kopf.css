@@ -1000,6 +1000,10 @@ a.entity_action:active {
 	float: right;
 	line-height: 18px;
 }
+
+.percolator-query-editor {
+	height: 450px;
+}
 .kopf-table-header {
 	font-weight: 500; 
 	font-color: #c0c0c0;

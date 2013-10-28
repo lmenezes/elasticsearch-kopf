@@ -115,13 +115,17 @@ function ElasticClient(host,username,password) {
 		this.syncRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
 	}
 	
-	this.fetchPercolateQueries=function(type, body, callback_success, callback_error) {
-		var path = isDefined(type) ? "/_percolator/" + type + "/_search" : "/_percolator/_search";
+	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
+		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
 		this.syncRequest('POST', path , body,callback_success, callback_error);
 	}
 	
-	this.deletePercolatorQuery=function(type, id, callback_success, callback_error) {
-		this.syncRequest('DELETE', "/_percolator/" + type + "/" + id, {}, callback_success, callback_error);
+	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
+		this.syncRequest('DELETE', "/_percolator/" + index + "/" + id, {}, callback_success, callback_error);
+	}
+	
+	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
+		this.syncRequest('PUT', "/_percolator/" + index + "/" + id, body, callback_success, callback_error);
 	}
 	
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {
