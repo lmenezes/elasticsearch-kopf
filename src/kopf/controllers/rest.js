@@ -56,12 +56,12 @@ function RestController($scope, $location, $timeout) {
 							var content = jsonTree.create(JSON.parse(error));
 							$('#rest-client-response').html(content);
 						} catch (invalid_json) {
-							$scope.setAlert(new Alert(false, "Request did not return a valid JSON", error));
+							$scope.setAlert(new ErrorAlert("Request did not return a valid JSON", error));
 						}
 					}
 				);
 			} catch (error) {
-				$scope.setAlert(new Alert(false, "Error while executing request", error));
+				$scope.setAlert(new ErrorAlert("Error while executing request", error));
 			}
 		}
 	}

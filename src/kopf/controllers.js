@@ -12,24 +12,50 @@ function Request(url, method, body) {
 	}
 }
 
-function Alert(success, message, response) {
-	if (success) {
-		this.level = 'success';
-	} else {
-		this.level = 'error';
-	}
+var Alert=function(message, response) {
 	this.message = message;
-	if (response != null) {
-		this.response = JSON.stringify(response, undefined, 2);
-	}
-	this.hasServerResponse=function() {
+	this.response = response;
+
+}
+
+Alert.prototype = {
+	getResponse:function() {
+		if (this.response != null) {
+			return JSON.stringify(this.response, undefined, 2);			
+		}
+	},
+	hasServerResponse:function() {
 		return this.response != null;
-	}
-	this.clear=function() {
+	},
+	clear:function() {
 		this.level = null;
 		this.message = null;
 	}
+};
+
+var SuccessAlert=function(message, response) {
+	this.message = message;
+	this.level = "success";
+	this.response = response;
 }
+SuccessAlert.prototype = new Alert();
+SuccessAlert.prototype.constructor = SuccessAlert;
+
+var ErrorAlert=function(message, response) {
+	this.message = message;
+	this.level = "error";
+	this.response = response;
+}
+ErrorAlert.prototype = new Alert();
+ErrorAlert.prototype.constructor = ErrorAlert;
+
+var InfoAlert=function(message, response) {
+	this.message = message;
+	this.level = "info";
+	this.response = response;
+}
+InfoAlert.prototype = new Alert();
+InfoAlert.prototype.constructor = InfoAlert;
 
 function AliasesPagination(page, results) {
 	this.page = page;

@@ -17,7 +17,7 @@ function NavbarController($scope, $location, $timeout) {
 				function(error_response) {
 					$scope.cluster_health = null;
 					$scope.setConnected(false);
-					$scope.alert = new Alert(false, "Error connecting to [" + $scope.host + "]",error_response);
+					$scope.alert = new ErrorAlert("Error connecting to [" + $scope.host + "]",error_response);
 				}
 			);
 		}

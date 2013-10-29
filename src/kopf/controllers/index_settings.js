@@ -22,11 +22,11 @@ function IndexSettingsController($scope, $location, $timeout) {
 				});
 				$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 					function(response) {
-						$scope.modal.alert = new Alert(true, "Index settings were successfully updated", response);
+						$scope.modal.alert = new SuccessAlert("Index settings were successfully updated", response);
 						$scope.broadcastMessage('forceRefresh', {});
 					},
 					function(error) {
-						$scope.modal.alert = new Alert(false, "Error while updating index settings", error);
+						$scope.modal.alert = new ErrorAlert("Error while updating index settings", error);
 					}
 				);
 			}

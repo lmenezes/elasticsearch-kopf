@@ -1,16 +1,11 @@
-<div ng-switch on="alert.level" class="alert-block">
-	<div ng-switch-when="success" class="alert alert-success">
-		 <button type="button" class="close" ng-click='alert.clear()'>&times;</button>
-		<b><i class="icon-ok big-icon"></i> {{alert.message}}.</b>
-		<div ng-show="alert.hasServerResponse()">
-			<pre class="alert alert-success response-pre">{{alert.response}}</pre>
-		</div>
-	</div>
-	<div ng-switch-when="error" class="alert alert-danger">
-		 <button type="button" class="close" ng-click='alert.clear()'>&times;</button>
-		<b><i class="icon-warning-sign"></i> {{alert.message}}.</b>
-		<div ng-show="alert.hasServerResponse()">
-			<pre class="alert alert-danger response-pre">{{alert.response}}</pre>
+<div ng-show="alert.level != null" class="alert-block">
+	<div class="alert" ng-class="{'alert-success': alert.level == 'success', 'alert-info': alert.level == 'info', 'alert-danger': alert.level == 'error'}">
+		<button type="button" class="close" ng-click='alert.clear()'>&times;</button>
+		<b>
+			<i ng-class="{'icon-ok': alert.level == 'success', 'icon-spinner icon-spin': alert.level == 'info', 'icon-warning-sign': alert.level == 'error'}" class="big-icon"></i>
+			</b> {{alert.message}}
+		<div ng-show="alert.hasServerResponse()" >
+			<pre ng-class="{'alert-success': alert.level == 'success', 'alert-info': alert.level == 'info', 'alert-danger': alert.level == 'error'}" class="alert response-pre">{{alert.getResponse()}}</pre>
 		</div>
 	</div>
 </div>

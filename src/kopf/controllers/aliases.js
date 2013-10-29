@@ -22,7 +22,7 @@ function AliasesController($scope, $location, $timeout) {
 			$scope.pagination.setResults($scope.aliases.info);
 			$scope.setAlert(null);
 		} catch (error) {
-			$scope.setAlert(new Alert(false, error ,null));
+			$scope.setAlert(new ErrorAlert(error ,null));
 		}
 	}
 	
@@ -91,10 +91,10 @@ function AliasesController($scope, $location, $timeout) {
 		$scope.client.updateAliases(adds,deletes, 
 			function(response) {
 				$scope.loadAliases();
-				$scope.setAlert(new Alert(true, "Aliases were successfully updated",response));
+				$scope.setAlert(new SuccessAlert("Aliases were successfully updated",response));
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while updating aliases",error));
+				$scope.setAlert(new ErrorAlert("Error while updating aliases",error));
 			}
 		);
 	}
@@ -108,7 +108,7 @@ function AliasesController($scope, $location, $timeout) {
 				$scope.pagination.setResults($scope.aliases.info);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while fetching aliases",error));		
+				$scope.setAlert(new ErrorAlert("Error while fetching aliases",error));		
 			}
 		);
 	}

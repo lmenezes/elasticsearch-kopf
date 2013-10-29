@@ -608,24 +608,50 @@ function Request(url, method, body) {
 	}
 }
 
-function Alert(success, message, response) {
-	if (success) {
-		this.level = 'success';
-	} else {
-		this.level = 'error';
-	}
+var Alert=function(message, response) {
 	this.message = message;
-	if (response != null) {
-		this.response = JSON.stringify(response, undefined, 2);
-	}
-	this.hasServerResponse=function() {
+	this.response = response;
+
+}
+
+Alert.prototype = {
+	getResponse:function() {
+		if (this.response != null) {
+			return JSON.stringify(this.response, undefined, 2);			
+		}
+	},
+	hasServerResponse:function() {
 		return this.response != null;
-	}
-	this.clear=function() {
+	},
+	clear:function() {
 		this.level = null;
 		this.message = null;
 	}
+};
+
+var SuccessAlert=function(message, response) {
+	this.message = message;
+	this.level = "success";
+	this.response = response;
 }
+SuccessAlert.prototype = new Alert();
+SuccessAlert.prototype.constructor = SuccessAlert;
+
+var ErrorAlert=function(message, response) {
+	this.message = message;
+	this.level = "error";
+	this.response = response;
+}
+ErrorAlert.prototype = new Alert();
+ErrorAlert.prototype.constructor = ErrorAlert;
+
+var InfoAlert=function(message, response) {
+	this.message = message;
+	this.level = "info";
+	this.response = response;
+}
+InfoAlert.prototype = new Alert();
+InfoAlert.prototype.constructor = InfoAlert;
 
 function AliasesPagination(page, results) {
 	this.page = page;
@@ -898,7 +924,7 @@ function AliasesController($scope, $location, $timeout) {
 			$scope.pagination.setResults($scope.aliases.info);
 			$scope.setAlert(null);
 		} catch (error) {
-			$scope.setAlert(new Alert(false, error ,null));
+			$scope.setAlert(new ErrorAlert(error ,null));
 		}
 	}
 	
@@ -967,10 +993,10 @@ function AliasesController($scope, $location, $timeout) {
 		$scope.client.updateAliases(adds,deletes, 
 			function(response) {
 				$scope.loadAliases();
-				$scope.setAlert(new Alert(true, "Aliases were successfully updated",response));
+				$scope.setAlert(new SuccessAlert("Aliases were successfully updated",response));
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while updating aliases",error));
+				$scope.setAlert(new ErrorAlert("Error while updating aliases",error));
 			}
 		);
 	}
@@ -984,7 +1010,7 @@ function AliasesController($scope, $location, $timeout) {
 				$scope.pagination.setResults($scope.aliases.info);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while fetching aliases",error));		
+				$scope.setAlert(new ErrorAlert("Error while fetching aliases",error));		
 			}
 		);
 	}
@@ -1024,7 +1050,7 @@ function AnalysisController($scope, $location, $timeout) {
 				},
 				function(error) {
 					$scope.field_tokens = null;
-					$scope.setAlert(new Alert(false, "Error while analyzing text", error));
+					$scope.setAlert(new ErrorAlert("Error while analyzing text", error));
 				}
 			);
 		}
@@ -1040,7 +1066,7 @@ function AnalysisController($scope, $location, $timeout) {
 				},
 				function(error) {
 					$scope.field_tokens = null;
-					$scope.setAlert(new Alert(false, "Error while analyzing text", error));
+					$scope.setAlert(new ErrorAlert("Error while analyzing text", error));
 				}
 			);
 		}
@@ -1080,7 +1106,7 @@ function AnalysisController($scope, $location, $timeout) {
 				$scope.indices = $scope.cluster_state.getIndices();
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while reading analyzers information from cluster", error));
+				$scope.setAlert(new ErrorAlert("Error while reading analyzers information from cluster", error));
 			}
 		);
 	}
@@ -1110,7 +1136,7 @@ function ClusterHealthController($scope,$location,$timeout) {
 			},
 			function(failed_request) {
 				$scope.state = '';
-				$scope.modal.alert = new Alert(false, "Error while retrieving cluster health information", failed_request.responseText);
+				$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
 		});
 	}
 
@@ -1125,10 +1151,10 @@ function ClusterHealthController($scope,$location,$timeout) {
 		var data = JSON.stringify(gist, undefined, 4);
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
 			.done(function(response) { 
-				$scope.modal.alert = new Alert(true, "Cluster health information successfully shared", "Gist available at : " + response.html_url);
+				$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
 			})
 			.fail(function(response) {
-				$scope.modal.alert = new Alert(false, "Error while publishing Gist", responseText);
+				$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
 			}
 		);
 	}
@@ -1217,10 +1243,10 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.shutdownNode=function(node_id) {
 		var response = $scope.client.shutdownNode(node_id,
 			function(response) {
-				$scope.setAlert(new Alert(true,"Node [" + node_id + "] successfully shutdown", response));
+				$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while shutting down node",error));
+				$scope.setAlert(new ErrorAlert("Error while shutting down node",error));
 			}
 		);
 	}
@@ -1228,10 +1254,10 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.optimizeIndex=function(index){
 		var response = $scope.client.optimizeIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully optimized", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully optimized", response));
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while optimizing index", error));
+				$scope.setAlert(new ErrorAlert("Error while optimizing index", error));
 			}				
 		);
 	}
@@ -1239,11 +1265,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.deleteIndex=function(index) {
 		var response = $scope.client.deleteIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully deleted", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully deleted", response));
 				$scope.closeModal(true);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while deleting index", error));
+				$scope.setAlert(new ErrorAlert("Error while deleting index", error));
 				$scope.closeModal(true);
 			}	
 		);
@@ -1252,11 +1278,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.clearCache=function(index) {
 		var response = $scope.client.clearCache(index,
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index cache was successfully cleared", response));
+				$scope.setAlert(new SuccessAlert("Index cache was successfully cleared", response));
 				$scope.closeModal(false);		
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while clearing index cache", error));
+				$scope.setAlert(new ErrorAlert("Error while clearing index cache", error));
 				$scope.closeModal(false);
 			}
 		);
@@ -1265,11 +1291,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.refreshIndex=function(index){
 		var response = $scope.client.refreshIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully refreshed", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully refreshed", response));
 				$scope.closeModal(false);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while refreshing index", error));	
+				$scope.setAlert(new ErrorAlert("Error while refreshing index", error));	
 				$scope.closeModal(false);
 			}
 		);
@@ -1278,11 +1304,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.enableAllocation=function() {
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
-				$scope.setAlert(new Alert(true, "Shard allocation was successfully enabled", response));
+				$scope.setAlert(new SuccessAlert("Shard allocation was successfully enabled", response));
 				$scope.forceRefresh();
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while enabling shard allocation", error));	
+				$scope.setAlert(new ErrorAlert("Error while enabling shard allocation", error));	
 				$scope.forceRefresh();
 			}
 		);
@@ -1291,11 +1317,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.disableAllocation=function(current_state) {
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
-				$scope.setAlert(new Alert(true, "Shard allocation was successfully disabled", response));
+				$scope.setAlert(new SuccessAlert("Shard allocation was successfully disabled", response));
 				$scope.forceRefresh();
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while disabling shard allocation", error));	
+				$scope.setAlert(new ErrorAlert("Error while disabling shard allocation", error));	
 				$scope.forceRefresh();
 			}
 		);
@@ -1304,11 +1330,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.closeIndex=function(index) {
 		var response = $scope.client.closeIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully closed", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully closed", response));
 				$scope.closeModal(true);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while closing index", error));	
+				$scope.setAlert(new ErrorAlert("Error while closing index", error));	
 				$scope.closeModal(true);
 			}
 		);
@@ -1317,11 +1343,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.openIndex=function(index) {
 		var response = $scope.client.openIndex(index,
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully opened", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully opened", response));
 				$scope.closeModal(true);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while opening index", error));
+				$scope.setAlert(new ErrorAlert("Error while opening index", error));
 				$scope.closeModal(true);
 			}
 		);
@@ -1333,11 +1359,11 @@ function ClusterSettingsController($scope, $location, $timeout) {
 			new_settings['transient'] = $scope.cluster.settings;
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
-					$scope.modal.alert = new Alert(true, "Cluster settings were successfully updated",response);
+					$scope.modal.alert = new SuccessAlert("Cluster settings were successfully updated",response);
 					$scope.broadcastMessage('forceRefresh', {});
 				}, 
 				function(error) {
-					$scope.modal.alert = new Alert(false, "Error while updating cluster settings",error);
+					$scope.modal.alert = new ErrorAlert("Error while updating cluster settings",error);
 				}
 		);
 	}
@@ -1363,7 +1389,7 @@ function CreateIndexController($scope, $location, $timeout) {
 
 	$scope.createIndex=function() {
 		if ($scope.name.trim().length == 0) {
-			$scope.modal.alert = new Alert(false, "You must specify a valid index name", null);	
+			$scope.modal.alert = new ErrorAlert("You must specify a valid index name", null);	
 		} else {
 			var settings = {};
 			var editor_content = $scope.editor.getValue();
@@ -1389,10 +1415,10 @@ function CreateIndexController($scope, $location, $timeout) {
 			}
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
-					$scope.modal.alert = new Alert(true, 'Index successfully created', response);
+					$scope.modal.alert = new SuccessAlert('Index successfully created', response);
 					$scope.broadcastMessage('forceRefresh', {});					
 				}, function(error) { 
-					$scope.modal.alert = new Alert(false, "Error while creating index", error);
+					$scope.modal.alert = new ErrorAlert("Error while creating index", error);
 				}
 			);
 		}
@@ -1539,11 +1565,11 @@ function IndexSettingsController($scope, $location, $timeout) {
 				});
 				$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 					function(response) {
-						$scope.modal.alert = new Alert(true, "Index settings were successfully updated", response);
+						$scope.modal.alert = new SuccessAlert("Index settings were successfully updated", response);
 						$scope.broadcastMessage('forceRefresh', {});
 					},
 					function(error) {
-						$scope.modal.alert = new Alert(false, "Error while updating index settings", error);
+						$scope.modal.alert = new ErrorAlert("Error while updating index settings", error);
 					}
 				);
 			}
@@ -1569,7 +1595,7 @@ function NavbarController($scope, $location, $timeout) {
 				function(error_response) {
 					$scope.cluster_health = null;
 					$scope.setConnected(false);
-					$scope.alert = new Alert(false, "Error connecting to [" + $scope.host + "]",error_response);
+					$scope.alert = new ErrorAlert("Error connecting to [" + $scope.host + "]",error_response);
 				}
 			);
 		}
@@ -1660,12 +1686,12 @@ function RestController($scope, $location, $timeout) {
 							var content = jsonTree.create(JSON.parse(error));
 							$('#rest-client-response').html(content);
 						} catch (invalid_json) {
-							$scope.setAlert(new Alert(false, "Request did not return a valid JSON", error));
+							$scope.setAlert(new ErrorAlert("Request did not return a valid JSON", error));
 						}
 					}
 				);
 			} catch (error) {
-				$scope.setAlert(new Alert(false, "Error while executing request", error));
+				$scope.setAlert(new ErrorAlert("Error while executing request", error));
 			}
 		}
 	}
@@ -1764,16 +1790,16 @@ function PercolatorController($scope, $location, $timeout) {
 				$scope.client.refreshIndex("_percolator", 
 					function(response) {
 						// non request action, no need to display
-						$scope.setAlert(new Alert(true,"Query successfully deleted", response));
+						$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
 						$scope.loadPercolatorQueries();
 					},
 					function(error) {
-						$scope.setAlert(new Alert(true,"Error while reloading queries", error));
+						$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
 					}
 				);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while deleting query", error));
+				$scope.setAlert(new ErrorAlert("Error while deleting query", error));
 			}
 		);
 	}
@@ -1787,16 +1813,16 @@ function PercolatorController($scope, $location, $timeout) {
 					$scope.client.refreshIndex("_percolator", 
 						function(response) {
 							// non request action, no need to display
-							$scope.setAlert(new Alert(true,"Percolator Query successfully created", response));
+							$scope.setAlert(new SuccessAlert("Percolator Query successfully created", response));
 							$scope.loadPercolatorQueries();
 						},
 						function(error) {
-							$scope.setAlert(new Alert(true,"Error while reloading queries", error));
+							$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
 						}
 					);
 				},
 				function(error) {
-					$scope.setAlert(new Alert(false,"Error while creating percolator query", error));
+					$scope.setAlert(new ErrorAlert("Error while creating percolator query", error));
 				}
 			);
 		}
@@ -1817,12 +1843,12 @@ function PercolatorController($scope, $location, $timeout) {
 				},
 				function(error) {
 					if (!(error['responseJSON'] != null && error['responseJSON']['error'] == "IndexMissingException[[_percolator] missing]")) {
-						$scope.setAlert(new Alert(false,"Error while reading loading percolate queries", error));	
+						$scope.setAlert(new ErrorAlert("Error while reading loading percolate queries", error));	
 					}
 				}
 			);
 		} catch (error) {
-			$scope.setAlert(new Alert(false,"Filter is not a valid JSON"));
+			$scope.setAlert(new ErrorAlert("Filter is not a valid JSON"));
 			return;
 		}
 	}
@@ -1833,7 +1859,7 @@ function PercolatorController($scope, $location, $timeout) {
 				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while reading loading cluster state", error));
+				$scope.setAlert(new ErrorAlert("Error while reading loading cluster state", error));
 			}
 		);
 	}

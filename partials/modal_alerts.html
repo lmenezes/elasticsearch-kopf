@@ -1,16 +1,12 @@
-<div ng-switch on="modal.alert.level" class="alert-block">
-	<div ng-switch-when="success" class="alert alert-success">
-		 <button type="button" class="close" ng-click='modal.alert.clear()'>&times;</button>
-		<b><i class="icon-ok big-icon"></i> {{modal.alert.message}}</b>
-		<div ng-show="modal.alert.hasServerResponse()">
-			<pre class="alert alert-success response-pre">{{modal.alert.response}}</pre>
-		</div>
-	</div>
-	<div ng-switch-when="error" class="alert alert-danger">
-		 <button type="button" class="close" ng-click='modal.alert.clear()'>&times;</button>
-		<b><i class="icon-warning-sign"></i> {{modal.alert.message}}</b>
-		<div ng-show="modal.alert.hasServerResponse()">
-			<pre class="alert alert-danger response-pre">{{modal.alert.response}}</pre>
+<div ng-show="modal.alert.level != null" class="alert-block">
+	<div class="alert" ng-class="{'alert-success': modal.alert.level == 'success', 'alert-info': modal.alert.level == 'info', 'alert-danger': modal.alert.level == 'error'}">
+		<button type="button" class="close" ng-click='modal.alert.clear()'>&times;</button>
+		<b>
+			<i ng-class="{'icon-ok': modal.alert.level == 'success', 'icon-spinner icon-spin': modal.alert.level == 'info', 'icon-warning-sign': modal.alert.level == 'error'}" class="big-icon"></i>
+			</b> {{modal.alert.message}}
+		<div ng-show="modal.alert.hasServerResponse()" >
+			<pre ng-class="{'alert-success': modal.alert.level == 'success', 'alert-info': modal.alert.level == 'info', 'alert-danger': modal.alert.level == 'error'}" class="alert response-pre">{{modal.alert.getResponse()}}</pre>
 		</div>
 	</div>
 </div>
+

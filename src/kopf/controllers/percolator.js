@@ -84,16 +84,16 @@ function PercolatorController($scope, $location, $timeout) {
 				$scope.client.refreshIndex("_percolator", 
 					function(response) {
 						// non request action, no need to display
-						$scope.setAlert(new Alert(true,"Query successfully deleted", response));
+						$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
 						$scope.loadPercolatorQueries();
 					},
 					function(error) {
-						$scope.setAlert(new Alert(true,"Error while reloading queries", error));
+						$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
 					}
 				);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while deleting query", error));
+				$scope.setAlert(new ErrorAlert("Error while deleting query", error));
 			}
 		);
 	}
@@ -107,16 +107,16 @@ function PercolatorController($scope, $location, $timeout) {
 					$scope.client.refreshIndex("_percolator", 
 						function(response) {
 							// non request action, no need to display
-							$scope.setAlert(new Alert(true,"Percolator Query successfully created", response));
+							$scope.setAlert(new SuccessAlert("Percolator Query successfully created", response));
 							$scope.loadPercolatorQueries();
 						},
 						function(error) {
-							$scope.setAlert(new Alert(true,"Error while reloading queries", error));
+							$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
 						}
 					);
 				},
 				function(error) {
-					$scope.setAlert(new Alert(false,"Error while creating percolator query", error));
+					$scope.setAlert(new ErrorAlert("Error while creating percolator query", error));
 				}
 			);
 		}
@@ -137,12 +137,12 @@ function PercolatorController($scope, $location, $timeout) {
 				},
 				function(error) {
 					if (!(error['responseJSON'] != null && error['responseJSON']['error'] == "IndexMissingException[[_percolator] missing]")) {
-						$scope.setAlert(new Alert(false,"Error while reading loading percolate queries", error));	
+						$scope.setAlert(new ErrorAlert("Error while reading loading percolate queries", error));	
 					}
 				}
 			);
 		} catch (error) {
-			$scope.setAlert(new Alert(false,"Filter is not a valid JSON"));
+			$scope.setAlert(new ErrorAlert("Filter is not a valid JSON"));
 			return;
 		}
 	}
@@ -153,7 +153,7 @@ function PercolatorController($scope, $location, $timeout) {
 				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while reading loading cluster state", error));
+				$scope.setAlert(new ErrorAlert("Error while reading loading cluster state", error));
 			}
 		);
 	}

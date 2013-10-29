@@ -82,10 +82,10 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.shutdownNode=function(node_id) {
 		var response = $scope.client.shutdownNode(node_id,
 			function(response) {
-				$scope.setAlert(new Alert(true,"Node [" + node_id + "] successfully shutdown", response));
+				$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false,"Error while shutting down node",error));
+				$scope.setAlert(new ErrorAlert("Error while shutting down node",error));
 			}
 		);
 	}
@@ -93,10 +93,10 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.optimizeIndex=function(index){
 		var response = $scope.client.optimizeIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully optimized", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully optimized", response));
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while optimizing index", error));
+				$scope.setAlert(new ErrorAlert("Error while optimizing index", error));
 			}				
 		);
 	}
@@ -104,11 +104,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.deleteIndex=function(index) {
 		var response = $scope.client.deleteIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully deleted", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully deleted", response));
 				$scope.closeModal(true);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while deleting index", error));
+				$scope.setAlert(new ErrorAlert("Error while deleting index", error));
 				$scope.closeModal(true);
 			}	
 		);
@@ -117,11 +117,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.clearCache=function(index) {
 		var response = $scope.client.clearCache(index,
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index cache was successfully cleared", response));
+				$scope.setAlert(new SuccessAlert("Index cache was successfully cleared", response));
 				$scope.closeModal(false);		
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while clearing index cache", error));
+				$scope.setAlert(new ErrorAlert("Error while clearing index cache", error));
 				$scope.closeModal(false);
 			}
 		);
@@ -130,11 +130,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.refreshIndex=function(index){
 		var response = $scope.client.refreshIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully refreshed", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully refreshed", response));
 				$scope.closeModal(false);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while refreshing index", error));	
+				$scope.setAlert(new ErrorAlert("Error while refreshing index", error));	
 				$scope.closeModal(false);
 			}
 		);
@@ -143,11 +143,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.enableAllocation=function() {
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
-				$scope.setAlert(new Alert(true, "Shard allocation was successfully enabled", response));
+				$scope.setAlert(new SuccessAlert("Shard allocation was successfully enabled", response));
 				$scope.forceRefresh();
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while enabling shard allocation", error));	
+				$scope.setAlert(new ErrorAlert("Error while enabling shard allocation", error));	
 				$scope.forceRefresh();
 			}
 		);
@@ -156,11 +156,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.disableAllocation=function(current_state) {
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
-				$scope.setAlert(new Alert(true, "Shard allocation was successfully disabled", response));
+				$scope.setAlert(new SuccessAlert("Shard allocation was successfully disabled", response));
 				$scope.forceRefresh();
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while disabling shard allocation", error));	
+				$scope.setAlert(new ErrorAlert("Error while disabling shard allocation", error));	
 				$scope.forceRefresh();
 			}
 		);
@@ -169,11 +169,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.closeIndex=function(index) {
 		var response = $scope.client.closeIndex(index, 
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully closed", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully closed", response));
 				$scope.closeModal(true);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while closing index", error));	
+				$scope.setAlert(new ErrorAlert("Error while closing index", error));	
 				$scope.closeModal(true);
 			}
 		);
@@ -182,11 +182,11 @@ function ClusterOverviewController($scope, $location, $timeout) {
 	$scope.openIndex=function(index) {
 		var response = $scope.client.openIndex(index,
 			function(response) {
-				$scope.setAlert(new Alert(true, "Index was successfully opened", response));
+				$scope.setAlert(new SuccessAlert("Index was successfully opened", response));
 				$scope.closeModal(true);
 			},
 			function(error) {
-				$scope.setAlert(new Alert(false, "Error while opening index", error));
+				$scope.setAlert(new ErrorAlert("Error while opening index", error));
 				$scope.closeModal(true);
 			}
 		);

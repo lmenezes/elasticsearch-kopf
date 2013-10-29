@@ -23,7 +23,7 @@ function ClusterHealthController($scope,$location,$timeout) {
 			},
 			function(failed_request) {
 				$scope.state = '';
-				$scope.modal.alert = new Alert(false, "Error while retrieving cluster health information", failed_request.responseText);
+				$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
 		});
 	}
 
@@ -38,10 +38,10 @@ function ClusterHealthController($scope,$location,$timeout) {
 		var data = JSON.stringify(gist, undefined, 4);
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
 			.done(function(response) { 
-				$scope.modal.alert = new Alert(true, "Cluster health information successfully shared", "Gist available at : " + response.html_url);
+				$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
 			})
 			.fail(function(response) {
-				$scope.modal.alert = new Alert(false, "Error while publishing Gist", responseText);
+				$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
 			}
 		);
 	}
