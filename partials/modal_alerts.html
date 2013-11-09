@@ -2,7 +2,7 @@
 	<div class="alert" ng-class="{'alert-success': modal.alert.level == 'success', 'alert-info': modal.alert.level == 'info', 'alert-danger': modal.alert.level == 'error'}">
 		<button type="button" class="close" ng-click='modal.alert.clear()'>&times;</button>
 		<b>
-			<i ng-class="{'icon-ok': modal.alert.level == 'success', 'icon-spinner icon-spin': modal.alert.level == 'info', 'icon-warning-sign': modal.alert.level == 'error'}" class="big-icon"></i>
+			<i ng-class="{'icon-ok': modal.alert.level == 'success', 'icon-info': modal.alert.level == 'info', 'icon-warning-sign': modal.alert.level == 'error'}" class="big-icon"></i>
 			</b> {{modal.alert.message}}
 		<div ng-show="modal.alert.hasServerResponse()" >
 			<pre ng-class="{'alert-success': modal.alert.level == 'success', 'alert-info': modal.alert.level == 'info', 'alert-danger': modal.alert.level == 'error'}" class="alert response-pre">{{modal.alert.getResponse()}}</pre>

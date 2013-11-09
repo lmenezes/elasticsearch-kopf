@@ -4,16 +4,17 @@
 		<div class="row">
 			<div class="col-lg-2">
 				<ul class="nav nav-pills nav-stacked" id="idx_settings_tabs">
-				  <li><a href="#idx_settings_index" data-toggle="tab">index</a></li>
-				  <li><a href="#idx_settings_index_blocks" data-toggle="tab">blocks</a></li>
-				  <li><a href="#idx_settings_index_translog" data-toggle="tab">translog</a></li>
-				  <li><a href="#idx_settings_index_routing" data-toggle="tab">routing</a></li>
-				  <li><a href="#idx_settings_index_cache" data-toggle="tab">cache</a></li>
+					<li><a href="#idx_settings_index" data-toggle="tab">index</a></li>
+					<li><a href="#idx_settings_index_blocks" data-toggle="tab">blocks</a></li>
+					<li><a href="#idx_settings_index_translog" data-toggle="tab">translog</a></li>
+					<li><a href="#idx_settings_index_routing" data-toggle="tab">routing</a></li>
+					<li><a href="#idx_settings_index_cache" data-toggle="tab">cache</a></li>
+					<li><a href="#idx_settings_index_slowlog" data-toggle="tab">slow log</a></li>
 				</ul>
 			</div>
 			<div class="col-lg-10">
 				<div class="tab-content">
-				  <div class="tab-pane active" id="idx_settings_index">
+					<div class="tab-pane active" id="idx_settings_index">
 					<div class="row">
 						<div class="col-lg-4">
 							<div class="form-group">
@@ -124,7 +125,7 @@
 						</div>
 					</div>
 				  </div>
-				  <div class="tab-pane" id="idx_settings_index_blocks">
+				  	<div class="tab-pane" id="idx_settings_index_blocks">
 					<div class="row">
 						<div class="col-lg-4">
 							<div class="form-group">
@@ -132,7 +133,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="set to true to have the index read only. false to allow writes and metadata changes" data-original-title="index.blocks.read_only" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.blocks.read_only']" disabled="true" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.blocks.read_only']" disabled="true" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -142,7 +143,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="set to true to disable read operations against the index" data-original-title="index.blocks.read" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.blocks.read']" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.blocks.read']" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -154,7 +155,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="set to true to disable write operations against the index" data-original-title="index.blocks.write" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.blocks.write']" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.blocks.write']" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -166,7 +167,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="set to true to disable metadata operations against the index" data-original-title="index.blocks.metadata" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.blocks.metadata']" disabled="true" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.blocks.metadata']" disabled="true" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -174,7 +175,7 @@
 						</div>
 					</div>
 				  </div>
-				  <div class="tab-pane" id="idx_settings_index_translog">
+				  	<div class="tab-pane" id="idx_settings_index_translog">
 					<div class="row">
 						<div class="col-lg-4">
 							<div class="form-group">
@@ -182,14 +183,14 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when to flush based on operations" data-original-title="index.translog.flush_threshold ops" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<input type="text" class="form-control input-sm" ng-model="index.settings['index.translog.flush_threshold_ops']" placeholder="">
+								<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.translog.flush_threshold_ops']" placeholder="">
 							</div>
 							<div class="form-group">
 								translog.flush_threshold_size
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when to flush based on translog (bytes) size" data-original-title="index.translog.flush_threshold_size" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<input type="text" class="form-control input-sm" ng-model="index.settings['index.translog.flush_threshold_size']" placeholder="">
+								<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.translog.flush_threshold_size']" placeholder="">
 							</div>
 						</div>
 						<div class="col-lg-4">
@@ -198,14 +199,14 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when to flush based on a period of not flushing" data-original-title="index.translog.flush_threshold_period" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<input type="text" class="form-control input-sm" ng-model="index.settings['index.translog.flush_threshold_period']" placeholder="">
+								<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.translog.flush_threshold_period']" placeholder="">
 							</div>
 							<div class="form-group">
 								translog.disable_flush
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="disables flushing. Note, should be set for a short interval and then enabled." data-original-title="index.translog.disable_flush" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.translog.disable_flush']" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.translog.disable_flush']" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -222,7 +223,7 @@
 						</div>
 					</div>
 				  </div>
-				  <div class="tab-pane" id="idx_settings_index_routing">
+				  	<div class="tab-pane" id="idx_settings_index_routing">
 					<div class="row">
 						<div class="col-lg-4">
 							<div class="form-group">
@@ -230,7 +231,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="disable shards allocation. defaults to false" data-original-title="index.disable_allocation" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.routing.allocation.disable_allocation']" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.routing.allocation.disable_allocation']" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -240,7 +241,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="disable new shards allocation. defaults to false" data-original-title="index.disable_new_allocation" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.routing.allocation.disable_new_allocation']" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.routing.allocation.disable_new_allocation']" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -252,7 +253,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="disable shard replica allocation. defaults to false" data-original-title="index.disable_replica_allocation" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<select ng-model="index.settings['index.routing.allocation.disable_replica_allocation']" class="form-control input-sm">
+								<select ng-model="service.index.settings['index.routing.allocation.disable_replica_allocation']" class="form-control input-sm">
 									<option value="true">true</option>
 									<option value="false">false</option>
 								</select>
@@ -264,12 +265,12 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="node_initial_primaries_recoveries" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<input type="text" class="form-control input-sm" ng-model="index.settings['cluster.routing.allocation.node_initial_primaries_recoveries']" placeholder="">
+								<input type="text" class="form-control input-sm" ng-model="service.index.settings['cluster.routing.allocation.node_initial_primaries_recoveries']" placeholder="">
 							</div>
 						</div>
 					</div>
 				  </div>
-				  <div class="tab-pane" id="idx_settings_index_cache">
+				  	<div class="tab-pane" id="idx_settings_index_cache">
 					<div class="row">
 						<div class="col-lg-4">
 							<div class="form-group">
@@ -277,7 +278,7 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="the maximum size of filter cache (per segment in shard). Set to -1 to disable" data-original-title="index.filter.max_size" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<input type="text" class="form-control input-sm" ng-model="index.settings['index.cache.filter.max_size']" placeholder="">
+								<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.cache.filter.max_size']" placeholder="">
 							</div>
 						</div>
 						<div class="col-lg-4">
@@ -286,13 +287,99 @@
 								<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="the expire after access time for filter cache. Set to -1 to disable" data-original-title="index.filter.expire" title="">
 									<i class="icon-info-sign"></i>
 								</a>
-								<input type="text" class="form-control input-sm" ng-model="index.settings['index.cache.filter.expire']" placeholder="">
+								<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.cache.filter.expire']" placeholder="">
 							</div>
 						</div>
 						<div class="col-lg-4">
 						</div>
 					</div>
 				  </div>
+				  	<div class="tab-pane" id="idx_settings_index_slowlog">
+						<!-- query -->
+						<h4>slow log for searches</h4>
+						<div class="row">
+							<div class="col-lg-3">
+								<div class="form-group">
+									warn
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.query.warn']" placeholder="(e.g.: 500ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									info
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.query.info']" placeholder="(e.g.: 400ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									debug
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.query.debug']" placeholder="(e.g.: 200ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									trace
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.query.trace']" placeholder="(e.g.: 100ms)">
+								</div>
+							</div>
+						</div>
+						<!-- fetch -->
+						<h4>slow log for fetching</h4>
+						<div class="row">
+							<div class="col-lg-3">
+								<div class="form-group">
+									warn
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.fetch.warn']" placeholder="(e.g.: 200ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									info
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.fetch.info']" placeholder="(e.g.: 100ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									debug
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.fetch.debug']" placeholder="(e.g.: 50ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									trace
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.search.slowlog.threshold.fetch.trace']" placeholder="(e.g.: 25ms)">
+								</div>
+							</div>
+						</div>
+						<!-- index -->
+						<h4>slow log for indexing</h4>
+						<div class="row">
+							<div class="col-lg-3">
+								<div class="form-group">
+									warn
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.indexing.slowlog.threshold.index.warn']" placeholder="(e.g.: 100ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									info
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.indexing.slowlog.threshold.index.info']" placeholder="(e.g.: 80ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									debug
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.indexing.slowlog.threshold.index.debug']" placeholder="(e.g.: 500ms)">
+								</div>
+							</div>
+							<div class="col-lg-3">
+								<div class="form-group">
+									trace
+									<input type="text" class="form-control input-sm" ng-model="service.index.settings['index.indexing.slowlog.threshold.index.trace']" placeholder="(e.g.: 30ms)">
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

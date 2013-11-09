@@ -1564,7 +1564,13 @@ function NewIndexSettingsController($scope, $location, $timeout, IndexSettingsSe
 	 'index.translog.flush_threshold_ops', 'index.translog.flush_threshold_size', 
 	 'index.translog.flush_threshold_period', 'index.translog.disable_flush', 
 	 'index.routing.allocation.total_shards_per_node', 
-	 'index.recovery.initial_shards', 'index.gc_deletes', 'index.ttl.disable_purge'];
+	 'index.recovery.initial_shards', 'index.gc_deletes', 'index.ttl.disable_purge',
+     "index.search.slowlog.threshold.query.warn", "index.search.slowlog.threshold.query.info",
+     "index.search.slowlog.threshold.query.debug", "index.search.slowlog.threshold.query.trace",
+     'index.search.slowlog.threshold.fetch.warn', 'index.search.slowlog.threshold.fetch.info',
+	 'index.search.slowlog.threshold.fetch.debug', 'index.search.slowlog.threshold.fetch.trace',
+	 'index.indexing.slowlog.threshold.index.warn', 'index.indexing.slowlog.threshold.index.info',
+	 'index.indexing.slowlog.threshold.index.debug', 'index.indexing.slowlog.threshold.index.trace'];
 	 
 	 $scope.back=function() {
 		 $('#cluster_option a').tab('show');
