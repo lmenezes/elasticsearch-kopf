@@ -1,5 +1,5 @@
 function GlobalController($scope, $location, $timeout) {
-	$scope.version = "0.2-SNAPSHOT";
+	$scope.version = "0.3-SNAPSHOT";
 	$scope.username = null;
 	$scope.password = null;
 	
