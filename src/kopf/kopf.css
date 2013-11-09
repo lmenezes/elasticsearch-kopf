@@ -656,7 +656,8 @@ a.cluster-map-node-action {
 	z-index: 1050;
 }
 .setting-info {
-	padding-left: 5px;
+	padding-left: 1px;
+	font-size: 12px;
 }
 
 a.setting-info:hover {

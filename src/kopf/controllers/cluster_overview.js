@@ -1,4 +1,5 @@
-function ClusterOverviewController($scope, $location, $timeout) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService) {
+	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.pagination= new Pagination(1,"", []);
 	$scope.cluster = null;
 	
@@ -190,5 +191,14 @@ function ClusterOverviewController($scope, $location, $timeout) {
 				$scope.closeModal(true);
 			}
 		);
+	}
+	
+	$scope.loadIndexSettings=function(index) {
+		$('#index_settings_option a').tab('show');
+		var indices = $scope.cluster.indices.filter(function(i) {
+			return i.name == index;
+		});
+		$scope.idxSettingsSrv.index = indices[0];
+		$('#idx_settings_tabs a:first').tab('show');		
 	}
 }

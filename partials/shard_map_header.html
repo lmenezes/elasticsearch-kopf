@@ -93,10 +93,9 @@
 					<div ng-include src="'./modals/confirm_clear_cache.html'"></div>
 				</div>
 				<div class="col-lg-2">
-					<a data-toggle="modal" href="#index_settings_{{index.name}}" class="cluster-map-header-index-action" title="index settings" data-backdrop="static" data-keyboard="false">
+					<a href="#" ng-click="loadIndexSettings(index.name)" class="cluster-map-header-index-action">
 						<i class="icon-cogs"></i>
 					</a>
-					<div ng-include src="'./modals/index_settings.html'"></div>
 				</div>		
 				<div class="col-lg-2">
 					<a data-toggle="modal" href="#confirm_delete_{{index.name}}" class="cluster-map-header-index-action" title="delete index" data-backdrop="static" data-keyboard="false">

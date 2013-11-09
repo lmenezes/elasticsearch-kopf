@@ -56,7 +56,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/index_settings.js',
 					'src/kopf/controllers/navbar.js',
 					'src/kopf/controllers/rest.js',
-					'src/kopf/controllers/percolator.js',
+					'src/kopf/controllers/percolator.js'
 				],
 				dest: 'dist/kopf.js'
 			},
@@ -64,7 +64,8 @@ module.exports = function(grunt) {
 				src: [
 					'src/kopf/kopf.css',
 					'src/kopf/css/percolator.css',
-					'src/kopf/css/common.css'
+					'src/kopf/css/common.css',
+					'src/kopf/css/index_settings.css',
 				],
 				dest: 'dist/kopf.css'
 			},

@@ -656,7 +656,8 @@ a.cluster-map-node-action {
 	z-index: 1050;
 }
 .setting-info {
-	padding-left: 5px;
+	padding-left: 1px;
+	font-size: 12px;
 }
 
 a.setting-info:hover {
@@ -1007,4 +1008,16 @@ a.entity_action:active {
 .kopf-table-header {
 	font-weight: 500; 
 	font-color: #c0c0c0;
+}
+
+/* selected pill color */
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+	background-color: #eeeeee;
+	color: #333;
+}
+.nav > li > a {
+	padding: 6px 15px;
+}
+.index-settings-panel {
+	padding-top: 10px;
 }
