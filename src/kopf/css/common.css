@@ -8,6 +8,7 @@
 	background-color: #eeeeee;
 	color: #333;
 }
-.nav > li > a {
+/* smaller padding for stacked pills */
+.nav-stacked > li > a {
 	padding: 6px 15px;
 }
