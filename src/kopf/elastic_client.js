@@ -239,7 +239,7 @@ function ElasticClient(host,username,password) {
 					} 
 				}
 			})
-		).done(
+		).then(
 			function(cluster_state,nodes_stats,cluster_status,settings) {
 				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
 			},

@@ -239,7 +239,7 @@ function ElasticClient(host,username,password) {
 					} 
 				}
 			})
-		).done(
+		).then(
 			function(cluster_state,nodes_stats,cluster_status,settings) {
 				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
 			},
@@ -903,6 +903,9 @@ var kopf = angular.module('kopf', []);
 kopf.factory('IndexSettingsService', function() {
 	return {index: null};
 });
+kopf.factory('ClusterSettingsService', function() {
+	return {cluster: null};
+});
 function AliasesController($scope, $location, $timeout) {
 	$scope.aliases = null;
 	$scope.new_index = {};
@@ -1162,8 +1165,9 @@ function ClusterHealthController($scope,$location,$timeout) {
 		);
 	}
 }
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService) {
 	$scope.idxSettingsSrv = IndexSettingsService;
+	$scope.cluster_service = ClusterSettingsService;
 	$scope.pagination= new Pagination(1,"", []);
 	$scope.cluster = null;
 	
@@ -1182,6 +1186,8 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 							if (!$scope.isInModal()) {
 								$scope.$apply(function() { // forces view refresh
 									$scope.cluster = cluster;
+									// TODO: cluster should go in here everywhere...
+									$scope.cluster_service.cluster = cluster;
 									$scope.pagination.setResults(cluster.indices);
 								});
 								forced_refresh = false;
@@ -1192,7 +1198,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 							}
 						},
 						function(error) {
-							// alert?
+							$scope.setAlert(new ErrorAlert("Error while retrieving cluster information", error));
 						}
 					);
 					} else {
@@ -1365,18 +1371,29 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		$scope.idxSettingsSrv.index = indices[0];
 		$('#idx_settings_tabs a:first').tab('show');		
 	}
+	
+	$scope.loadClusterSettings=function() {
+		$('#cluster_settings_option a').tab('show');
+		$('#cluster_settings_tabs a:first').tab('show');		
+	}
 }
-function ClusterSettingsController($scope, $location, $timeout) {
-	$scope.saveClusterSettings=function() {
+function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsService) {
+	$scope.cluster_service = ClusterSettingsService;
+
+	$scope.back=function() {
+		$('#cluster_option a').tab('show');
+	}
+
+	$scope.save=function() {
 			var new_settings = {};
-			new_settings['transient'] = $scope.cluster.settings;
+			new_settings['transient'] = $scope.cluster_service.cluster.settings;
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
-					$scope.modal.alert = new SuccessAlert("Cluster settings were successfully updated",response);
+					$scope.setAlert(new SuccessAlert("Cluster settings were successfully updated",response));
 					$scope.broadcastMessage('forceRefresh', {});
 				}, 
 				function(error) {
-					$scope.modal.alert = new ErrorAlert("Error while updating cluster settings",error);
+					$scope.setAlert(new ErrorAlert("Error while updating cluster settings",error));
 				}
 		);
 	}
