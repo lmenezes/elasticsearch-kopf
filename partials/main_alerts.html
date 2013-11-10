@@ -1,11 +1,15 @@
-<div ng-show="alert.level != null" class="alert-block">
-	<div class="alert" ng-class="{'alert-success': alert.level == 'success', 'alert-info': alert.level == 'info', 'alert-danger': alert.level == 'error'}">
-		<button type="button" class="close" ng-click='alert.clear()'>&times;</button>
-		<b>
-			<i ng-class="{'icon-ok': alert.level == 'success', 'icon-info': alert.level == 'info', 'icon-warning-sign': alert.level == 'error'}" class="big-icon"></i>
-			</b> {{alert.message}}
-		<div ng-show="alert.hasServerResponse()" >
-			<pre ng-class="{'alert-success': alert.level == 'success', 'alert-info': alert.level == 'info', 'alert-danger': alert.level == 'error'}" class="alert response-pre">{{alert.getResponse()}}</pre>
+<div ng-show="alert.level != null" class="alert-block" id="alert_box">
+	<div class="alert" ng-class="alert.class">
+		<span class="pull-right normal-action" ng-click='alert.clear()'>
+			<i class="icon-remove-sign"></i>
+		</span>
+		<i ng-class="alert.icon" class="big-icon">&nbsp;</i>
+		<a ng-class="alert.class" data-toggle="collapse" data-parent="#alert_box" href="#alert_details" ng-show="alert.hasServerResponse()">
+			{{alert.message}}
+		</a>
+		<span ng-show="!alert.hasServerResponse()">{{alert.message}}</span>
+		<div ng-show="alert.hasServerResponse()" id="alert_details" class="panel-collapse collapse">
+			<pre ng-class="alert.class" class="alert response-pre">{{alert.getResponse()}}</pre>
 		</div>
 	</div>
 </div>
