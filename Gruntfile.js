@@ -67,6 +67,14 @@ module.exports = function(grunt) {
 					'src/kopf/css/percolator.css',
 					'src/kopf/css/common.css',
 					'src/kopf/css/index_settings.css',
+					'src/kopf/css/aliases.css',
+					'src/kopf/css/analysis.css',
+					'src/kopf/css/cluster_health.css',
+					'src/kopf/css/cluster_overview.css',
+					'src/kopf/css/gist_share.css',
+					'src/kopf/css/json_tree.css',
+					'src/kopf/css/navbar.css',
+					'src/kopf/css/rest_client.css'
 				],
 				dest: 'dist/kopf.css'
 			},

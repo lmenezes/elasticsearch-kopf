@@ -1,0 +1,12 @@
+.cluster-health-top-actions {
+	text-align: right;
+}
+.cluster-health-state {
+	font-size: 12px;
+	font-weight: 300;
+	color: #666;
+}
+.cluster-health-content {
+	background: #fff;
+	font-size: 10px;
+}

@@ -1,0 +1,70 @@
+.aliases-index-alias {
+	background: #FFFFFF;
+	border: 1px solid #333;
+	border-radius: 2px 2px 2px 2px;
+	font-size: 12px;
+	margin-right: 10px;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-top: 3px;
+}
+.aliases-alias-cell {
+	width: 250px;
+	max-width: 250px;
+	min-width: 250px;
+}
+.aliases-new-alias-input {
+	overflow: hidden;
+	display: block;
+}
+
+.aliases-save-changes {
+	margin-top: 20px;
+	text-align: right;
+}
+
+.aliases-remove-alias-action {
+	float: right;
+	padding-top: 4px;
+	padding-left: 5px;
+}
+
+.aliases-remove-new-alias-action {
+	float: right;
+	padding-top: 8px;
+	padding-left: 5px;
+}
+.aliases-add-index-input {
+	font-size: 11px;
+	border: 0px;
+	border-top: 0px solid #333;
+	width: 100px;
+	line-height: 10px;
+	background: #CCCCCC;
+}
+.aliases-add-index-action {
+	font-size: 12px;
+}
+.aliases-new-index {
+	float: right;
+	background: #CCCCCC;
+	border: 1px solid #333;
+	border-radius: 5px 5px 5px 5px;
+	font-size: 12px;
+	margin-right: 10px;
+	padding-right: 3px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+.aliases-section {
+	padding-top: 10px;
+}
+.aliases-alias {
+	font-weight: 300;
+	font-size: 12px;
+}
+.alias-remove-index {
+	float: right;
+}
