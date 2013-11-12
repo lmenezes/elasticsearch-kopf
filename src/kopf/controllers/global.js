@@ -1,7 +1,16 @@
-function GlobalController($scope, $location, $timeout) {
+function GlobalController($scope, $location, $timeout, ConfirmDialogService) {
+	$scope.dialog = ConfirmDialogService;
 	$scope.version = "0.3-SNAPSHOT";
 	$scope.username = null;
 	$scope.password = null;
+	
+	$scope.test=function() {
+		$scope.dialog.test();
+	}
+	
+	$scope.setTest=function() {
+		$scope.dialog.setValue("works");
+	}
 	
 	$scope.setConnected=function(status) {
 		$scope.is_connected = status;
@@ -91,7 +100,7 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = jsonTree.create(info);
-		$('#modal_info').modal({show:true,backdrop:false});
+		$('#modal_info').modal({show:true,backdrop:true});
 	}
 	
 	$scope.setAlert=function(alert) {

@@ -2,7 +2,6 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-
 		<meta name="description" content="">
 		<meta name="author" content="">
 		<title>kopf</title>
@@ -11,10 +10,8 @@
 		<link href="dist/kopf.css" rel="stylesheet">
 		<script src="dist/lib.js" type="text/javascript" charset="utf-8"></script>
 		<script src="dist/kopf.js" type="text/javascript" charset="utf-8"></script>
-		
   	</head>
 	<body ng-app="kopf" ng-controller="GlobalController">
-		<div ng-include src="'partials/modal_info.html'"></div>
 		<div id="page-wrap">
 			<div ng-include src="'partials/nav_bar.html'"></div>
 			<div class="container app-container">
@@ -29,6 +26,11 @@
 					<div class="tab-pane" id="percolator" ng-include src="'partials/percolator.html'"></div>
 				</div>
 			</div>
+			<!-- modals used through the app -->
+			<div ng-include src="'./modals/modal_info.html'"></div>
+			<div ng-include src="'./modals/confirm_dialog.html'"></div>
+			<div ng-include src="'./modals/cluster_health.html'"></div>
+			<div ng-include src="'./modals/create_index.html'"></div>
 		</div>
 	</body>
 </html>

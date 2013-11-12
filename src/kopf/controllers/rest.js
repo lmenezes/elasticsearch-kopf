@@ -8,11 +8,13 @@ function RestController($scope, $location, $timeout) {
 	$scope.validation_error = null;
 	$scope.history = [];
 	$scope.history_request = null;
-	
+		
 	$scope.updateEditor=function() {
 		$scope.editor.setValue($scope.request.body,1);
 		$scope.editor.gotoLine(0,0,false);
 	}
+	
+	$scope.updateEditor();
 	
 	$scope.formatBody=function() {
 		var query = $scope.editor.getValue();

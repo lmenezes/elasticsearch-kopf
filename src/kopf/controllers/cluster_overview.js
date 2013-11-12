@@ -1,6 +1,7 @@
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService) {
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.cluster_service = ClusterSettingsService;
+	$scope.dialog_service = ConfirmDialogService;
 	$scope.pagination= new Pagination(1,"", []);
 	$scope.cluster = null;
 	
@@ -83,63 +84,98 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		$scope.broadcastMessage('loadClusterHealth',{});
 	}
 	
-	$scope.shutdownNode=function(node_id) {
-		var response = $scope.client.shutdownNode(node_id,
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while shutting down node",error));
+	$scope.shutdown_node=function(node_id, node_name) {
+		$scope.dialog_service.open(
+			"are you sure you want to shutdown node " + node_name + "?",
+			"Shutting down a node will make all data stored in this node inaccessible, unless this data is replicated across other nodes." +
+			"Replicated shards will be promoted to primary if the primary shard is no longer reachable.",
+			"Shutdown",
+			function() {
+				alert("open");
+				var response = $scope.client.shutdownNode(node_id,
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while shutting down node",error));
+					}
+				);
 			}
 		);
 	}
 
 	$scope.optimizeIndex=function(index){
-		var response = $scope.client.optimizeIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully optimized", response));
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while optimizing index", error));
-			}				
+		$scope.dialog_service.open(
+			"are you sure you want to optimize index " + index + "?",
+			"Optimizing an index is a resource intensive operation and should be done with caution."+
+			"Usually, you will only want to optimize an index when it will no longer receive updates",
+			"Optimize",
+			function() {
+				$scope.client.optimizeIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully optimized", response));
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while optimizing index", error));
+					}				
+				);
+			}
 		);
 	}
 	
 	$scope.deleteIndex=function(index) {
-		var response = $scope.client.deleteIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully deleted", response));
-				$scope.closeModal(true);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while deleting index", error));
-				$scope.closeModal(true);
-			}	
+		$scope.dialog_service.open(
+			"are you sure you want to delete index " + index + "?",
+			"Deleting an index cannot be undone and all data for this index will be lost",
+			"Delete",
+			function() {
+				$scope.client.deleteIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully deleted", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while deleting index", error));
+					}	
+				);
+			}
 		);
 	}
 	
 	$scope.clearCache=function(index) {
-		var response = $scope.client.clearCache(index,
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index cache was successfully cleared", response));
-				$scope.closeModal(false);		
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while clearing index cache", error));
-				$scope.closeModal(false);
+		$scope.dialog_service.open(
+			"are you sure you want to clear the cache for index " + index + "?",
+			"This will clear all caches for this index.",
+			"Clear",
+			function() {
+				$scope.client.clearCache(index,
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index cache was successfully cleared", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while clearing index cache", error));
+					}
+				);
 			}
 		);
 	}
 
-	$scope.refreshIndex=function(index){
-		var response = $scope.client.refreshIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully refreshed", response));
-				$scope.closeModal(false);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while refreshing index", error));	
-				$scope.closeModal(false);
+	$scope.refreshIndex=function(index) {
+		$scope.dialog_service.open(
+			"are you sure you want to refresh index " + index + "?",
+			"Refreshing an index makes all operations performed since the last refresh available for search.",
+			"Refresh",
+			function() {
+				$scope.client.refreshIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully refreshed", response));
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while refreshing index", error));	
+					}
+				);
 			}
 		);
 	}
@@ -171,27 +207,42 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	}
 	
 	$scope.closeIndex=function(index) {
-		var response = $scope.client.closeIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully closed", response));
-				$scope.closeModal(true);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while closing index", error));	
-				$scope.closeModal(true);
+		$scope.dialog_service.open(
+			"are you sure you want to close index " + index + "?",
+			"Closing an index will remove all it's allocated shards from the cluster. " +
+			"Both searches and updates will no longer be accepted for the index." +
+			"A closed index can be reopened at any time",
+			"Close index",
+			function() {
+				$scope.client.closeIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully closed", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while closing index", error));	
+					}
+				);
 			}
 		);
 	}
 	
 	$scope.openIndex=function(index) {
-		var response = $scope.client.openIndex(index,
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully opened", response));
-				$scope.closeModal(true);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while opening index", error));
-				$scope.closeModal(true);
+		$scope.dialog_service.open(
+			"are you sure you want to open index " + index + "?",
+			"Opening an index will trigger the recovery process for the index. " +
+			"This process could take sometime depending on the index size.",
+			"Open index",
+			function() {
+				$scope.client.openIndex(index,
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully opened", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while opening index", error));
+					}
+				);
 			}
 		);
 	}

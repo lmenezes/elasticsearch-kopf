@@ -3,12 +3,69 @@
 	font-color: #c0c0c0;
 }
 
-/* selected pill color */
+/* selected pill color to grey */
 .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
 	background-color: #eeeeee;
 	color: #333;
 }
+
 /* smaller padding for stacked pills */
 .nav-stacked > li > a {
 	padding: 6px 15px;
 }
+
+/** ############### START - modals - START ############### **/
+.modal-close-icon {
+	float: right;
+	font-size: 20px;
+	color: #b94a48;
+	padding-top: 2px;
+	cursor: pointer;
+}
+.confirm-dialog-body {
+	background: #fff;
+	color: #666;
+	font-size: 13px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-weight: 300;
+	border: 0px;
+	line-height: 18px;
+	margin: 0px;
+	word-break: normal;
+	padding: 0px;
+}
+
+.modal-title {
+	padding: 0px;
+}
+.modal-body {
+	font-size: 12px;
+	font-weight: 400;
+	padding: 12px;
+	color: #666;
+	
+}
+.modal-footer {
+	padding: 0px 10px 10px;
+	margin-top: 0px;
+	border: 0px;
+}
+.modal-header {
+	padding: 5px 10px 5px 10px;
+}
+
+.custom-modal {
+	padding-top: 5px;
+	text-align: left;
+	word-break: break-word;
+}
+/** ############### END - modals - END ############### **/
+
+
+/**###################### HEADERS /**######################**/
+h1 { color: #555; font-variant:small-caps; font-weight: 400; }
+h2 { color: #555; font-variant:small-caps; font-weight: 400; }
+h3 { color: #555; font-variant:small-caps; font-weight: 500; }
+h4 { color: #555; font-variant:small-caps; font-weight: 500; }
+h5 { color: #555; font-variant:small-caps; font-weight: 500; }
+h6 { color: #555; font-variant:small-caps; font-weight: 500; }

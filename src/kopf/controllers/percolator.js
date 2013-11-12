@@ -1,4 +1,5 @@
-function PercolatorController($scope, $location, $timeout) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService) {
+	$scope.dialog_service = ConfirmDialogService;
 	$scope.editor = ace.edit("percolator-query-editor");
 	$scope.editor.setFontSize("10px");
 	$scope.editor.setTheme("ace/theme/kopf");
@@ -78,22 +79,28 @@ function PercolatorController($scope, $location, $timeout) {
 		return queries;
 	}
 	
-	$scope.deletePercolatorQuery=function(type, id) {
-		$scope.client.deletePercolatorQuery(type, id,
-			function(response) {
-				$scope.client.refreshIndex("_percolator", 
+	$scope.deletePercolatorQuery=function(query) {
+		$scope.dialog_service.open(
+			"are you sure you want to delete query " + query.id + " for index " + query.type + "?",
+			query.sourceAsJSON(),
+			"Delete",
+			function() {
+				$scope.client.deletePercolatorQuery(query.type, query.id,
 					function(response) {
-						// non request action, no need to display
-						$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
-						$scope.loadPercolatorQueries();
+						$scope.client.refreshIndex("_percolator", 
+							function(response) {
+								$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
+								$scope.loadPercolatorQueries();
+							},
+							function(error) {
+								$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
+							}
+						);
 					},
 					function(error) {
-						$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
+						$scope.setAlert(new ErrorAlert("Error while deleting query", error));
 					}
 				);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while deleting query", error));
 			}
 		);
 	}

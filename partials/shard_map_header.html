@@ -3,7 +3,7 @@
 	<th class="cluster-map-header-cluster-actions" rowspan="2">
 		<div class="row">
 			<div class="col-lg-3">
-				<a data-toggle="modal" href="#create_index" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false" ng-click="prepareCreateIndex()">
+				<a data-toggle="modal" href="#create_index" class="cluster-map-header-cluster-action" data-backdrop="static" ng-click="prepareCreateIndex()">
 					<i class="icon-file-alt" title="create new index"></i>
 				</a>
 			</div>
@@ -19,13 +19,10 @@
 				</a>
 			</div>
 			<div class="col-lg-3">
-				<a data-toggle="modal" href="#cluster_health" class="cluster-map-header-cluster-action" data-backdrop="static" data-keyboard="false">
+				<a data-toggle="modal" href="#cluster_health" class="cluster-map-header-cluster-action" data-backdrop="static">
 					<i class="icon-stethoscope header-action" title="cluster health information" ng-click="displayClusterHealth()"></i>
 				</a>
 			</div>
-			<div ng-include src="'./modals/cluster_health.html'"></div>
-			<div ng-include src="'./modals/create_index.html'"></div>
-			<div ng-include src="'./modals/cluster_settings.html'"></div>
 		</div>
 	</th>
 	<!-- indices -->
@@ -68,29 +65,25 @@
 		<div class="row">
 			<div class="cluster-map-header-index-actions">
 				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_state_change_{{index.name}}" class="cluster-map-header-index-action" data-backdrop="static" data-keyboard="false">
-						<i ng-show="index.state == 'close'" class="icon-folder-close" title="open index"></i>
-						<i ng-show="index.state == 'open'" class="icon-folder-open" title="close index"></i>
+					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static">
+						<i ng-show="index.state == 'close'" class="icon-folder-close" title="open index" ng-click="openIndex(index.name)"></i>
+						<i ng-show="index.state == 'open'" class="icon-folder-open" title="close index" ng-click="closeIndex(index.name)"></i>
 					</a>
-					<div ng-include src="'./modals/confirm_state_change.html'"></div>
 				</div>
 				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_optimize_{{index.name}}" class="cluster-map-header-index-action" title="optimize index" data-backdrop="static" data-keyboard="false">
-						<i class="icon-wrench"></i>
+					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="optimize index" data-backdrop="static">
+						<i class="icon-wrench" ng-click="optimizeIndex(index.name)"></i>
 					</a>
-					<div ng-include src="'./modals/confirm_optimize.html'"></div>
 				</div>
 				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_refresh_{{index.name}}" class="cluster-map-header-index-action" title="refresh index" data-backdrop="static" data-keyboard="false">
-						<i class="icon-refresh"></i>
+					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="refresh index" data-backdrop="static">
+						<i class="icon-refresh" ng-click="refreshIndex(index.name)"></i>
 					</a>
-					<div ng-include src="'./modals/confirm_refresh.html'"></div>
 				</div>
 				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_clear_cache_{{index.name}}" class="cluster-map-header-index-action" title="clear index cache" data-backdrop="static" data-keyboard="false">
-						<i class="icon-circle-blank"></i>
+					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="clear index cache" data-backdrop="static" data-keyboard="false">
+						<i class="icon-circle-blank" ng-click="clearCache(index.name)"></i>
 					</a>
-					<div ng-include src="'./modals/confirm_clear_cache.html'"></div>
 				</div>
 				<div class="col-lg-2">
 					<a href="#" ng-click="loadIndexSettings(index.name)" class="cluster-map-header-index-action">
@@ -98,10 +91,9 @@
 					</a>
 				</div>		
 				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_delete_{{index.name}}" class="cluster-map-header-index-action" title="delete index" data-backdrop="static" data-keyboard="false">
-						<i class="icon-trash"></i>
+					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="delete index" data-backdrop="static">
+						<i class="icon-trash" ng-click="deleteIndex(index.name)"></i>
 					</a>
-					<div ng-include src="'./modals/confirm_delete.html'"></div>
 				</div>	
 			</div>
 		</div>

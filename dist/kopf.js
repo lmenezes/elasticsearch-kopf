@@ -907,11 +907,39 @@ function hierachyJson(json) {
 	return JSON.stringify(resultObject,undefined,4);
 }
 var kopf = angular.module('kopf', []);
+
 kopf.factory('IndexSettingsService', function() {
 	return {index: null};
 });
+
 kopf.factory('ClusterSettingsService', function() {
 	return {cluster: null};
+});
+
+// manages behavior of confirmation dialog
+kopf.factory('ConfirmDialogService', function() {
+	this.header = "Default Header";
+	this.body = "Default Body";
+	this.cancel_text = "cancel";
+	this.confirm_text = "confirm";
+	
+	this.confirm=function() {
+		// when created, does nothing
+	}
+	
+	this.close=function() {
+		// when created, does nothing		
+	}
+	
+	this.open=function(header, body, action, confirm_callback, close_callback) {
+		this.header = header;
+		this.body = body;
+		this.action = action;
+		this.confirm = confirm_callback;
+		this.close = close_callback;
+	}
+	
+	return this;
 });
 function AliasesController($scope, $location, $timeout) {
 	$scope.aliases = null;
@@ -1172,9 +1200,10 @@ function ClusterHealthController($scope,$location,$timeout) {
 		);
 	}
 }
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService) {
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.cluster_service = ClusterSettingsService;
+	$scope.dialog_service = ConfirmDialogService;
 	$scope.pagination= new Pagination(1,"", []);
 	$scope.cluster = null;
 	
@@ -1257,63 +1286,98 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		$scope.broadcastMessage('loadClusterHealth',{});
 	}
 	
-	$scope.shutdownNode=function(node_id) {
-		var response = $scope.client.shutdownNode(node_id,
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while shutting down node",error));
+	$scope.shutdown_node=function(node_id, node_name) {
+		$scope.dialog_service.open(
+			"are you sure you want to shutdown node " + node_name + "?",
+			"Shutting down a node will make all data stored in this node inaccessible, unless this data is replicated across other nodes." +
+			"Replicated shards will be promoted to primary if the primary shard is no longer reachable.",
+			"Shutdown",
+			function() {
+				alert("open");
+				var response = $scope.client.shutdownNode(node_id,
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while shutting down node",error));
+					}
+				);
 			}
 		);
 	}
 
 	$scope.optimizeIndex=function(index){
-		var response = $scope.client.optimizeIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully optimized", response));
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while optimizing index", error));
-			}				
+		$scope.dialog_service.open(
+			"are you sure you want to optimize index " + index + "?",
+			"Optimizing an index is a resource intensive operation and should be done with caution."+
+			"Usually, you will only want to optimize an index when it will no longer receive updates",
+			"Optimize",
+			function() {
+				$scope.client.optimizeIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully optimized", response));
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while optimizing index", error));
+					}				
+				);
+			}
 		);
 	}
 	
 	$scope.deleteIndex=function(index) {
-		var response = $scope.client.deleteIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully deleted", response));
-				$scope.closeModal(true);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while deleting index", error));
-				$scope.closeModal(true);
-			}	
+		$scope.dialog_service.open(
+			"are you sure you want to delete index " + index + "?",
+			"Deleting an index cannot be undone and all data for this index will be lost",
+			"Delete",
+			function() {
+				$scope.client.deleteIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully deleted", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while deleting index", error));
+					}	
+				);
+			}
 		);
 	}
 	
 	$scope.clearCache=function(index) {
-		var response = $scope.client.clearCache(index,
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index cache was successfully cleared", response));
-				$scope.closeModal(false);		
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while clearing index cache", error));
-				$scope.closeModal(false);
+		$scope.dialog_service.open(
+			"are you sure you want to clear the cache for index " + index + "?",
+			"This will clear all caches for this index.",
+			"Clear",
+			function() {
+				$scope.client.clearCache(index,
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index cache was successfully cleared", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while clearing index cache", error));
+					}
+				);
 			}
 		);
 	}
 
-	$scope.refreshIndex=function(index){
-		var response = $scope.client.refreshIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully refreshed", response));
-				$scope.closeModal(false);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while refreshing index", error));	
-				$scope.closeModal(false);
+	$scope.refreshIndex=function(index) {
+		$scope.dialog_service.open(
+			"are you sure you want to refresh index " + index + "?",
+			"Refreshing an index makes all operations performed since the last refresh available for search.",
+			"Refresh",
+			function() {
+				$scope.client.refreshIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully refreshed", response));
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while refreshing index", error));	
+					}
+				);
 			}
 		);
 	}
@@ -1345,27 +1409,42 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	}
 	
 	$scope.closeIndex=function(index) {
-		var response = $scope.client.closeIndex(index, 
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully closed", response));
-				$scope.closeModal(true);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while closing index", error));	
-				$scope.closeModal(true);
+		$scope.dialog_service.open(
+			"are you sure you want to close index " + index + "?",
+			"Closing an index will remove all it's allocated shards from the cluster. " +
+			"Both searches and updates will no longer be accepted for the index." +
+			"A closed index can be reopened at any time",
+			"Close index",
+			function() {
+				$scope.client.closeIndex(index, 
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully closed", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while closing index", error));	
+					}
+				);
 			}
 		);
 	}
 	
 	$scope.openIndex=function(index) {
-		var response = $scope.client.openIndex(index,
-			function(response) {
-				$scope.setAlert(new SuccessAlert("Index was successfully opened", response));
-				$scope.closeModal(true);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while opening index", error));
-				$scope.closeModal(true);
+		$scope.dialog_service.open(
+			"are you sure you want to open index " + index + "?",
+			"Opening an index will trigger the recovery process for the index. " +
+			"This process could take sometime depending on the index size.",
+			"Open index",
+			function() {
+				$scope.client.openIndex(index,
+					function(response) {
+						$scope.setAlert(new SuccessAlert("Index was successfully opened", response));
+						$scope.forceRefresh();
+					},
+					function(error) {
+						$scope.setAlert(new ErrorAlert("Error while opening index", error));
+					}
+				);
 			}
 		);
 	}
@@ -1469,10 +1548,19 @@ function CreateIndexController($scope, $location, $timeout) {
 		$scope.replicas = '';
 	}
 }
-function GlobalController($scope, $location, $timeout) {
+function GlobalController($scope, $location, $timeout, ConfirmDialogService) {
+	$scope.dialog = ConfirmDialogService;
 	$scope.version = "0.3-SNAPSHOT";
 	$scope.username = null;
 	$scope.password = null;
+	
+	$scope.test=function() {
+		$scope.dialog.test();
+	}
+	
+	$scope.setTest=function() {
+		$scope.dialog.setValue("works");
+	}
 	
 	$scope.setConnected=function(status) {
 		$scope.is_connected = status;
@@ -1562,7 +1650,7 @@ function GlobalController($scope, $location, $timeout) {
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = jsonTree.create(info);
-		$('#modal_info').modal({show:true,backdrop:false});
+		$('#modal_info').modal({show:true,backdrop:true});
 	}
 	
 	$scope.setAlert=function(alert) {
@@ -1717,11 +1805,13 @@ function RestController($scope, $location, $timeout) {
 	$scope.validation_error = null;
 	$scope.history = [];
 	$scope.history_request = null;
-	
+		
 	$scope.updateEditor=function() {
 		$scope.editor.setValue($scope.request.body,1);
 		$scope.editor.gotoLine(0,0,false);
 	}
+	
+	$scope.updateEditor();
 	
 	$scope.formatBody=function() {
 		var query = $scope.editor.getValue();
@@ -1786,7 +1876,8 @@ function RestController($scope, $location, $timeout) {
 		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
 	];
 }
-function PercolatorController($scope, $location, $timeout) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService) {
+	$scope.dialog_service = ConfirmDialogService;
 	$scope.editor = ace.edit("percolator-query-editor");
 	$scope.editor.setFontSize("10px");
 	$scope.editor.setTheme("ace/theme/kopf");
@@ -1866,22 +1957,28 @@ function PercolatorController($scope, $location, $timeout) {
 		return queries;
 	}
 	
-	$scope.deletePercolatorQuery=function(type, id) {
-		$scope.client.deletePercolatorQuery(type, id,
-			function(response) {
-				$scope.client.refreshIndex("_percolator", 
+	$scope.deletePercolatorQuery=function(query) {
+		$scope.dialog_service.open(
+			"are you sure you want to delete query " + query.id + " for index " + query.type + "?",
+			query.sourceAsJSON(),
+			"Delete",
+			function() {
+				$scope.client.deletePercolatorQuery(query.type, query.id,
 					function(response) {
-						// non request action, no need to display
-						$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
-						$scope.loadPercolatorQueries();
+						$scope.client.refreshIndex("_percolator", 
+							function(response) {
+								$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
+								$scope.loadPercolatorQueries();
+							},
+							function(error) {
+								$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
+							}
+						);
 					},
 					function(error) {
-						$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
+						$scope.setAlert(new ErrorAlert("Error while deleting query", error));
 					}
 				);
-			},
-			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while deleting query", error));
 			}
 		);
 	}
@@ -1959,4 +2056,17 @@ function PercolateQuery(query_info) {
 
 		}
 	}
+}
+function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogService) {
+
+	$scope.dialog_service = ConfirmDialogService;
+	
+	$scope.close=function() {
+		$scope.dialog_service.close();
+	}
+	
+	$scope.confirm=function() {
+		$scope.dialog_service.confirm();
+	}
+	
 }

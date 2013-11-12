@@ -9,6 +9,7 @@
 	border: 1px solid #ccc;
 	border-radius: 3px 3px 3px 3px;
 	text-align: left;
+	margin-top: 10px;
 }
 /** ############### END - ACE editor - END ############### **/
 
@@ -78,13 +79,7 @@
 	display: none;
 }
 /** ############### START - global - START ############### **/
-.modal-close-icon {
-	float: right;
-	font-size: 22px;
-	color: #666;
-	padding-top: 3px;
-	cursor: pointer;
-}
+
 .connection-status-console {
 	float:right;
 	text-align: right;
@@ -99,36 +94,7 @@
 .normal-action {
 	cursor: pointer;
 }
-h1 {
-	color: #666;
-	font-variant:small-caps;
-	font-weight: 400;
-}
-h2 {
-	color: #666;
-	font-variant:small-caps;
-	font-weight: 400;
-}
-h3 {
-	color: #666;
-	font-variant:small-caps;
-	font-weight: 500;
-}
-h4 {
-	color: #666;
-	font-variant:small-caps;
-	font-weight: 500;
-}
-h5 {
-	color: #666;
-	font-variant:small-caps;
-	font-weight: 500;
-}
-h6 {
-	color: #666;
-	font-variant:small-caps;
-	font-weight: 500;
-}
+
 .modal-open {
 	margin-right: 0px !important;
 }
@@ -431,33 +397,6 @@ a.cluster-map-node-action {
 }
 /** ############### END - create index - END ############### **/
 
-
-/** ############### START - modals - START ############### **/
-.modal-title {
-
-}
-.modal-body {
-	font-size: 12px;
-	font-weight: 400;
-	padding: 12px;
-	color: #666;
-	
-}
-.modal-footer {
-	padding: 0px 10px 10px;
-	margin-top: 0px;
-	border: 0px;
-}
-.modal-header {
-	padding: 7px 10px 7px 10px;
-}
-
-.custom-modal {
-	padding-top: 5px;
-	text-align: left;
-	word-break: break-word;
-}
-/** ############### END - modals - END ############### **/
 
 /** ############### START - rest client - START ############### **/
 .rest-client-body {
