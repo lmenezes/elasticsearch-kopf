@@ -1,82 +1,118 @@
 <div ng-controller="PercolatorController">
 	<h2>percolator</h2>
-	<div class="row">
-		<div class="col-lg-5">
-			<h4>create new percolator query</h4>
-			<div class="row">
-				<div class="col-lg-5">
-					<select class="form-control input-sm" ng-model="new_query.index" ng-options="i for i in indices">
-					</select>
+	<div class="content-panel">
+		<div class="panel-group" id="#percolatorAccordion">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#percolatorAccordion" href="#newPercolatorQuery">
+							create new percolator query
+						</a>
+					</h4>
 				</div>
-				<div class="col-lg-4">
-					<input ng-model="new_query.id" class="form-control input-sm" placeholder="query id">
-				</div>
-				<div class="col-lg-3">
-					<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="createNewQuery()">
-						<i class="icon-file-alt"></i> create
-					</button>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12">
-					<div id="percolator-query-editor" class="kopf-ace-editor percolator-query-editor"></div>
-				</div>
-			</div>
-		</div>
-		<div class="col-lg-7">
-			<h4>browse existing queries</h4>
-			<div class="row">
-				<div class="col-lg-4">
-					<select class="form-control input-sm" ng-model="index" ng-options="i for i in indices" ng-change="loadPercolatorQueries()">
-						<option value="">all</option>
-					</select>
-				</div>
-				<div class="col-lg-2">
-					<input ng-model="id" class="form-control input-sm" placeholder="query id">
-				</div>
-				<div class="col-lg-4">
-					<input ng-model="filter" class="form-control input-sm" placeholder='filter(e.g.: {"color":"blue"})'>
-				</div>
-				<div class="col-lg-2">
-					<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="loadPercolatorQueries()">
-						<i class="icon-filter"></i> search
-					</button>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12" style="text-align: right;">
-					<div class="cluster-map-pagination">
-						<span ng-switch on="hasPreviousPage()">
-							<i class="icon-double-angle-left" ng-click="previousPage()" ng-switch-when="true"></i>
-							<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
-						</span>
-						{{firstResult()}}-{{lastResult()}} of {{total}}
-						<span ng-switch on="hasNextPage()">
-							<i class="icon-double-angle-right" ng-click="nextPage()" ng-switch-when="true"></i>
-							<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
-						</span>
+				<div id="newPercolatorQuery" class="panel-collapse collapse">
+					<div class="panel-body">
+						<form class="form-inline">
+							<div class="row">
+								<div class="form-group col-lg-5">
+									<select class="form-control input-sm" ng-model="new_query.index" ng-options="i for i in indices">
+									</select>
+								</div>
+								<div class="form-group col-lg-6">
+									<input ng-model="new_query.id" class="form-control input-sm" placeholder="query id">
+								</div>
+								<div class="form-group col-lg-1">
+									<button type="submit" class="btn btn-primary rest-client-execute input-sm pull-right" ng-click="createNewQuery()">
+										<i class="icon-file-alt"></i> create
+									</button>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
+									<div id="percolator-query-editor" class="kopf-ace-editor percolator-query-editor"></div>
+								</div>
+							</div>
+							<div class="editor-format-block">
+								<div class="row">
+									<div class="col-lg-12">
+										<span class="validation-error">{{validation_error}}</span>
+										<button type="submit" class="btn btn-default input-sm pull-right" ng-click="formatBody()">
+											<i class="icon-align-left"></i> format body
+										</button>
+									</div>
+								</div>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-12">
-					<table class="table table-bordered table-striped">
-						<tr class="percolator-table-header">
-							<td>id</td>
-							<td>index</td>
-							<td>source</td>
-						</tr>
-						<tr ng-repeat="q in queries" class="content-row">
-							<td>{{q.id}}</td>
-							<td>{{q.type}}</td>
-							<td>{{q.source}}
-								<a data-toggle="modal" href="#confirm_dialog" 
-								class="remove-icon" data-backdrop="static" data-keyboard="false">
-									<i class="icon-remove remove-icon" ng-click="deletePercolatorQuery(q)"></i>
-								</a>
-							</td>
-						</tr>
-					</table>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#percolatorAccordion" href="#percolatorQueries">
+							registered percolator queries
+						</a>
+					</h4>
+				</div>
+				<div id="percolatorQueries" class="panel-collapse collapse in">
+					<div class="panel-body">
+						<div class="row">
+							<div class="form-group col-lg-3">
+								<select class="form-control input-sm" ng-model="index" ng-options="i for i in indices" ng-change="loadPercolatorQueries()">
+									<option value="">all</option>
+								</select>
+							</div>
+							<div class="form-group col-lg-3">
+								<input ng-model="id" class="form-control input-sm" placeholder="query id">
+							</div>
+							<div class="form-group col-lg-5">
+								<input ng-model="filter" class="form-control input-sm" placeholder='filter(e.g.: {"color":"blue"})'>
+							</div>
+							<div class="form-group col-lg-1">
+								<button type="submit" class="btn btn-primary rest-client-execute input-sm" ng-click="loadPercolatorQueries()">
+									<i class="icon-filter"></i> search
+								</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="pagination-block">
+									<span ng-switch on="hasPreviousPage()">
+										<i class="icon-double-angle-left" ng-click="previousPage()" ng-switch-when="true"></i>
+										<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+									</span>
+									{{firstResult()}}-{{lastResult()}} of {{total}}
+									<span ng-switch on="hasNextPage()">
+										<i class="icon-double-angle-right" ng-click="nextPage()" ng-switch-when="true"></i>
+										<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="table-panel">
+							<div class="row">
+								<div class="col-lg-12">
+									<table class="table table-bordered table-striped">
+										<tr class="percolator-table-header">
+											<td>id</td>
+											<td>index</td>
+											<td>source</td>
+										</tr>
+										<tr ng-repeat="q in queries" class="content-row">
+											<td>{{q.id}}</td>
+											<td>{{q.type}}</td>
+											<td>{{q.source}}
+												<a data-toggle="modal" href="#confirm_dialog" 
+												class="remove-icon" data-backdrop="static" data-keyboard="false">
+													<i class="icon-remove remove-icon" ng-click="deletePercolatorQuery(q)"></i>
+												</a>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
