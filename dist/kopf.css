@@ -2,19 +2,44 @@
 	font-size: 12px;
 	font-weight: 800;
 }
-.percolator-table-body {
-	font-size: 12px;
-	color: #666666;
-}
-.percolator-remove-icon {
-	color: red;
-	float: right;
-	line-height: 18px;
-}
 
 .percolator-query-editor {
 	height: 450px;
 }
+/** GENERIC CONTAIENR FOR MAIN AGE */
+.content-panel {
+	padding-top: 10px;
+}
+
+.table-panel {
+
+}
+
+.validation-error {
+	color: #b94a48;
+	padding-top: 5px;
+	font-size: 13px;
+	font-weight: 300;
+}
+
+.editor-format-block {
+	padding-top: 5px;
+}
+
+/* BOOTSTRAP CUSTOMIZATION */
+.btn {
+	font-size: 13px;
+}
+
+/* PAGINATION BLOCK */
+.pagination-block  {
+	padding-top: 10px;
+	float: right;
+	color: #666;
+	font-size: 13px;
+}
+
+
 .kopf-table-header {
 	font-weight: 500; 
 	font-color: #c0c0c0;
@@ -83,9 +108,9 @@
 h1 { color: #555; font-variant:small-caps; font-weight: 400; }
 h2 { color: #555; font-variant:small-caps; font-weight: 400; }
 h3 { color: #555; font-variant:small-caps; font-weight: 500; }
-h4 { color: #555; font-variant:small-caps; font-weight: 500; }
-h5 { color: #555; font-variant:small-caps; font-weight: 500; }
-h6 { color: #555; font-variant:small-caps; font-weight: 500; }
+h4 { color: #666; font-variant:small-caps; font-weight: 500; }
+h5 { color: #777; font-variant:small-caps; font-weight: 500; }
+h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
 #page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 0px 60px; }
 
@@ -116,6 +141,7 @@ a.setting-info:hover {
 
 html,body {
   height: 100%;
+  color: #555555;
 }
 
 .response-pre {
@@ -196,7 +222,7 @@ body {
 	vertical-align: top;
 	margin-left: 5px;
 }
-
+/* TOOLTIP STYLE */
 .tooltip {
   font-size: 13px;
   opacity: 1.0 !important;
@@ -204,6 +230,27 @@ body {
 .tooltip-inner {
     background: #c0c0c0;
     color: white;
+}
+
+.table-actions > a:hover {
+	text-decoration: none;	
+}
+
+.remove-icon {
+	color: #b94a48;
+	float: right;
+	line-height: 18px;
+	padding-left: 5px;
+}
+.details-icon {
+	color: #555;
+	float: right;
+	line-height: 18px;
+	padding-left: 5px;
+}
+.content-row {
+	font-size: 13px;
+	color: #555555;
 }
 .index-settings-panel {
 	padding-top: 10px;
@@ -856,4 +903,8 @@ a.header-index-action-mini:hover {
 }
 .rest-client-editor {
 	height: 524px;
+}
+.warmup-query-editor {
+	width: 100%;
+	height: 400px;
 }

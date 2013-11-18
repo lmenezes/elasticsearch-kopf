@@ -115,6 +115,25 @@ function ElasticClient(host,username,password) {
 		this.syncRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
 	}
 	
+	this.getIndexWarmers=function(index, warmer, callback_success, callback_error) {
+		var path = "/" + index + "/_warmer/" + warmer.trim();
+		this.syncRequest('GET', path ,{},callback_success, callback_error);
+	}
+	
+	this.deleteWarmupQuery=function(index, warmer, callback_success, callback_error) {
+		var path = "/" + index + "/_warmer/" + warmer;
+		this.syncRequest('DELETE', path, {},callback_success, callback_error);
+	}
+	
+	this.registerWarmupQuery=function(index, types, warmer_id, source, callback_success, callback_error) {
+		var path = "/" + index + "/";
+		if (types != null && types.trim().length > 0) {
+			path += types + "/";
+		}
+		path += "/_warmer/" + warmer_id.trim();
+		this.syncRequest('PUT', path ,source,callback_success, callback_error);
+	}
+	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
 		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
 		this.syncRequest('POST', path , body,callback_success, callback_error);

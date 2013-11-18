@@ -66,13 +66,13 @@
 							<td>index</td>
 							<td>source</td>
 						</tr>
-						<tr ng-repeat="q in queries" class="percolator-table-body">
+						<tr ng-repeat="q in queries" class="content-row">
 							<td>{{q.id}}</td>
 							<td>{{q.type}}</td>
 							<td>{{q.source}}
 								<a data-toggle="modal" href="#confirm_dialog" 
-								class="percolator-remove-icon" data-backdrop="static" data-keyboard="false">
-									<i class="icon-remove percolator-remove-icon" ng-click="deletePercolatorQuery(q)"></i>
+								class="remove-icon" data-backdrop="static" data-keyboard="false">
+									<i class="icon-remove remove-icon" ng-click="deletePercolatorQuery(q)"></i>
 								</a>
 							</td>
 						</tr>
