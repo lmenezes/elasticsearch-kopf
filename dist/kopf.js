@@ -964,27 +964,40 @@ function AliasesController($scope, $location, $timeout) {
 	$scope.aliases = null;
 	$scope.new_index = {};
 	$scope.pagination= new AliasesPagination(1, []);
+	
+	$scope.editor = ace.edit("alias-filter-editor");
+	$scope.editor.setFontSize("10px");
+	$scope.editor.setTheme("ace/theme/kopf");
+	$scope.editor.getSession().setMode("ace/mode/json");
+	
+	$scope.viewDetails=function(alias) {
+		$scope.details = alias;
+	}
 
 	$scope.addAlias=function() {
-		try {
-			$scope.new_alias.validate();
-			// if alias already exists, check if its already associated with index
-			if (isDefined($scope.aliases.info[$scope.new_alias.alias])) { 
-				var aliases = $scope.aliases.info[$scope.new_alias.alias];
-				$.each(aliases,function(i, alias) {
-					if (alias.index === $scope.new_alias.index) {
-						throw "Alias is already associated with this index";
-					} 
-				});
-			} else { 
-				$scope.aliases.info[$scope.new_alias.alias] = [];
+		$scope.formatBody();
+		$scope.clearAlert();
+		if ($scope.validation_error == null) {
+			try {
+				$scope.new_alias.validate();
+				// if alias already exists, check if its already associated with index
+				if (isDefined($scope.aliases.info[$scope.new_alias.alias])) { 
+					var aliases = $scope.aliases.info[$scope.new_alias.alias];
+					$.each(aliases,function(i, alias) {
+						if (alias.index === $scope.new_alias.index) {
+							throw "Alias is already associated with this index";
+						} 
+					});
+				} else { 
+					$scope.aliases.info[$scope.new_alias.alias] = [];
+				}
+				$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
+				$scope.new_alias = new Alias();
+				$scope.pagination.setResults($scope.aliases.info);
+				$scope.setAlert(null);
+			} catch (error) {
+				$scope.setAlert(new ErrorAlert(error ,null));
 			}
-			$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
-			$scope.new_alias = new Alias();
-			$scope.pagination.setResults($scope.aliases.info);
-			$scope.setAlert(null);
-		} catch (error) {
-			$scope.setAlert(new ErrorAlert(error ,null));
 		}
 	}
 	
@@ -1082,6 +1095,20 @@ function AliasesController($scope, $location, $timeout) {
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
     });
+	
+	$scope.formatBody=function() {
+		var source = $scope.editor.getValue();
+		try {
+			$scope.validation_error = null;
+			var sourceObj = JSON.parse(source);
+			var formattedSource = JSON.stringify(sourceObj,undefined,4);
+			$scope.editor.setValue(formattedSource,0);
+			$scope.editor.gotoLine(0,0,false);
+			$scope.new_alias.filter = formattedSource;
+		} catch (error) {
+			$scope.validation_error = error.toString();
+		}
+	}
 
 }
 function AnalysisController($scope, $location, $timeout) {

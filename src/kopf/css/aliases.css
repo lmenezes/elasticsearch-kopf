@@ -1,15 +1,22 @@
-.aliases-index-alias {
-	background: #FFFFFF;
-	border: 1px solid #333;
-	border-radius: 2px 2px 2px 2px;
-	font-size: 12px;
-	margin-right: 10px;
-	padding-left: 3px;
-	padding-right: 3px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	margin-top: 3px;
+.aliases-filter-display {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	color: #444;
+	background: #f0f0f0
 }
+
+.aliases-index-alias {
+	background: #F0F0F0;
+	border: 1px solid #666;
+	border-radius: 2px 2px 2px 2px;
+	margin-left: 5px;
+	padding-left: 3px;
+	padding-right: 2px;
+	line-height: 14px;
+	margin-bottom: 2px;
+	height: 16px;
+}
+
 .aliases-alias-cell {
 	width: 250px;
 	max-width: 250px;
@@ -17,7 +24,10 @@
 }
 .aliases-new-alias-input {
 	overflow: hidden;
-	display: block;
+}
+.aliases-new-alias-input > a {
+	text-decoration: none;
+	color: inherit;
 }
 
 .aliases-save-changes {
@@ -26,9 +36,7 @@
 }
 
 .aliases-remove-alias-action {
-	float: right;
-	padding-top: 4px;
-	padding-left: 5px;
+	color: #b94a48;
 }
 
 .aliases-remove-new-alias-action {
@@ -67,4 +75,12 @@
 }
 .alias-remove-index {
 	float: right;
+}
+.alias-filter-editor {
+	width: auto;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+	width: 100%;
+	height: 237px;
 }
