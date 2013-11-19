@@ -1,5 +1,10 @@
 .percolator-query-editor {
-	height: 450px;
+	height: 400px;
+	width: auto;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+	width: 100%;
 }
 /** GENERIC CONTAIENR FOR MAIN AGE */
 .content-panel {
@@ -344,7 +349,7 @@ body {
 	border-radius: 3px 3px 3px 3px;
 	text-align: left;
 	width: 100%;
-	height: 237px;
+	height: 400px;
 }
 .analysis-section {
 	padding-top: 10px;
@@ -926,6 +931,10 @@ a.header-index-action-mini:hover {
 	height: 524px;
 }
 .warmup-query-editor {
-	width: 100%;
 	height: 400px;
+	width: auto;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+	width: 100%;
 }
