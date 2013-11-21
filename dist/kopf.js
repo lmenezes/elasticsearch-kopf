@@ -1339,7 +1339,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			"Replicated shards will be promoted to primary if the primary shard is no longer reachable.",
 			"Shutdown",
 			function() {
-				alert("open");
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
 						$scope.setAlert(new SuccessAlert("Node [" + node_id + "] successfully shutdown", response));
