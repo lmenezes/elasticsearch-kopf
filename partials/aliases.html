@@ -65,6 +65,16 @@
 				<div id="aliasesList" class="panel-collapse collapse in">
 					<div class="panel-body">
 						<div class="row">
+							<form class="form-inline" role="form">
+								<div class="col-lg-6 form-group">
+									<input type="text" ng-model="pagination.alias_query" class="form-control input-sm" placeholder="filter by alias name">
+								</div>
+								<div class="col-lg-6 form-group">
+									<input type="text" ng-model="pagination.index_query" class="form-control input-sm" placeholder="filter by index name">
+								</div>
+							</form>
+						</div>
+						<div class="row">
 							<div class="col-lg-12">
 								<div class="pagination-block">
 									<span ng-switch on="pagination.hasPreviousPage()">
