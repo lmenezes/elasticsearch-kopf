@@ -44,6 +44,7 @@ module.exports = function(grunt) {
 			appjs: {
 				src: [
 					'src/kopf/elastic_client.js',
+					// CONTROLLERS
 					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
 					'src/kopf/controllers/aliases.js',
@@ -59,7 +60,10 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/percolator.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
-					'src/kopf/services/alerts.js'
+					// SERVICES
+					'src/kopf/services/alerts.js',
+					// MODELS
+					'src/kopf/models/ace_editor.js'
 				],
 				dest: 'dist/kopf.js'
 			},

@@ -966,18 +966,15 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	$scope.pagination= new AliasesPagination(1, []);
 	$scope.alert_service = AlertService;
 	
-	$scope.editor = ace.edit("alias-filter-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
+	$scope.editor = new AceEditor('alias-filter-editor');
 	
 	$scope.viewDetails=function(alias) {
 		$scope.details = alias;
 	}
 
 	$scope.addAlias=function() {
-		$scope.formatBody();
-		if ($scope.validation_error == null) {
+		$scope.new_alias.filter = $scope.editor.format();
+		if ($scope.editor.error == null) {
 			try {
 				$scope.new_alias.validate();
 				// if alias already exists, check if its already associated with index
@@ -1094,20 +1091,6 @@ function AliasesController($scope, $location, $timeout, AlertService) {
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
     });
-	
-	$scope.formatBody=function() {
-		var source = $scope.editor.getValue();
-		try {
-			$scope.validation_error = null;
-			var sourceObj = JSON.parse(source);
-			var formattedSource = JSON.stringify(sourceObj,undefined,4);
-			$scope.editor.setValue(formattedSource,0);
-			$scope.editor.gotoLine(0,0,false);
-			$scope.new_alias.filter = formattedSource;
-		} catch (error) {
-			$scope.validation_error = error.toString();
-		}
-	}
 
 }
 function AnalysisController($scope, $location, $timeout, AlertService) {
@@ -1535,15 +1518,8 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
-	$scope.editor = ace.edit("index-settings-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
-	
-	$scope.updateEditor=function() {
-		$scope.editor.setValue($scope.settings,1);
-		$scope.editor.gotoLine(0,0,false);
-	}
+
+	$scope.editor = new AceEditor('index-settings-editor');
 	
     $scope.$on('prepareCreateIndex', function() {
 		$scope.prepareCreateIndex();
@@ -1554,10 +1530,10 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			$scope.modal.alert = new ErrorAlert("You must specify a valid index name", null);	
 		} else {
 			var settings = {};
-			var editor_content = $scope.editor.getValue();
-			if (editor_content.trim().length > 0) {
+			var content = $scope.editor.getValue();
+			if (content.trim().length > 0) {
 				try {
-					settings = JSON.parse(editor_content);
+					settings = JSON.parse(content);
 				} catch (error) {
 					throw "Invalid JSON: " + error;
 				}
@@ -1834,38 +1810,14 @@ function NavbarController($scope, $location, $timeout, AlertService) {
 
 function RestController($scope, $location, $timeout, AlertService) {
 	$scope.alert_service = AlertService;
-	$scope.editor = ace.edit("rest-client-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
 	
 	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
 	$scope.history = [];
 	$scope.history_request = null;
 		
-	$scope.updateEditor=function() {
-		$scope.editor.setValue($scope.request.body,1);
-		$scope.editor.gotoLine(0,0,false);
-	}
-	
-	$scope.updateEditor();
-	
-	$scope.formatBody=function() {
-		var query = $scope.editor.getValue();
-		try {
-			if (notEmpty(query)) {
-				$scope.validation_error = null;
-				var bodyObject = JSON.parse(query);
-				var formattedBody = JSON.stringify(bodyObject,undefined,4);
-				$scope.editor.setValue(formattedBody,0);
-				$scope.editor.gotoLine(0,0,false);
-				$scope.request.body = formattedBody;
-			}
-		} catch (error) {
-			$scope.validation_error = error.toString();
-		}
-	}
+	$scope.editor = new AceEditor('rest-client-editor');
+	$scope.editor.setValue($scope.request.body);
 	
 	$scope.loadHistoryRequest=function() {
 		$scope.request.url = $scope.history_request.url;
@@ -1876,9 +1828,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 	}
 	
 	$scope.sendRequest=function() {
-		$scope.formatBody();
+		$scope.request.body = $scope.editor.format();
 		$('#rest-client-response').html('');
-		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
+		if ($scope.editor.error == null && notEmpty($scope.request.url)) {
 			try {
 				// TODO: deal with basic auth here
 				if ($scope.request.method == 'GET' && $scope.request.body.length > 1) {
@@ -1892,10 +1844,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 					},
 					function(error) {
 						try {
-							var content = jsonTree.create(JSON.parse(error));
-							$('#rest-client-response').html(content);
+							$('#rest-client-response').html(jsonTree.create(JSON.parse(error)));
 						} catch (invalid_json) {
-							$scope.alert_service.error("Request did not return a valid JSON", error);
+							$scope.alert_service.error("Request did not return a valid JSON", invalid_json);
 						}
 					}
 				);
@@ -1916,10 +1867,8 @@ function RestController($scope, $location, $timeout, AlertService) {
 function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.editor = ace.edit("percolator-query-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
+	
+	$scope.editor = new AceEditor('percolator-query-editor');
 		
 	$scope.total = 0;
 	$scope.queries = [];
@@ -1961,22 +1910,6 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	
 	$scope.lastResult=function() {
 		return $scope.hasNextPage() ? $scope.page * 10 : $scope.total;
-	}
-	
-	$scope.formatBody=function() {
-		var source = $scope.editor.getValue();
-		try {
-			if (notEmpty(source)) {
-				$scope.validation_error = null;
-				var sourceObj = JSON.parse(source);
-				var formattedSource = JSON.stringify(sourceObj,undefined,4);
-				$scope.editor.setValue(formattedSource,0);
-				$scope.editor.gotoLine(0,0,false);
-				$scope.new_query.source = formattedSource;
-			}
-		} catch (error) {
-			$scope.validation_error = error.toString();
-		}
 	}
 	
 	$scope.parseSearchParams=function() {
@@ -2022,8 +1955,8 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	}
 	
 	$scope.createNewQuery=function() {
-		$scope.formatBody();
-		if ($scope.validation_error == null) {
+		$scope.new_query.source = $scope.editor.format();
+		if ($scope.editor.error == null) {
 			$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
@@ -2278,3 +2211,39 @@ kopf.factory('AlertService', function() {
 	
 	return this;
 });
+function AceEditor(target) {
+	// ace editor
+	this.editor = ace.edit(target);
+	this.editor.setFontSize("10px");
+	this.editor.setTheme("ace/theme/kopf");
+	this.editor.getSession().setMode("ace/mode/json");
+	
+	// validation error
+	this.error = null;
+	
+	// sets value and moves cursor to beggining
+	this.setValue=function(value) {
+		this.editor.setValue(value,1);
+		this.editor.gotoLine(0,0,false);
+	}
+	
+	this.getValue=function() {
+		return this.editor.getValue();
+	}
+	
+	// formats the json content
+	this.format=function() {
+		var content = this.editor.getValue();
+		try {
+			if (typeof content != 'undefined' && content != null && content.trim().length > 0) {
+				this.error = null;
+				content = JSON.stringify(JSON.parse(content),undefined,4);
+				this.editor.setValue(content,0);
+				this.editor.gotoLine(0,0,false);
+			}
+		} catch (error) {
+			this.error = error.toString();
+		}
+		return content;
+	}
+}

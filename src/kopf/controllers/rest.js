@@ -1,37 +1,13 @@
 function RestController($scope, $location, $timeout, AlertService) {
 	$scope.alert_service = AlertService;
-	$scope.editor = ace.edit("rest-client-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
 	
 	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
 	$scope.history = [];
 	$scope.history_request = null;
 		
-	$scope.updateEditor=function() {
-		$scope.editor.setValue($scope.request.body,1);
-		$scope.editor.gotoLine(0,0,false);
-	}
-	
-	$scope.updateEditor();
-	
-	$scope.formatBody=function() {
-		var query = $scope.editor.getValue();
-		try {
-			if (notEmpty(query)) {
-				$scope.validation_error = null;
-				var bodyObject = JSON.parse(query);
-				var formattedBody = JSON.stringify(bodyObject,undefined,4);
-				$scope.editor.setValue(formattedBody,0);
-				$scope.editor.gotoLine(0,0,false);
-				$scope.request.body = formattedBody;
-			}
-		} catch (error) {
-			$scope.validation_error = error.toString();
-		}
-	}
+	$scope.editor = new AceEditor('rest-client-editor');
+	$scope.editor.setValue($scope.request.body);
 	
 	$scope.loadHistoryRequest=function() {
 		$scope.request.url = $scope.history_request.url;
@@ -42,9 +18,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 	}
 	
 	$scope.sendRequest=function() {
-		$scope.formatBody();
+		$scope.request.body = $scope.editor.format();
 		$('#rest-client-response').html('');
-		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
+		if ($scope.editor.error == null && notEmpty($scope.request.url)) {
 			try {
 				// TODO: deal with basic auth here
 				if ($scope.request.method == 'GET' && $scope.request.body.length > 1) {
@@ -58,10 +34,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 					},
 					function(error) {
 						try {
-							var content = jsonTree.create(JSON.parse(error));
-							$('#rest-client-response').html(content);
+							$('#rest-client-response').html(jsonTree.create(JSON.parse(error)));
 						} catch (invalid_json) {
-							$scope.alert_service.error("Request did not return a valid JSON", error);
+							$scope.alert_service.error("Request did not return a valid JSON", invalid_json);
 						}
 					}
 				);

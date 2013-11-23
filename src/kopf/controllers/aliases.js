@@ -4,18 +4,15 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	$scope.pagination= new AliasesPagination(1, []);
 	$scope.alert_service = AlertService;
 	
-	$scope.editor = ace.edit("alias-filter-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
+	$scope.editor = new AceEditor('alias-filter-editor');
 	
 	$scope.viewDetails=function(alias) {
 		$scope.details = alias;
 	}
 
 	$scope.addAlias=function() {
-		$scope.formatBody();
-		if ($scope.validation_error == null) {
+		$scope.new_alias.filter = $scope.editor.format();
+		if ($scope.editor.error == null) {
 			try {
 				$scope.new_alias.validate();
 				// if alias already exists, check if its already associated with index
@@ -132,19 +129,5 @@ function AliasesController($scope, $location, $timeout, AlertService) {
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
     });
-	
-	$scope.formatBody=function() {
-		var source = $scope.editor.getValue();
-		try {
-			$scope.validation_error = null;
-			var sourceObj = JSON.parse(source);
-			var formattedSource = JSON.stringify(sourceObj,undefined,4);
-			$scope.editor.setValue(formattedSource,0);
-			$scope.editor.gotoLine(0,0,false);
-			$scope.new_alias.filter = formattedSource;
-		} catch (error) {
-			$scope.validation_error = error.toString();
-		}
-	}
 
 }

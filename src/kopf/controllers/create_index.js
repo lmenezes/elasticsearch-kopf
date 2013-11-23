@@ -4,15 +4,8 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
-	$scope.editor = ace.edit("index-settings-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
-	
-	$scope.updateEditor=function() {
-		$scope.editor.setValue($scope.settings,1);
-		$scope.editor.gotoLine(0,0,false);
-	}
+
+	$scope.editor = new AceEditor('index-settings-editor');
 	
     $scope.$on('prepareCreateIndex', function() {
 		$scope.prepareCreateIndex();
@@ -23,10 +16,10 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			$scope.modal.alert = new ErrorAlert("You must specify a valid index name", null);	
 		} else {
 			var settings = {};
-			var editor_content = $scope.editor.getValue();
-			if (editor_content.trim().length > 0) {
+			var content = $scope.editor.getValue();
+			if (content.trim().length > 0) {
 				try {
-					settings = JSON.parse(editor_content);
+					settings = JSON.parse(content);
 				} catch (error) {
 					throw "Invalid JSON: " + error;
 				}

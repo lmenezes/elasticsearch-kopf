@@ -1,10 +1,8 @@
 function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.editor = ace.edit("percolator-query-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
+	
+	$scope.editor = new AceEditor('percolator-query-editor');
 		
 	$scope.total = 0;
 	$scope.queries = [];
@@ -46,22 +44,6 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	
 	$scope.lastResult=function() {
 		return $scope.hasNextPage() ? $scope.page * 10 : $scope.total;
-	}
-	
-	$scope.formatBody=function() {
-		var source = $scope.editor.getValue();
-		try {
-			if (notEmpty(source)) {
-				$scope.validation_error = null;
-				var sourceObj = JSON.parse(source);
-				var formattedSource = JSON.stringify(sourceObj,undefined,4);
-				$scope.editor.setValue(formattedSource,0);
-				$scope.editor.gotoLine(0,0,false);
-				$scope.new_query.source = formattedSource;
-			}
-		} catch (error) {
-			$scope.validation_error = error.toString();
-		}
 	}
 	
 	$scope.parseSearchParams=function() {
@@ -107,8 +89,8 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	}
 	
 	$scope.createNewQuery=function() {
-		$scope.formatBody();
-		if ($scope.validation_error == null) {
+		$scope.new_query.source = $scope.editor.format();
+		if ($scope.editor.error == null) {
 			$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
