@@ -1,4 +1,5 @@
-function CreateIndexController($scope, $location, $timeout) {
+function CreateIndexController($scope, $location, $timeout, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';

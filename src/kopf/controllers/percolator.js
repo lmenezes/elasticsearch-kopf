@@ -1,4 +1,5 @@
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
 	$scope.editor = ace.edit("percolator-query-editor");
 	$scope.editor.setFontSize("10px");
@@ -89,16 +90,16 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService)
 					function(response) {
 						$scope.client.refreshIndex("_percolator", 
 							function(response) {
-								$scope.setAlert(new SuccessAlert("Query successfully deleted", response));
+								$scope.alert_service.success("Query successfully deleted", response);
 								$scope.loadPercolatorQueries();
 							},
 							function(error) {
-								$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
+								$scope.alert_service.success("Error while reloading queries", error);
 							}
 						);
 					},
 					function(error) {
-						$scope.setAlert(new ErrorAlert("Error while deleting query", error));
+						$scope.alert_service.error("Error while deleting query", error);
 					}
 				);
 			}
@@ -107,23 +108,22 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService)
 	
 	$scope.createNewQuery=function() {
 		$scope.formatBody();
-		$scope.clearAlert();
 		if ($scope.validation_error == null) {
 			$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
 						function(response) {
 							// non request action, no need to display
-							$scope.setAlert(new SuccessAlert("Percolator Query successfully created", response));
+							$scope.alert_service.success("Percolator Query successfully created", response);
 							$scope.loadPercolatorQueries();
 						},
 						function(error) {
-							$scope.setAlert(new SuccessAlert("Error while reloading queries", error));
+							$scope.alert_service.success("Error while reloading queries", error);
 						}
 					);
 				},
 				function(error) {
-					$scope.setAlert(new ErrorAlert("Error while creating percolator query", error));
+					$scope.alert_service.error("Error while creating percolator query", error);
 				}
 			);
 		}
@@ -144,12 +144,12 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService)
 				},
 				function(error) {
 					if (!(error['responseJSON'] != null && error['responseJSON']['error'] == "IndexMissingException[[_percolator] missing]")) {
-						$scope.setAlert(new ErrorAlert("Error while reading loading percolate queries", error));	
+						$scope.alert_service.error("Error while reading loading percolate queries", error);
 					}
 				}
 			);
 		} catch (error) {
-			$scope.setAlert(new ErrorAlert("Filter is not a valid JSON"));
+			$scope.alert_service.error("Filter is not a valid JSON");
 			return;
 		}
 	}
@@ -160,7 +160,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService)
 				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
 			},
 			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while reading loading cluster state", error));
+				$scope.alert_service.error("Error while reading loading cluster state", error);
 			}
 		);
 	}

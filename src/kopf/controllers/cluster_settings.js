@@ -1,4 +1,5 @@
-function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsService) {
+function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsService, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.cluster_service = ClusterSettingsService;
 
 	$scope.back=function() {
@@ -10,11 +11,11 @@ function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsS
 			new_settings['transient'] = $scope.cluster_service.cluster.settings;
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
-					$scope.setAlert(new SuccessAlert("Cluster settings were successfully updated",response));
+					$scope.alert_service.success("Cluster settings were successfully updated",response);
 					$scope.broadcastMessage('forceRefresh', {});
 				}, 
 				function(error) {
-					$scope.setAlert(new ErrorAlert("Error while updating cluster settings",error));
+					$scope.alert_service.error("Error while updating cluster settings",error);
 				}
 		);
 	}

@@ -1,4 +1,5 @@
-function RestController($scope, $location, $timeout) {
+function RestController($scope, $location, $timeout, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.editor = ace.edit("rest-client-editor");
 	$scope.editor.setFontSize("10px");
 	$scope.editor.setTheme("ace/theme/kopf");
@@ -42,13 +43,12 @@ function RestController($scope, $location, $timeout) {
 	
 	$scope.sendRequest=function() {
 		$scope.formatBody();
-		$scope.clearAlert();
 		$('#rest-client-response').html('');
 		if ($scope.validation_error == null && notEmpty($scope.request.url)) {
 			try {
 				// TODO: deal with basic auth here
 				if ($scope.request.method == 'GET' && $scope.request.body.length > 1) {
-					$scope.setAlert(new InfoAlert("You are executing a GET request with body content. Maybe you meant to use POST or PUT?"));
+					$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 				}
 				$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
 					function(response) {
@@ -61,12 +61,12 @@ function RestController($scope, $location, $timeout) {
 							var content = jsonTree.create(JSON.parse(error));
 							$('#rest-client-response').html(content);
 						} catch (invalid_json) {
-							$scope.setAlert(new ErrorAlert("Request did not return a valid JSON", error));
+							$scope.alert_service.error("Request did not return a valid JSON", error);
 						}
 					}
 				);
 			} catch (error) {
-				$scope.setAlert(new ErrorAlert("Error while executing request", error));
+				$scope.alert_service.error("Error while executing request", error);
 			}
 		}
 	}

@@ -162,12 +162,11 @@ function ElasticClient(host,username,password) {
 	
 	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {
 		var auth = this.createAuthToken(username,password);
-		var dataType = method == 'GET' ? 'jsonp' : 'json';
 		$.when(
 			$.ajax({
 				type: method,
 				url: url,
-				dataType: dataType,
+				dataType: 'json',
 				beforeSend: function(xhr) { 
 					if (auth != null) {
 						xhr.setRequestHeader("Authorization", auth);
@@ -193,7 +192,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET',
 				url: url,
-				dataType: 'jsonp',
+				dataType: 'json',
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -217,7 +216,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/state", 
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -228,7 +227,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/nodes/stats?all=true", 
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				data: {}, 
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -239,7 +238,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_status", 
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				data: {}, 
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -250,7 +249,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/settings", 
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				data: {}, 
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -275,7 +274,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/state", 
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {
@@ -286,7 +285,7 @@ function ElasticClient(host,username,password) {
 			$.ajax({ 
 				type: 'GET', 
 				url: host+"/_cluster/nodes/stats?all=true", 
-				dataType: 'jsonp', 
+				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
 					if (auth != null) {

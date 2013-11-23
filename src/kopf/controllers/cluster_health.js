@@ -1,4 +1,5 @@
-function ClusterHealthController($scope,$location,$timeout) {
+function ClusterHealthController($scope,$location,$timeout, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.shared_url = '';
 	$scope.cluster_health = {};
 	$scope.state = '';

@@ -1,5 +1,6 @@
-function AnalysisController($scope, $location, $timeout) {
+function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.indices = null;
+	$scope.alert_service = AlertService;
 
 	// by index
 	$scope.field_index = '';
@@ -20,11 +21,10 @@ function AnalysisController($scope, $location, $timeout) {
 			$scope.client.analyzeByField($scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text, 
 				function(response) {
 					$scope.field_tokens = response;
-					$scope.clearAlert();
 				},
 				function(error) {
 					$scope.field_tokens = null;
-					$scope.setAlert(new ErrorAlert("Error while analyzing text", error));
+					$scope.alert_service.error("Error while analyzing text", error);
 				}
 			);
 		}
@@ -36,11 +36,10 @@ function AnalysisController($scope, $location, $timeout) {
 			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
 					$scope.field_tokens = response;
-					$scope.clearAlert();
 				},
 				function(error) {
 					$scope.field_tokens = null;
-					$scope.setAlert(new ErrorAlert("Error while analyzing text", error));
+					$scope.alert_service.error("Error while analyzing text", error);
 				}
 			);
 		}
@@ -80,7 +79,7 @@ function AnalysisController($scope, $location, $timeout) {
 				$scope.indices = $scope.cluster_state.getIndices();
 			},
 			function(error) {
-				$scope.setAlert(new ErrorAlert("Error while reading analyzers information from cluster", error));
+				$scope.alert_service.error("Error while reading analyzers information from cluster", error);
 			}
 		);
 	}

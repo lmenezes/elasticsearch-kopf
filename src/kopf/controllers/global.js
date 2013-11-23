@@ -1,8 +1,9 @@
-function GlobalController($scope, $location, $timeout, ConfirmDialogService) {
+function GlobalController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "0.3-SNAPSHOT";
 	$scope.username = null;
 	$scope.password = null;
+	$scope.alerts_service = AlertService;
 	
 	$scope.test=function() {
 		$scope.dialog.test();
@@ -82,10 +83,6 @@ function GlobalController($scope, $location, $timeout, ConfirmDialogService) {
 	$scope.getRefresh=function() {
 		return $scope.refresh;
 	}
-
-	$scope.clearAlert=function() {
-		$scope.alert = null;
-	}
 	
 	$scope.readablizeBytes=function(bytes) {
 		if (bytes > 0) {
@@ -101,10 +98,6 @@ function GlobalController($scope, $location, $timeout, ConfirmDialogService) {
 		$scope.modal.title = title;
 		$scope.modal.info = jsonTree.create(info);
 		$('#modal_info').modal({show:true,backdrop:true});
-	}
-	
-	$scope.setAlert=function(alert) {
-		$scope.alert = alert;
 	}
 	
 	$scope.isInModal=function() {

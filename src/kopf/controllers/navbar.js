@@ -1,5 +1,5 @@
-function NavbarController($scope, $location, $timeout) {
-	
+function NavbarController($scope, $location, $timeout, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.new_refresh = $scope.getRefresh();
 	$scope.cluster_health = null;
 	
@@ -8,16 +8,13 @@ function NavbarController($scope, $location, $timeout) {
 		$scope.updateClusterHealth=function() {
 			$scope.client.getClusterHealth( 
 				function(cluster) {
-					if ($scope.cluster_health == null) {
-						$scope.clearAlert();
-					}
 					$scope.cluster_health = cluster;
 					$scope.setConnected(true);
 				},
-				function(error_response) {
+				function(error) {
 					$scope.cluster_health = null;
 					$scope.setConnected(false);
-					$scope.alert = new ErrorAlert("Error connecting to [" + $scope.host + "]",error_response);
+					$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
 				}
 			);
 		}
@@ -43,7 +40,7 @@ function NavbarController($scope, $location, $timeout) {
 	}
 
 	$scope.selectTab=function(event) {
-		$scope.clearAlert();
+		$scope.alert_service.clear();
 		if (isDefined(event)) {
 			$scope.broadcastMessage(event, {});
 		}

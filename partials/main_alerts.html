@@ -1,15 +1,15 @@
-<div ng-show="alert.level != null" class="alert-block" id="alert_box">
-	<div class="alert" ng-class="alert.class">
-		<span class="pull-right normal-action" ng-click='alert.clear()'>
+<div class="alert-block" id="{{a.id}}" ng-repeat="a in alerts_service.alerts">
+	<div class="alert" ng-class="a.class">
+		<span class="pull-right normal-action" ng-click='alerts_service.remove(a.id)'>
 			<i class="icon-remove-sign"></i>
 		</span>
-		<i ng-class="alert.icon" class="big-icon">&nbsp;</i>
-		<a ng-class="alert.class" data-toggle="collapse" data-parent="#alert_box" href="#alert_details" ng-show="alert.hasServerResponse()">
-			{{alert.message}}
+		<i ng-class="a.icon" class="big-icon">&nbsp;</i>
+		<a ng-class="a.class" data-toggle="collapse" data-parent="#alert_box_{{a.id}}" href="#alert_details_{{a.id}}" ng-show="a.hasResponse()">
+			{{a.message}}
 		</a>
-		<span ng-show="!alert.hasServerResponse()">{{alert.message}}</span>
-		<div ng-show="alert.hasServerResponse()" id="alert_details" class="panel-collapse collapse">
-			<pre ng-class="alert.class" class="alert response-pre">{{alert.getResponse()}}</pre>
+		<span ng-show="!a.hasResponse()">{{a.message}}</span>
+		<div ng-show="a.hasResponse()" id="alert_details_{{a.id}}" class="panel-collapse collapse">
+			<pre ng-class="a.class" class="alert response-pre">{{a.getResponse()}}</pre>
 		</div>
 	</div>
 </div>

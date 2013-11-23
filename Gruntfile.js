@@ -59,6 +59,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/percolator.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
+					'src/kopf/services/alerts.js'
 				],
 				dest: 'dist/kopf.js'
 			},

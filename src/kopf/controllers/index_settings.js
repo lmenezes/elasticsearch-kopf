@@ -1,4 +1,5 @@
-function IndexSettingsController($scope, $location, $timeout, IndexSettingsService) {
+function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
+	$scope.alert_service = AlertService;
 	$scope.service = IndexSettingsService;
 	
 	//index.cache.filter.max_size,index.cache.filter.expire
@@ -66,11 +67,11 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		 });
 		 $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			 function(response) {
-				 $scope.setAlert(new SuccessAlert("Index settings were successfully updated", response));
+				 $scope.alert_service.success("Index settings were successfully updated", response);
 				 $scope.broadcastMessage('forceRefresh', {});
 			 },
 			 function(error) {
-				 $scope.setAlert(new ErrorAlert("Error while updating index settings", error));
+				 $scope.alert_service.error("Error while updating index settings", error);
 			 }
 		 );
 	 }
