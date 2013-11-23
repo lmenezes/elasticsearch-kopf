@@ -5,14 +5,6 @@ function GlobalController($scope, $location, $timeout, ConfirmDialogService, Ale
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
 	
-	$scope.test=function() {
-		$scope.dialog.test();
-	}
-	
-	$scope.setTest=function() {
-		$scope.dialog.setValue("works");
-	}
-	
 	$scope.setConnected=function(status) {
 		$scope.is_connected = status;
 	}
@@ -105,7 +97,7 @@ function GlobalController($scope, $location, $timeout, ConfirmDialogService, Ale
 	}
 	
 	$scope.getCurrentTime=function() {
-		var d = new Date(); 
-		return ('0' + d.getHours()).slice(-2) + ":" + ('0' + d.getMinutes()).slice(-2) + ":" + ('0' + d.getSeconds()).slice(-2);
+		return getTimeString();
 	}
+	
 }

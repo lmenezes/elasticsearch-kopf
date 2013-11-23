@@ -5,7 +5,7 @@ var Alert=function(message, response, level, _class, icon) {
 	this.level = level;
 	this.class = _class;
 	this.icon = icon;
-	this.timestamp = current_date.getHours() + ":" + current_date.getMinutes() + ":" + current_date.getSeconds();
+	this.timestamp = getTimeString(current_date);
 	this.id = "alert_box_" + current_date.getTime();
 	
 	this.hasResponse=function() {
@@ -17,7 +17,6 @@ var Alert=function(message, response, level, _class, icon) {
 			return JSON.stringify(this.response, undefined, 2);			
 		}
 	}
-	
 }
 
 kopf.factory('AlertService', function() {

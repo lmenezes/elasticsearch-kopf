@@ -1,6 +1,12 @@
 var jsonTree = new JSONTree();
 
+function getTimeString(date) {
+	date = date == null ? new Date() : date; 
+	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
+}
+
 function Request(url, method, body) {
+	this.timestamp = getTimeString();
 	this.url = url;
 	this.method = method;
 	this.body = body;

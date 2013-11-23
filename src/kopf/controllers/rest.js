@@ -9,14 +9,14 @@ function RestController($scope, $location, $timeout, AlertService) {
 	$scope.editor = new AceEditor('rest-client-editor');
 	$scope.editor.setValue($scope.request.body);
 	
-	$scope.loadHistoryRequest=function() {
-		$scope.request.url = $scope.history_request.url;
-		$scope.request.body = $scope.history_request.body;
-		$scope.request.method = $scope.history_request.method;
-		$scope.updateEditor();
+	$scope.loadFromHistory=function(history_request) {
+		$scope.request.url = history_request.url;
+		$scope.request.body = history_request.body;
+		$scope.request.method = history_request.method;
+		$scope.editor.setValue(history_request.body);
 		$scope.history_request = null;
 	}
-	
+
 	$scope.sendRequest=function() {
 		$scope.request.body = $scope.editor.format();
 		$('#rest-client-response').html('');
@@ -30,7 +30,10 @@ function RestController($scope, $location, $timeout, AlertService) {
 					function(response) {
 						var content = jsonTree.create(response);
 						$('#rest-client-response').html(content);
-						$scope.history.push(new Request($scope.request.url,$scope.request.method,$scope.request.body));	
+						$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
+						if ($scope.history.length > 30) {
+							$scope.history.length = 30;
+						}
 					},
 					function(error) {
 						try {
@@ -45,12 +48,4 @@ function RestController($scope, $location, $timeout, AlertService) {
 			}
 		}
 	}
-	// maybe allow storing queries in ES? would need some kind of security
-	$scope.templates = [
-		{'key':"search + filter + facets + highlight + sort",'value':JSON.stringify(JSON.parse('{ "query" : { "term" : { "field" : "value" } }, "filter" : { "term" : { "field_name" : "value" } }, "facets" : { "facet_name" : { "terms" : { "field" : "field_name" } } }, "sort" : [ { "field_name" : {"order" : "asc"} } ], "highlight" : { "fields" : { "field_name" : {"fragment_size" : 150, "number_of_fragments" : 3} } }, "from" : 0, "size" : 10 }'), undefined, 4)},
-		{'key':"bool query",'value':JSON.stringify(JSON.parse('{"query" : { "bool" : { "must" : { "term" : { "field" : "value" } }, "must_not" : { "term" : { "field" : "value" } }, "should" : [ {"term" : { "field" : "value" }} ], "minimum_should_match" : 1, "boost" : 1.0 } } }'), undefined, 4)},
-		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
-		{'key':"ids query",'value':JSON.stringify(JSON.parse('{"query": { "ids" : { "type" : "document_type", "values" : ["1", "2","3"] } } }'), undefined, 4)},
-		{'key':"range query",'value':JSON.stringify(JSON.parse('{"query": { "range" : { "field_name" : { "from" : 10, "to" : 20, "include_lower" : true, "include_upper": false, "boost" : 2.0 } } } }'), undefined, 4)},
-	];
 }
