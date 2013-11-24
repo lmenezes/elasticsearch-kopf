@@ -997,15 +997,19 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 				$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
 				$scope.new_alias = new Alias();
 				$scope.pagination.setResults($scope.aliases.info);
+				$scope.alert_service.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
 			} catch (error) {
 				$scope.alert_service.error(error ,null);
 			}
+		} else {
+			$scope.alert_service.error("Invalid filter defined for alias" , $scope.editor.error);
 		}
 	}
 	
 	$scope.removeAlias=function(alias) {
 		delete $scope.aliases.info[alias];
 		$scope.pagination.setResults($scope.aliases.info);
+		$scope.alert_service.success("Alias successfully removed. Note that changes made will only be persisted after saving changes");
 	}
 	
 	$scope.removeAliasFromIndex=function(index, alias_name) {
@@ -1018,6 +1022,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		}
 		if (removeIndex != null) {
 			$scope.aliases.info[alias_name].splice(removeIndex,1);
+			$scope.alert_service.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 		}
 	}
 	
