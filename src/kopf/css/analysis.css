@@ -15,7 +15,7 @@
 
 }
 .analysis-token {
-	background: #E7EEF5;
+	background: #FFF;
 	border: 1px solid #333;
 	border-radius: 1px 1px 1px 1px;
 	margin-right: 10px;
@@ -25,14 +25,14 @@
 	float: left;
 }
 .analysis-token-token {
-	font-size:10px;
+	font-size:11px;
 	text-align: center;
 	font-weight: 500;
 }
 .analysis-token-info {
-	font-size:7px;
+	font-size:9px;
 	display: inline;
-	font-weight: 300;
+	color: #555;
 }
 .analysis-text-input {
 	overflow: hidden;
