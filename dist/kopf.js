@@ -1253,44 +1253,24 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			return ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
 		}
 		
-		$scope.updateCluster=function(is_forced_refresh) {
+		$scope.updateCluster=function() {
 			if ($scope.hasConnection()) {
-				var forced_refresh = is_forced_refresh;
-				if (!$scope.isInModal()) { // only refreshes if no modal is active
-					if ($scope.isCurrentView()) {
-						$scope.client.getClusterDetail(function(cluster) {
-							if (!$scope.isInModal()) {
-								$scope.$apply(function() { // forces view refresh
-									$scope.cluster = cluster;
-									// TODO: cluster should go in here everywhere...
-									$scope.cluster_service.cluster = cluster;
-									$scope.pagination.setResults(cluster.indices);
-								});
-								forced_refresh = false;
-							} else {
-								if (forced_refresh) {
-									$scope.forcedRefresh();
-								}
-							}
-						},
-						function(error) {
-							$scope.alert_service.error("Error while retrieving cluster information", error);
-						}
-					);
-					} else {
-						if (forced_refresh) {
-							$scope.forcedRefresh();
-						}
+				$scope.client.getClusterDetail(
+					function(cluster) {
+						$scope.$apply(function() { // forces view refresh
+							$scope.cluster = cluster;
+							$scope.cluster_service.cluster = cluster;
+							$scope.pagination.setResults(cluster.indices);
+						});
+					},
+					function(error) {
+						$scope.alert_service.error("Error while retrieving cluster information", error);
 					}
-				} else {
-					if (forced_refresh) {
-						$scope.forcedRefresh();
-					}
-				}
+				);
 			}
 		}
 		$timeout(loadClusterState, $scope.getRefresh());	
-		$scope.updateCluster(false);
+		$scope.updateCluster();
 	}());
 	
 	
@@ -1301,13 +1281,8 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	}
 	
     $scope.$on('forceRefresh', function() {
-		$scope.forcedRefresh();
+		$scope.updateCluster();
     });
-	
-	// not to mistake with forceRefresh, which invokes a global refresh
-	$scope.forcedRefresh=function() {
-		$timeout(function() { $scope.updateCluster(true) }, 100);
-	}
 	
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
@@ -1335,7 +1310,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
 						$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
-						$scope.forceRefresh();
+						$scope.updateCluster();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while shutting down node",error);
@@ -1373,7 +1348,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.deleteIndex(index, 
 					function(response) {
 						$scope.alert_service.success("Index was successfully deleted", response);
-						$scope.forceRefresh();
+						$scope.updateCluster();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while deleting index", error);
@@ -1392,7 +1367,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.clearCache(index,
 					function(response) {
 						$scope.alert_service.success("Index cache was successfully cleared", response);
-						$scope.forceRefresh();
+						$scope.updateCluster();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while clearing index cache", error);
@@ -1424,11 +1399,11 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
 				$scope.alert_service.success("Shard allocation was successfully enabled", response);
-				$scope.forceRefresh();
+				$scope.updateCluster();
 			},
 			function(error) {
 				$scope.alert_service.error("Error while enabling shard allocation", error);	
-				$scope.forceRefresh();
+				$scope.updateCluster();
 			}
 		);
 	}
@@ -1437,11 +1412,11 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
 				$scope.alert_service.success("Shard allocation was successfully disabled", response);
-				$scope.forceRefresh();
+				$scope.updateCluster();
 			},
 			function(error) {
 				$scope.alert_service.error("Error while disabling shard allocation", error);	
-				$scope.forceRefresh();
+				$scope.updateCluster();
 			}
 		);
 	}
@@ -1457,7 +1432,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.closeIndex(index, 
 					function(response) {
 						$scope.alert_service.success("Index was successfully closed", response);
-						$scope.forceRefresh();
+						$scope.updateCluster();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while closing index", error);	
@@ -1477,7 +1452,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.openIndex(index,
 					function(response) {
 						$scope.alert_service.success("Index was successfully opened", response);
-						$scope.forceRefresh();
+						$scope.updateCluster();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while opening index", error);
@@ -1515,7 +1490,7 @@ function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsS
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
 					$scope.alert_service.success("Cluster settings were successfully updated",response);
-					$scope.broadcastMessage('forceRefresh', {});
+					$scope.forceRefresh();
 				}, 
 				function(error) {
 					$scope.alert_service.error("Error while updating cluster settings",error);
@@ -1565,7 +1540,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
 					$scope.modal.alert = new SuccessAlert('Index successfully created', response);
-					$scope.broadcastMessage('forceRefresh', {});					
+					$scope.forceRefresh();					
 				}, function(error) { 
 					$scope.modal.alert = new ErrorAlert("Error while creating index", error);
 				}
@@ -1754,7 +1729,7 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		 $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			 function(response) {
 				 $scope.alert_service.success("Index settings were successfully updated", response);
-				 $scope.broadcastMessage('forceRefresh', {});
+				 $scope.forceRefresh();
 			 },
 			 function(error) {
 				 $scope.alert_service.error("Error while updating index settings", error);

@@ -40,7 +40,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
 					$scope.modal.alert = new SuccessAlert('Index successfully created', response);
-					$scope.broadcastMessage('forceRefresh', {});					
+					$scope.forceRefresh();					
 				}, function(error) { 
 					$scope.modal.alert = new ErrorAlert("Error while creating index", error);
 				}

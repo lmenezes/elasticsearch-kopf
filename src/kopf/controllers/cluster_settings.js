@@ -12,7 +12,7 @@ function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsS
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
 					$scope.alert_service.success("Cluster settings were successfully updated",response);
-					$scope.broadcastMessage('forceRefresh', {});
+					$scope.forceRefresh();
 				}, 
 				function(error) {
 					$scope.alert_service.error("Error while updating cluster settings",error);
