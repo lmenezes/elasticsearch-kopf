@@ -31,10 +31,10 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 				settings['settings']['index'] = {};
 			} 
 			var index_settings = settings['settings']['index'];
-			if (!isDefined(index_settings['number_of_shards']) && $scope.shards.length > 0) {
+			if ($scope.shards.trim().length > 0) {
 				index_settings['number_of_shards'] = $scope.shards;
 			}
-			if (!isDefined(index_settings['number_of_replicas']) && $scope.replicas.length > 0) {
+			if ($scope.replicas.trim().length > 0) {
 				index_settings['number_of_replicas'] = $scope.replicas;
 			}
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
