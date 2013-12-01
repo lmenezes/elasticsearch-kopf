@@ -1014,15 +1014,11 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	
 	$scope.removeAliasFromIndex=function(index, alias_name) {
 		var aliases = $scope.aliases.info[alias_name];
-		var removeIndex = null;
 		for (var i = 0; i < aliases.length; i++) {
-			if (alias_name === aliases[i].alias) {
-				removeIndex = i;
+			if (alias_name === aliases[i].alias && index === aliases[i].index) {
+				$scope.aliases.info[alias_name].splice(i,1);
+				$scope.alert_service.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 			}
-		}
-		if (removeIndex != null) {
-			$scope.aliases.info[alias_name].splice(removeIndex,1);
-			$scope.alert_service.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 		}
 	}
 	
