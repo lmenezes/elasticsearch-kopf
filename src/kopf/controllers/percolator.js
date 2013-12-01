@@ -1,6 +1,7 @@
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService, ClusterSettingsService) {
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
+	$scope.cluster_service = ClusterSettingsService;
 	
 	$scope.editor = new AceEditor('percolator-query-editor');
 		
@@ -91,7 +92,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	$scope.createNewQuery=function() {
 		$scope.new_query.source = $scope.editor.format();
 		if ($scope.editor.error == null) {
-			$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
+			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
 						function(response) {
@@ -119,7 +120,8 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				params['query'] = {"bool": {"must": queries}};
 			}
 			params['from'] = (($scope.page - 1) * 10);
-			$scope.client.fetchPercolateQueries($scope.index, JSON.stringify(params),
+			var index = $scope.index != null ? $scope.index.name : null;
+			$scope.client.fetchPercolateQueries(index, JSON.stringify(params),
 				function(response) {
 					$scope.total = response['hits']['total'];
 					$scope.queries = response['hits']['hits'].map(function(q) { return new PercolateQuery(q); });
@@ -137,14 +139,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.client.getClusterState(
-			function(response) {
-				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
-			},
-			function(error) {
-				$scope.alert_service.error("Error while reading loading cluster state", error);
-			}
-		);
+		$scope.indices = $scope.cluster_service.cluster.indices.filter(function(index) { return index != '_percolator' });
 	}
 }
 

@@ -1,6 +1,6 @@
 <div ng-controller="AnalysisController" ng-show="hasConnection()">
 	<h2>analysis</h2>
-	<div class="content-panel" ng-show="cluster_state != null">
+	<div class="content-panel">
 		<div class="panel-group" id="#analysisAccordion">
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -14,15 +14,15 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="field_index" ng-options="index as index for index in indices">
+								<select class="form-control input-sm" ng-model="field_index" ng-options="i as i.name for i in indices">
 								</select>
 							</div>
 							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="field_type" ng-options="type as type for type in getTypes()">
+								<select class="form-control input-sm" ng-model="field_type" ng-options="type for type in field_index.getTypes(field_index)">
 								</select>
 							</div>
 							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="field_field" ng-options="field for field in getFields()">
+								<select class="form-control input-sm" ng-model="field_field" ng-options="field for field in field_index.getFields(field_type)">
 								</select>
 							</div>
 							<div class="col-lg-3">
@@ -63,11 +63,11 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="analyzer_index" ng-options="index as index for index in indices">
+								<select class="form-control input-sm" ng-model="analyzer_index" ng-options="i as i.name for i in indices">
 								</select>
 							</div>
 							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="analyzer_analyzer" ng-options="analyzer for analyzer in getAnalyzers()">
+								<select class="form-control input-sm" ng-model="analyzer_analyzer" ng-options="analyzer for analyzer in analyzer_index.getAnalyzers()">
 								</select>
 							</div>
 							<div class="col-lg-6">

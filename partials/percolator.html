@@ -17,7 +17,7 @@
 								<form role="form">
 								  <div class="form-group">
 								    <label class="form-label">index</label>
-									<select class="form-control input-sm" ng-model="new_query.index" ng-options="i for i in indices">
+									<select class="form-control input-sm" ng-model="new_query.index" ng-options="i.name for i in indices">
 									</select>
 								  </div>
 								  <div class="form-group">
@@ -63,7 +63,7 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="form-group col-lg-3">
-								<select class="form-control input-sm" ng-model="index" ng-options="i for i in indices" ng-change="loadPercolatorQueries()">
+								<select class="form-control input-sm" ng-model="index" ng-options="i.name for i in indices" ng-change="loadPercolatorQueries()">
 									<option value="">all</option>
 								</select>
 							</div>

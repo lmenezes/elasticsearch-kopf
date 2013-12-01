@@ -28,20 +28,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.client.getClusterState(
-			function(response) {
-				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
-			},
-			function(error) {
-				$scope.alert_service.error("Error while reading indices from cluster", error);
-			}
-		);
+		$scope.indices = $scope.cluster_service.cluster.indices;
 	}
 	
 	$scope.createWarmerQuery=function() {
 		$scope.formatBody();
 		if ($scope.validation_error == null) {
-			$scope.client.registerWarmupQuery($scope.new_index, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
+			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
 					$scope.alert_service.success("Warmup query successfully registered", response);
 				},
@@ -58,7 +51,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 			source,
 			"Delete",
 			function() {
-				$scope.client.deleteWarmupQuery($scope.index, warmer_id,
+				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
 					function(response) {
 						$scope.alert_service.success("Warmup query successfully deleted", response);
 						$scope.loadIndexWarmers();
@@ -73,10 +66,10 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 	
 	$scope.loadIndexWarmers=function() {
 		if ($scope.index != null) {
-			$scope.client.getIndexWarmers($scope.index, $scope.warmer_id,
+			$scope.client.getIndexWarmers($scope.index.name, $scope.warmer_id,
 				function(response) {
-					if (response[$scope.index] != null) {
-						$scope.warmers = response[$scope.index]['warmers'];
+					if (response[$scope.index.name] != null) {
+						$scope.warmers = response[$scope.index.name]['warmers'];
 					} else {
 						$scope.warmers = {};
 					}

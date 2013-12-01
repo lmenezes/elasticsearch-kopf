@@ -135,7 +135,7 @@ function ElasticClient(host,username,password) {
 	}
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
+		var path = index != null ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
 		this.syncRequest('POST', path , body,callback_success, callback_error);
 	}
 	
@@ -558,6 +558,33 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
 	}
+	
+	this.getTypes=function() {
+		return Object.keys(this.mappings);
+	}
+	
+	this.getAnalyzers=function() {
+		var analyzers = [];
+		Object.keys(this.settings).forEach(function(setting) {
+			if (setting.indexOf('index.analysis.analyzer') == 0) {
+				var analyzer = setting.substring('index.analysis.analyzer.'.length);
+				analyzer = analyzer.substring(0,analyzer.indexOf("."));
+				if ($.inArray(analyzer, analyzers) == -1) {
+					analyzers.push(analyzer);
+				}
+			}
+		});
+		return analyzers;
+	}
+	
+	this.getFields=function(type) {
+		if (isDefined(this.mappings[type])) {
+			return Object.keys(this.mappings[type]['properties']);
+		} else {
+			return [];
+		}
+	}
+	
 }
 
 function ClusterState(cluster_state) {
@@ -1100,12 +1127,13 @@ function AliasesController($scope, $location, $timeout, AlertService) {
     });
 
 }
-function AnalysisController($scope, $location, $timeout, AlertService) {
+function AnalysisController($scope, $location, $timeout, AlertService, ClusterSettingsService) {
 	$scope.indices = null;
 	$scope.alert_service = AlertService;
+	$scope.cluster_service = ClusterSettingsService;
 
 	// by index
-	$scope.field_index = '';
+	$scope.field_index = null;
 	$scope.field_type = '';
 	$scope.field_field = '';
 	$scope.field_text = '';
@@ -1120,7 +1148,7 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.analyzeByField=function() {
 		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
 			$scope.field_tokens = null;
-			$scope.client.analyzeByField($scope.field_index,$scope.field_type,$scope.field_field,$scope.field_text, 
+			$scope.client.analyzeByField($scope.field_index.name,$scope.field_type,$scope.field_field,$scope.field_text, 
 				function(response) {
 					$scope.field_tokens = response;
 				},
@@ -1135,7 +1163,7 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
 			$scope.field_tokens = null;
-			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index,$scope.analyzer_analyzer,$scope.analyzer_text,
+			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
 					$scope.field_tokens = response;
 				},
@@ -1147,44 +1175,14 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		}
 	}
 	
-	$scope.getTypes=function() {
-		if ($scope.cluster_state != null) {
-			return $scope.cluster_state.getTypes($scope.field_index);
-		}
-	}
-	
-	$scope.getAnalyzers=function() {
-		if ($scope.cluster_state != null) {
-			return $scope.cluster_state.getAnalyzers($scope.analyzer_index);
-		}
-	}
-
-	$scope.getFields=function() {
-		if ($scope.cluster_state != null) {
-			return $scope.cluster_state.getFields($scope.field_index,$scope.field_type);
-		}
-	}	
-	
 	$scope.$on('hostChanged',function() {
-		$scope.loadAnalysisData();
+		$scope.indices = $scope.cluster_service.cluster.indices;
 	});
 	
     $scope.$on('loadAnalysisEvent', function() {
-		$scope.loadAnalysisData();
+		$scope.indices = $scope.cluster_service.cluster.indices;
     });
 	
-	$scope.loadAnalysisData=function() {
-		$scope.client.getClusterState(
-			function(response) {
-				var start = new Date().getTime();
-				$scope.cluster_state = new ClusterState(response);
-				$scope.indices = $scope.cluster_state.getIndices();
-			},
-			function(error) {
-				$scope.alert_service.error("Error while reading analyzers information from cluster", error);
-			}
-		);
-	}
 }
 function ClusterHealthController($scope,$location,$timeout, AlertService) {
 	$scope.alert_service = AlertService;
@@ -1833,9 +1831,10 @@ function RestController($scope, $location, $timeout, AlertService) {
 		}
 	}
 }
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService, ClusterSettingsService) {
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
+	$scope.cluster_service = ClusterSettingsService;
 	
 	$scope.editor = new AceEditor('percolator-query-editor');
 		
@@ -1926,7 +1925,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	$scope.createNewQuery=function() {
 		$scope.new_query.source = $scope.editor.format();
 		if ($scope.editor.error == null) {
-			$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
+			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
 						function(response) {
@@ -1954,7 +1953,8 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				params['query'] = {"bool": {"must": queries}};
 			}
 			params['from'] = (($scope.page - 1) * 10);
-			$scope.client.fetchPercolateQueries($scope.index, JSON.stringify(params),
+			var index = $scope.index != null ? $scope.index.name : null;
+			$scope.client.fetchPercolateQueries(index, JSON.stringify(params),
 				function(response) {
 					$scope.total = response['hits']['total'];
 					$scope.queries = response['hits']['hits'].map(function(q) { return new PercolateQuery(q); });
@@ -1972,14 +1972,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.client.getClusterState(
-			function(response) {
-				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
-			},
-			function(error) {
-				$scope.alert_service.error("Error while reading loading cluster state", error);
-			}
-		);
+		$scope.indices = $scope.cluster_service.cluster.indices.filter(function(index) { return index != '_percolator' });
 	}
 }
 
@@ -2039,20 +2032,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.client.getClusterState(
-			function(response) {
-				$scope.indices = new ClusterState(response).getIndices().filter(function(index) { return index != '_percolator' });
-			},
-			function(error) {
-				$scope.alert_service.error("Error while reading indices from cluster", error);
-			}
-		);
+		$scope.indices = $scope.cluster_service.cluster.indices;
 	}
 	
 	$scope.createWarmerQuery=function() {
 		$scope.formatBody();
 		if ($scope.validation_error == null) {
-			$scope.client.registerWarmupQuery($scope.new_index, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
+			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
 					$scope.alert_service.success("Warmup query successfully registered", response);
 				},
@@ -2069,7 +2055,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 			source,
 			"Delete",
 			function() {
-				$scope.client.deleteWarmupQuery($scope.index, warmer_id,
+				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
 					function(response) {
 						$scope.alert_service.success("Warmup query successfully deleted", response);
 						$scope.loadIndexWarmers();
@@ -2084,10 +2070,10 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 	
 	$scope.loadIndexWarmers=function() {
 		if ($scope.index != null) {
-			$scope.client.getIndexWarmers($scope.index, $scope.warmer_id,
+			$scope.client.getIndexWarmers($scope.index.name, $scope.warmer_id,
 				function(response) {
-					if (response[$scope.index] != null) {
-						$scope.warmers = response[$scope.index]['warmers'];
+					if (response[$scope.index.name] != null) {
+						$scope.warmers = response[$scope.index.name]['warmers'];
 					} else {
 						$scope.warmers = {};
 					}

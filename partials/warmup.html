@@ -17,7 +17,7 @@
 								<form role="form">
 								  <div class="form-group">
 								    <label class="form-label">index</label>
-									<select class="form-control input-sm" ng-model="new_index" ng-options="i for i in indices" ng-change="loadIndexWarmers()">
+									<select class="form-control input-sm" ng-model="new_index" ng-options="i.name for i in indices" ng-change="loadIndexWarmers()">
 										<option value="">select target index</option>
 									</select>
 								  </div>
@@ -64,7 +64,7 @@
 					<div class="panel-body">
 						<div class="row">
 							<div class="form-group col-lg-6">
-								<select class="form-control input-sm" ng-model="index" ng-options="i for i in indices" ng-change="loadIndexWarmers()">
+								<select class="form-control input-sm" ng-model="index" ng-options="i.name for i in indices" ng-change="loadIndexWarmers()">
 									<option value="">load warmup queries for selected index</option>
 								</select>
 							</div>

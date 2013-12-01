@@ -135,7 +135,7 @@ function ElasticClient(host,username,password) {
 	}
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
+		var path = index != null ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
 		this.syncRequest('POST', path , body,callback_success, callback_error);
 	}
 	
@@ -558,6 +558,33 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
 	}
+	
+	this.getTypes=function() {
+		return Object.keys(this.mappings);
+	}
+	
+	this.getAnalyzers=function() {
+		var analyzers = [];
+		Object.keys(this.settings).forEach(function(setting) {
+			if (setting.indexOf('index.analysis.analyzer') == 0) {
+				var analyzer = setting.substring('index.analysis.analyzer.'.length);
+				analyzer = analyzer.substring(0,analyzer.indexOf("."));
+				if ($.inArray(analyzer, analyzers) == -1) {
+					analyzers.push(analyzer);
+				}
+			}
+		});
+		return analyzers;
+	}
+	
+	this.getFields=function(type) {
+		if (isDefined(this.mappings[type])) {
+			return Object.keys(this.mappings[type]['properties']);
+		} else {
+			return [];
+		}
+	}
+	
 }
 
 function ClusterState(cluster_state) {
