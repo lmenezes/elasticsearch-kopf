@@ -1248,20 +1248,18 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		}
 		
 		$scope.updateCluster=function() {
-			if ($scope.hasConnection()) {
-				$scope.client.getClusterDetail(
-					function(cluster) {
-						$scope.$apply(function() { // forces view refresh
-							$scope.cluster = cluster;
-							$scope.cluster_service.cluster = cluster;
-							$scope.pagination.setResults(cluster.indices);
-						});
-					},
-					function(error) {
-						$scope.alert_service.error("Error while retrieving cluster information", error);
-					}
-				);
-			}
+			$scope.client.getClusterDetail(
+				function(cluster) {
+					$scope.$apply(function() { // forces view refresh
+						$scope.cluster = cluster;
+						$scope.cluster_service.cluster = cluster;
+						$scope.pagination.setResults(cluster.indices);
+					});
+				},
+				function(error) {
+					$scope.alert_service.error("Error while retrieving cluster information", error);
+				}
+			);
 		}
 		$timeout(loadClusterState, $scope.getRefresh());	
 		$scope.updateCluster();
