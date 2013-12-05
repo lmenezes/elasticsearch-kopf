@@ -491,8 +491,11 @@ function Cluster(state,status,nodes,settings) {
 		this.failed_shards = status['_shards']['failed'];
 		this.successful_shards = status['_shards']['successful'];
 		this.total_size = total_size;
-		this.getNodes=function(data, master, client) { 
-			return $.map(this.nodes,function(n) { 
+		this.getNodes=function(name, data, master, client) { 
+			return $.map(this.nodes,function(n) {
+				if (name.trim().length > 0 && n.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
+					return null;
+				} 
 				return (data && n.data || master && n.master || client && n.client) ? n : null;
 			});
 		};

@@ -33,7 +33,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	
 	$scope.getNodes=function() {
 		if ($scope.cluster != null) {
-			return $scope.cluster.getNodes($scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
+			return $scope.cluster.getNodes($scope.pagination.node_name, $scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
 		}
 	}
 	

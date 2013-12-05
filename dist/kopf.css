@@ -465,7 +465,7 @@ a.cluster-map-header-index-action:hover {
 	font-size: 12px;
 }
 .cluster-map-node-type {
-	padding-left: 15px !important;
+	padding-right: 12px;
 }
 .cluster-map-node-cell {
 	width: 220px;
@@ -499,6 +499,7 @@ a.cluster-map-header-index-action:hover {
 .cluster-map-pagination {
 	padding-top: 5px;
 	font-weight: 400;
+	height: 30px;
 }
 .cluster-map-node-action {
 	color: #333333;

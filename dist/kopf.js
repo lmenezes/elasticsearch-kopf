@@ -491,8 +491,11 @@ function Cluster(state,status,nodes,settings) {
 		this.failed_shards = status['_shards']['failed'];
 		this.successful_shards = status['_shards']['successful'];
 		this.total_size = total_size;
-		this.getNodes=function(data, master, client) { 
-			return $.map(this.nodes,function(n) { 
+		this.getNodes=function(name, data, master, client) { 
+			return $.map(this.nodes,function(n) {
+				if (name.trim().length > 0 && n.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
+					return null;
+				} 
 				return (data && n.data || master && n.master || client && n.client) ? n : null;
 			});
 		};
@@ -834,6 +837,8 @@ function Pagination(page, query, results) {
 	this.data = true;
 	this.master = true;
 	this.client = true;
+	this.state = "";
+	this.node_name = "";
 	
 	this.firstResult=function() {
 		if (this.getResults().length > 0) {
@@ -898,16 +903,17 @@ function Pagination(page, query, results) {
 	
 	this.getResults=function() {
 		var query = this.query;
+		var state = this.state;
 		return $.map(this.results,function(i) {
 			if (isDefined(query) && query.length > 0) {
-				if (i.name.indexOf(query) != -1) {
-					return i;
-				} else {
+				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
 					return null;
-				}
-			} else {
-				return i;
+				} 
 			}
+			if (state.length > 0 && state != i.state) {
+				return null;
+			} 
+			return i;
 		});
 	}
 }
@@ -1268,7 +1274,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	
 	$scope.getNodes=function() {
 		if ($scope.cluster != null) {
-			return $scope.cluster.getNodes($scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
+			return $scope.cluster.getNodes($scope.pagination.node_name, $scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
 		}
 	}
 	

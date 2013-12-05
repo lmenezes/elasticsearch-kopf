@@ -193,6 +193,8 @@ function Pagination(page, query, results) {
 	this.data = true;
 	this.master = true;
 	this.client = true;
+	this.state = "";
+	this.node_name = "";
 	
 	this.firstResult=function() {
 		if (this.getResults().length > 0) {
@@ -257,16 +259,17 @@ function Pagination(page, query, results) {
 	
 	this.getResults=function() {
 		var query = this.query;
+		var state = this.state;
 		return $.map(this.results,function(i) {
 			if (isDefined(query) && query.length > 0) {
-				if (i.name.indexOf(query) != -1) {
-					return i;
-				} else {
+				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
 					return null;
-				}
-			} else {
-				return i;
+				} 
 			}
+			if (state.length > 0 && state != i.state) {
+				return null;
+			} 
+			return i;
 		});
 	}
 }
