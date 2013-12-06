@@ -5,6 +5,51 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#analysisAccordion" href="#analyzerAnalysis">
+							analyze by analyzer
+						</a>
+					</h4>
+				</div>
+				<div id="analyzerAnalysis" class="panel-collapse collapse">
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-lg-3">
+								<select class="form-control input-sm" ng-model="analyzer_index" ng-options="i as i.name for i in indices">
+								</select>
+							</div>
+							<div class="col-lg-3">
+								<select class="form-control input-sm" ng-model="analyzer_analyzer" ng-options="analyzer for analyzer in analyzer_index.getAnalyzers()">
+								</select>
+							</div>
+							<div class="col-lg-6">
+								<button type="submit" class="btn btn-primary btn-sm" ng-click="analyzeByAnalyzer()">analyze</button>
+							</div>
+						</div>
+						<div class="row content-panel">
+							<div class="col-lg-12">
+								<input type="text" class="form-control input-sm" placeholder="text to analyze" ng-model="analyzer_text">
+							</div>
+						</div>
+						<div class="row content-panel">
+							<div class="col-lg-12">
+								<div class="analysis-tokens">
+									<div ng-repeat="token in analyzer_tokens" class="analysis-token" >
+										<div class="analysis-token-token">
+											{{token.token}}
+										</div>
+										<div class="analysis-token-info">
+											<b>start</b>: {{token.start_offset}} <b>end</b>: {{token.end_offset}} <b>pos</b>: {{token.position}}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
 						<a data-toggle="collapse" data-parent="#analysisAccordion" href="#fieldTypeAnalysis">
 							analyze by field type
 						</a>
@@ -43,51 +88,6 @@
 										</div>
 										<div class="analysis-token-info">
 											pos: {{token.position}} start: {{token.start_offset}} end: {{token.end_offset}}
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h4 class="panel-title">
-						<a data-toggle="collapse" data-parent="#analysisAccordion" href="#analyzerAnalysis">
-							analyze by analyzer
-						</a>
-					</h4>
-				</div>
-				<div id="analyzerAnalysis" class="panel-collapse collapse">
-					<div class="panel-body">
-						<div class="row">
-							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="analyzer_index" ng-options="i as i.name for i in indices">
-								</select>
-							</div>
-							<div class="col-lg-3">
-								<select class="form-control input-sm" ng-model="analyzer_analyzer" ng-options="analyzer for analyzer in analyzer_index.getAnalyzers()">
-								</select>
-							</div>
-							<div class="col-lg-6">
-								<button type="submit" class="btn btn-primary btn-sm" ng-click="analyzeByAnalyzer()">analyze</button>
-							</div>
-						</div>
-						<div class="row content-panel">
-							<div class="col-lg-12">
-								<input type="text" class="form-control input-sm" placeholder="text to analyze" ng-model="analyzer_text">
-							</div>
-						</div>
-						<div class="row content-panel">
-							<div class="col-lg-12">
-								<div class="analysis-tokens">
-									<div ng-repeat="token in analyzer_tokens" class="analysis-token" >
-										<div class="analysis-token-token">
-											{{token.token}}
-										</div>
-										<div class="analysis-token-info">
-											<b>start</b>: {{token.start_offset}} <b>end</b>: {{token.end_offset}} <b>pos</b>: {{token.position}}
 										</div>
 									</div>
 								</div>
