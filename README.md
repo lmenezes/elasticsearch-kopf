@@ -22,9 +22,14 @@ Install on a ElasticSearch instance:
     ./elasticsearch/bin/plugin -install lmenezes/elasticsearch-kopf
     open http://localhost:9200/_plugin/kopf
 
+Try it online:
+
+http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
+
 Screenshots
 ------------
 
+![cluster state](/imgs/cluster_state.png)
 ![cluster overview](/imgs/cluster_view.png)
 ![rest client](/imgs/rest_client.png)
 ![aliases management](/imgs/aliases.png)
