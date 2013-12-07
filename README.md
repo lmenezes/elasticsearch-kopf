@@ -28,8 +28,14 @@ http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
 
 Screenshots
 ------------
-
+Reactive header reflects cluster state
 ![cluster state](/imgs/cluster_state.png)
+------------
+Full cluster overview
 ![cluster overview](/imgs/cluster_view.png)
+------------
+Rest Client
 ![rest client](/imgs/rest_client.png)
+------------
+Aliases management
 ![aliases management](/imgs/aliases.png)
