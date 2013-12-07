@@ -376,8 +376,8 @@ function Alias(alias, index, filter, index_routing, search_routing) {
 		info['index'] = this.index;
 		info['alias'] = this.alias;
 	
-		if (this.filter != null && this.filter.trim().length > 0) {
-			if (typeof this.filter == 'string') {
+		if (this.filter != null) {
+			if (typeof this.filter == 'string' && this.filter.trim().length > 0) {
 				info['filter'] = JSON.parse(this.filter);
 			} else {
 				info['filter'] = this.filter;
