@@ -1,6 +1,6 @@
-function GlobalController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.3";
+	$scope.version = "0.3.1";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
@@ -88,7 +88,7 @@ function GlobalController($scope, $location, $timeout, ConfirmDialogService, Ale
 
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
-		$scope.modal.info = jsonTree.create(info);
+		$scope.modal.info = $sce.trustAsHtml(jsonTree.create(info));
 		$('#modal_info').modal({show:true,backdrop:true});
 	}
 	
