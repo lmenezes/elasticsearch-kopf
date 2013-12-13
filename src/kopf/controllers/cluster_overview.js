@@ -1,4 +1,5 @@
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService, AlertService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService, AlertService, SettingsService) {
+	$scope.settings_service = SettingsService;
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.cluster_service = ClusterSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
@@ -26,7 +27,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				}
 			);
 		}
-		$timeout(loadClusterState, $scope.getRefresh());	
+		$timeout(loadClusterState, $scope.settings_service.getRefreshInterval());	
 		$scope.updateCluster();
 	}());
 	

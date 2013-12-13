@@ -1,6 +1,6 @@
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.3.1";
+	$scope.version = "0.3.2";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
@@ -46,7 +46,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
 		}
  	}
-	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
@@ -66,14 +65,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 	$scope.getHost=function() {
 		return $scope.host;
-	}
-	
-	$scope.setRefresh=function(refresh) {
-		$scope.refresh = refresh;
-	}
-	
-	$scope.getRefresh=function() {
-		return $scope.refresh;
 	}
 	
 	$scope.readablizeBytes=function(bytes) {

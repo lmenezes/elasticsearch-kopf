@@ -1,6 +1,7 @@
-function NavbarController($scope, $location, $timeout, AlertService) {
+function NavbarController($scope, $location, $timeout, AlertService, SettingsService) {
+	$scope.settings_service = SettingsService;
 	$scope.alert_service = AlertService;
-	$scope.new_refresh = $scope.getRefresh();
+	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
 	$scope.cluster_health = null;
 	
 	(function loadClusterHealth() {
@@ -19,7 +20,7 @@ function NavbarController($scope, $location, $timeout, AlertService) {
 			);
 		}
 		
-    	$timeout(loadClusterHealth, $scope.refresh);
+    	$timeout(loadClusterHealth, $scope.settings_service.getRefreshInterval());
 		$scope.updateClusterHealth();
 	}());
 	
@@ -36,7 +37,7 @@ function NavbarController($scope, $location, $timeout, AlertService) {
 	}
 	
 	$scope.changeRefresh=function() {
-		$scope.setRefresh($scope.new_refresh);
+		$scope.settings_service.setRefreshInterval($scope.new_refresh);
 	}
 
 	$scope.selectTab=function(event) {

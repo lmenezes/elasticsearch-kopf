@@ -62,6 +62,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/warmup.js',
 					// SERVICES
 					'src/kopf/services/alerts.js',
+					'src/kopf/services/settings.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js'
 				],

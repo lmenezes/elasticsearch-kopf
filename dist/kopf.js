@@ -1239,7 +1239,8 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		);
 	}
 }
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService, AlertService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService, AlertService, SettingsService) {
+	$scope.settings_service = SettingsService;
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.cluster_service = ClusterSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
@@ -1267,7 +1268,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				}
 			);
 		}
-		$timeout(loadClusterState, $scope.getRefresh());	
+		$timeout(loadClusterState, $scope.settings_service.getRefreshInterval());	
 		$scope.updateCluster();
 	}());
 	
@@ -1556,7 +1557,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 }
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.3.1";
+	$scope.version = "0.3.2";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
@@ -1602,7 +1603,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
 		}
  	}
-	$scope.refresh = 3000;
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
@@ -1622,14 +1622,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 	$scope.getHost=function() {
 		return $scope.host;
-	}
-	
-	$scope.setRefresh=function(refresh) {
-		$scope.refresh = refresh;
-	}
-	
-	$scope.getRefresh=function() {
-		return $scope.refresh;
 	}
 	
 	$scope.readablizeBytes=function(bytes) {
@@ -1735,9 +1727,10 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		 );
 	 }
  }
-function NavbarController($scope, $location, $timeout, AlertService) {
+function NavbarController($scope, $location, $timeout, AlertService, SettingsService) {
+	$scope.settings_service = SettingsService;
 	$scope.alert_service = AlertService;
-	$scope.new_refresh = $scope.getRefresh();
+	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
 	$scope.cluster_health = null;
 	
 	(function loadClusterHealth() {
@@ -1756,7 +1749,7 @@ function NavbarController($scope, $location, $timeout, AlertService) {
 			);
 		}
 		
-    	$timeout(loadClusterHealth, $scope.refresh);
+    	$timeout(loadClusterHealth, $scope.settings_service.getRefreshInterval());
 		$scope.updateClusterHealth();
 	}());
 	
@@ -1773,7 +1766,7 @@ function NavbarController($scope, $location, $timeout, AlertService) {
 	}
 	
 	$scope.changeRefresh=function() {
-		$scope.setRefresh($scope.new_refresh);
+		$scope.settings_service.setRefreshInterval($scope.new_refresh);
 	}
 
 	$scope.selectTab=function(event) {
@@ -2165,6 +2158,25 @@ kopf.factory('AlertService', function() {
 		this.alerts.unshift(alert);
 		var service = this;
 		setTimeout(function() { service.remove(alert.id) }, 5000);
+	}
+	
+	return this;
+});
+kopf.factory('SettingsService', function() {
+	
+	this.refresh_interval = 3000;
+	
+	this.setRefreshInterval=function(interval) {
+		this.refresh_interval = interval;
+		localStorage.kopf_refresh_interval = interval;
+	}
+	
+	this.getRefreshInterval=function() {
+		if (isDefined(localStorage.kopf_refresh_interval) && localStorage.kopf_refresh_interval != null) {
+			return localStorage.kopf_refresh_interval;
+		} else {
+			return this.refresh_interval;
+		}
 	}
 	
 	return this;
