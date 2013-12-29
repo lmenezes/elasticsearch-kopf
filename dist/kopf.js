@@ -1470,10 +1470,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		$('#idx_settings_tabs a:first').tab('show');		
 	}
 	
-	$scope.loadClusterSettings=function() {
-		$('#cluster_settings_option a').tab('show');
-		$('#cluster_settings_tabs a:first').tab('show');		
-	}
 }
 function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsService, AlertService) {
 	$scope.alert_service = AlertService;
@@ -1482,10 +1478,16 @@ function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsS
 	$scope.back=function() {
 		$('#cluster_option a').tab('show');
 	}
+	
+    $scope.$on('loadClusterSettingsEvent', function() {
+		$('#cluster_settings_option a').tab('show');
+		$('#cluster_settings_tabs a:first').tab('show');
+		$scope.settings = $scope.cluster_service.cluster.settings;
+    });
 
 	$scope.save=function() {
 			var new_settings = {};
-			new_settings['transient'] = $scope.cluster_service.cluster.settings;
+			new_settings['transient'] = $scope.settings;
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
 					$scope.alert_service.success("Cluster settings were successfully updated",response);
@@ -1557,7 +1559,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 }
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.3.2";
+	$scope.version = "0.3.3";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
@@ -1646,6 +1648,13 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 	$scope.getCurrentTime=function() {
 		return getTimeString();
+	}
+	
+	$scope.selectTab=function(event) {
+		$scope.alerts_service.clear();
+		if (isDefined(event)) {
+			$scope.broadcastMessage(event, {});
+		}
 	}
 	
 }
@@ -1769,12 +1778,6 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 		$scope.settings_service.setRefreshInterval($scope.new_refresh);
 	}
 
-	$scope.selectTab=function(event) {
-		$scope.alert_service.clear();
-		if (isDefined(event)) {
-			$scope.broadcastMessage(event, {});
-		}
-	}
 }
 
 function RestController($scope, $location, $timeout, AlertService) {

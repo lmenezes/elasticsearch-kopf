@@ -5,14 +5,14 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="node_initial_primaries_recoveries" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['cluster.routing.allocation.node_initial_primaries_recoveries']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings['cluster.routing.allocation.node_initial_primaries_recoveries']" placeholder="">
 		</div>
 		<div class="form-group">
 			cluster_concurrent_rebalance
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="cluster_concurrent_rebalance" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['cluster.routing.allocation.cluster_concurrent_rebalance']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings['cluster.routing.allocation.cluster_concurrent_rebalance']" placeholder="">
 		</div>
 	</div>
 	<div class="col-lg-4">
@@ -21,14 +21,14 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="awareness.attributes" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['cluster.routing.allocation.awareness.attributes']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings['cluster.routing.allocation.awareness.attributes']" placeholder="">
 		</div>
 		<div class="form-group">
 			node_concurrent_recoveries
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="node_concurrent_recoveries" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['cluster.routing.allocation.node_concurrent_recoveries']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings['cluster.routing.allocation.node_concurrent_recoveries']" placeholder="">
 		</div>
 	</div>
 	
@@ -38,7 +38,7 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="disable_allocation" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<select ng-model="cluster_service.cluster.settings['cluster.routing.allocation.disable_allocation']" class="form-control input-sm">
+			<select ng-model="settings['cluster.routing.allocation.disable_allocation']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
@@ -48,7 +48,7 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="disable_replica_allocation" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<select ng-model="cluster_service.cluster.settings['cluster.routing.allocation.disable_replica_allocation']" class="form-control input-sm">
+			<select ng-model="settings['cluster.routing.allocation.disable_replica_allocation']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>

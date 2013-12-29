@@ -5,7 +5,7 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="makes the cluster read only. indices won't accept write operations and metadata can't be updated(create or delete indices)" data-original-title="blocks.read_only">
 				<i class="icon-info-sign"></i>
 			</a>
-			<select ng-model="cluster_service.cluster.settings['cluster.blocks.read_only']" class="form-control input-sm">
+			<select ng-model="settings['cluster.blocks.read_only']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
@@ -15,7 +15,7 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="indices.ttl.interval" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['indices.ttl.interval']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings['indices.ttl.interval']" placeholder="">
 		</div>
 	</div>
 	
@@ -25,7 +25,7 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="indices.cache.filter.size" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['indices.cache.filter.size']" placeholder=""/>
+			<input type="text" class="form-control input-sm" ng-model="settings['indices.cache.filter.size']" placeholder=""/>
 		</div>
 	</div>
 	
@@ -35,7 +35,7 @@
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="discovery.zen.minimum_master_nodes" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="cluster_service.cluster.settings['discovery.zen.minimum_master_nodes']" placeholder=""/>
+			<input type="text" class="form-control input-sm" ng-model="settings['discovery.zen.minimum_master_nodes']" placeholder=""/>
 		</div>
 	</div>
 </div>

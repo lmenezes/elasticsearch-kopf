@@ -40,10 +40,4 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 		$scope.settings_service.setRefreshInterval($scope.new_refresh);
 	}
 
-	$scope.selectTab=function(event) {
-		$scope.alert_service.clear();
-		if (isDefined(event)) {
-			$scope.broadcastMessage(event, {});
-		}
-	}
 }

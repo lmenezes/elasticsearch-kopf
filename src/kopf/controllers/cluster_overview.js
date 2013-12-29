@@ -229,8 +229,4 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		$('#idx_settings_tabs a:first').tab('show');		
 	}
 	
-	$scope.loadClusterSettings=function() {
-		$('#cluster_settings_option a').tab('show');
-		$('#cluster_settings_tabs a:first').tab('show');		
-	}
 }

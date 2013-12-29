@@ -1,6 +1,6 @@
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.3.2";
+	$scope.version = "0.3.3";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
@@ -89,6 +89,13 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 	$scope.getCurrentTime=function() {
 		return getTimeString();
+	}
+	
+	$scope.selectTab=function(event) {
+		$scope.alerts_service.clear();
+		if (isDefined(event)) {
+			$scope.broadcastMessage(event, {});
+		}
 	}
 	
 }
