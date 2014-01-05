@@ -488,7 +488,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
   			var shards_info = index_info['shards'][x];
 			shards_info.forEach(function(shard_info) {
 				if (shard_info['state'] === 'UNASSIGNED') {
-					unassigned.push(shard_info['shard']);	
+					unassigned.push(new UnassignedShard(shard_info));	
 				}
 			});
   		});
@@ -586,6 +586,15 @@ function Shard(shard_info) {
 	this.state = shard_info.routing.state;
 	this.node = shard_info.routing.node;
 	this.index = shard_info.routing.index;
+	this.id = this.node + "_" + this.shard + "_" + this.index;
+}
+
+function UnassignedShard(shard_info) {
+	this.primary = shard_info['primary'];
+	this.shard = shard_info['shard'];
+	this.state = shard_info['state'];
+	this.node = shard_info['node'];
+	this.index = shard_info['index'];
 	this.id = this.node + "_" + this.shard + "_" + this.index;
 }
 /** TYPES **/

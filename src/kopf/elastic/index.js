@@ -37,7 +37,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
   			var shards_info = index_info['shards'][x];
 			shards_info.forEach(function(shard_info) {
 				if (shard_info['state'] === 'UNASSIGNED') {
-					unassigned.push(shard_info['shard']);	
+					unassigned.push(new UnassignedShard(shard_info));	
 				}
 			});
   		});
