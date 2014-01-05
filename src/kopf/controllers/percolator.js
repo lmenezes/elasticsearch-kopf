@@ -1,7 +1,6 @@
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService, ClusterSettingsService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.cluster_service = ClusterSettingsService;
 	
 	$scope.editor = new AceEditor('percolator-query-editor');
 		
@@ -139,7 +138,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster_service.cluster.indices.filter(function(index) { return index != '_percolator' });
+		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator' });
 	}
 }
 

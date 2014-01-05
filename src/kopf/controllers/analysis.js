@@ -1,7 +1,6 @@
-function AnalysisController($scope, $location, $timeout, AlertService, ClusterSettingsService) {
+function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.indices = null;
 	$scope.alert_service = AlertService;
-	$scope.cluster_service = ClusterSettingsService;
 
 	// by index
 	$scope.field_index = null;
@@ -47,11 +46,11 @@ function AnalysisController($scope, $location, $timeout, AlertService, ClusterSe
 	}
 	
 	$scope.$on('hostChanged',function() {
-		$scope.indices = $scope.cluster_service.cluster.indices;
+		$scope.indices = $scope.cluster.indices;
 	});
 	
     $scope.$on('loadAnalysisEvent', function() {
-		$scope.indices = $scope.cluster_service.cluster.indices;
+		$scope.indices = $scope.cluster.indices;
     });
 	
 }

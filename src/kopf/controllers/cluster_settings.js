@@ -1,6 +1,5 @@
-function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsService, AlertService) {
+function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 	$scope.alert_service = AlertService;
-	$scope.cluster_service = ClusterSettingsService;
 
 	$scope.back=function() {
 		$('#cluster_option a').tab('show');
@@ -9,7 +8,7 @@ function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsS
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
-		$scope.settings = $scope.cluster_service.cluster.settings;
+		$scope.settings = $scope.cluster.settings;
     });
 
 	$scope.save=function() {

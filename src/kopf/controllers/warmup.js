@@ -1,7 +1,6 @@
-function WarmupController($scope, $location, $timeout, ConfirmDialogService, ClusterSettingsService, AlertService) {
+function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.alert_service = AlertService;	
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.cluster_service = ClusterSettingsService;
 	
 	$scope.editor = ace.edit("warmup-query-editor");
 	$scope.editor.setFontSize("10px");
@@ -28,7 +27,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster_service.cluster.indices;
+		$scope.indices = $scope.cluster.indices;
 	}
 	
 	$scope.createWarmerQuery=function() {

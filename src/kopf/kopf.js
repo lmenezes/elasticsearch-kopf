@@ -4,10 +4,6 @@ kopf.factory('IndexSettingsService', function() {
 	return {index: null};
 });
 
-kopf.factory('ClusterSettingsService', function() {
-	return {cluster: null};
-});
-
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
 	this.header = "Default Header";

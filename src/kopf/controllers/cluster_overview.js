@@ -1,31 +1,9 @@
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService, AlertService, SettingsService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.settings_service = SettingsService;
 	$scope.idxSettingsSrv = IndexSettingsService;
-	$scope.cluster_service = ClusterSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
 	$scope.pagination= new ClusterNavigation();
-	$scope.cluster = null;
 	$scope.alert_service = AlertService;
-	
-	(function loadClusterState() {
-		
-		$scope.updateCluster=function() {
-			$scope.client.getClusterDetail(
-				function(cluster) {
-					$scope.$apply(function() { // forces view refresh
-						$scope.cluster = cluster;
-						$scope.cluster_service.cluster = cluster;
-					});
-				},
-				function(error) {
-					$scope.alert_service.error("Error while retrieving cluster information", error);
-				}
-			);
-		}
-		$timeout(loadClusterState, $scope.settings_service.getRefreshInterval());	
-		$scope.updateCluster();
-	}());
-	
 	
 	$scope.getNodes=function() {
 		if ($scope.cluster != null) {

@@ -856,10 +856,6 @@ kopf.factory('IndexSettingsService', function() {
 	return {index: null};
 });
 
-kopf.factory('ClusterSettingsService', function() {
-	return {cluster: null};
-});
-
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
 	this.header = "Default Header";
@@ -1020,10 +1016,9 @@ function AliasesController($scope, $location, $timeout, AlertService) {
     });
 
 }
-function AnalysisController($scope, $location, $timeout, AlertService, ClusterSettingsService) {
+function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.indices = null;
 	$scope.alert_service = AlertService;
-	$scope.cluster_service = ClusterSettingsService;
 
 	// by index
 	$scope.field_index = null;
@@ -1069,11 +1064,11 @@ function AnalysisController($scope, $location, $timeout, AlertService, ClusterSe
 	}
 	
 	$scope.$on('hostChanged',function() {
-		$scope.indices = $scope.cluster_service.cluster.indices;
+		$scope.indices = $scope.cluster.indices;
 	});
 	
     $scope.$on('loadAnalysisEvent', function() {
-		$scope.indices = $scope.cluster_service.cluster.indices;
+		$scope.indices = $scope.cluster.indices;
     });
 	
 }
@@ -1126,34 +1121,12 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		);
 	}
 }
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ClusterSettingsService, ConfirmDialogService, AlertService, SettingsService) {
+function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.settings_service = SettingsService;
 	$scope.idxSettingsSrv = IndexSettingsService;
-	$scope.cluster_service = ClusterSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
 	$scope.pagination= new ClusterNavigation();
-	$scope.cluster = null;
 	$scope.alert_service = AlertService;
-	
-	(function loadClusterState() {
-		
-		$scope.updateCluster=function() {
-			$scope.client.getClusterDetail(
-				function(cluster) {
-					$scope.$apply(function() { // forces view refresh
-						$scope.cluster = cluster;
-						$scope.cluster_service.cluster = cluster;
-					});
-				},
-				function(error) {
-					$scope.alert_service.error("Error while retrieving cluster information", error);
-				}
-			);
-		}
-		$timeout(loadClusterState, $scope.settings_service.getRefreshInterval());	
-		$scope.updateCluster();
-	}());
-	
 	
 	$scope.getNodes=function() {
 		if ($scope.cluster != null) {
@@ -1428,9 +1401,8 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	}
 	
 }
-function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsService, AlertService) {
+function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 	$scope.alert_service = AlertService;
-	$scope.cluster_service = ClusterSettingsService;
 
 	$scope.back=function() {
 		$('#cluster_option a').tab('show');
@@ -1439,7 +1411,7 @@ function ClusterSettingsController($scope, $location, $timeout, ClusterSettingsS
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
-		$scope.settings = $scope.cluster_service.cluster.settings;
+		$scope.settings = $scope.cluster.settings;
     });
 
 	$scope.save=function() {
@@ -1514,7 +1486,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 		$scope.replicas = '';
 	}
 }
-function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService) {
+function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "0.4.0-SNAPSHOT";
 	$scope.username = null;
@@ -1565,6 +1537,41 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
+			
+	$scope.updateClusterHealth=function() {
+		$scope.client.getClusterHealth( 
+			function(cluster) {
+				$scope.cluster_health = cluster;
+				$scope.setConnected(true);
+			},
+			function(error) {
+				$scope.cluster_health = null;
+				$scope.setConnected(false);
+				$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
+			}
+		);
+	}
+		
+	$scope.updateCluster=function() {
+		$scope.client.getClusterDetail(
+			function(cluster) {
+				$scope.$apply(function() { $scope.cluster = cluster; });
+			},
+			function(error) {
+				$scope.cluster = null;
+				AlertService.error("Error while retrieving cluster information", error);
+			}
+		);
+	}
+	
+	$scope.autoRefreshCluster=function() {
+		$scope.updateCluster();
+		$scope.updateClusterHealth();
+		$timeout(function() { $scope.autoRefreshCluster() }, SettingsService.getRefreshInterval());	
+	}
+	
+	$scope.autoRefreshCluster();
+	
 
 	// should be called when an action could change status/topology of cluster
 	$scope.forceRefresh=function() {
@@ -1697,27 +1704,6 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 	$scope.settings_service = SettingsService;
 	$scope.alert_service = AlertService;
 	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
-	$scope.cluster_health = null;
-	
-	(function loadClusterHealth() {
-		
-		$scope.updateClusterHealth=function() {
-			$scope.client.getClusterHealth( 
-				function(cluster) {
-					$scope.cluster_health = cluster;
-					$scope.setConnected(true);
-				},
-				function(error) {
-					$scope.cluster_health = null;
-					$scope.setConnected(false);
-					$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
-				}
-			);
-		}
-		
-    	$timeout(loadClusterHealth, $scope.settings_service.getRefreshInterval());
-		$scope.updateClusterHealth();
-	}());
 	
     $scope.$on('forceRefresh', function() {
 		$scope.updateClusterHealth();
@@ -1788,10 +1774,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 		}
 	}
 }
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService, ClusterSettingsService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.cluster_service = ClusterSettingsService;
 	
 	$scope.editor = new AceEditor('percolator-query-editor');
 		
@@ -1929,7 +1914,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster_service.cluster.indices.filter(function(index) { return index != '_percolator' });
+		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator' });
 	}
 }
 
@@ -1959,10 +1944,9 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 	}
 	
 }
-function WarmupController($scope, $location, $timeout, ConfirmDialogService, ClusterSettingsService, AlertService) {
+function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
 	$scope.alert_service = AlertService;	
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.cluster_service = ClusterSettingsService;
 	
 	$scope.editor = ace.edit("warmup-query-editor");
 	$scope.editor.setFontSize("10px");
@@ -1989,7 +1973,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Clu
 	}
 	
 	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster_service.cluster.indices;
+		$scope.indices = $scope.cluster.indices;
 	}
 	
 	$scope.createWarmerQuery=function() {
