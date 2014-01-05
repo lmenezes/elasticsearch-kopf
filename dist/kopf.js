@@ -497,9 +497,9 @@ function Index(index_name,index_info, index_metadata, index_status) {
 
 	this.unassigned = unassigned;
 	var has_status = this.state === 'open' && (typeof index_status != 'undefined')
-	this.num_docs = has_status ? index_status['docs']['num_docs'] : 0;
-	this.max_doc = has_status ? index_status['docs']['max_doc'] : 0;
-	this.deleted_docs = has_status ? index_status['docs']['deleted_docs'] : 0;
+	this.num_docs = has_status && isDefined(index_status['docs']) ? index_status['docs']['num_docs'] : 0;
+	this.max_doc = has_status && isDefined(index_status['docs']) ? index_status['docs']['max_doc'] : 0;
+	this.deleted_docs = has_status && isDefined(index_status['docs']) ? index_status['docs']['deleted_docs'] : 0;
 	this.size = has_status ? index_status['index']['primary_size_in_bytes'] : 0;
 	this.total_size = has_status ? index_status['index']['size_in_bytes'] : 0;
 	this.settingsAsString=function() {
