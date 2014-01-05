@@ -1,3 +1,126 @@
+function Alias(alias, index, filter, index_routing, search_routing) {
+	this.alias = alias != null ? alias.toLowerCase() : "";
+	this.index = index != null ? index.toLowerCase() : "";
+	this.filter = filter;
+	this.index_routing = index_routing;
+	this.search_routing = search_routing;
+
+	this.validate=function() {
+		if (this.alias == null || this.alias.trim().length == 0) {
+			throw "Alias must have a non empty name";
+		}
+		if (this.index == null || this.index.trim().length == 0) {
+			throw "Alias must have a valid index name";
+		}
+	}
+
+	this.equals=function(other_alias) {
+		var equal = 
+		(this.alias === other_alias.alias) &&
+		(this.index === other_alias.index) &&
+		(this.filter === other_alias.filter) &&
+		(this.index_routing === other_alias.index_routing) &&
+		(this.search_routing === other_alias.search_routing);
+		return equal;
+	}
+
+	this.info=function() {
+		var info = {};
+		info['index'] = this.index;
+		info['alias'] = this.alias;
+	
+		if (this.filter != null) {
+			if (typeof this.filter == 'string' && this.filter.trim().length > 0) {
+				info['filter'] = JSON.parse(this.filter);
+			} else {
+				info['filter'] = this.filter;
+			}
+		}
+		if (this.index_routing != null && this.index_routing.trim().length > 0) {
+			info['index_routing'] = this.index_routing;
+		}
+		if (this.search_routing != null && this.search_routing.trim().length > 0) {
+			info['search_routing'] = this.search_routing;
+		}
+		return info; 
+	}
+}
+function Aliases(aliases_info) {
+	var indices  = [];
+	var aliases_map = {};
+	Object.keys(aliases_info).forEach(function(index) {
+		indices.push(index); // fills list of available indices
+		var indexAliases = aliases_info[index]['aliases'];
+		Object.keys(indexAliases).forEach(function(alias) { // group aliases per alias name
+			if (!isDefined(aliases_map[alias])) {
+				aliases_map[alias] = [];
+			}
+			var alias_instance = new Alias(alias, index, indexAliases[alias]['filter'], indexAliases[alias]['index_routing'],indexAliases[alias]['search_routing']);
+			aliases_map[alias].push(alias_instance);
+		});
+	});
+	this.indices = indices;
+	this.info = aliases_map;
+}
+
+function ClusterHealth(health) {
+	this.status = health['status'];
+	this.name = health['cluster_name'];
+}
+function Cluster(state,status,nodes,settings) {
+	if (state != null && status != null && nodes != null && settings != null) {
+		this.disableAllocation = false;
+		if (isDefined(settings['persistent']) && isDefined(settings['persistent']['disable_allocation'])) {
+			this.disableAllocation = settings['persistent']['disable_allocation'] == "true" ? true : false;
+		}
+		if (isDefined(settings['transient']) && isDefined(settings['transient']['cluster.routing.allocation.disable_allocation'])) {
+			this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] == "true" ? true : false;
+		}
+		this.settings = $.extend({}, settings['persistent'], settings['transient']);
+		this.master_node = state['master_node'];
+		var num_nodes = 0;
+		this.nodes = Object.keys(state['nodes']).map(function(x) { 
+			var node = new Node(x,state['nodes'][x],nodes['nodes'][x]);
+			num_nodes += 1;
+			if (node.id === state['master_node']) {
+				node.setCurrentMaster();
+			}
+			return node;
+		}).sort(function(a,b) { return a.compare(b) });
+    	this.number_of_nodes = num_nodes;
+		var iMetadata = state['metadata']['indices'];
+		var iRoutingTable = state['routing_table']['indices'];
+		var iStatus = status['indices'];
+		var count = 0;
+		var unassigned_shards = 0;
+		var total_size = 0;
+		var num_docs = 0;
+		this.indices = Object.keys(iMetadata).map(
+			function(x) { 
+				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+				unassigned_shards += index.unassigned.length;
+				total_size += parseInt(index.total_size);
+				num_docs += index.num_docs;
+				return index;
+			 }
+		).sort(function(a,b) { return a.compare(b) });
+		this.num_docs = num_docs;
+		this.unassigned_shards = unassigned_shards;
+		this.total_indices = this.indices.length;
+		this.shards = status['_shards']['total'];
+		this.failed_shards = status['_shards']['failed'];
+		this.successful_shards = status['_shards']['successful'];
+		this.total_size = total_size;
+		this.getNodes=function(name, data, master, client) { 
+			return $.map(this.nodes,function(n) {
+				if (name.trim().length > 0 && n.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
+					return null;
+				} 
+				return (data && n.data || master && n.master || client && n.client) ? n : null;
+			});
+		};
+	}
+}
 function ElasticClient(host,username,password) {
 	this.host = host;
 	this.username = username;
@@ -314,193 +437,17 @@ function ElasticClient(host,username,password) {
 	}
 }
 
-/** TYPES **/
-function Token(token, start_offset, end_offset, position) {
-	this.token = token;
-	this.start_offset = start_offset;
-	this.end_offset = end_offset;
-	this.position = position;
-}
 
-function ClusterHealth(health) {
-	this.status = health['status'];
-	this.name = health['cluster_name'];
-}
 
-function Aliases(aliases_info) {
-	var indices  = [];
-	var aliases_map = {};
-	Object.keys(aliases_info).forEach(function(index) {
-		indices.push(index); // fills list of available indices
-		var indexAliases = aliases_info[index]['aliases'];
-		Object.keys(indexAliases).forEach(function(alias) { // group aliases per alias name
-			if (!isDefined(aliases_map[alias])) {
-				aliases_map[alias] = [];
-			}
-			var alias_instance = new Alias(alias, index, indexAliases[alias]['filter'], indexAliases[alias]['index_routing'],indexAliases[alias]['search_routing']);
-			aliases_map[alias].push(alias_instance);
-		});
-	});
-	this.indices = indices;
-	this.info = aliases_map;
-}
 
-function Alias(alias, index, filter, index_routing, search_routing) {
-	this.alias = alias != null ? alias.toLowerCase() : "";
-	this.index = index != null ? index.toLowerCase() : "";
-	this.filter = filter;
-	this.index_routing = index_routing;
-	this.search_routing = search_routing;
 
-	this.validate=function() {
-		if (this.alias == null || this.alias.trim().length == 0) {
-			throw "Alias must have a non empty name";
-		}
-		if (this.index == null || this.index.trim().length == 0) {
-			throw "Alias must have a valid index name";
-		}
-	}
 
-	this.equals=function(other_alias) {
-		var equal = 
-		(this.alias === other_alias.alias) &&
-		(this.index === other_alias.index) &&
-		(this.filter === other_alias.filter) &&
-		(this.index_routing === other_alias.index_routing) &&
-		(this.search_routing === other_alias.search_routing);
-		return equal;
-	}
 
-	this.info=function() {
-		var info = {};
-		info['index'] = this.index;
-		info['alias'] = this.alias;
-	
-		if (this.filter != null) {
-			if (typeof this.filter == 'string' && this.filter.trim().length > 0) {
-				info['filter'] = JSON.parse(this.filter);
-			} else {
-				info['filter'] = this.filter;
-			}
-		}
-		if (this.index_routing != null && this.index_routing.trim().length > 0) {
-			info['index_routing'] = this.index_routing;
-		}
-		if (this.search_routing != null && this.search_routing.trim().length > 0) {
-			info['search_routing'] = this.search_routing;
-		}
-		return info; 
-	}
-}
 
-function Node(node_id, node_info, node_stats) {
-	this.id = node_id;	
-	this.name = node_info['name'];
-	this.metadata = {};
-	this.metadata['info'] = node_info;
-	this.metadata['stats'] = node_stats;
-	this.transport_address = node_info['transport_address'];
-	var master = node_info['attributes']['master'] === 'false' ? false : true;
-	var data = node_info['attributes']['data'] === 'false' ? false : true;
-	var client = node_info['attributes']['client'] === 'true' ? true : false;
-	this.master =  master && !client;
-	this.data = data && !client;
-	this.client = client || !master && !data;
-	this.current_master = false;
-	this.stats = node_stats;
 
-	this.setCurrentMaster=function() {
-		this.current_master = true;
-	}
-	
-	this.compare=function(other) { // TODO: take into account node specs?
-		if (other.current_master) {
-			return 1;
-		}
-		if (this.current_master) {
-			return -1;
-		}
-		if (other.master && !this.master) {
-			return 1;
-		} 
-		if (this.master && !other.master) {
-			return -1;
-		}
 
-		if (other.data && !this.data) {
-			return 1;
-		} 
-		if (this.data && !other.data) {
-			return -1;
-		}
-		return this.name.localeCompare(other.name);
-	}
-}
 
-function Shard(shard_info) {
-	this.info = shard_info;
-	this.primary = shard_info.routing.primary;
-	this.shard = shard_info.routing.shard;
-	this.state = shard_info.routing.state;
-	this.node = shard_info.routing.node;
-	this.index = shard_info.routing.index;
-	this.id = this.node + "_" + this.shard + "_" + this.index;
-}
 
-function Cluster(state,status,nodes,settings) {
-	if (state != null && status != null && nodes != null && settings != null) {
-		this.disableAllocation = false;
-		if (isDefined(settings['persistent']) && isDefined(settings['persistent']['disable_allocation'])) {
-			this.disableAllocation = settings['persistent']['disable_allocation'] == "true" ? true : false;
-		}
-		if (isDefined(settings['transient']) && isDefined(settings['transient']['cluster.routing.allocation.disable_allocation'])) {
-			this.disableAllocation = settings['transient']['cluster.routing.allocation.disable_allocation'] == "true" ? true : false;
-		}
-		this.settings = $.extend({}, settings['persistent'], settings['transient']);
-		this.master_node = state['master_node'];
-		var num_nodes = 0;
-		this.nodes = Object.keys(state['nodes']).map(function(x) { 
-			var node = new Node(x,state['nodes'][x],nodes['nodes'][x]);
-			num_nodes += 1;
-			if (node.id === state['master_node']) {
-				node.setCurrentMaster();
-			}
-			return node;
-		}).sort(function(a,b) { return a.compare(b) });
-    	this.number_of_nodes = num_nodes;
-		var iMetadata = state['metadata']['indices'];
-		var iRoutingTable = state['routing_table']['indices'];
-		var iStatus = status['indices'];
-		var count = 0;
-		var unassigned_shards = 0;
-		var total_size = 0;
-		var num_docs = 0;
-		this.indices = Object.keys(iMetadata).map(
-			function(x) { 
-				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
-				unassigned_shards += index.unassigned.length;
-				total_size += parseInt(index.total_size);
-				num_docs += index.num_docs;
-				return index;
-			 }
-		).sort(function(a,b) { return a.compare(b) });
-		this.num_docs = num_docs;
-		this.unassigned_shards = unassigned_shards;
-		this.total_indices = this.indices.length;
-		this.shards = status['_shards']['total'];
-		this.failed_shards = status['_shards']['failed'];
-		this.successful_shards = status['_shards']['successful'];
-		this.total_size = total_size;
-		this.getNodes=function(name, data, master, client) { 
-			return $.map(this.nodes,function(n) {
-				if (name.trim().length > 0 && n.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
-					return null;
-				} 
-				return (data && n.data || master && n.master || client && n.client) ? n : null;
-			});
-		};
-	}
-}
 
 function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;
@@ -589,58 +536,64 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	}
 	
 }
+function Node(node_id, node_info, node_stats) {
+	this.id = node_id;	
+	this.name = node_info['name'];
+	this.metadata = {};
+	this.metadata['info'] = node_info;
+	this.metadata['stats'] = node_stats;
+	this.transport_address = node_info['transport_address'];
+	var master = node_info['attributes']['master'] === 'false' ? false : true;
+	var data = node_info['attributes']['data'] === 'false' ? false : true;
+	var client = node_info['attributes']['client'] === 'true' ? true : false;
+	this.master =  master && !client;
+	this.data = data && !client;
+	this.client = client || !master && !data;
+	this.current_master = false;
+	this.stats = node_stats;
 
-function ClusterState(cluster_state) {
-	var start = new Date().getTime();
-	
-	this.getIndices=function() {
-		return Object.keys(this.indices);
+	this.setCurrentMaster=function() {
+		this.current_master = true;
 	}
 	
-	this.getTypes=function(index) {
-		if (typeof this.indices[index] != 'undefined') {
-			return Object.keys(this.indices[index]['types']);
+	this.compare=function(other) { // TODO: take into account node specs?
+		if (other.current_master) {
+			return 1;
 		}
+		if (this.current_master) {
+			return -1;
+		}
+		if (other.master && !this.master) {
+			return 1;
+		} 
+		if (this.master && !other.master) {
+			return -1;
+		}
+
+		if (other.data && !this.data) {
+			return 1;
+		} 
+		if (this.data && !other.data) {
+			return -1;
+		}
+		return this.name.localeCompare(other.name);
 	}
-	
-	this.getAnalyzers=function(index) {
-		if (typeof this.indices[index] != 'undefined') {
-			return this.indices[index]['analyzers'];
-		}
-	}
-	
-	this.getFields=function(index, type) {
-		if (typeof this.indices[index] != 'undefined') {
-			return this.indices[index]['types'][type];
-		}
-	} 
-	
-	var indices = {};
-	
-	Object.keys(cluster_state['metadata']['indices']).forEach(function(index) {
-		indices[index] = {};
-		var indexData = cluster_state['metadata']['indices'][index]['mappings'];
-		indices[index]['types'] = {};
-		Object.keys(indexData).forEach(function(type) {
-			indices[index]['types'][type] = [];
-			Object.keys(indexData[type]['properties']).forEach(function(property) {
-				indices[index]['types'][type].push(property);
-			});
-		});
-		var indexSettings = cluster_state['metadata']['indices'][index]['settings'];
-		indices[index]['analyzers'] = [];
-		Object.keys(indexSettings).forEach(function(setting) {
-			if (setting.indexOf('index.analysis.analyzer') == 0) {
-				var analyzer = setting.substring('index.analysis.analyzer.'.length);
-				analyzer = analyzer.substring(0,analyzer.indexOf("."));
-				if ($.inArray(analyzer, indices[index]['analyzers']) == -1) {
-					indices[index]['analyzers'].push(analyzer);
-				}
-			}
-		});
-	});
-	
-	this.indices = indices;
+}
+function Shard(shard_info) {
+	this.info = shard_info;
+	this.primary = shard_info.routing.primary;
+	this.shard = shard_info.routing.shard;
+	this.state = shard_info.routing.state;
+	this.node = shard_info.routing.node;
+	this.index = shard_info.routing.index;
+	this.id = this.node + "_" + this.shard + "_" + this.index;
+}
+/** TYPES **/
+function Token(token, start_offset, end_offset, position) {
+	this.token = token;
+	this.start_offset = start_offset;
+	this.end_offset = end_offset;
+	this.position = position;
 }
 var jsonTree = new JSONTree();
 

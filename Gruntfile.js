@@ -43,7 +43,15 @@ module.exports = function(grunt) {
 			},
 			appjs: {
 				src: [
-					'src/kopf/elastic_client.js',
+					'src/kopf/elastic/alias.js',
+					'src/kopf/elastic/aliases.js',
+					'src/kopf/elastic/cluster_health.js',
+					'src/kopf/elastic/cluster.js',
+					'src/kopf/elastic/elastic_client.js',
+					'src/kopf/elastic/index.js',
+					'src/kopf/elastic/node.js',
+					'src/kopf/elastic/shard.js',
+					'src/kopf/elastic/token.js',
 					// CONTROLLERS
 					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
