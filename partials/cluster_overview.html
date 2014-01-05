@@ -40,13 +40,13 @@
 		</div>
 		<div class="col-lg-2 form-group" style="text-align: right;">
 			<div class="cluster-map-pagination">
-				<span ng-switch on="pagination.hasPreviousPage()">
-					<i class="icon-double-angle-left" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+				<span ng-switch on="hasPreviousPage()">
+					<i class="icon-double-angle-left" ng-click="previousPage()" ng-switch-when="true"></i>
 					<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
 				</span>
-				{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
-				<span ng-switch on="pagination.hasNextPage()">
-					<i class="icon-double-angle-right" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+				{{firstResult()}}-{{lastResult()}} of {{total()}}
+				<span ng-switch on="hasNextPage()">
+					<i class="icon-double-angle-right" ng-click="nextPage()" ng-switch-when="true"></i>
 					<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
 				</span>
 			</div>

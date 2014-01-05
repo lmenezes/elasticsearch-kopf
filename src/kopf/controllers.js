@@ -185,93 +185,18 @@ function AliasesPagination(page, results) {
 	}
 }
 
-function Pagination(page, query, results) {
-	this.page = page;
-	this.page_size = 4;
-	this.results = results;
-	this.query = query;
+function ClusterNavigation() {
+	this.page = 1;
+	this.page_size = 4; // TODO: allow to change it?
+
+	this.query = "";
+	this.previous_query = null;
+	
 	this.data = true;
 	this.master = true;
 	this.client = true;
 	this.state = "";
 	this.node_name = "";
-	
-	this.firstResult=function() {
-		if (this.getResults().length > 0) {
-			return ((this.current_page() - 1) * this.page_size) + 1;
-		} else {
-			return 0;
-		}
-	}
-	
-	this.lastResult=function() {
-		if (this.current_page() * this.page_size > this.getResults().length) {
-			return this.getResults().length;
-		} else {
-			return this.current_page() * this.page_size;
-		}
-	}
-
-	this.hasNextPage=function() {
-		return this.page_size * this.current_page() < this.getResults().length;
-	}
-	
-	this.hasPreviousPage=function() {
-		return this.current_page() > 1;
-	}
-	this.nextPage=function() {
-		this.page += 1;
-	}
-	this.previousPage=function() {
-		this.page -= 1;
-	}
-	
-	this.total=function() {
-		return this.getResults().length;
-	}
-	
-	this.current_page=function() {
-		if (this.query != this.previous_query) {
-			this.previous_query = this.query;
-			this.page = 1;
-		}
-		return this.page;
-	}
-	
-	this.getPage=function() {
-		var count = 1;
-		var first_result = this.firstResult();
-		var last_result = this.lastResult();
-		var page = $.map(this.getResults(),function(i) {
-			if (count < first_result || count > last_result) {
-				count += 1;
-				return null;
-			}
-			count += 1;
-			return i;
-		});
-		return page;
-	}
-	
-	this.setResults=function(results) {
-		this.results = results;
-	}
-	
-	this.getResults=function() {
-		var query = this.query;
-		var state = this.state;
-		return $.map(this.results,function(i) {
-			if (isDefined(query) && query.length > 0) {
-				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
-					return null;
-				} 
-			}
-			if (state.length > 0 && state != i.state) {
-				return null;
-			} 
-			return i;
-		});
-	}
 }
 
 function ModalControls() {

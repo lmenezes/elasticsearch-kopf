@@ -3,15 +3,11 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.cluster_service = ClusterSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.pagination= new Pagination(1,"", []);
+	$scope.pagination= new ClusterNavigation();
 	$scope.cluster = null;
 	$scope.alert_service = AlertService;
 	
 	(function loadClusterState() {
-		
-		$scope.isCurrentView=function() {
-			return ($("#cluster_option").length > 0) ? $scope.isActive('cluster_option') : true;
-		}
 		
 		$scope.updateCluster=function() {
 			$scope.client.getClusterDetail(
@@ -19,7 +15,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 					$scope.$apply(function() { // forces view refresh
 						$scope.cluster = cluster;
 						$scope.cluster_service.cluster = cluster;
-						$scope.pagination.setResults(cluster.indices);
 					});
 				},
 				function(error) {
@@ -227,6 +222,81 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		});
 		$scope.idxSettingsSrv.index = indices[0];
 		$('#idx_settings_tabs a:first').tab('show');		
+	}
+	
+	
+	$scope.firstResult=function() {
+		if ($scope.getResults().length > 0) {
+			return (($scope.current_page() - 1) * $scope.pagination.page_size) + 1;
+		} else {
+			return 0;
+		}
+	}
+	
+	$scope.lastResult=function() {
+		if ($scope.current_page() * $scope.pagination.page_size > $scope.getResults().length) {
+			return $scope.getResults().length;
+		} else {
+			return $scope.current_page() * $scope.pagination.page_size;
+		}
+	}
+
+	$scope.hasNextPage=function() {
+		return $scope.pagination.page_size * $scope.current_page() < $scope.getResults().length;
+	}
+	
+	$scope.hasPreviousPage=function() {
+		return $scope.current_page() > 1;
+	}
+	$scope.nextPage=function() {
+		$scope.pagination.page += 1;
+	}
+	$scope.previousPage=function() {
+		$scope.pagination.page -= 1;
+	}
+	
+	$scope.total=function() {
+		return $scope.getResults().length;
+	}
+	
+	$scope.current_page=function() {
+		if ($scope.pagination.query != $scope.pagination.previous_query) {
+			$scope.pagination.previous_query = $scope.pagination.query;
+			$scope.pagination.page = 1;
+		}
+		return $scope.pagination.page;
+	}
+	
+	$scope.getPage=function() {
+		var count = 1;
+		var first_result = $scope.firstResult();
+		var last_result = $scope.lastResult();
+		var page = $.map($scope.getResults(),function(i) {
+			if (count < first_result || count > last_result) {
+				count += 1;
+				return null;
+			}
+			count += 1;
+			return i;
+		});
+		return page;
+	}
+	
+	$scope.getResults=function() {
+		var indices = $scope.cluster != null ? $scope.cluster.indices : [];
+		var query = $scope.pagination.query;
+		var state = $scope.pagination.state;
+		return $.map(indices,function(i) {
+			if (isDefined(query) && query.length > 0) {
+				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
+					return null;
+				} 
+			}
+			if (state.length > 0 && state != i.state) {
+				return null;
+			} 
+			return i;
+		});
 	}
 	
 }

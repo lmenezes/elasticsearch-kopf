@@ -32,7 +32,7 @@
 			</div>
 		</div>
 	</td>
-	<td ng-repeat="index in pagination.getPage()">
+	<td ng-repeat="index in getPage()">
 		<div class="cluster-map-shards">
 			<span id="{{shard.id}}" ng-switch on="shard.primary" ng-click="displayInfo('shard info',shard.info)" ng-repeat="shard in index.shards[node.id]">
 				<span ng-switch-when="true" class="shard shard-primary" ng-class="{STARTED:'shard-started', INITIALIZING:'shard-initializing', 'RELOCATED':'shard-relocated', 	'RECOVERING':'shard-recovering','CLOSED':'shard-closed'}[shard.state]">{{shard.shard}}</span>
@@ -61,7 +61,7 @@
 			</div>
 		</div>
 	</td>
-	<td ng-repeat="index in pagination.getPage()" class="shards">
+	<td ng-repeat="index in getPage()" class="shards">
 		<div class="cluster-map-shards">
 			<span ng-repeat="shard in index.unassigned" >
 				<span class="shard shard-unallocated">{{shard.shard}}</span>
