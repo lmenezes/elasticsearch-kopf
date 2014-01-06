@@ -49,36 +49,37 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
-			
-	$scope.updateClusterHealth=function() {
-		$scope.client.getClusterHealth( 
-			function(cluster) {
-				$scope.cluster_health = cluster;
-				$scope.setConnected(true);
-			},
-			function(error) {
-				$scope.cluster_health = null;
-				$scope.setConnected(false);
-				$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
-			}
-		);
-	}
 		
-	$scope.updateCluster=function() {
-		$scope.client.getClusterDetail(
-			function(cluster) {
-				$scope.$apply(function() { $scope.cluster = cluster; });
-			},
-			function(error) {
-				$scope.cluster = null;
-				AlertService.error("Error while retrieving cluster information", error);
-			}
-		);
+	$scope.refreshClusterState=function() {
+		$timeout(function() { 
+			$scope.client.getClusterDetail(
+				function(cluster) {
+					$scope.$apply(function() { $scope.cluster = cluster; });
+				},
+				function(error) {
+					$scope.cluster = null;
+					AlertService.error("Error while retrieving cluster information", error);
+				}
+			);
+			
+			$scope.client.getClusterHealth( 
+				function(cluster) {
+					$scope.$apply(function() { 
+						$scope.cluster_health = cluster;
+						$scope.setConnected(true);
+					});
+				},
+				function(error) {
+					$scope.cluster_health = null;
+					$scope.setConnected(false);
+					$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
+				}
+			);
+		}, 50);	
 	}
-	
+
 	$scope.autoRefreshCluster=function() {
-		$scope.updateCluster();
-		$scope.updateClusterHealth();
+		$scope.refreshClusterState();
 		$timeout(function() { $scope.autoRefreshCluster() }, SettingsService.getRefreshInterval());	
 	}
 	

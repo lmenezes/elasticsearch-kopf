@@ -12,7 +12,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	}
 	
     $scope.$on('forceRefresh', function() {
-		$scope.updateCluster();
+		$scope.refreshClusterState();
     });
 	
 	$scope.closeModal=function(forced_refresh){
@@ -41,7 +41,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
 						$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
-						$scope.updateCluster();
+						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while shutting down node",error);
@@ -79,7 +79,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.deleteIndex(index, 
 					function(response) {
 						$scope.alert_service.success("Index was successfully deleted", response);
-						$scope.updateCluster();
+						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while deleting index", error);
@@ -98,7 +98,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.clearCache(index,
 					function(response) {
 						$scope.alert_service.success("Index cache was successfully cleared", response);
-						$scope.updateCluster();
+						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while clearing index cache", error);
@@ -130,11 +130,11 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
 				$scope.alert_service.success("Shard allocation was successfully enabled", response);
-				$scope.updateCluster();
+				$scope.refreshClusterState();
 			},
 			function(error) {
 				$scope.alert_service.error("Error while enabling shard allocation", error);	
-				$scope.updateCluster();
+				$scope.refreshClusterState();
 			}
 		);
 	}
@@ -143,11 +143,11 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
 				$scope.alert_service.success("Shard allocation was successfully disabled", response);
-				$scope.updateCluster();
+				$scope.refreshClusterState();
 			},
 			function(error) {
 				$scope.alert_service.error("Error while disabling shard allocation", error);	
-				$scope.updateCluster();
+				$scope.refreshClusterState();
 			}
 		);
 	}
@@ -163,7 +163,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.closeIndex(index, 
 					function(response) {
 						$scope.alert_service.success("Index was successfully closed", response);
-						$scope.updateCluster();
+						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while closing index", error);	
@@ -183,7 +183,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.openIndex(index,
 					function(response) {
 						$scope.alert_service.success("Index was successfully opened", response);
-						$scope.updateCluster();
+						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.alert_service.error("Error while opening index", error);
