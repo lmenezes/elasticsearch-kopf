@@ -166,7 +166,6 @@ function ElasticClient(host,username,password) {
 			$.ajax({
 				type: method,
 				url: url,
-				dataType: 'json',
 				beforeSend: function(xhr) { 
 					if (auth != null) {
 						xhr.setRequestHeader("Authorization", auth);
