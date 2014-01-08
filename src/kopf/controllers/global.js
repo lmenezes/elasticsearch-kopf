@@ -84,12 +84,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	}
 	
 	$scope.autoRefreshCluster();
-	
-
-	// should be called when an action could change status/topology of cluster
-	$scope.forceRefresh=function() {
-		$scope.broadcastMessage('forceRefresh',{});
-	}
 
 	$scope.hasConnection=function() {
 		return $scope.is_connected;

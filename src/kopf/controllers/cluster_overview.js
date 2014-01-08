@@ -11,13 +11,9 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		}
 	}
 	
-    $scope.$on('forceRefresh', function() {
-		$scope.refreshClusterState();
-    });
-	
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
-			$scope.forceRefresh(); // broadcasts so every controller gets the forceRefresg
+			$scope.refreshClusterState();
 		}
 	}
 	

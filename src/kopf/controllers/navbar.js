@@ -3,10 +3,6 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 	$scope.alert_service = AlertService;
 	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
 	
-    $scope.$on('forceRefresh', function() {
-		$scope.refreshClusterState();
-    });
-	
     $scope.connectToHost=function() {
 		if (isDefined($scope.new_host) && $scope.new_host.length > 0) {
 			$scope.setHost($scope.new_host);

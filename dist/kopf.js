@@ -1133,13 +1133,9 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		}
 	}
 	
-    $scope.$on('forceRefresh', function() {
-		$scope.refreshClusterState();
-    });
-	
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
-			$scope.forceRefresh(); // broadcasts so every controller gets the forceRefresg
+			$scope.refreshClusterState();
 		}
 	}
 	
@@ -1419,7 +1415,7 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
 					$scope.alert_service.success("Cluster settings were successfully updated",response);
-					$scope.forceRefresh();
+					$scope.refreshClusterState();
 				}, 
 				function(error) {
 					$scope.alert_service.error("Error while updating cluster settings",error);
@@ -1469,7 +1465,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
 					$scope.modal.alert = new SuccessAlert('Index successfully created', response);
-					$scope.forceRefresh();					
+					$scope.refreshClusterState();
 				}, function(error) { 
 					$scope.modal.alert = new ErrorAlert("Error while creating index", error);
 				}
@@ -1571,12 +1567,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	}
 	
 	$scope.autoRefreshCluster();
-	
-
-	// should be called when an action could change status/topology of cluster
-	$scope.forceRefresh=function() {
-		$scope.broadcastMessage('forceRefresh',{});
-	}
 
 	$scope.hasConnection=function() {
 		return $scope.is_connected;
@@ -1692,7 +1682,7 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		 $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			 function(response) {
 				 $scope.alert_service.success("Index settings were successfully updated", response);
-				 $scope.forceRefresh();
+				 $scope.refreshClusterState();
 			 },
 			 function(error) {
 				 $scope.alert_service.error("Error while updating index settings", error);
@@ -1704,10 +1694,6 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 	$scope.settings_service = SettingsService;
 	$scope.alert_service = AlertService;
 	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
-	
-    $scope.$on('forceRefresh', function() {
-		$scope.refreshClusterState();
-    });
 	
     $scope.connectToHost=function() {
 		if (isDefined($scope.new_host) && $scope.new_host.length > 0) {
