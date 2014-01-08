@@ -75,7 +75,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 					$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
 				}
 			);
-		}, 50);	
+		}, 100);	
 	}
 
 	$scope.autoRefreshCluster=function() {
