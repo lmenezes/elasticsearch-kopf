@@ -54,25 +54,29 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$timeout(function() { 
 			$scope.client.getClusterDetail(
 				function(cluster) {
-					$scope.$apply(function() { $scope.cluster = cluster; });
+					$scope.updateModel(function() { $scope.cluster = cluster; });
 				},
 				function(error) {
-					$scope.cluster = null;
-					AlertService.error("Error while retrieving cluster information", error);
+					$scope.updateModel(function() { 
+						AlertService.error("Error while retrieving cluster information", error);
+						$scope.cluster = null; 
+					});
 				}
 			);
 			
 			$scope.client.getClusterHealth( 
 				function(cluster) {
-					$scope.$apply(function() { 
+					$scope.updateModel(function() { 
 						$scope.cluster_health = cluster;
 						$scope.setConnected(true);
 					});
 				},
 				function(error) {
-					$scope.cluster_health = null;
-					$scope.setConnected(false);
-					$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
+					$scope.updateModel(function() {
+						$scope.cluster_health = null;
+						$scope.setConnected(false);
+						$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);						
+					});
 				}
 			);
 		}, 100);	
@@ -126,6 +130,10 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		if (isDefined(event)) {
 			$scope.broadcastMessage(event, {});
 		}
+	}
+	
+	$scope.updateModel=function(action) {
+		$scope.$apply(action);
 	}
 	
 }

@@ -983,11 +983,15 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		});
 		$scope.client.updateAliases(adds,deletes, 
 			function(response) {
+   				$scope.updateModel(function() {
+					$scope.alert_service.success("Aliases were successfully updated",response);
+   				});
 				$scope.loadAliases();
-				$scope.alert_service.success("Aliases were successfully updated",response);
 			},
 			function(error) {
-				$scope.alert_service.error("Error while updating aliases",error);
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while updating aliases",error);
+   				});
 			}
 		);
 	}
@@ -996,12 +1000,16 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		$scope.new_alias = new Alias();
 		$scope.client.fetchAliases(
 			function(aliases) {
-				$scope.originalAliases = aliases;
-				$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
-				$scope.pagination.setResults($scope.aliases.info);
+   				$scope.updateModel(function() {
+					$scope.originalAliases = aliases;
+					$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
+					$scope.pagination.setResults($scope.aliases.info);
+   				});
 			},
 			function(error) {
-				$scope.alert_service.error("Error while fetching aliases",error);		
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while fetching aliases",error);		
+				});
 			}
 		);
 	}
@@ -1037,11 +1045,15 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 			$scope.field_tokens = null;
 			$scope.client.analyzeByField($scope.field_index.name,$scope.field_type,$scope.field_field,$scope.field_text, 
 				function(response) {
-					$scope.field_tokens = response;
+	   				$scope.updateModel(function() {
+						$scope.field_tokens = response;
+	   				});
 				},
 				function(error) {
-					$scope.field_tokens = null;
-					$scope.alert_service.error("Error while analyzing text", error);
+	   				$scope.updateModel(function() {
+						$scope.field_tokens = null;
+						$scope.alert_service.error("Error while analyzing text", error);
+	   				});
 				}
 			);
 		}
@@ -1052,11 +1064,15 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 			$scope.field_tokens = null;
 			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
-					$scope.field_tokens = response;
+	   				$scope.updateModel(function() {
+						$scope.field_tokens = response;
+	   				});
 				},
 				function(error) {
-					$scope.field_tokens = null;
-					$scope.alert_service.error("Error while analyzing text", error);
+	   				$scope.updateModel(function() {
+						$scope.field_tokens = null;
+						$scope.alert_service.error("Error while analyzing text", error);
+	   				});
 				}
 			);
 		}
@@ -1092,12 +1108,16 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 				cluster_health['state'] = JSON.stringify(state, undefined, 4);
 				cluster_health['stats'] = JSON.stringify(stats, undefined, 4);
 				cluster_health['hot_threads'] = hot_threads;
-				$scope.cluster_health = cluster_health;
-				$scope.state = '';
+   				$scope.updateModel(function() {
+					$scope.cluster_health = cluster_health;
+					$scope.state = '';
+   				});
 			},
 			function(failed_request) {
-				$scope.state = '';
-				$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
+   				$scope.updateModel(function() {
+					$scope.state = '';
+					$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
+   				});
 		});
 	}
 
@@ -1112,10 +1132,14 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		var data = JSON.stringify(gist, undefined, 4);
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
 			.done(function(response) { 
-				$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
+   				$scope.updateModel(function() {
+					$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
+   				});
 			})
 			.fail(function(response) {
-				$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
+   				$scope.updateModel(function() {
+					$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
+   				});
 			}
 		);
 	}
@@ -1158,11 +1182,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
-						$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while shutting down node",error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while shutting down node",error);
+		   				});
 					}
 				);
 			}
@@ -1178,10 +1206,14 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.optimizeIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully optimized", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully optimized", response);
+		   				});
 					},
 					function(error) {
-						$scope.alert_service.error("Error while optimizing index", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while optimizing index", error);
+		   				});
 					}				
 				);
 			}
@@ -1196,11 +1228,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.deleteIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully deleted", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully deleted", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while deleting index", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting index", error);
+		   				});
 					}	
 				);
 			}
@@ -1215,11 +1251,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.clearCache(index,
 					function(response) {
-						$scope.alert_service.success("Index cache was successfully cleared", response);
-						$scope.refreshClusterState();
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index cache was successfully cleared", response);
+		   				});
+						$scope.refreshClusterState();						
 					},
 					function(error) {
-						$scope.alert_service.error("Error while clearing index cache", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while clearing index cache", error);
+		   				});
 					}
 				);
 			}
@@ -1234,10 +1274,14 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.refreshIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully refreshed", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully refreshed", response);
+		   				});
 					},
 					function(error) {
-						$scope.alert_service.error("Error while refreshing index", error);	
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while refreshing index", error);	
+		   				});
 					}
 				);
 			}
@@ -1247,12 +1291,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.enableAllocation=function() {
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
-				$scope.alert_service.success("Shard allocation was successfully enabled", response);
+   				$scope.updateModel(function() {
+					$scope.alert_service.success("Shard allocation was successfully enabled", response);
+   				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.alert_service.error("Error while enabling shard allocation", error);	
-				$scope.refreshClusterState();
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while enabling shard allocation", error);	
+   				});
 			}
 		);
 	}
@@ -1260,12 +1307,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.disableAllocation=function(current_state) {
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
-				$scope.alert_service.success("Shard allocation was successfully disabled", response);
+   				$scope.updateModel(function() {
+					$scope.alert_service.success("Shard allocation was successfully disabled", response);
+   				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.alert_service.error("Error while disabling shard allocation", error);	
-				$scope.refreshClusterState();
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while disabling shard allocation", error);	
+   				});
 			}
 		);
 	}
@@ -1280,11 +1330,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.closeIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully closed", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully closed", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while closing index", error);	
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while closing index", error);	
+		   				});
 					}
 				);
 			}
@@ -1300,11 +1354,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.openIndex(index,
 					function(response) {
-						$scope.alert_service.success("Index was successfully opened", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully opened", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while opening index", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while opening index", error);
+		   				});
 					}
 				);
 			}
@@ -1414,11 +1472,15 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 			new_settings['transient'] = $scope.settings;
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
-					$scope.alert_service.success("Cluster settings were successfully updated",response);
+	   				$scope.updateModel(function() {
+						$scope.alert_service.success("Cluster settings were successfully updated",response);
+	   				});
 					$scope.refreshClusterState();
 				}, 
 				function(error) {
-					$scope.alert_service.error("Error while updating cluster settings",error);
+	   				$scope.updateModel(function() {
+						$scope.alert_service.error("Error while updating cluster settings",error);
+	   				});
 				}
 		);
 	}
@@ -1464,10 +1526,14 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			}
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
-					$scope.modal.alert = new SuccessAlert('Index successfully created', response);
+	   				$scope.updateModel(function() {
+						$scope.modal.alert = new SuccessAlert('Index successfully created', response);
+	   				});
 					$scope.refreshClusterState();
 				}, function(error) { 
-					$scope.modal.alert = new ErrorAlert("Error while creating index", error);
+	   				$scope.updateModel(function() {
+						$scope.modal.alert = new ErrorAlert("Error while creating index", error);
+	   				});
 				}
 			);
 		}
@@ -1537,25 +1603,29 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$timeout(function() { 
 			$scope.client.getClusterDetail(
 				function(cluster) {
-					$scope.$apply(function() { $scope.cluster = cluster; });
+					$scope.updateModel(function() { $scope.cluster = cluster; });
 				},
 				function(error) {
-					$scope.cluster = null;
-					AlertService.error("Error while retrieving cluster information", error);
+					$scope.updateModel(function() { 
+						AlertService.error("Error while retrieving cluster information", error);
+						$scope.cluster = null; 
+					});
 				}
 			);
 			
 			$scope.client.getClusterHealth( 
 				function(cluster) {
-					$scope.$apply(function() { 
+					$scope.updateModel(function() { 
 						$scope.cluster_health = cluster;
 						$scope.setConnected(true);
 					});
 				},
 				function(error) {
-					$scope.cluster_health = null;
-					$scope.setConnected(false);
-					$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);
+					$scope.updateModel(function() {
+						$scope.cluster_health = null;
+						$scope.setConnected(false);
+						$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);						
+					});
 				}
 			);
 		}, 100);	
@@ -1609,6 +1679,10 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		if (isDefined(event)) {
 			$scope.broadcastMessage(event, {});
 		}
+	}
+	
+	$scope.updateModel=function(action) {
+		$scope.$apply(action);
 	}
 	
 }
@@ -1681,11 +1755,15 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		 });
 		 $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			 function(response) {
-				 $scope.alert_service.success("Index settings were successfully updated", response);
-				 $scope.refreshClusterState();
+  				$scope.updateModel(function() {
+					 $scope.alert_service.success("Index settings were successfully updated", response);
+  				});
+				$scope.refreshClusterState();
 			 },
 			 function(error) {
-				 $scope.alert_service.error("Error while updating index settings", error);
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while updating index settings", error);
+   				});
 			 }
 		 );
 	 }
@@ -1745,13 +1823,18 @@ function RestController($scope, $location, $timeout, AlertService) {
 						// nothing to do
 					}
 					$('#rest-client-response').html(content);
-					$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-					if ($scope.history.length > 30) {
-						$scope.history.length = 30;
-					}
+					$scope.updateModel(function() {
+						$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
+						if ($scope.history.length > 30) {
+							$scope.history.length = 30;
+						}
+					});
+
 				},
 				function(error) {
-					$scope.alert_service.error("Request was not successful: " + error['statusText']);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Request was not successful: " + error['statusText']);
+					});
 					try {
 						$('#rest-client-response').html(jsonTree.create(JSON.parse(error['responseText'])));
 					} catch (invalid_json) {
@@ -1836,16 +1919,22 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 					function(response) {
 						$scope.client.refreshIndex("_percolator", 
 							function(response) {
-								$scope.alert_service.success("Query successfully deleted", response);
-								$scope.loadPercolatorQueries();
+								$scope.updateModel(function() {
+									$scope.alert_service.success("Query successfully deleted", response);
+									$scope.loadPercolatorQueries();
+								});
 							},
 							function(error) {
-								$scope.alert_service.success("Error while reloading queries", error);
+								$scope.updateModel(function() {
+									$scope.alert_service.success("Error while reloading queries", error);
+								});
 							}
 						);
 					},
 					function(error) {
-						$scope.alert_service.error("Error while deleting query", error);
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting query", error);
+						});
 					}
 				);
 			}
@@ -1859,17 +1948,22 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
 						function(response) {
-							// non request action, no need to display
-							$scope.alert_service.success("Percolator Query successfully created", response);
-							$scope.loadPercolatorQueries();
+							$scope.updateModel(function() {
+								$scope.alert_service.success("Percolator Query successfully created", response);
+								$scope.loadPercolatorQueries();
+							});
 						},
 						function(error) {
-							$scope.alert_service.success("Error while reloading queries", error);
+							$scope.updateModel(function() {
+								$scope.alert_service.success("Error while reloading queries", error);
+							});
 						}
 					);
 				},
 				function(error) {
-					$scope.alert_service.error("Error while creating percolator query", error);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Error while creating percolator query", error);
+					});
 				}
 			);
 		}
@@ -1886,12 +1980,16 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			var index = $scope.index != null ? $scope.index.name : null;
 			$scope.client.fetchPercolateQueries(index, JSON.stringify(params),
 				function(response) {
-					$scope.total = response['hits']['total'];
-					$scope.queries = response['hits']['hits'].map(function(q) { return new PercolateQuery(q); });
+					$scope.updateModel(function() {
+						$scope.total = response['hits']['total'];
+						$scope.queries = response['hits']['hits'].map(function(q) { return new PercolateQuery(q); });
+					});
 				},
 				function(error) {
 					if (!(error['responseJSON'] != null && error['responseJSON']['error'] == "IndexMissingException[[_percolator] missing]")) {
-						$scope.alert_service.error("Error while reading loading percolate queries", error);
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while reading loading percolate queries", error);
+						});
 					}
 				}
 			);
@@ -1969,10 +2067,14 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		if ($scope.validation_error == null) {
 			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
-					$scope.alert_service.success("Warmup query successfully registered", response);
+					$scope.updateModel(function() {
+						$scope.alert_service.success("Warmup query successfully registered", response);						
+					});
 				},
 				function(error) {
-					$scope.alert_service.error("Request did not return a valid JSON", error);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Request did not return a valid JSON", error);						
+					});
 				}
 			);
 		}
@@ -1986,11 +2088,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 			function() {
 				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
 					function(response) {
-						$scope.alert_service.success("Warmup query successfully deleted", response);
-						$scope.loadIndexWarmers();
+						$scope.updateModel(function() {
+							$scope.alert_service.success("Warmup query successfully deleted", response);
+							$scope.loadIndexWarmers();
+						});
 					},
 					function(error) {
-						$scope.alert_service.error("Error while deleting warmup query", error);
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting warmup query", error);
+						});
 					}
 				);
 			}
@@ -2001,14 +2107,18 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		if ($scope.index != null) {
 			$scope.client.getIndexWarmers($scope.index.name, $scope.warmer_id,
 				function(response) {
-					if (response[$scope.index.name] != null) {
-						$scope.warmers = response[$scope.index.name]['warmers'];
-					} else {
-						$scope.warmers = {};
-					}
+					$scope.updateModel(function() {
+						if (response[$scope.index.name] != null) {
+							$scope.warmers = response[$scope.index.name]['warmers'];
+						} else {
+							$scope.warmers = {};
+						}
+					});
 				},
 				function(error) {
-					$scope.alert_service.error("Error while fetching warmup queries", error);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Error while fetching warmup queries", error);
+					});
 				}
 			);
 		} else {

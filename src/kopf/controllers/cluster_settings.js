@@ -16,11 +16,15 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 			new_settings['transient'] = $scope.settings;
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
-					$scope.alert_service.success("Cluster settings were successfully updated",response);
+	   				$scope.updateModel(function() {
+						$scope.alert_service.success("Cluster settings were successfully updated",response);
+	   				});
 					$scope.refreshClusterState();
 				}, 
 				function(error) {
-					$scope.alert_service.error("Error while updating cluster settings",error);
+	   				$scope.updateModel(function() {
+						$scope.alert_service.error("Error while updating cluster settings",error);
+	   				});
 				}
 		);
 	}

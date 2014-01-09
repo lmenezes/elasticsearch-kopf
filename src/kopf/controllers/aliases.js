@@ -100,11 +100,15 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		});
 		$scope.client.updateAliases(adds,deletes, 
 			function(response) {
+   				$scope.updateModel(function() {
+					$scope.alert_service.success("Aliases were successfully updated",response);
+   				});
 				$scope.loadAliases();
-				$scope.alert_service.success("Aliases were successfully updated",response);
 			},
 			function(error) {
-				$scope.alert_service.error("Error while updating aliases",error);
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while updating aliases",error);
+   				});
 			}
 		);
 	}
@@ -113,12 +117,16 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		$scope.new_alias = new Alias();
 		$scope.client.fetchAliases(
 			function(aliases) {
-				$scope.originalAliases = aliases;
-				$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
-				$scope.pagination.setResults($scope.aliases.info);
+   				$scope.updateModel(function() {
+					$scope.originalAliases = aliases;
+					$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
+					$scope.pagination.setResults($scope.aliases.info);
+   				});
 			},
 			function(error) {
-				$scope.alert_service.error("Error while fetching aliases",error);		
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while fetching aliases",error);		
+				});
 			}
 		);
 	}

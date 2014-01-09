@@ -36,11 +36,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
-						$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while shutting down node",error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while shutting down node",error);
+		   				});
 					}
 				);
 			}
@@ -56,10 +60,14 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.optimizeIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully optimized", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully optimized", response);
+		   				});
 					},
 					function(error) {
-						$scope.alert_service.error("Error while optimizing index", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while optimizing index", error);
+		   				});
 					}				
 				);
 			}
@@ -74,11 +82,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.deleteIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully deleted", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully deleted", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while deleting index", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting index", error);
+		   				});
 					}	
 				);
 			}
@@ -93,11 +105,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.clearCache(index,
 					function(response) {
-						$scope.alert_service.success("Index cache was successfully cleared", response);
-						$scope.refreshClusterState();
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index cache was successfully cleared", response);
+		   				});
+						$scope.refreshClusterState();						
 					},
 					function(error) {
-						$scope.alert_service.error("Error while clearing index cache", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while clearing index cache", error);
+		   				});
 					}
 				);
 			}
@@ -112,10 +128,14 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.refreshIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully refreshed", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully refreshed", response);
+		   				});
 					},
 					function(error) {
-						$scope.alert_service.error("Error while refreshing index", error);	
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while refreshing index", error);	
+		   				});
 					}
 				);
 			}
@@ -125,12 +145,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.enableAllocation=function() {
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
-				$scope.alert_service.success("Shard allocation was successfully enabled", response);
+   				$scope.updateModel(function() {
+					$scope.alert_service.success("Shard allocation was successfully enabled", response);
+   				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.alert_service.error("Error while enabling shard allocation", error);	
-				$scope.refreshClusterState();
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while enabling shard allocation", error);	
+   				});
 			}
 		);
 	}
@@ -138,12 +161,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.disableAllocation=function(current_state) {
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
-				$scope.alert_service.success("Shard allocation was successfully disabled", response);
+   				$scope.updateModel(function() {
+					$scope.alert_service.success("Shard allocation was successfully disabled", response);
+   				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.alert_service.error("Error while disabling shard allocation", error);	
-				$scope.refreshClusterState();
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while disabling shard allocation", error);	
+   				});
 			}
 		);
 	}
@@ -158,11 +184,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.closeIndex(index, 
 					function(response) {
-						$scope.alert_service.success("Index was successfully closed", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully closed", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while closing index", error);	
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while closing index", error);	
+		   				});
 					}
 				);
 			}
@@ -178,11 +208,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.openIndex(index,
 					function(response) {
-						$scope.alert_service.success("Index was successfully opened", response);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.success("Index was successfully opened", response);
+		   				});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-						$scope.alert_service.error("Error while opening index", error);
+		   				$scope.updateModel(function() {
+							$scope.alert_service.error("Error while opening index", error);
+		   				});
 					}
 				);
 			}

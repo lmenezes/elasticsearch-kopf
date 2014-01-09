@@ -19,12 +19,16 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 				cluster_health['state'] = JSON.stringify(state, undefined, 4);
 				cluster_health['stats'] = JSON.stringify(stats, undefined, 4);
 				cluster_health['hot_threads'] = hot_threads;
-				$scope.cluster_health = cluster_health;
-				$scope.state = '';
+   				$scope.updateModel(function() {
+					$scope.cluster_health = cluster_health;
+					$scope.state = '';
+   				});
 			},
 			function(failed_request) {
-				$scope.state = '';
-				$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
+   				$scope.updateModel(function() {
+					$scope.state = '';
+					$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
+   				});
 		});
 	}
 
@@ -39,10 +43,14 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		var data = JSON.stringify(gist, undefined, 4);
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
 			.done(function(response) { 
-				$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
+   				$scope.updateModel(function() {
+					$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
+   				});
 			})
 			.fail(function(response) {
-				$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
+   				$scope.updateModel(function() {
+					$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
+   				});
 			}
 		);
 	}

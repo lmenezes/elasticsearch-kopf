@@ -35,10 +35,14 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		if ($scope.validation_error == null) {
 			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
-					$scope.alert_service.success("Warmup query successfully registered", response);
+					$scope.updateModel(function() {
+						$scope.alert_service.success("Warmup query successfully registered", response);						
+					});
 				},
 				function(error) {
-					$scope.alert_service.error("Request did not return a valid JSON", error);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Request did not return a valid JSON", error);						
+					});
 				}
 			);
 		}
@@ -52,11 +56,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 			function() {
 				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
 					function(response) {
-						$scope.alert_service.success("Warmup query successfully deleted", response);
-						$scope.loadIndexWarmers();
+						$scope.updateModel(function() {
+							$scope.alert_service.success("Warmup query successfully deleted", response);
+							$scope.loadIndexWarmers();
+						});
 					},
 					function(error) {
-						$scope.alert_service.error("Error while deleting warmup query", error);
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting warmup query", error);
+						});
 					}
 				);
 			}
@@ -67,14 +75,18 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		if ($scope.index != null) {
 			$scope.client.getIndexWarmers($scope.index.name, $scope.warmer_id,
 				function(response) {
-					if (response[$scope.index.name] != null) {
-						$scope.warmers = response[$scope.index.name]['warmers'];
-					} else {
-						$scope.warmers = {};
-					}
+					$scope.updateModel(function() {
+						if (response[$scope.index.name] != null) {
+							$scope.warmers = response[$scope.index.name]['warmers'];
+						} else {
+							$scope.warmers = {};
+						}
+					});
 				},
 				function(error) {
-					$scope.alert_service.error("Error while fetching warmup queries", error);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Error while fetching warmup queries", error);
+					});
 				}
 			);
 		} else {

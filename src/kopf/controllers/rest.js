@@ -34,13 +34,18 @@ function RestController($scope, $location, $timeout, AlertService) {
 						// nothing to do
 					}
 					$('#rest-client-response').html(content);
-					$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-					if ($scope.history.length > 30) {
-						$scope.history.length = 30;
-					}
+					$scope.updateModel(function() {
+						$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
+						if ($scope.history.length > 30) {
+							$scope.history.length = 30;
+						}
+					});
+
 				},
 				function(error) {
-					$scope.alert_service.error("Request was not successful: " + error['statusText']);
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Request was not successful: " + error['statusText']);
+					});
 					try {
 						$('#rest-client-response').html(jsonTree.create(JSON.parse(error['responseText'])));
 					} catch (invalid_json) {

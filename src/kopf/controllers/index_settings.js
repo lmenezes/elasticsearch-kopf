@@ -67,11 +67,15 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		 });
 		 $scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			 function(response) {
-				 $scope.alert_service.success("Index settings were successfully updated", response);
-				 $scope.refreshClusterState();
+  				$scope.updateModel(function() {
+					 $scope.alert_service.success("Index settings were successfully updated", response);
+  				});
+				$scope.refreshClusterState();
 			 },
 			 function(error) {
-				 $scope.alert_service.error("Error while updating index settings", error);
+   				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while updating index settings", error);
+   				});
 			 }
 		 );
 	 }
