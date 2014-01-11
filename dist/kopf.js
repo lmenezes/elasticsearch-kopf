@@ -1811,7 +1811,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 		$('#rest-client-response').html('');
 		if ($scope.editor.error == null && notEmpty($scope.request.url)) {
 			// TODO: deal with basic auth here
-			if ($scope.request.method == 'GET' && $scope.request.body.length > 1) {
+			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
 				$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 			}
 			$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
