@@ -1132,14 +1132,10 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		var data = JSON.stringify(gist, undefined, 4);
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
 			.done(function(response) { 
-   				$scope.updateModel(function() {
-					$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
-   				});
+				$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
 			})
 			.fail(function(response) {
-   				$scope.updateModel(function() {
-					$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
-   				});
+				$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
 			}
 		);
 	}
@@ -1549,7 +1545,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 }
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.4.0";
+	$scope.version = "0.4.1";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
