@@ -17,16 +17,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		}
 	}
 	
-	// actions invoked from view
-	
-	$scope.prepareCreateIndex=function() {
-		$scope.broadcastMessage('prepareCreateIndex',{});
-	}
-	
-	$scope.displayClusterHealth=function() {
-		$scope.broadcastMessage('loadClusterHealth',{});
-	}
-	
 	$scope.shutdown_node=function(node_id, node_name) {
 		$scope.dialog_service.open(
 			"are you sure you want to shutdown node " + node_name + "?",

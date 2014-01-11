@@ -1,0 +1,46 @@
+<div ng-controller="ClusterHealthController">
+	<h2>cluster health information</h2>
+	<div class="content-panel">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="cluster-health-top-actions">
+					<button type="button" class="btn btn-default" ng-click='back()'>Back</button>
+					<button type="button" class="btn btn-primary float-right" title="load cluster information" ng-click='loadClusterHealth()'>
+						<i class="icon-stethoscope"></i> Load
+					</button>
+					<button ng-show="cluster_health != null" type="button" title="easily share cluster information with others" class="btn btn-primary float-right" ng-click='publishClusterHealth()'>
+						<i class="icon-github"></i> Gist it!
+					</button>
+				</div>
+			</div>
+		</div>
+		<div ng-show="cluster_health != null">
+			<h4>cluster state</h4>
+			<div>
+				<pre class="cluster-health-content">{{cluster_health.state}}</pre>
+			</div>
+			<h4>nodes stats</h4>
+			<div>
+				<pre class="cluster-health-content">{{cluster_health.stats}}</pre>
+			</div>
+			<h4>hot threads</h4>
+			<div>
+				<pre class="cluster-health-content">{{cluster_health.hot_threads}}</pre>
+			</div>
+		</div>
+		<div class="cluster-health-state">{{state}}</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<span class="pull-right" ng-show="cluster_health != null">
+					<button type="button" class="btn btn-default" ng-click='back()'>Back</button>
+					<button type="button" class="btn btn-primary float-right" title="load cluster information" ng-click='loadClusterHealth()'>
+						<i class="icon-stethoscope"></i> Load
+					</button>
+					<button ng-show="cluster_health != null" type="button" title="easily share cluster information with others" class="btn btn-primary float-right" ng-click='publishClusterHealth()'>
+						<i class="icon-github"></i> Gist it!
+					</button>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

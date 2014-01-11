@@ -1,10 +1,15 @@
 function ClusterHealthController($scope,$location,$timeout, AlertService) {
-	$scope.alert_service = AlertService;
 	$scope.shared_url = '';
 	$scope.cluster_health = {};
 	$scope.state = '';
 	
+	
+	$scope.back=function() {
+		$('#cluster_option a').tab('show');
+	}
+	
     $scope.$on('loadClusterHealth', function() {
+		$('#cluster_health_option a').tab('show');
 		$scope.cluster_health = null; // otherwise we see past version, then new
 		$scope.state = ''; // informs about loading state
     });
@@ -27,7 +32,7 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 			function(failed_request) {
    				$scope.updateModel(function() {
 					$scope.state = '';
-					$scope.modal.alert = new ErrorAlert("Error while retrieving cluster health information", failed_request.responseText);
+					AlertService.error("Error while retrieving cluster health information", failed_request.responseText);
    				});
 		});
 	}
@@ -41,16 +46,16 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		gist['files']['stats'] = {'content': $scope.cluster_health['stats'],'indent':'2', 'language':'JSON'} ;
 		gist['files']['hot_threads'] = {'content':$scope.cluster_health['hot_threads'],'indent':'2', 'language':'JSON'};
 		var data = JSON.stringify(gist, undefined, 4);
-		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data, async: false})
+		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data})
 			.done(function(response) { 
-   				$scope.updateModel(function() {
-					$scope.modal.alert = new SuccessAlert("Cluster health information successfully shared", "Gist available at : " + response.html_url);
-   				});
+				$scope.updateModel(function() {
+					AlertService.success("Cluster health information successfully shared", "Gist available at : " + response.html_url);
+				});
 			})
 			.fail(function(response) {
-   				$scope.updateModel(function() {
-					$scope.modal.alert = new ErrorAlert("Error while publishing Gist", responseText);
-   				});
+				$scope.updateModel(function() {
+					AlertService.error("Error while publishing Gist", responseText);
+				});
 			}
 		);
 	}
