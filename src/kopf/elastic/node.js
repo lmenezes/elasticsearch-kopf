@@ -17,6 +17,10 @@ function Node(node_id, node_info, node_stats) {
 	this.setCurrentMaster=function() {
 		this.current_master = true;
 	}
+
+	this.equals=function(node) {
+		return node.id === this.id;
+	}
 	
 	this.compare=function(other) { // TODO: take into account node specs?
 		if (other.current_master) {

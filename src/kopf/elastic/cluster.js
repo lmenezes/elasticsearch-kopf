@@ -50,5 +50,37 @@ function Cluster(state,status,nodes,settings) {
 				return (data && n.data || master && n.master || client && n.client) ? n : null;
 			});
 		};
+
+		this.getChanges=function(new_cluster) {
+			var nodes = this.nodes;
+			var changes = new ClusterChanges();
+			if (new_cluster != null) {
+				nodes.forEach(function(node) {
+					for (var i = 0; i < new_cluster.nodes.length; i++) {
+						if (new_cluster.nodes[i].equals(node)) {
+							node = null;
+							break;
+						}
+					}
+					if (node != null) {
+						changes.addLeavingNode(node);
+					}
+				});
+				if (new_cluster.nodes.length != nodes.length || !changes.hasJoins()) {
+						new_cluster.nodes.forEach(function(node) {
+							for (var i = 0; i < nodes.length; i++) {
+								if (nodes[i].equals(node)) {
+									node = null;
+									break;
+								}
+							}	
+						if (node != null) {
+							changes.addJoiningNode(node);	
+						}
+					});
+				}
+			}
+			return changes;
+		}
 	}
 }

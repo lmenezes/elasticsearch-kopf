@@ -49,12 +49,31 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
+
+	$scope.alertClusterChanges=function(cluster) {
+		if ($scope.cluster != null && cluster != null) {
+			var changes = $scope.cluster.getChanges(cluster);
+			if (changes.hasChanges()) {
+				if (changes.hasJoins()) {
+					var joins = changes.nodeJoins.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
+					AlertService.info(joins.length + " new node(s) joined the cluster", joins);
+				}
+				if (changes.hasLeaves()) {
+					var leaves = changes.nodeLeaves.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
+					AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
+				}
+			}
+		}
+	}
 		
 	$scope.refreshClusterState=function() {
 		$timeout(function() { 
 			$scope.client.getClusterDetail(
 				function(cluster) {
-					$scope.updateModel(function() { $scope.cluster = cluster; });
+					$scope.updateModel(function() { 
+						$scope.alertClusterChanges(cluster);
+						$scope.cluster = cluster; 
+					});
 				},
 				function(error) {
 					$scope.updateModel(function() { 

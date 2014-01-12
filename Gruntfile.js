@@ -45,6 +45,7 @@ module.exports = function(grunt) {
 				src: [
 					'src/kopf/elastic/alias.js',
 					'src/kopf/elastic/aliases.js',
+					'src/kopf/elastic/cluster_changes.js',
 					'src/kopf/elastic/cluster_health.js',
 					'src/kopf/elastic/cluster.js',
 					'src/kopf/elastic/elastic_client.js',

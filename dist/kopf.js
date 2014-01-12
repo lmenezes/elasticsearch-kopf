@@ -63,6 +63,42 @@ function Aliases(aliases_info) {
 	this.info = aliases_map;
 }
 
+function ClusterChanges() {
+
+	this.nodeJoins = null;
+	this.nodeLeaves = null;
+
+	this.hasChanges=function() {
+		return (this.nodeJoins != null ||
+			this.nodeLeaves != null
+		);
+	}
+
+	this.addJoiningNode=function(node) {
+		this.changes = true;
+		if (this.nodeJoins == null) {
+			this.nodeJoins = [];
+		}
+		this.nodeJoins.push(node);
+	}
+
+	this.addLeavingNode=function(node) {
+		this.changes = true;
+		if (this.nodeLeaves == null) {
+			this.nodeLeaves = [];
+		}
+		this.nodeLeaves.push(node);
+	}
+
+	this.hasJoins=function() {
+		return this.nodeJoins != null;
+	}
+
+	this.hasLeaves=function() {
+		return this.nodeLeaves != null;
+	}
+
+}
 function ClusterHealth(health) {
 	this.status = health['status'];
 	this.name = health['cluster_name'];
@@ -119,6 +155,38 @@ function Cluster(state,status,nodes,settings) {
 				return (data && n.data || master && n.master || client && n.client) ? n : null;
 			});
 		};
+
+		this.getChanges=function(new_cluster) {
+			var nodes = this.nodes;
+			var changes = new ClusterChanges();
+			if (new_cluster != null) {
+				nodes.forEach(function(node) {
+					for (var i = 0; i < new_cluster.nodes.length; i++) {
+						if (new_cluster.nodes[i].equals(node)) {
+							node = null;
+							break;
+						}
+					}
+					if (node != null) {
+						changes.addLeavingNode(node);
+					}
+				});
+				if (new_cluster.nodes.length != nodes.length || !changes.hasJoins()) {
+						new_cluster.nodes.forEach(function(node) {
+							for (var i = 0; i < nodes.length; i++) {
+								if (nodes[i].equals(node)) {
+									node = null;
+									break;
+								}
+							}	
+						if (node != null) {
+							changes.addJoiningNode(node);	
+						}
+					});
+				}
+			}
+			return changes;
+		}
 	}
 }
 function ElasticClient(host,username,password) {
@@ -553,6 +621,10 @@ function Node(node_id, node_info, node_stats) {
 
 	this.setCurrentMaster=function() {
 		this.current_master = true;
+	}
+
+	this.equals=function(node) {
+		return node.id === this.id;
 	}
 	
 	this.compare=function(other) { // TODO: take into account node specs?
@@ -1598,12 +1670,31 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
+
+	$scope.alertClusterChanges=function(cluster) {
+		if ($scope.cluster != null && cluster != null) {
+			var changes = $scope.cluster.getChanges(cluster);
+			if (changes.hasChanges()) {
+				if (changes.hasJoins()) {
+					var joins = changes.nodeJoins.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
+					AlertService.info(joins.length + " new node(s) joined the cluster", joins);
+				}
+				if (changes.hasLeaves()) {
+					var leaves = changes.nodeLeaves.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
+					AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
+				}
+			}
+		}
+	}
 		
 	$scope.refreshClusterState=function() {
 		$timeout(function() { 
 			$scope.client.getClusterDetail(
 				function(cluster) {
-					$scope.updateModel(function() { $scope.cluster = cluster; });
+					$scope.updateModel(function() { 
+						$scope.alertClusterChanges(cluster);
+						$scope.cluster = cluster; 
+					});
 				},
 				function(error) {
 					$scope.updateModel(function() { 
@@ -2181,18 +2272,27 @@ kopf.factory('AlertService', function() {
 	}
 	
 	// creates an error alert
-	this.error=function(message, response) {
-		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), 15000);
+	this.error=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 15000;
+		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
 	}
 	
 	// creates an info alert
-	this.info=function(message, response) {
-		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), 5000);
+	this.info=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 5000;
+		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
 	}
 	
 	// creates success alert
-	this.success=function(message, response) {
-		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), 5000);
+	this.success=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 5000;
+		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
+	}
+	
+	// creates a warn alert
+	this.warn=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 10000;
+		this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
 	}
 	
 	this.addAlert=function(alert, timeout) {

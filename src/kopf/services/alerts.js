@@ -38,18 +38,27 @@ kopf.factory('AlertService', function() {
 	}
 	
 	// creates an error alert
-	this.error=function(message, response) {
-		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), 15000);
+	this.error=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 15000;
+		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
 	}
 	
 	// creates an info alert
-	this.info=function(message, response) {
-		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), 5000);
+	this.info=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 5000;
+		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
 	}
 	
 	// creates success alert
-	this.success=function(message, response) {
-		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), 5000);
+	this.success=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 5000;
+		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
+	}
+	
+	// creates a warn alert
+	this.warn=function(message, response, timeout) {
+		timeout = timeout != null ? timeout : 10000;
+		this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
 	}
 	
 	this.addAlert=function(alert, timeout) {
