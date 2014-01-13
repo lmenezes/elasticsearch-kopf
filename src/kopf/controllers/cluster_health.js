@@ -49,7 +49,7 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data})
 			.done(function(response) { 
 				$scope.updateModel(function() {
-					AlertService.success("Cluster health information successfully shared", "Gist available at : " + response.html_url);
+					AlertService.success("Cluster health information successfully shared at: " + response.html_url, null, 60000);
 				});
 			})
 			.fail(function(response) {
