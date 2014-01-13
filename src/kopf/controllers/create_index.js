@@ -18,7 +18,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 
 	$scope.createIndex=function() {
 		if ($scope.name.trim().length == 0) {
-			$scope.modal.alert = new ErrorAlert("You must specify a valid index name", null);	
+			AlertService.error("You must specify a valid index name", null);	
 		} else {
 			var settings = {};
 			var content = $scope.editor.getValue();
@@ -45,12 +45,12 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
 	   				$scope.updateModel(function() {
-						$scope.modal.alert = new SuccessAlert('Index successfully created', response);
+						AlertService.success('Index successfully created', response);
 	   				});
 					$scope.refreshClusterState();
 				}, function(error) { 
 	   				$scope.updateModel(function() {
-						$scope.modal.alert = new ErrorAlert("Error while creating index", error);
+						AlertService.error("Error while creating index", error);
 	   				});
 				}
 			);

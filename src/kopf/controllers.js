@@ -26,58 +26,6 @@ function Request(url, method, body) {
 	}
 }
 
-var Alert=function(message, response) {
-	this.message = message;
-	this.response = response;
-
-}
-
-Alert.prototype = {
-	getResponse:function() {
-		if (this.response != null) {
-			return JSON.stringify(this.response, undefined, 2);			
-		}
-	},
-	hasServerResponse:function() {
-		return this.response != null;
-	},
-	clear:function() {
-		this.level = null;
-		this.message = null;
-		this.class = null;
-	}
-};
-
-var SuccessAlert=function(message, response) {
-	this.message = message;
-	this.level = "success";
-	this.class = "alert-success";
-	this.icon = "icon-ok";
-	this.response = response;
-}
-SuccessAlert.prototype = new Alert();
-SuccessAlert.prototype.constructor = SuccessAlert;
-
-var ErrorAlert=function(message, response) {
-	this.message = message;
-	this.level = "error";
-	this.class = 'alert-danger';
-	this.icon = "icon-warning-sign";
-	this.response = response;
-}
-ErrorAlert.prototype = new Alert();
-ErrorAlert.prototype.constructor = ErrorAlert;
-
-var InfoAlert=function(message, response) {
-	this.message = message;
-	this.level = "info";
-	this.class = 'alert-info';
-	this.icon = "icon-info";
-	this.response = response;
-}
-InfoAlert.prototype = new Alert();
-InfoAlert.prototype.constructor = InfoAlert;
-
 function AliasesPagination(page, results) {
 	this.page = page;
 	this.page_size = 10;
