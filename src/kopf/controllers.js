@@ -16,6 +16,14 @@ function Request(url, method, body) {
 		this.method = '';
 		this.body = '';
 	}
+	
+	this.loadFromJSON=function(json) {
+		this.method = json['method'];
+		this.url = json['url'];
+		this.body = json['body'];
+		this.timestamp = json['timestamp'];
+		return this;
+	}
 }
 
 var Alert=function(message, response) {
@@ -207,7 +215,7 @@ function ModalControls() {
 }
 
 function isDefined(value) {
-	return typeof value != 'undefined';
+	return typeof value != 'undefined' && value != null;
 }
 
 function notEmpty(value) {

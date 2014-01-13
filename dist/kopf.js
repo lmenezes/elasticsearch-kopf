@@ -693,6 +693,14 @@ function Request(url, method, body) {
 		this.method = '';
 		this.body = '';
 	}
+	
+	this.loadFromJSON=function(json) {
+		this.method = json['method'];
+		this.url = json['url'];
+		this.body = json['body'];
+		this.timestamp = json['timestamp'];
+		return this;
+	}
 }
 
 var Alert=function(message, response) {
@@ -884,7 +892,7 @@ function ModalControls() {
 }
 
 function isDefined(value) {
-	return typeof value != 'undefined';
+	return typeof value != 'undefined' && value != null;
 }
 
 function notEmpty(value) {
@@ -1883,7 +1891,22 @@ function RestController($scope, $location, $timeout, AlertService) {
 	
 	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
-	$scope.history = [];
+
+	$scope.loadHistory=function() {
+		var history = [];
+		if (isDefined(localStorage.kopf_request_history)) {
+			try {
+				history = JSON.parse(localStorage.kopf_request_history).map(function(h) {
+					console.log(h);
+					return new Request().loadFromJSON(h);
+				});
+			} catch (error) {
+				localStorage.kopf_request_history = null;
+			}
+		} 
+		return history;
+	}
+	$scope.history = $scope.loadHistory();
 	$scope.history_request = null;
 		
 	$scope.editor = new AceEditor('rest-client-editor');
@@ -1895,6 +1918,14 @@ function RestController($scope, $location, $timeout, AlertService) {
 		$scope.request.method = history_request.method;
 		$scope.editor.setValue(history_request.body);
 		$scope.history_request = null;
+	}
+
+	$scope.addToHistory=function(history_request) {
+		$scope.history.unshift(history_request);
+		if ($scope.history.length > 30) {
+			$scope.history.length = 30;
+		}
+		localStorage.kopf_request_history = JSON.stringify($scope.history);
 	}
 
 	$scope.sendRequest=function() {
@@ -1915,10 +1946,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 					}
 					$('#rest-client-response').html(content);
 					$scope.updateModel(function() {
-						$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-						if ($scope.history.length > 30) {
-							$scope.history.length = 30;
-						}
+						$scope.addToHistory(new Request($scope.request.url,$scope.request.method,$scope.request.body));
 					});
 
 				},
