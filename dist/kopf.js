@@ -701,6 +701,14 @@ function Request(url, method, body) {
 		this.timestamp = json['timestamp'];
 		return this;
 	}
+	
+	this.equals=function(request) {
+		return (
+			this.url === request.url &&
+			this.method.toUpperCase() === request.method.toUpperCase() &&
+			this.body === request.body
+		)
+	} 
 }
 
 function AliasesPagination(page, results) {
@@ -1868,11 +1876,20 @@ function RestController($scope, $location, $timeout, AlertService) {
 	}
 
 	$scope.addToHistory=function(history_request) {
-		$scope.history.unshift(history_request);
-		if ($scope.history.length > 30) {
-			$scope.history.length = 30;
+		var exists = false;
+		for (var i = 0; i < $scope.history.length; i++) {
+			if ($scope.history[i].equals(history_request)) {
+				exists = true;
+				break;
+			}
 		}
-		localStorage.kopf_request_history = JSON.stringify($scope.history);
+		if (!exists) {
+			$scope.history.unshift(history_request);
+			if ($scope.history.length > 30) {
+				$scope.history.length = 30;
+			}
+			localStorage.kopf_request_history = JSON.stringify($scope.history);			
+		}
 	}
 
 	$scope.sendRequest=function() {

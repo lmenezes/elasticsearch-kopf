@@ -24,6 +24,14 @@ function Request(url, method, body) {
 		this.timestamp = json['timestamp'];
 		return this;
 	}
+	
+	this.equals=function(request) {
+		return (
+			this.url === request.url &&
+			this.method.toUpperCase() === request.method.toUpperCase() &&
+			this.body === request.body
+		)
+	} 
 }
 
 function AliasesPagination(page, results) {
