@@ -1845,7 +1845,6 @@ function RestController($scope, $location, $timeout, AlertService) {
 		if (isDefined(localStorage.kopf_request_history)) {
 			try {
 				history = JSON.parse(localStorage.kopf_request_history).map(function(h) {
-					console.log(h);
 					return new Request().loadFromJSON(h);
 				});
 			} catch (error) {
