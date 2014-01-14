@@ -1545,7 +1545,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 }
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.4.1";
+	$scope.version = "0.4.2";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alerts_service = AlertService;
@@ -1620,7 +1620,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 					$scope.updateModel(function() {
 						$scope.cluster_health = null;
 						$scope.setConnected(false);
-						$scope.alert_service.error("Error connecting to [" + $scope.host + "]",error);						
+						AlertService.error("Error connecting to [" + $scope.host + "]",error);						
 					});
 				}
 			);
@@ -1671,7 +1671,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	}
 	
 	$scope.selectTab=function(event) {
-		$scope.alerts_service.clear();
+		AlertService.clear();
 		if (isDefined(event)) {
 			$scope.broadcastMessage(event, {});
 		}
