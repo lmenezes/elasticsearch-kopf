@@ -12,6 +12,6 @@ function Aliases(aliases_info) {
 			aliases_map[alias].push(alias_instance);
 		});
 	});
-	this.indices = indices;
+	this.indices = indices.sort(function(a,b) { return a.localeCompare(b); });
 	this.info = aliases_map;
 }

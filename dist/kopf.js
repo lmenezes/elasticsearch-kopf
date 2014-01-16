@@ -59,7 +59,7 @@ function Aliases(aliases_info) {
 			aliases_map[alias].push(alias_instance);
 		});
 	});
-	this.indices = indices;
+	this.indices = indices.sort(function(a,b) { return a.localeCompare(b); });
 	this.info = aliases_map;
 }
 
@@ -921,7 +921,6 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	$scope.aliases = null;
 	$scope.new_index = {};
 	$scope.pagination= new AliasesPagination(1, []);
-	$scope.alert_service = AlertService;
 	
 	$scope.editor = new AceEditor('alias-filter-editor');
 	
@@ -948,19 +947,19 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 				$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
 				$scope.new_alias = new Alias();
 				$scope.pagination.setResults($scope.aliases.info);
-				$scope.alert_service.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
+				AlertService.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
 			} catch (error) {
-				$scope.alert_service.error(error ,null);
+				AlertService.error(error ,null);
 			}
 		} else {
-			$scope.alert_service.error("Invalid filter defined for alias" , $scope.editor.error);
+			AlertService.error("Invalid filter defined for alias" , $scope.editor.error);
 		}
 	}
 	
 	$scope.removeAlias=function(alias) {
 		delete $scope.aliases.info[alias];
 		$scope.pagination.setResults($scope.aliases.info);
-		$scope.alert_service.success("Alias successfully removed. Note that changes made will only be persisted after saving changes");
+		AlertService.success("Alias successfully removed. Note that changes made will only be persisted after saving changes");
 	}
 	
 	$scope.removeAliasFromIndex=function(index, alias_name) {
@@ -968,7 +967,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		for (var i = 0; i < aliases.length; i++) {
 			if (alias_name === aliases[i].alias && index === aliases[i].index) {
 				$scope.aliases.info[alias_name].splice(i,1);
-				$scope.alert_service.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
+				AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 			}
 		}
 	}
@@ -1020,13 +1019,13 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		$scope.client.updateAliases(adds,deletes, 
 			function(response) {
    				$scope.updateModel(function() {
-					$scope.alert_service.success("Aliases were successfully updated",response);
+					AlertService.success("Aliases were successfully updated",response);
    				});
 				$scope.loadAliases();
 			},
 			function(error) {
    				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while updating aliases",error);
+					AlertService.error("Error while updating aliases",error);
    				});
 			}
 		);
@@ -1044,7 +1043,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			},
 			function(error) {
    				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while fetching aliases",error);		
+					AlertService.error("Error while fetching aliases",error);		
 				});
 			}
 		);
