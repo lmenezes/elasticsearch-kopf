@@ -59,7 +59,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	}
 	
 	this.getTypes=function() {
-		return Object.keys(this.mappings);
+		return Object.keys(this.mappings).sort(function(a, b) { return a.localeCompare(b); });
 	}
 	
 	this.getAnalyzers=function() {
@@ -73,12 +73,12 @@ function Index(index_name,index_info, index_metadata, index_status) {
 				}
 			}
 		});
-		return analyzers;
+		return analyzers.sort(function(a, b) { return a.localeCompare(b); });
 	}
 	
 	this.getFields=function(type) {
 		if (isDefined(this.mappings[type])) {
-			return Object.keys(this.mappings[type]['properties']);
+			return Object.keys(this.mappings[type]['properties']).sort(function(a, b) { return a.localeCompare(b); });
 		} else {
 			return [];
 		}
