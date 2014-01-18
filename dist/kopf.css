@@ -688,6 +688,14 @@ a.header-index-action-mini:hover {
 .diagnosis-gist-share {
 	margin-left: 10px;
 }
+/* json string right " */
+.json-object-expand:after {
+	content: '+';
+}
+.json-object-collapse:after {
+	content: '-';
+}
+
 .json-object-expand {
 	display: inline-block;
 	font-weight: 500;

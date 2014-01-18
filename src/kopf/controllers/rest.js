@@ -60,7 +60,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 				function(response) {
 					var content = response;
 					try {
-						content = jsonTree.create(response);
+						content = JSONTree.create(response);
 					} catch (parsing_error) {
 						// nothing to do
 					}
@@ -75,7 +75,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 						$scope.alert_service.error("Request was not successful: " + error['statusText']);
 					});
 					try {
-						$('#rest-client-response').html(jsonTree.create(JSON.parse(error['responseText'])));
+						$('#rest-client-response').html(JSONTree.create(JSON.parse(error['responseText'])));
 					} catch (invalid_json) {
 						$('#rest-client-response').html(error['responseText']);
 					}

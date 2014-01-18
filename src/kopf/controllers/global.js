@@ -132,7 +132,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
-		$scope.modal.info = $sce.trustAsHtml(jsonTree.create(info));
+		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
 		$('#modal_info').modal({show:true,backdrop:true});
 	}
 	
