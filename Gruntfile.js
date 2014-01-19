@@ -107,7 +107,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
-		    kopf: {
+			kopf: {
 				src: [
 					'src/kopf/elastic/alias.js',
 					'src/kopf/elastic/aliases.js',
@@ -141,8 +141,11 @@ module.exports = function(grunt) {
 					// MODELS
 					'src/kopf/models/ace_editor.js'
 				]
-		    }
-		  }
+			}
+		},
+		qunit: {
+			all: ['tests/all.html']
+		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -150,7 +153,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.registerTask('build', ['clean', 'jshint', 'copy', 'concat']);
-	grunt.registerTask('server', ['clean', 'jshint', 'copy', 'concat','connect:server']);
+	grunt.loadNpmTasks('grunt-contrib-qunit');
+	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat']);
+	grunt.registerTask('server', ['clean', 'jshint', 'qunit', 'copy', 'concat','connect:server']);
 
 };
