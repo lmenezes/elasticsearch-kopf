@@ -5,14 +5,14 @@
 	border-bottom: 0px !important;
 }
 .cluster-map-header-cluster-action {
-	color: #333333;
+	color: #555555;
 	font-size: 32px;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.cluster-map-header-cluster-action {
-	color: #222222;
+	color: #555555;
 	font-weight: 200;
 	text-decoration: none;
 }
@@ -31,7 +31,7 @@ a.cluster-map-header-cluster-action {
 .cluster-map-header-index-alias {
 	word-wrap:break-word;
 	font-size: 10px;
-	color: #666666;
+	color: #555555;
 	font-weight: 300;
 }
 .cluster-map-header-index-actions {
@@ -39,13 +39,13 @@ a.cluster-map-header-cluster-action {
 	padding-right: 6px;
 }
 .cluster-map-header-index-action {
-	color: #333333;
+	color: #555555;
 	font-size: 12px;
 	font-weight: 200;
 	cursor: pointer;
 }
 a.cluster-map-header-index-action:hover {
-	color: #333333;
+	color: #555555;
 	font-size: 12px;
 	font-weight: 200;
 	text-decoration: none;
@@ -97,13 +97,13 @@ a.cluster-map-header-index-action:hover {
 	height: 30px;
 }
 .cluster-map-node-action {
-	color: #333333;
+	color: #555555;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.cluster-map-node-action {
-	color: #222222;
+	color: #555555;
 	font-weight: 200;
 	text-decoration: none;
 }
@@ -137,13 +137,13 @@ a.cluster-map-node-action {
 	display: inline-block;
 }
 .cluster-map-stat-number {
-	color: #666;
+	color: #555555;
 	font-size: 28px;
 	text-align: center;
 	font-weight: 600;
 }
 .cluster-map-stat-description {
-	color: #666;
+	color: #555555;
 	font-size: 18px;
 	text-align: center;
 	font-weight: 200;
@@ -206,14 +206,14 @@ a.cluster-map-node-action {
 	white-space: nowrap;
 }
 .header-action {
-	color: #222222;
+	color: #555555;
 	font-size: 32px;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.header-action:hover {
-	color: #222222;
+	color: #555555;
 	font-weight: 200;
 	text-decoration: none;
 }
@@ -244,24 +244,24 @@ a.header-action:hover {
 	padding-top: 5px;
 }
 .header-index-action {
-	color: #222222;
+	color: #555555;
 	font-size: 11px;
 	font-weight: 200;
 	cursor: pointer;
 }
 a.header-index-action:hover {
-	color: #222222;
+	color: #555555;
 	font-size: 11px;
 	font-weight: 200;
 	text-decoration: none;
 }
 .header-index-action-mini {
-	color: #222222;
+	color: #555555;
 	font-size: 9px;
 	font-weight: 200;
 }
 a.header-index-action-mini:hover {
-	color: #222222;
+	color: #555555;
 	font-size: 9px;
 	font-weight: 200;
 	text-decoration: none;
