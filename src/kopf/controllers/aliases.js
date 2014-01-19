@@ -7,11 +7,11 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	
 	$scope.viewDetails=function(alias) {
 		$scope.details = alias;
-	}
+	};
 
 	$scope.addAlias=function() {
 		$scope.new_alias.filter = $scope.editor.format();
-		if ($scope.editor.error == null) {
+		if (!isDefined($scope.editor.error)) {
 			try {
 				$scope.new_alias.validate();
 				// if alias already exists, check if its already associated with index
@@ -35,13 +35,13 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		} else {
 			AlertService.error("Invalid filter defined for alias" , $scope.editor.error);
 		}
-	}
+	};
 	
 	$scope.removeAlias=function(alias) {
 		delete $scope.aliases.info[alias];
 		$scope.pagination.setResults($scope.aliases.info);
 		AlertService.success("Alias successfully removed. Note that changes made will only be persisted after saving changes");
-	}
+	};
 	
 	$scope.removeAliasFromIndex=function(index, alias_name) {
 		var aliases = $scope.aliases.info[alias_name];
@@ -51,7 +51,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 				AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 			}
 		}
-	}
+	};
 	
 	$scope.mergeAliases=function() {
 		var deletes = [];
@@ -99,36 +99,36 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		});
 		$scope.client.updateAliases(adds,deletes, 
 			function(response) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					AlertService.success("Aliases were successfully updated",response);
-   				});
+				});
 				$scope.loadAliases();
 			},
 			function(error) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					AlertService.error("Error while updating aliases",error);
-   				});
+				});
 			}
 		);
-	}
+	};
 	
 	$scope.loadAliases=function() {
 		$scope.new_alias = new Alias();
 		$scope.client.fetchAliases(
 			function(aliases) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					$scope.originalAliases = aliases;
 					$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
 					$scope.pagination.setResults($scope.aliases.info);
-   				});
+				});
 			},
 			function(error) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					AlertService.error("Error while fetching aliases",error);		
 				});
 			}
 		);
-	}
+	};
 	
 	$scope.$on('hostChanged',function() {
 		$scope.loadAliases();

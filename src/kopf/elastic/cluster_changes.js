@@ -4,33 +4,33 @@ function ClusterChanges() {
 	this.nodeLeaves = null;
 
 	this.hasChanges=function() {
-		return (this.nodeJoins != null ||
-			this.nodeLeaves != null
+		return (isDefined(this.nodeJoins) ||
+			isDefined(this.nodeLeaves)
 		);
-	}
+	};
 
 	this.addJoiningNode=function(node) {
 		this.changes = true;
-		if (this.nodeJoins == null) {
+		if (!isDefined(this.nodeJoins)) {
 			this.nodeJoins = [];
 		}
 		this.nodeJoins.push(node);
-	}
+	};
 
 	this.addLeavingNode=function(node) {
 		this.changes = true;
-		if (this.nodeLeaves == null) {
+		if (!isDefined(this.nodeLeaves)) {
 			this.nodeLeaves = [];
 		}
 		this.nodeLeaves.push(node);
-	}
+	};
 
 	this.hasJoins=function() {
-		return this.nodeJoins != null;
-	}
+		return isDefined(this.nodeJoins);
+	};
 
 	this.hasLeaves=function() {
-		return this.nodeLeaves != null;
-	}
+		return isDefined(this.nodeLeaves);
+	};
 
 }

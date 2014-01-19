@@ -12,17 +12,17 @@ function AceEditor(target) {
 	this.setValue=function(value) {
 		this.editor.setValue(value,1);
 		this.editor.gotoLine(0,0,false);
-	}
+	};
 	
 	this.getValue=function() {
 		return this.editor.getValue();
-	}
+	};
 	
 	// formats the json content
 	this.format=function() {
 		var content = this.editor.getValue();
 		try {
-			if (typeof content != 'undefined' && content != null && content.trim().length > 0) {
+			if (isDefined(content) && content.trim().length > 0) {
 				this.error = null;
 				content = JSON.stringify(JSON.parse(content),undefined,4);
 				this.editor.setValue(content,0);
@@ -32,5 +32,5 @@ function AceEditor(target) {
 			this.error = error.toString();
 		}
 		return content;
-	}
+	};
 }

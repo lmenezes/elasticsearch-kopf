@@ -16,7 +16,8 @@ function RestController($scope, $location, $timeout, AlertService) {
 			}
 		} 
 		return history;
-	}
+	};
+	
 	$scope.history = $scope.loadHistory();
 	$scope.history_request = null;
 		
@@ -29,7 +30,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 		$scope.request.method = history_request.method;
 		$scope.editor.setValue(history_request.body);
 		$scope.history_request = null;
-	}
+	};
 
 	$scope.addToHistory=function(history_request) {
 		var exists = false;
@@ -46,12 +47,12 @@ function RestController($scope, $location, $timeout, AlertService) {
 			}
 			localStorage.kopf_request_history = JSON.stringify($scope.history);			
 		}
-	}
+	};
 
 	$scope.sendRequest=function() {
 		$scope.request.body = $scope.editor.format();
 		$('#rest-client-response').html('');
-		if ($scope.editor.error == null && notEmpty($scope.request.url)) {
+		if (!isDefined($scope.editor.error) && notEmpty($scope.request.url)) {
 			// TODO: deal with basic auth here
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
 				$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
@@ -72,19 +73,19 @@ function RestController($scope, $location, $timeout, AlertService) {
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						if (error['status'] != 0) {
-							$scope.alert_service.error("Request was not successful: " + error['statusText']);	
+						if (error.status !== 0) {
+							$scope.alert_service.error("Request was not successful: " + error.statusText);
 						} else {
 							$scope.alert_service.error($scope.request.url + " is unreachable");	
 						}
 					});
 					try {
-						$('#rest-client-response').html(JSONTree.create(JSON.parse(error['responseText'])));
+						$('#rest-client-response').html(JSONTree.create(JSON.parse(error.responseText)));
 					} catch (invalid_json) {
-						$('#rest-client-response').html(error['responseText']);
+						$('#rest-client-response').html(error.responseText);
 					}
 				}
 			);
 		}
-	}
+	};
 }

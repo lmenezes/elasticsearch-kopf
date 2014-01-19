@@ -7,22 +7,22 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 	$scope.setConnected=function(status) {
 		$scope.is_connected = status;
-	}
+	};
 
 	$scope.broadcastMessage=function(message,args) {
 		$scope.$broadcast(message,args);
-	}
+	};
 	
 	$scope.readParameter=function(name){
-	    var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
-		return (results != null) ? results[1] : null;
-	}
+		var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+		return isDefined(results) ? results[1] : null;
+	};
 	
 	$scope.setHost=function(url) {
 		var exp = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
 		// expected: "http://user:password@host", "http", "user", "password", "host"]
 		var url_parts = exp.exec(url);
-		if (url_parts != null) {
+		if (isDefined(url_parts)) {
 			$scope.host = url_parts[1] + "://" + url_parts[4];
 			$scope.username = url_parts[2];
 			$scope.password = url_parts[3];
@@ -34,24 +34,24 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$scope.setConnected(false);
 		$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
 		$scope.broadcastMessage('hostChanged',{});
-	}
+	};
 	
-	if ($location.host() == "") { // when opening from filesystem
+	if ($location.host() === "") { // when opening from filesystem
 		$scope.setHost("http://localhost:9200");
 	} else {
 		var location = $scope.readParameter('location');
-		if (location != null) {
+		if (isDefined(location)) {
 			$scope.setHost(location);
 		} else {
 			$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
 		}
- 	}
+	}
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
 
 	$scope.alertClusterChanges=function(cluster) {
-		if ($scope.cluster != null && cluster != null) {
+		if (isDefined($scope.cluster) && isDefined(cluster)) {
 			var changes = $scope.cluster.getChanges(cluster);
 			if (changes.hasChanges()) {
 				if (changes.hasJoins()) {
@@ -64,7 +64,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 				}
 			}
 		}
-	}
+	};
 		
 	$scope.refreshClusterState=function() {
 		$timeout(function() { 
@@ -99,60 +99,60 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 				}
 			);
 		}, 100);	
-	}
+	};
 
 	$scope.autoRefreshCluster=function() {
 		$scope.refreshClusterState();
-		$timeout(function() { $scope.autoRefreshCluster() }, SettingsService.getRefreshInterval());	
-	}
+		$timeout(function() { $scope.autoRefreshCluster(); }, SettingsService.getRefreshInterval());	
+	};
 	
 	$scope.autoRefreshCluster();
 
 	$scope.hasConnection=function() {
 		return $scope.is_connected;
-	}
+	};
 	
 	$scope.isActive=function(tab) {
 		return $('#' + tab).hasClass('active');
-	}
+	};
 	
 	$scope.getHost=function() {
 		return $scope.host;
-	}
+	};
 	
 	$scope.readablizeBytes=function(bytes) {
 		if (bytes > 0) {
-		    var s = ['b', 'KB', 'MB', 'GB', 'TB', 'PB'];
-		    var e = Math.floor(Math.log(bytes) / Math.log(1024));
-		    return (bytes / Math.pow(1024, e)).toFixed(2) + s[e];	
+			var s = ['b', 'KB', 'MB', 'GB', 'TB', 'PB'];
+			var e = Math.floor(Math.log(bytes) / Math.log(1024));
+			return (bytes / Math.pow(1024, e)).toFixed(2) + s[e];	
 		} else {
 			return 0;
 		}
-	}
+	};
 
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
 		$('#modal_info').modal({show:true,backdrop:true});
-	}
+	};
 	
 	$scope.isInModal=function() {
 		return ($('.modal-backdrop').length > 0);
-	}
+	};
 	
 	$scope.getCurrentTime=function() {
 		return getTimeString();
-	}
+	};
 	
 	$scope.selectTab=function(event) {
 		AlertService.clear();
 		if (isDefined(event)) {
 			$scope.broadcastMessage(event, {});
 		}
-	}
+	};
 	
 	$scope.updateModel=function(action) {
 		$scope.$apply(action);
-	}
+	};
 	
 }

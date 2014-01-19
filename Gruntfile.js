@@ -105,14 +105,52 @@ module.exports = function(grunt) {
 					keepalive: true
 				}
 			}
-		}
+		},
+		jshint: {
+		    kopf: {
+				src: [
+					'src/kopf/elastic/alias.js',
+					'src/kopf/elastic/aliases.js',
+					'src/kopf/elastic/cluster_changes.js',
+					'src/kopf/elastic/cluster_health.js',
+					'src/kopf/elastic/cluster.js',
+					'src/kopf/elastic/elastic_client.js',
+					'src/kopf/elastic/index.js',
+					'src/kopf/elastic/node.js',
+					'src/kopf/elastic/shard.js',
+					'src/kopf/elastic/token.js',
+					// CONTROLLERS
+					'src/kopf/controllers.js',
+					'src/kopf/kopf.js',
+					'src/kopf/controllers/aliases.js',
+					'src/kopf/controllers/analysis.js',
+					'src/kopf/controllers/cluster_health.js',
+					'src/kopf/controllers/cluster_overview.js',
+					'src/kopf/controllers/cluster_settings.js',
+					'src/kopf/controllers/create_index.js',
+					'src/kopf/controllers/global.js',
+					'src/kopf/controllers/index_settings.js',
+					'src/kopf/controllers/navbar.js',
+					'src/kopf/controllers/rest.js',
+					'src/kopf/controllers/percolator.js',
+					'src/kopf/controllers/confirm_dialog.js',
+					'src/kopf/controllers/warmup.js',
+					// SERVICES
+					'src/kopf/services/alerts.js',
+					'src/kopf/services/settings.js',
+					// MODELS
+					'src/kopf/models/ace_editor.js'
+				]
+		    }
+		  }
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.registerTask('build', ['clean', 'copy', 'concat']);
-	grunt.registerTask('server', ['clean', 'copy', 'concat','connect:server']);
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.registerTask('build', ['clean', 'jshint', 'copy', 'concat']);
+	grunt.registerTask('server', ['clean', 'jshint', 'copy', 'concat','connect:server']);
 
 };

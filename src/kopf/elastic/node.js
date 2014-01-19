@@ -1,13 +1,13 @@
 function Node(node_id, node_info, node_stats) {
 	this.id = node_id;	
-	this.name = node_info['name'];
+	this.name = node_info.name;
 	this.metadata = {};
-	this.metadata['info'] = node_info;
-	this.metadata['stats'] = node_stats;
-	this.transport_address = node_info['transport_address'];
-	var master = node_info['attributes']['master'] === 'false' ? false : true;
-	var data = node_info['attributes']['data'] === 'false' ? false : true;
-	var client = node_info['attributes']['client'] === 'true' ? true : false;
+	this.metadata.info = node_info;
+	this.metadata.stats = node_stats;
+	this.transport_address = node_info.transport_address;
+	var master = node_info.attributes.master === 'false' ? false : true;
+	var data = node_info.attributes.data === 'false' ? false : true;
+	var client = node_info.attributes.client === 'true' ? true : false;
 	this.master =  master && !client;
 	this.data = data && !client;
 	this.client = client || !master && !data;
@@ -16,11 +16,11 @@ function Node(node_id, node_info, node_stats) {
 
 	this.setCurrentMaster=function() {
 		this.current_master = true;
-	}
+	};
 
 	this.equals=function(node) {
 		return node.id === this.id;
-	}
+	};
 	
 	this.compare=function(other) { // TODO: take into account node specs?
 		if (other.current_master) {
@@ -43,5 +43,5 @@ function Node(node_id, node_info, node_stats) {
 			return -1;
 		}
 		return this.name.localeCompare(other.name);
-	}
+	};
 }

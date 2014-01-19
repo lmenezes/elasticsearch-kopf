@@ -1,18 +1,18 @@
 function Alias(alias, index, filter, index_routing, search_routing) {
-	this.alias = alias != null ? alias.toLowerCase() : "";
-	this.index = index != null ? index.toLowerCase() : "";
+	this.alias = isDefined(alias) ? alias.toLowerCase() : "";
+	this.index = isDefined(index) ? index.toLowerCase() : "";
 	this.filter = filter;
 	this.index_routing = index_routing;
 	this.search_routing = search_routing;
 
 	this.validate=function() {
-		if (this.alias == null || this.alias.trim().length == 0) {
+		if (!notEmpty(this.alias)) {
 			throw "Alias must have a non empty name";
 		}
-		if (this.index == null || this.index.trim().length == 0) {
+		if (!notEmpty(this.index)) {
 			throw "Alias must have a valid index name";
 		}
-	}
+	};
 
 	this.equals=function(other_alias) {
 		var equal = 
@@ -22,26 +22,26 @@ function Alias(alias, index, filter, index_routing, search_routing) {
 		(this.index_routing === other_alias.index_routing) &&
 		(this.search_routing === other_alias.search_routing);
 		return equal;
-	}
+	};
 
 	this.info=function() {
 		var info = {};
-		info['index'] = this.index;
-		info['alias'] = this.alias;
+		info.index = this.index;
+		info.alias = this.alias;
 	
-		if (this.filter != null) {
-			if (typeof this.filter == 'string' && this.filter.trim().length > 0) {
-				info['filter'] = JSON.parse(this.filter);
+		if (isDefined(this.filter)) {
+			if (typeof this.filter == 'string' && notEmpty(this.filter)) {
+				info.filter = JSON.parse(this.filter);
 			} else {
-				info['filter'] = this.filter;
+				info.filter = this.filter;
 			}
 		}
-		if (this.index_routing != null && this.index_routing.trim().length > 0) {
-			info['index_routing'] = this.index_routing;
+		if (notEmpty(this.index_routing)) {
+			info.index_routing = this.index_routing;
 		}
-		if (this.search_routing != null && this.search_routing.trim().length > 0) {
-			info['search_routing'] = this.search_routing;
+		if (notEmpty(this.search_routing)) {
+			info.search_routing = this.search_routing;
 		}
 		return info; 
-	}
+	};
 }
