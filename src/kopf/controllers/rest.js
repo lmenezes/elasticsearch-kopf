@@ -72,7 +72,11 @@ function RestController($scope, $location, $timeout, AlertService) {
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Request was not successful: " + error['statusText']);
+						if (error['status'] != 0) {
+							$scope.alert_service.error("Request was not successful: " + error['statusText']);	
+						} else {
+							$scope.alert_service.error($scope.request.url + " is unreachable");	
+						}
 					});
 					try {
 						$('#rest-client-response').html(JSONTree.create(JSON.parse(error['responseText'])));
