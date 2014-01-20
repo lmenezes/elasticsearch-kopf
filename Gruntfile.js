@@ -66,6 +66,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/navbar.js',
 					'src/kopf/controllers/rest.js',
 					'src/kopf/controllers/percolator.js',
+					'src/kopf/controllers/repository.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
 					// SERVICES
@@ -90,7 +91,8 @@ module.exports = function(grunt) {
 					'src/kopf/css/json_tree.css',
 					'src/kopf/css/navbar.css',
 					'src/kopf/css/rest_client.css',
-					'src/kopf/css/warmup.css'
+					'src/kopf/css/warmup.css',
+					'src/kopf/css/repository.css'
 				],
 				dest: 'dist/kopf.css'
 			},

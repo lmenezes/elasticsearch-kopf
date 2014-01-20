@@ -146,7 +146,23 @@ function ElasticClient(host,username,password) {
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
 		this.syncRequest('PUT', "/_percolator/" + index + "/" + id, body, callback_success, callback_error);
 	}
-	
+
+	this.getRepositories=function(callback_success, callback_error) {
+		this.syncRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);	
+	}
+
+	this.createRepository=function(repository, body, callback_success, callback_error) {
+		this.syncRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error)
+	}
+
+	this.deleteRepository=function(repository, callback_success, callback_error) {
+		this.syncRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error)
+	}
+
+	this.getSnapshots=function(repository, callback_success, callback_error){
+		this.synchRequest('GET', "/_snapshot/" + repository + "/_all", callback_success, callback_error);
+	}
+
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
