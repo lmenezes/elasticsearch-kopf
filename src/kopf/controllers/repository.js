@@ -96,7 +96,4 @@ function RepositoryController($scope, $location, $timeout, ConfirmDialogService,
 
 	};
 
-	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator' });
-	}
 }
