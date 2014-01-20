@@ -269,7 +269,23 @@ function ElasticClient(host,username,password) {
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
 		this.syncRequest('PUT', "/_percolator/" + index + "/" + id, body, callback_success, callback_error);
 	}
-	
+
+	this.getRepositories=function(callback_success, callback_error) {
+		this.syncRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);	
+	}
+
+	this.createRepository=function(repository, body, callback_success, callback_error) {
+		this.syncRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error)
+	}
+
+	this.deleteRepository=function(repository, callback_success, callback_error) {
+		this.syncRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error)
+	}
+
+	this.getSnapshots=function(repository, callback_success, callback_error){
+		this.synchRequest('GET', "/_snapshot/" + repository + "/_all", callback_success, callback_error);
+	}
+
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
@@ -348,7 +364,7 @@ function ElasticClient(host,username,password) {
 			}),
 			$.ajax({ 
 				type: 'GET', 
-				url: host+"/_cluster/nodes/stats?all=true", 
+				url: host+"/_nodes/stats/_all",     
 				dataType: 'json', 
 				data: {}, 
 				beforeSend: function(xhr) { 
@@ -406,7 +422,7 @@ function ElasticClient(host,username,password) {
 			}),
 			$.ajax({ 
 				type: 'GET', 
-				url: host+"/_cluster/nodes/stats?all=true", 
+				url: host+"/_nodes/stats/_all", 
 				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
@@ -1585,6 +1601,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$scope.setHost("http://localhost:9200");
 	} else {
 		var location = $scope.readParameter('location');
+		location = "http://localhost:9200";
 		if (location != null) {
 			$scope.setHost(location);
 		} else {
@@ -1673,6 +1690,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.selectTab=function(event) {
 		AlertService.clear();
 		if (isDefined(event)) {
+			console.log("SELECT TAB : broadcasting... : ", event)
 			$scope.broadcastMessage(event, {});
 		}
 	}
@@ -1859,6 +1877,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	
 	
     $scope.$on('loadPercolatorEvent', function() {
+    	console.log("INIT PERCS !!!!!!!!!!!!!");
 		$scope.loadIndices();
 		$scope.loadPercolatorQueries();
     });
@@ -2013,6 +2032,109 @@ function PercolateQuery(query_info) {
 		}
 	}
 }
+function RepositoryController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+
+	$scope.alert_service = AlertService;
+	$scope.dialog_service = ConfirmDialogService;
+	
+	$scope.editor = new AceEditor('repository-settings-editor');
+	$scope.repositories = [];
+	
+    $scope.$on('loadRepositoryEvent', function() {
+		$scope.loadRepositories();
+    });
+	
+	$scope.deleteRepository=function(name, value){
+		$scope.dialog_service.open(
+			"are you sure you want to delete repository " + name + "?",
+			value,
+			"Delete",
+			function() {
+				$scope.client.deleteRepository(name,
+					function(response) {
+						$scope.alert_service.success("Repository successfully deleted", response);
+						$scope.loadRepositories();
+					},
+					function(error) {
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting repositor", error);
+						});
+					}
+				);
+			}
+		);
+	}
+
+	/*
+		createRepository
+
+		example:
+			POST /_snapshot/my_repository/
+			{
+				"type": "fs",
+				"settings": {
+					"location": "/mount/backups/my_backup",
+					"compress": true
+				}
+			}
+
+		settings field from editor should contain:
+		{
+    		"location": "/mount/backups/my_backup",
+    		"compress": true
+		}
+	*/
+	$scope.createRepository=function(){
+		$scope.new_repo.settings = $scope.editor.format();
+		if ($scope.editor.error == null) {
+			var body = {
+				type: $scope.new_repo.type,
+				settings: JSON.parse($scope.new_repo.settings)
+			}
+
+			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body), 
+				function(response) {
+					$scope.alert_service.success("Repository created");
+					$scope.loadRepositories();
+				},
+				function(error) {
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Error while creating repository", error);
+					});
+				}
+			);
+			
+		}		
+	}
+
+	$scope.loadRepositories=function() {
+		try {			
+			$scope.client.getRepositories(
+				function(response) {
+					$scope.updateModel(function() {
+						$scope.repositories = response;
+					});
+				},
+				function(error) {
+					if (!(error['responseJSON'] != null )) {
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while reading repositories", error);
+						});
+					}
+				}
+			)
+		} catch (error) {
+			$scope.alert_service.error("Failed to load repositories");
+			return;
+		}
+
+	};
+
+	$scope.loadIndices=function() {
+		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator' });
+	}
+}
+
 function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogService) {
 
 	$scope.dialog_service = ConfirmDialogService;
