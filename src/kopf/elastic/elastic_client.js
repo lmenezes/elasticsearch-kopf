@@ -224,7 +224,7 @@ function ElasticClient(host,username,password) {
 			}),
 			$.ajax({ 
 				type: 'GET', 
-				url: host+"/_cluster/nodes/stats?all=true", 
+				url: host+"/_nodes/stats/_all",     
 				dataType: 'json', 
 				data: {}, 
 				beforeSend: function(xhr) { 
@@ -282,7 +282,7 @@ function ElasticClient(host,username,password) {
 			}),
 			$.ajax({ 
 				type: 'GET', 
-				url: host+"/_cluster/nodes/stats?all=true", 
+				url: host+"/_nodes/stats/_all", 
 				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
