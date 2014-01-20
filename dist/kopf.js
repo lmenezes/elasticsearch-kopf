@@ -325,16 +325,16 @@ function ElasticClient(host,username,password) {
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
+		var path = "/" + index + "/.percolator/_search";
 		this.syncRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		this.syncRequest('DELETE', "/_percolator/" + index + "/" + id, {}, callback_success, callback_error);
+		this.syncRequest('DELETE', "/" + index + "/.percolator/" + id, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		this.syncRequest('PUT', "/_percolator/" + index + "/" + id, body, callback_success, callback_error);
+		this.syncRequest('PUT', "/" + index + "/.percolator/" + id, body, callback_success, callback_error);
 	};
 	
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {
@@ -1933,7 +1933,6 @@ function RestController($scope, $location, $timeout, AlertService) {
 	};
 }
 function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
-	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
 	
 	$scope.editor = new AceEditor('percolator-query-editor');
@@ -1949,8 +1948,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	$scope.new_query = new PercolateQuery("","","");
 	
 	$scope.$on('loadPercolatorEvent', function() {
-		$scope.loadIndices();
-		$scope.loadPercolatorQueries();
+		$scope.indices = $scope.cluster.indices;
     });
 	
 	$scope.previousPage=function() {
@@ -1997,29 +1995,29 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	
 	$scope.deletePercolatorQuery=function(query) {
 		$scope.dialog_service.open(
-			"are you sure you want to delete query " + query.id + " for index " + query.type + "?",
+			"are you sure you want to delete query " + query.id + " for index " + query.index + "?",
 			query.sourceAsJSON(),
 			"Delete",
 			function() {
-				$scope.client.deletePercolatorQuery(query.type, query.id,
+				$scope.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
-						$scope.client.refreshIndex("_percolator", 
+						$scope.client.refreshIndex(query.index, 
 							function(response) {
 								$scope.updateModel(function() {
-									$scope.alert_service.success("Query successfully deleted", response);
+									AlertService.success("Query successfully deleted", response);
 									$scope.loadPercolatorQueries();
 								});
 							},
 							function(error) {
 								$scope.updateModel(function() {
-									$scope.alert_service.success("Error while reloading queries", error);
+									AlertService.error("Error while reloading queries", error);
 								});
 							}
 						);
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting query", error);
+							AlertService.error("Error while deleting query", error);
 						});
 					}
 				);
@@ -2032,23 +2030,23 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 		if (!isDefined($scope.editor.error)) {
 			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
-					$scope.client.refreshIndex("_percolator", 
+					$scope.client.refreshIndex($scope.new_query.index.name, 
 						function(response) {
 							$scope.updateModel(function() {
-								$scope.alert_service.success("Percolator Query successfully created", response);
+								AlertService.success("Percolator Query successfully created", response);
 								$scope.loadPercolatorQueries();
 							});
 						},
 						function(error) {
 							$scope.updateModel(function() {
-								$scope.alert_service.success("Error while reloading queries", error);
+								AlertService.success("Error while reloading queries", error);
 							});
 						}
 					);
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while creating percolator query", error);
+						AlertService.error("Error while creating percolator query", error);
 					});
 				}
 			);
@@ -2058,40 +2056,40 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	$scope.loadPercolatorQueries=function() {
 		var params = {};
 		try {
-			var queries = $scope.parseSearchParams();
-			if (queries.length > 0) {
-				params.query = {"bool": {"must": queries}};
-			}
-			params.from = (($scope.page - 1) * 10);
-			var index = isDefined($scope.index) ? $scope.index.name : null;
-			$scope.client.fetchPercolateQueries(index, JSON.stringify(params),
-				function(response) {
-					$scope.updateModel(function() {
-						$scope.total = response.hits.total;
-						$scope.queries = response.hits.hits.map(function(q) { return new PercolateQuery(q); });
-					});
-				},
-				function(error) {
-					if (!(isDefined(error.responseJSON) && error.responseJSON.error == "IndexMissingException[[_percolator] missing]")) {
-						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while reading loading percolate queries", error);
-						});
-					}
+			if (isDefined($scope.index)) {
+				var queries = $scope.parseSearchParams();
+				if (queries.length > 0) {
+					params.query = {"bool": {"must": queries}};
 				}
-			);
+				params.from = (($scope.page - 1) * 10);
+				$scope.client.fetchPercolateQueries($scope.index.name, JSON.stringify(params),
+					function(response) {
+						$scope.updateModel(function() {
+							$scope.total = response.hits.total;
+							$scope.queries = response.hits.hits.map(function(q) { return new PercolateQuery(q); });
+						});
+					},
+					function(error) {
+						if (!(isDefined(error.responseJSON) && error.responseJSON.error == "IndexMissingException[[_percolator] missing]")) {
+							$scope.updateModel(function() {
+								AlertService.error("Error while reading loading percolate queries", error);
+							});
+						}
+					}
+				);				
+			} else {
+				AlertService.info("No index is selected");
+			}
 		} catch (error) {
-			$scope.alert_service.error("Filter is not a valid JSON");
+			AlertService.error("Filter is not a valid JSON");
 			return;
 		}
-	};
-	
-	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator'; });
 	};
 	
 }
 
 function PercolateQuery(query_info) {
+	this.index = query_info._index;
 	this.type = query_info._type;
 	this.id = query_info._id;
 	this.source = query_info._source;

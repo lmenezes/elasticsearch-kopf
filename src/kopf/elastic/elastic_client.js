@@ -134,16 +134,16 @@ function ElasticClient(host,username,password) {
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
+		var path = "/" + index + "/.percolator/_search";
 		this.syncRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		this.syncRequest('DELETE', "/_percolator/" + index + "/" + id, {}, callback_success, callback_error);
+		this.syncRequest('DELETE', "/" + index + "/.percolator/" + id, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		this.syncRequest('PUT', "/_percolator/" + index + "/" + id, body, callback_success, callback_error);
+		this.syncRequest('PUT', "/" + index + "/.percolator/" + id, body, callback_success, callback_error);
 	};
 	
 	this.syncRequest=function(method, path, data, callback_success, callback_error) {

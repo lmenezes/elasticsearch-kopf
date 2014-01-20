@@ -64,7 +64,6 @@
 						<div class="row">
 							<div class="form-group col-lg-3">
 								<select class="form-control input-sm" ng-model="index" ng-options="i.name for i in indices" ng-change="loadPercolatorQueries()">
-									<option value="">all</option>
 								</select>
 							</div>
 							<div class="form-group col-lg-3">
@@ -100,12 +99,10 @@
 									<table class="table table-bordered table-striped">
 										<tr class="header-row">
 											<td>id</td>
-											<td>index</td>
 											<td>source</td>
 										</tr>
 										<tr ng-repeat="q in queries" class="content-row">
 											<td>{{q.id}}</td>
-											<td>{{q.type}}</td>
 											<td>{{q.source}}
 												<a data-toggle="modal" href="#confirm_dialog" 
 												class="remove-icon" data-backdrop="static" data-keyboard="false">
