@@ -35,8 +35,7 @@ a.cluster-map-header-cluster-action {
 	font-weight: 300;
 }
 .cluster-map-header-index-actions {
-	padding-left: 6px;
-	padding-right: 6px;
+	padding: 6px;
 }
 .cluster-map-header-index-action {
 	color: #555555;

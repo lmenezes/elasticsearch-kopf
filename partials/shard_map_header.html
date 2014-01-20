@@ -1,6 +1,6 @@
 <tr>
 	<!-- cluster actions -->
-	<th class="cluster-map-header-cluster-actions" rowspan="2">
+	<th class="cluster-map-header-cluster-actions">
 		<div class="row">
 			<div class="col-lg-3">
 				<a href="#" class="cluster-map-header-cluster-action" ng-click="selectTab('loadCreateIndex')">
@@ -42,28 +42,8 @@
 				</div>
 			</div>	
 		</div>
-		<!-- index info -->
-		<div ng-show="index.total_aliases <= 5" class="row" ng-repeat="alias in index.visibleAliases()">
-			<div class="col-lg-12">
-				<div class="cluster-map-header-index-alias">
-					<i class="icon-tag"></i> {{alias}}
-				</div>
-			</div>
-		</div>
-		<div ng-show="index.total_aliases > 5" class="row">
-			<div class="col-lg-12">
-				<div class="cluster-map-header-index-alias">
-					<i class="icon-tags"></i> {{index.total_aliases}} total aliases
-				</div>
-			</div>
-		</div>
-	</th>
-</tr>
-<tr>
-	<td ng-repeat="index in getPage()" class="cluster-map-header-index-actions-cell">
 		<!-- index actions -->
-		<div class="row">
-			<div class="cluster-map-header-index-actions">
+		<div class="row cluster-map-header-index-actions">
 				<div class="col-lg-2">
 					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static">
 						<i ng-show="index.state == 'close'" class="icon-folder-close" title="open index" ng-click="openIndex(index.name)"></i>
@@ -95,7 +75,21 @@
 						<i class="icon-trash" ng-click="deleteIndex(index.name)"></i>
 					</a>
 				</div>	
+		</div>
+		<!-- index info -->
+		<div ng-show="index.total_aliases <= 5" class="row" ng-repeat="alias in index.visibleAliases()">
+			<div class="col-lg-12">
+				<div class="cluster-map-header-index-alias">
+					<i class="icon-tag"></i> {{alias}}
+				</div>
 			</div>
 		</div>
-	</td>
+		<div ng-show="index.total_aliases > 5" class="row">
+			<div class="col-lg-12">
+				<div class="cluster-map-header-index-alias">
+					<i class="icon-tags"></i> {{index.total_aliases}} total aliases
+				</div>
+			</div>
+		</div>
+	</th>
 </tr>
