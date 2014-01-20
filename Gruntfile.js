@@ -67,6 +67,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/navbar.js',
 					'src/kopf/controllers/rest.js',
 					'src/kopf/controllers/percolator.js',
+					'src/kopf/controllers/repository.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
 					// SERVICES
@@ -91,7 +92,8 @@ module.exports = function(grunt) {
 					'src/kopf/css/json_tree.css',
 					'src/kopf/css/navbar.css',
 					'src/kopf/css/rest_client.css',
-					'src/kopf/css/warmup.css'
+					'src/kopf/css/warmup.css',
+					'src/kopf/css/repository.css'
 				],
 				dest: 'dist/kopf.css'
 			},
@@ -107,7 +109,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
-		    kopf: {
+			kopf: {
 				src: [
 					'src/kopf/elastic/alias.js',
 					'src/kopf/elastic/aliases.js',
@@ -141,8 +143,11 @@ module.exports = function(grunt) {
 					// MODELS
 					'src/kopf/models/ace_editor.js'
 				]
-		    }
-		  }
+			}
+		},
+		qunit: {
+			all: ['tests/all.html']
+		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -150,7 +155,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.registerTask('build', ['clean', 'jshint', 'copy', 'concat']);
-	grunt.registerTask('server', ['clean', 'jshint', 'copy', 'concat','connect:server']);
+	grunt.loadNpmTasks('grunt-contrib-qunit');
+	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat']);
+	grunt.registerTask('server', ['clean', 'jshint', 'qunit', 'copy', 'concat','connect:server']);
 
 };

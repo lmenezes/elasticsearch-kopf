@@ -25,7 +25,7 @@
 				<div class="row">
 						<div class="col-lg-12">
 							<span class="cluster-map-node-stat" title="current load average">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
-							<span class="cluster-map-node-stat" title="used heap / commited heap">heap: {{node.stats.jvm.mem.heap_used}}/{{node.stats.jvm.mem.heap_committed}}</span>
+							<span class="cluster-map-node-stat" title="used heap / commited heap">heap: {{readablizeBytes(node.stats.jvm.mem.heap_used_in_bytes)}}/{{readablizeBytes(node.stats.jvm.mem.heap_committed_in_bytes)}}</span>
 						</div>
 					</div>
 				</div>
