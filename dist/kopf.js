@@ -1830,7 +1830,6 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
     $scope.connectToHost=function() {
 		if (isDefined($scope.new_host) && $scope.new_host.length > 0) {
 			$scope.setHost($scope.new_host);
-			$scope.cluster_health = null;
 			$scope.refreshClusterState();
 		}
 	};
