@@ -6,26 +6,16 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.alert_service = AlertService;
 	
 	$scope.getNodes=function() {
-		if ($scope.cluster != null) {
+		if (isDefined($scope.cluster)) {
 			return $scope.cluster.getNodes($scope.pagination.node_name, $scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
 		}
-	}
+	};
 	
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
 			$scope.refreshClusterState();
 		}
-	}
-	
-	// actions invoked from view
-	
-	$scope.prepareCreateIndex=function() {
-		$scope.broadcastMessage('prepareCreateIndex',{});
-	}
-	
-	$scope.displayClusterHealth=function() {
-		$scope.broadcastMessage('loadClusterHealth',{});
-	}
+	};
 	
 	$scope.shutdown_node=function(node_id, node_name) {
 		$scope.dialog_service.open(
@@ -36,20 +26,20 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
-		   				});
+						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while shutting down node",error);
-		   				});
+						});
 					}
 				);
 			}
 		);
-	}
+	};
 
 	$scope.optimizeIndex=function(index){
 		$scope.dialog_service.open(
@@ -60,19 +50,19 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.optimizeIndex(index, 
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Index was successfully optimized", response);
-		   				});
+						});
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while optimizing index", error);
-		   				});
+						});
 					}				
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.deleteIndex=function(index) {
 		$scope.dialog_service.open(
@@ -82,20 +72,20 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.deleteIndex(index, 
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Index was successfully deleted", response);
-		   				});
+						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while deleting index", error);
-		   				});
+						});
 					}	
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.clearCache=function(index) {
 		$scope.dialog_service.open(
@@ -105,20 +95,20 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.clearCache(index,
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Index cache was successfully cleared", response);
-		   				});
+						});
 						$scope.refreshClusterState();						
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while clearing index cache", error);
-		   				});
+						});
 					}
 				);
 			}
 		);
-	}
+	};
 
 	$scope.refreshIndex=function(index) {
 		$scope.dialog_service.open(
@@ -128,51 +118,51 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.refreshIndex(index, 
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Index was successfully refreshed", response);
-		   				});
+						});
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while refreshing index", error);	
-		   				});
+						});
 					}
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.enableAllocation=function() {
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					$scope.alert_service.success("Shard allocation was successfully enabled", response);
-   				});
+				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					$scope.alert_service.error("Error while enabling shard allocation", error);	
-   				});
+				});
 			}
 		);
-	}
+	};
 	
 	$scope.disableAllocation=function(current_state) {
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					$scope.alert_service.success("Shard allocation was successfully disabled", response);
-   				});
+				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
-   				$scope.updateModel(function() {
+				$scope.updateModel(function() {
 					$scope.alert_service.error("Error while disabling shard allocation", error);	
-   				});
+				});
 			}
 		);
-	}
+	};
 	
 	$scope.closeIndex=function(index) {
 		$scope.dialog_service.open(
@@ -184,20 +174,20 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.closeIndex(index, 
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Index was successfully closed", response);
-		   				});
+						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while closing index", error);	
-		   				});
+						});
 					}
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.openIndex=function(index) {
 		$scope.dialog_service.open(
@@ -208,20 +198,20 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.openIndex(index,
 					function(response) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.success("Index was successfully opened", response);
-		   				});
+						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
-		   				$scope.updateModel(function() {
+						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while opening index", error);
-		   				});
+						});
 					}
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.loadIndexSettings=function(index) {
 		$('#index_settings_option a').tab('show');
@@ -230,7 +220,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		});
 		$scope.idxSettingsSrv.index = indices[0];
 		$('#idx_settings_tabs a:first').tab('show');		
-	}
+	};
 	
 	
 	$scope.firstResult=function() {
@@ -239,7 +229,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		} else {
 			return 0;
 		}
-	}
+	};
 	
 	$scope.lastResult=function() {
 		if ($scope.current_page() * $scope.pagination.page_size > $scope.getResults().length) {
@@ -247,25 +237,27 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		} else {
 			return $scope.current_page() * $scope.pagination.page_size;
 		}
-	}
+	};
 
 	$scope.hasNextPage=function() {
 		return $scope.pagination.page_size * $scope.current_page() < $scope.getResults().length;
-	}
+	};
 	
 	$scope.hasPreviousPage=function() {
 		return $scope.current_page() > 1;
-	}
+	};
+	
 	$scope.nextPage=function() {
 		$scope.pagination.page += 1;
-	}
+	};
+	
 	$scope.previousPage=function() {
 		$scope.pagination.page -= 1;
-	}
+	};
 	
 	$scope.total=function() {
 		return $scope.getResults().length;
-	}
+	};
 	
 	$scope.current_page=function() {
 		if ($scope.pagination.query != $scope.pagination.previous_query) {
@@ -273,7 +265,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			$scope.pagination.page = 1;
 		}
 		return $scope.pagination.page;
-	}
+	};
 	
 	$scope.getPage=function() {
 		var count = 1;
@@ -288,10 +280,10 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			return i;
 		});
 		return page;
-	}
+	};
 	
 	$scope.getResults=function() {
-		var indices = $scope.cluster != null ? $scope.cluster.indices : [];
+		var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
 		var query = $scope.pagination.query;
 		var state = $scope.pagination.state;
 		return $.map(indices,function(i) {
@@ -305,6 +297,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			} 
 			return i;
 		});
-	}
+	};
 	
 }

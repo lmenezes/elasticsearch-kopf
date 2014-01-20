@@ -3,7 +3,7 @@
 	<th class="cluster-map-header-cluster-actions" rowspan="2">
 		<div class="row">
 			<div class="col-lg-3">
-				<a data-toggle="modal" href="#create_index" class="cluster-map-header-cluster-action" data-backdrop="static" ng-click="prepareCreateIndex()">
+				<a href="#" class="cluster-map-header-cluster-action" ng-click="selectTab('loadCreateIndex')">
 					<i class="icon-file-alt" title="create new index"></i>
 				</a>
 			</div>
@@ -15,12 +15,12 @@
 			</div>
 			<div class="col-lg-3">
 				<a href="#" ng-click="selectTab('loadClusterSettingsEvent')" class="cluster-map-header-cluster-action">
-					<i class="icon-cogs header-action" title="cluster settings"></i>
+					<i class="icon-cogs" title="cluster settings"></i>
 				</a>
 			</div>
 			<div class="col-lg-3">
-				<a data-toggle="modal" href="#cluster_health" class="cluster-map-header-cluster-action" data-backdrop="static">
-					<i class="icon-stethoscope header-action" title="cluster health information" ng-click="displayClusterHealth()"></i>
+				<a href="#" ng-click="selectTab('loadClusterHealth')" class="cluster-map-header-cluster-action">
+					<i class="icon-stethoscope" title="cluster health information"></i>
 				</a>
 			</div>
 		</div>

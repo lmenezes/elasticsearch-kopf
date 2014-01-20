@@ -9,15 +9,15 @@ var Alert=function(message, response, level, _class, icon) {
 	this.id = "alert_box_" + current_date.getTime();
 	
 	this.hasResponse=function() {
-		return this.response != null;
-	}
+		return isDefined(this.response);
+	};
 	
 	this.getResponse=function() {
-		if (this.response != null) {
+		if (isDefined(this.response)) {
 			return JSON.stringify(this.response, undefined, 2);			
 		}
-	}
-}
+	};
+};
 
 kopf.factory('AlertService', function() {
 	this.max_alerts = 3;
@@ -27,39 +27,48 @@ kopf.factory('AlertService', function() {
 	// removes ALL alerts
 	this.clear=function() {
 		this.alerts.length = 0;
-	}
+	};
 	
 	// remove a particular alert message
 	this.remove=function(id) {
 		$("#" + id).fadeTo(1000, 0).slideUp(200, function(){
-        	$(this).remove(); 
+			$(this).remove(); 
 		});
-		this.alerts = this.alerts.filter(function(a) { return id != a.id });
-	}
+		this.alerts = this.alerts.filter(function(a) { return id != a.id; });
+	};
 	
 	// creates an error alert
-	this.error=function(message, response) {
-		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), 15000);
-	}
+	this.error=function(message, response, timeout) {
+		timeout = isDefined(timeout) ? timeout : 15000;
+		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
+	};
 	
 	// creates an info alert
-	this.info=function(message, response) {
-		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), 5000);
-	}
+	this.info=function(message, response, timeout) {
+		timeout = isDefined(timeout) ? timeout : 5000;
+		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
+	};
 	
 	// creates success alert
-	this.success=function(message, response) {
-		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), 5000);
-	}
+	this.success=function(message, response, timeout) {
+		timeout = isDefined(timeout) ? timeout : 5000;
+		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
+	};
+	
+	// creates a warn alert
+	this.warn=function(message, response, timeout) {
+		timeout = isDefined(timeout) ? timeout : 10000;
+		this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
+	};
 	
 	this.addAlert=function(alert, timeout) {
 		this.alerts.unshift(alert);
 		var service = this;
-		setTimeout(function() { service.remove(alert.id) }, timeout);		
+		setTimeout(function() { service.remove(alert.id); }, timeout);		
 		if (this.alerts.length >= this.max_alerts) {
 			this.alerts.length = 3;
 		}
-	}
+	};
 	
 	return this;
 });

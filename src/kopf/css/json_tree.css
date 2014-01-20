@@ -1,3 +1,11 @@
+/* json string right " */
+.json-object-expand:after {
+	content: '+';
+}
+.json-object-collapse:after {
+	content: '-';
+}
+
 .json-object-expand {
 	display: inline-block;
 	font-weight: 500;

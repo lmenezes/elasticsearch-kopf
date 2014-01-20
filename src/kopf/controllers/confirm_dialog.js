@@ -4,10 +4,10 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 	
 	$scope.close=function() {
 		$scope.dialog_service.close();
-	}
+	};
 	
 	$scope.confirm=function() {
 		$scope.dialog_service.confirm();
-	}
+	};
 	
 }

@@ -9,10 +9,10 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 			$scope.cluster_health = null;
 			$scope.refreshClusterState();
 		}
-	}
+	};
 	
 	$scope.changeRefresh=function() {
 		$scope.settings_service.setRefreshInterval($scope.new_refresh);
-	}
+	};
 
 }

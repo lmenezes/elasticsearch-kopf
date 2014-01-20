@@ -1,7 +1,5 @@
-var jsonTree = new JSONTree();
-
 function getTimeString(date) {
-	date = date == null ? new Date() : date; 
+	date = isDefined(date) ? date : new Date();
 	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
 }
 
@@ -15,60 +13,24 @@ function Request(url, method, body) {
 		this.url = '';
 		this.method = '';
 		this.body = '';
-	}
+	};
+	
+	this.loadFromJSON=function(json) {
+		this.method = json.method;
+		this.url = json.url;
+		this.body = json.body;
+		this.timestamp = json.timestamp;
+		return this;
+	};
+	
+	this.equals=function(request) {
+		return (
+			this.url === request.url &&
+			this.method.toUpperCase() === request.method.toUpperCase() &&
+			this.body === request.body
+		);
+	};
 }
-
-var Alert=function(message, response) {
-	this.message = message;
-	this.response = response;
-
-}
-
-Alert.prototype = {
-	getResponse:function() {
-		if (this.response != null) {
-			return JSON.stringify(this.response, undefined, 2);			
-		}
-	},
-	hasServerResponse:function() {
-		return this.response != null;
-	},
-	clear:function() {
-		this.level = null;
-		this.message = null;
-		this.class = null;
-	}
-};
-
-var SuccessAlert=function(message, response) {
-	this.message = message;
-	this.level = "success";
-	this.class = "alert-success";
-	this.icon = "icon-ok";
-	this.response = response;
-}
-SuccessAlert.prototype = new Alert();
-SuccessAlert.prototype.constructor = SuccessAlert;
-
-var ErrorAlert=function(message, response) {
-	this.message = message;
-	this.level = "error";
-	this.class = 'alert-danger';
-	this.icon = "icon-warning-sign";
-	this.response = response;
-}
-ErrorAlert.prototype = new Alert();
-ErrorAlert.prototype.constructor = ErrorAlert;
-
-var InfoAlert=function(message, response) {
-	this.message = message;
-	this.level = "info";
-	this.class = 'alert-info';
-	this.icon = "icon-info";
-	this.response = response;
-}
-InfoAlert.prototype = new Alert();
-InfoAlert.prototype.constructor = InfoAlert;
 
 function AliasesPagination(page, results) {
 	this.page = page;
@@ -87,7 +49,7 @@ function AliasesPagination(page, results) {
 		} else {
 			return 0;
 		}
-	}
+	};
 	
 	this.lastResult=function() {
 		if (this.current_page() * this.page_size > Object.keys(this.getResults()).length) {
@@ -95,28 +57,30 @@ function AliasesPagination(page, results) {
 		} else {
 			return this.current_page() * this.page_size;
 		}
-	}
+	};
 
 	this.hasNextPage=function() {
 		return this.page_size * this.current_page() < Object.keys(this.getResults()).length;
-	}
+	};
 	
 	this.hasPreviousPage=function() {
 		return this.current_page() > 1;
-	}
+	};
+	
 	this.nextPage=function() {
 		this.page += 1;
-	}
+	};
+	
 	this.previousPage=function() {
 		this.page -= 1;
-	}
+	};
 	
 	this.current_page=function() {
 		if (this.alias_query != this.past_alias_query || this.index_query != this.past_index_query) {
 			this.page = 1;
 		}
 		return this.page;
-	}
+	};
 	
 	this.getPage=function() {
 		var count = 1;
@@ -133,22 +97,22 @@ function AliasesPagination(page, results) {
 			}
 		});
 		return page;
-	}
+	};
 	
 	this.setResults=function(results) {
 		this.results = results;
 		// forces recalculation of page
 		this.cached_results = null; 
-	}
+	};
 	
 	this.total=function() {
 		return Object.keys(this.getResults()).length;
-	}
+	};
 	
 	this.getResults=function() {
 		var matchingResults = {};
 		var filters_changed = (this.alias_query != this.past_alias_query || this.index_query != this.past_index_query);
-		if (filters_changed || this.cached_results == null) { // if filters changed or no cached, calculate
+		if (filters_changed || !isDefined(this.cached_results)) { // if filters changed or no cached, calculate
 			var alias_query = this.alias_query;
 			var index_query = this.index_query;
 			var results = this.results;
@@ -182,7 +146,7 @@ function AliasesPagination(page, results) {
 			this.past_index_query = this.index_query;
 		}
 		return this.cached_results;
-	}
+	};
 }
 
 function ClusterNavigation() {
@@ -207,11 +171,11 @@ function ModalControls() {
 }
 
 function isDefined(value) {
-	return typeof value != 'undefined';
+	return value !== null && typeof value != 'undefined';
 }
 
 function notEmpty(value) {
-	return isDefined(value) && value != null && value.trim().length > 0;
+	return isDefined(value) && value.trim().length > 0;
 }
 
 function hierachyJson(json) {

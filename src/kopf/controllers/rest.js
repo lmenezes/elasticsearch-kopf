@@ -3,7 +3,22 @@ function RestController($scope, $location, $timeout, AlertService) {
 	
 	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
-	$scope.history = [];
+
+	$scope.loadHistory=function() {
+		var history = [];
+		if (isDefined(localStorage.kopf_request_history)) {
+			try {
+				history = JSON.parse(localStorage.kopf_request_history).map(function(h) {
+					return new Request().loadFromJSON(h);
+				});
+			} catch (error) {
+				localStorage.kopf_request_history = null;
+			}
+		} 
+		return history;
+	};
+	
+	$scope.history = $scope.loadHistory();
 	$scope.history_request = null;
 		
 	$scope.editor = new AceEditor('rest-client-editor');
@@ -15,12 +30,29 @@ function RestController($scope, $location, $timeout, AlertService) {
 		$scope.request.method = history_request.method;
 		$scope.editor.setValue(history_request.body);
 		$scope.history_request = null;
-	}
+	};
+
+	$scope.addToHistory=function(history_request) {
+		var exists = false;
+		for (var i = 0; i < $scope.history.length; i++) {
+			if ($scope.history[i].equals(history_request)) {
+				exists = true;
+				break;
+			}
+		}
+		if (!exists) {
+			$scope.history.unshift(history_request);
+			if ($scope.history.length > 30) {
+				$scope.history.length = 30;
+			}
+			localStorage.kopf_request_history = JSON.stringify($scope.history);			
+		}
+	};
 
 	$scope.sendRequest=function() {
 		$scope.request.body = $scope.editor.format();
 		$('#rest-client-response').html('');
-		if ($scope.editor.error == null && notEmpty($scope.request.url)) {
+		if (!isDefined($scope.editor.error) && notEmpty($scope.request.url)) {
 			// TODO: deal with basic auth here
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
 				$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
@@ -29,30 +61,31 @@ function RestController($scope, $location, $timeout, AlertService) {
 				function(response) {
 					var content = response;
 					try {
-						content = jsonTree.create(response);
+						content = JSONTree.create(response);
 					} catch (parsing_error) {
 						// nothing to do
 					}
 					$('#rest-client-response').html(content);
 					$scope.updateModel(function() {
-						$scope.history.unshift(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-						if ($scope.history.length > 30) {
-							$scope.history.length = 30;
-						}
+						$scope.addToHistory(new Request($scope.request.url,$scope.request.method,$scope.request.body));
 					});
 
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Request was not successful: " + error['statusText']);
+						if (error.status !== 0) {
+							$scope.alert_service.error("Request was not successful: " + error.statusText);
+						} else {
+							$scope.alert_service.error($scope.request.url + " is unreachable");	
+						}
 					});
 					try {
-						$('#rest-client-response').html(jsonTree.create(JSON.parse(error['responseText'])));
+						$('#rest-client-response').html(JSONTree.create(JSON.parse(error.responseText)));
 					} catch (invalid_json) {
-						$('#rest-client-response').html(error['responseText']);
+						$('#rest-client-response').html(error.responseText);
 					}
 				}
 			);
 		}
-	}
+	};
 }

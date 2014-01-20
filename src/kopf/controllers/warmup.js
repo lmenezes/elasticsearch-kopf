@@ -24,15 +24,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 	$scope.totalWarmers=function() {
 		return Object.keys($scope.warmers).length;
-	}
+	};
 	
 	$scope.loadIndices=function() {
 		$scope.indices = $scope.cluster.indices;
-	}
+	};
 	
 	$scope.createWarmerQuery=function() {
 		$scope.formatBody();
-		if ($scope.validation_error == null) {
+		if (!isDefined($scope.validation_error)) {
 			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
 					$scope.updateModel(function() {
@@ -46,7 +46,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				}
 			);
 		}
-	}
+	};
 	
 	$scope.deleteWarmupQuery=function(warmer_id, source) {
 		$scope.dialog_service.open(
@@ -69,15 +69,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.loadIndexWarmers=function() {
-		if ($scope.index != null) {
+		if (isDefined($scope.index)) {
 			$scope.client.getIndexWarmers($scope.index.name, $scope.warmer_id,
 				function(response) {
 					$scope.updateModel(function() {
-						if (response[$scope.index.name] != null) {
-							$scope.warmers = response[$scope.index.name]['warmers'];
+						if (isDefined(response[$scope.index.name])) {
+							$scope.warmers = response[$scope.index.name].warmers;
 						} else {
 							$scope.warmers = {};
 						}
@@ -92,7 +92,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		} else {
 			$scope.warmers = {};
 		}
-	}
+	};
 	
 	$scope.formatBody=function() {
 		var source = $scope.editor.getValue();
@@ -106,6 +106,6 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		} catch (error) {
 			$scope.validation_error = error.toString();
 		}
-	}
+	};
 	
 }

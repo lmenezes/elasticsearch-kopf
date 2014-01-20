@@ -1,0 +1,49 @@
+<div ng-controller="CreateIndexController">
+	<h2>create new index</h2>
+	<div class="content-panel">
+		<div class="row">
+			<div class="col-lg-6">
+				<div class="form-group">
+					<input type="text" ng-model="name" class="form-control input-sm" placeholder="New index name">
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<div class="form-group">
+					<input type="text" ng-model="shards" class="form-control input-sm" placeholder="# of shards" type="number">
+				</div>
+			</div>
+			<div class="col-lg-3">
+				<div class="form-group">
+					<input type="text" ng-model="replicas" class="form-control input-sm" placeholder="# of replicas" type="number">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6">
+				<h4>Index settings</h4>
+			</div>
+			<div class="col-lg-6">
+				<div class="form-group">
+					<select ng-model="settings" ng-options="i.settingsAsString() as i.name for i in pagination.results" class="form-control input-sm" ng-change="updateEditor()">
+						<option value="">load settings from an existing index</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="form-group">
+					<div id="index-settings-editor" class="kopf-ace-editor create-index-editor"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<span class="pull-right">
+					<button type="button" class="btn btn-default" ng-click='back()'>Back</button>
+					<button type="button" class="btn btn-primary" ng-click='createIndex()'><i class="icon-ok"></i> Create</button>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

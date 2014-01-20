@@ -10,12 +10,11 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	$scope.filter = "";
 	$scope.id = "";
 	
-	$scope.index;
+	$scope.index = null;
 	$scope.indices = [];
 	$scope.new_query = new PercolateQuery("","","");
 	
-	
-    $scope.$on('loadPercolatorEvent', function() {
+	$scope.$on('loadPercolatorEvent', function() {
 		$scope.loadIndices();
 		$scope.loadPercolatorQueries();
     });
@@ -23,28 +22,28 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	$scope.previousPage=function() {
 		$scope.page -= 1;
 		$scope.loadPercolatorQueries();
-	}
+	};
 	
 	$scope.nextPage=function() {
 		$scope.page += 1;
 		$scope.loadPercolatorQueries();
-	}
+	};
 	
 	$scope.hasNextPage=function() {
 		return $scope.page * 10 < $scope.total;
-	}
+	};
 	
 	$scope.hasPreviousPage=function() {
 		return $scope.page > 1;
-	}
+	};
 	
 	$scope.firstResult=function() {
 		return $scope.total > 0 ? ($scope.page - 1) * 10  + 1 : 0;
-	}
+	};
 	
 	$scope.lastResult=function() {
 		return $scope.hasNextPage() ? $scope.page * 10 : $scope.total;
-	}
+	};
 	
 	$scope.parseSearchParams=function() {
 		var queries = [];
@@ -60,7 +59,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			});
 		}
 		return queries;
-	}
+	};
 	
 	$scope.deletePercolatorQuery=function(query) {
 		$scope.dialog_service.open(
@@ -92,11 +91,11 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				);
 			}
 		);
-	}
+	};
 	
 	$scope.createNewQuery=function() {
 		$scope.new_query.source = $scope.editor.format();
-		if ($scope.editor.error == null) {
+		if (!isDefined($scope.editor.error)) {
 			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					$scope.client.refreshIndex("_percolator", 
@@ -120,26 +119,26 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				}
 			);
 		}
-	}
+	};
 	
 	$scope.loadPercolatorQueries=function() {
 		var params = {};
 		try {
 			var queries = $scope.parseSearchParams();
 			if (queries.length > 0) {
-				params['query'] = {"bool": {"must": queries}};
+				params.query = {"bool": {"must": queries}};
 			}
-			params['from'] = (($scope.page - 1) * 10);
-			var index = $scope.index != null ? $scope.index.name : null;
+			params.from = (($scope.page - 1) * 10);
+			var index = isDefined($scope.index) ? $scope.index.name : null;
 			$scope.client.fetchPercolateQueries(index, JSON.stringify(params),
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.total = response['hits']['total'];
-						$scope.queries = response['hits']['hits'].map(function(q) { return new PercolateQuery(q); });
+						$scope.total = response.hits.total;
+						$scope.queries = response.hits.hits.map(function(q) { return new PercolateQuery(q); });
 					});
 				},
 				function(error) {
-					if (!(error['responseJSON'] != null && error['responseJSON']['error'] == "IndexMissingException[[_percolator] missing]")) {
+					if (!(isDefined(error.responseJSON) && error.responseJSON.error == "IndexMissingException[[_percolator] missing]")) {
 						$scope.updateModel(function() {
 							$scope.alert_service.error("Error while reading loading percolate queries", error);
 						});
@@ -150,17 +149,18 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			$scope.alert_service.error("Filter is not a valid JSON");
 			return;
 		}
-	}
+	};
 	
 	$scope.loadIndices=function() {
-		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator' });
-	}
+		$scope.indices = $scope.cluster.indices.filter(function(index) { return index != '_percolator'; });
+	};
+	
 }
 
 function PercolateQuery(query_info) {
-	this.type = query_info['_type'];
-	this.id = query_info['_id'];
-	this.source = query_info['_source'];
+	this.type = query_info._type;
+	this.id = query_info._id;
+	this.source = query_info._source;
 	
 	this.sourceAsJSON=function() {
 		try {
@@ -168,5 +168,5 @@ function PercolateQuery(query_info) {
 		} catch (error) {
 
 		}
-	}
+	};
 }
