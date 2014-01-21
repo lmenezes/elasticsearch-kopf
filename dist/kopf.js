@@ -195,57 +195,57 @@ function ElasticClient(host,username,password) {
 	this.password = password;
 	
 	this.createIndex=function(name, settings, callback_success, callback_error) {
-		this.syncRequest('POST', "/" + name, settings, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);
 	};
 
 	this.enableShardAllocation=function(callback_success, callback_error) {
 		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":false }};
-		this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
 	this.disableShardAllocation=function(callback_success, callback_error) {
 		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":true }};
-		this.syncRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
 	this.getClusterState=function(callback_success, callback_error) {
-		this.syncRequest('GET', "/_cluster/state",{}, callback_success, callback_error);
+		this.executeElasticRequest('GET', "/_cluster/state",{}, callback_success, callback_error);
 	};
 
 	this.shutdownNode=function(node_id, callback_success, callback_error) {
-		this.syncRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
 	};
 
 	this.openIndex=function(index, callback_success, callback_error) {
-		this.syncRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
 	};
 
 	this.optimizeIndex=function(index, callback_success, callback_error) {
-		this.syncRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
 	};
 
 	this.clearCache=function(index, callback_success, callback_error) {
-		this.syncRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
 	};
 
 	this.closeIndex=function(index, callback_success, callback_error) {
-		this.syncRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
 	};
 
 	this.refreshIndex=function(index, callback_success, callback_error) {
-		this.syncRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
 	};
 
 	this.deleteIndex=function(name, callback_success, callback_error) {
-		this.syncRequest('DELETE', "/" + name, {}, callback_success, callback_error);
+		this.executeElasticRequest('DELETE', "/" + name, {}, callback_success, callback_error);
 	};
 
 	this.updateIndexSettings=function(name, settings, callback_success, callback_error) {
-		this.syncRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
+		this.executeElasticRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
 	};
 
 	this.updateClusterSettings=function(settings, callback_success, callback_error) {
-		this.syncRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
+		this.executeElasticRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
 	};
 
 	this.getNodes=function(callback_success, callback_error) {
@@ -256,14 +256,14 @@ function ElasticClient(host,username,password) {
 			});
 			callback_success(nodes);
 		};
-		this.syncRequest('GET', "/_cluster/state", {}, createNodes, callback_error);
+		this.executeElasticRequest('GET', "/_cluster/state", {}, createNodes, callback_error);
 	};
 
 	this.fetchAliases=function(callback_success, callback_error) {
 		var createAliases=function(response) {
 			callback_success(new Aliases(response));
 		};
-		this.syncRequest('GET', "/_aliases",{},createAliases, callback_error);
+		this.executeElasticRequest('GET', "/_aliases",{},createAliases, callback_error);
 	};
 
 	this.analyzeByField=function(index, type, field, text, callback_success, callback_error) {
@@ -273,7 +273,7 @@ function ElasticClient(host,username,password) {
 			});
 			callback_success(tokens);	
 		};
-		this.syncRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
+		this.executeElasticRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
 	};
 
 	this.analyzeByAnalyzer=function(index, analyzer, text, callback_success, callback_error) {
@@ -283,7 +283,7 @@ function ElasticClient(host,username,password) {
 			});
 			callback_success(tokens);	
 		};
-		this.syncRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
+		this.executeElasticRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
 	};
 
 	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
@@ -298,21 +298,21 @@ function ElasticClient(host,username,password) {
 		add_aliases.forEach(function(alias) {
 			data.actions.push({'add':alias.info()});
 		});
-		this.syncRequest('POST', "/_aliases",JSON.stringify(data, undefined, ""), callback_success, callback_error);
+		this.executeElasticRequest('POST', "/_aliases",JSON.stringify(data, undefined, ""), callback_success, callback_error);
 	};
 
 	this.getNodesStats=function(callback_success, callback_error) {
-		this.syncRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
+		this.executeElasticRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
 	};
 	
 	this.getIndexWarmers=function(index, warmer, callback_success, callback_error) {
 		var path = "/" + index + "/_warmer/" + warmer.trim();
-		this.syncRequest('GET', path ,{},callback_success, callback_error);
+		this.executeElasticRequest('GET', path ,{},callback_success, callback_error);
 	};
 	
 	this.deleteWarmupQuery=function(index, warmer, callback_success, callback_error) {
 		var path = "/" + index + "/_warmer/" + warmer;
-		this.syncRequest('DELETE', path, {},callback_success, callback_error);
+		this.executeElasticRequest('DELETE', path, {},callback_success, callback_error);
 	};
 	
 	this.registerWarmupQuery=function(index, types, warmer_id, source, callback_success, callback_error) {
@@ -321,39 +321,39 @@ function ElasticClient(host,username,password) {
 			path += types + "/";
 		}
 		path += "/_warmer/" + warmer_id.trim();
-		this.syncRequest('PUT', path ,source,callback_success, callback_error);
+		this.executeElasticRequest('PUT', path ,source,callback_success, callback_error);
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
 		var path = "/" + index + "/.percolator/_search";
-		this.syncRequest('POST', path , body,callback_success, callback_error);
+		this.executeElasticRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		this.syncRequest('DELETE', "/" + index + "/.percolator/" + id, {}, callback_success, callback_error);
+		this.executeElasticRequest('DELETE', "/" + index + "/.percolator/" + id, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		this.syncRequest('PUT', "/" + index + "/.percolator/" + id, body, callback_success, callback_error);
+		this.executeElasticRequest('PUT', "/" + index + "/.percolator/" + id, body, callback_success, callback_error);
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
-		this.syncRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);	
+		this.executeElasticRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);	
 	};
 
 	this.createRepository=function(repository, body, callback_success, callback_error) {
-		this.syncRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error);
+		this.executeElasticRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error);
 	};
 
 	this.deleteRepository=function(repository, callback_success, callback_error) {
-		this.syncRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error);
+		this.executeElasticRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error);
 	};
 
 	this.getSnapshots=function(repository, callback_success, callback_error){
-		this.synchRequest('GET', "/_snapshot/" + repository + "/_all", callback_success, callback_error);
+		this.executeElasticRequest('GET', "/_snapshot/" + repository + "/_all", callback_success, callback_error);
 	};
 
-	this.syncRequest=function(method, path, data, callback_success, callback_error) {
+	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
 	};
