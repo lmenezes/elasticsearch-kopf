@@ -946,3 +946,11 @@ a.header-index-action-mini:hover {
 	text-align: left;
 	width: 100%;
 }
+.repository-settings-editor {
+	height: 400px;
+	width: auto;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+	width: 100%;
+}
