@@ -2,10 +2,13 @@ function Cluster(state,status,nodes,settings) {
 	if (isDefined(state) && isDefined(status) && isDefined(nodes) && isDefined(settings)) {
 		this.disableAllocation = false;
 		if (isDefined(settings.persistent) && isDefined(settings.persistent.disable_allocation)) {
-			this.disableAllocation = settings.persistent.disable_allocation == "true" ? true : false;
+			this.disableAllocation = settings.persistent.disable_allocation;
 		}
+		// FIXME: 0.90/1.0 check
 		if (isDefined(settings.transient) && isDefined(settings.transient['cluster.routing.allocation.disable_allocation'])) {
-			this.disableAllocation = settings.transient['cluster.routing.allocation.disable_allocation'] == "true" ? true : false;
+			this.disableAllocation = settings.transient['cluster.routing.allocation.disable_allocation'];
+		} else {
+			this.disableAllocation = getProperty(settings,['transient', 'cluster','routing', 'allocation', 'disable_allocation'], "false");
 		}
 		this.settings = $.extend({}, settings.persistent, settings.transient);
 		this.master_node = state.master_node;

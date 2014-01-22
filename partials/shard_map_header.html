@@ -9,8 +9,8 @@
 			</div>
 			<div class="col-lg-3">
 				<a class="cluster-map-header-cluster-action">
-					<i class="icon-lock" ng-show="cluster.disableAllocation" ng-click="enableAllocation()" title="enabled shard allocation"></i>
-					<i class="icon-unlock-alt" ng-show="!cluster.disableAllocation" ng-click="disableAllocation()" title="disable shard allocation"></i>
+					<i class="icon-lock" ng-show="cluster.disableAllocation === 'true'" ng-click="enableAllocation()" title="enabled shard allocation"></i>
+					<i class="icon-unlock-alt" ng-show="cluster.disableAllocation !== 'true'" ng-click="disableAllocation()" title="disable shard allocation"></i>
 				</a>
 			</div>
 			<div class="col-lg-3">
