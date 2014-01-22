@@ -194,6 +194,44 @@ function ElasticClient(host,username,password) {
 	this.username = username;
 	this.password = password;
 	
+	this.createAuthToken=function(username,password) {
+		var auth = null;
+		if (isDefined(username) && isDefined(password)) {
+			auth = "Basic " + window.btoa(username + ":" + password);
+		}
+		return auth;
+	};
+	
+	var auth = this.createAuthToken(username,password);
+	var fetch_version = $.ajax({
+		type: 'GET',
+		url: host,
+		beforeSend: function(xhr) { 
+			if (isDefined(auth)) {
+				xhr.setRequestHeader("Authorization", auth);
+			} 
+		},
+		data: {},
+		async: false
+	});
+	
+	var client = this;
+	fetch_version.done(function(response) {
+		try {
+			client.version = response.version.number;	
+		} catch (error) {
+			throw "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + host + "]?";
+		}
+	});
+	
+	fetch_version.fail(function(error) {
+		throw error.statusText;
+	});
+
+	this.is1=function() {
+		return this.version.substring(0, 3) == "1.0";
+	};
+
 	this.createIndex=function(name, settings, callback_success, callback_error) {
 		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);
 	};
@@ -325,16 +363,30 @@ function ElasticClient(host,username,password) {
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		var path = "/" + index + "/.percolator/_search";
+		// FIXME: 0.90/1.0 check
+		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
+		if (this.is1()) {
+			path = "/" + index + "/.percolator/_search";	
+		} 
 		this.executeElasticRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		this.executeElasticRequest('DELETE', "/" + index + "/.percolator/" + id, {}, callback_success, callback_error);
+		// FIXME: 0.90/1.0 check
+		var path = "/_percolator/" + index + "/" + id;
+		if (this.is1()) {
+			path = "/" + index + "/.percolator/" + id;
+		}
+		this.executeElasticRequest('DELETE', path, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		this.executeElasticRequest('PUT', "/" + index + "/.percolator/" + id, body, callback_success, callback_error);
+		// FIXME: 0.90/1.0 check
+		var path = "/_percolator/" + index + "/" + id;
+		if (this.is1()) {
+			path = "/" + index + "/.percolator/" + id;
+		}
+		this.executeElasticRequest('PUT', path, body, callback_success, callback_error);
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
@@ -356,14 +408,6 @@ function ElasticClient(host,username,password) {
 	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
-	};
-	
-	this.createAuthToken=function(username,password) {
-		var auth = null;
-		if (isDefined(username) && isDefined(password)) {
-			auth = "Basic " + window.btoa(username + ":" + password);
-		}
-		return auth;
 	};
 	
 	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {
@@ -546,8 +590,16 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
-	this.num_of_shards = index_metadata.settings.index.number_of_shards;
-	this.num_of_replicas = parseInt(index_metadata.settings.index.number_of_replicas);
+
+	// FIXME: 0.90/1.0 check
+	if (isDefined(index_metadata.settings['index.number_of_shards'])) {
+		this.num_of_shards = index_metadata.settings['index.number_of_shards'];
+		this.num_of_replicas = parseInt(index_metadata.settings['index.number_of_replicas']);
+	} else {
+		this.num_of_shards = index_metadata.settings.index.number_of_shards;
+		this.num_of_replicas = parseInt(index_metadata.settings.index.number_of_replicas);
+	}
+	
 	this.state_class = index_metadata.state === "open" ? "success" : "active";
 	this.visible = true;
 	var unassigned = [];
@@ -632,6 +684,15 @@ function Node(node_id, node_info, node_stats) {
 	this.client = client || !master && !data;
 	this.current_master = false;
 	this.stats = node_stats;
+	
+	// FIXME: 0.90/1.0 check
+	if (isDefined(this.stats.jvm.mem.heap_used)) {
+		this.heap_used = this.stats.jvm.mem.heap_used;
+		this.heap_committed = this.stats.jvm.mem.heap_committed;
+	} else {
+		this.heap_used = readablizeBytes(this.stats.jvm.mem.heap_used_in_bytes);
+		this.heap_committed = readablizeBytes(this.stats.jvm.mem.heap_committed_in_bytes);
+	}
 
 	this.setCurrentMaster=function() {
 		this.current_master = true;
@@ -1632,8 +1693,13 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			$scope.host = url;
 		}
 		$scope.setConnected(false);
-		$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
-		$scope.broadcastMessage('hostChanged',{});
+		try {
+			$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
+			$scope.broadcastMessage('hostChanged',{});	
+		} catch (error) {
+			AlertService.error(error);
+		}
+		
 	};
 	
 	if ($location.host() === "") { // when opening from filesystem
@@ -1667,38 +1733,40 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 		
 	$scope.refreshClusterState=function() {
-		$timeout(function() { 
-			$scope.client.getClusterDetail(
-				function(cluster) {
-					$scope.updateModel(function() { 
-						$scope.alertClusterChanges(cluster);
-						$scope.cluster = cluster; 
-					});
-				},
-				function(error) {
-					$scope.updateModel(function() { 
-						AlertService.error("Error while retrieving cluster information", error);
-						$scope.cluster = null; 
-					});
-				}
-			);
+		if (isDefined($scope.client)) {
+			$timeout(function() { 
+				$scope.client.getClusterDetail(
+					function(cluster) {
+						$scope.updateModel(function() { 
+							$scope.alertClusterChanges(cluster);
+							$scope.cluster = cluster; 
+						});
+					},
+					function(error) {
+						$scope.updateModel(function() { 
+							AlertService.error("Error while retrieving cluster information", error);
+							$scope.cluster = null; 
+						});
+					}
+				);
 			
-			$scope.client.getClusterHealth( 
-				function(cluster) {
-					$scope.updateModel(function() { 
-						$scope.cluster_health = cluster;
-						$scope.setConnected(true);
-					});
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						$scope.cluster_health = null;
-						$scope.setConnected(false);
-						AlertService.error("Error connecting to [" + $scope.host + "]",error);						
-					});
-				}
-			);
-		}, 100);	
+				$scope.client.getClusterHealth( 
+					function(cluster) {
+						$scope.updateModel(function() { 
+							$scope.cluster_health = cluster;
+							$scope.setConnected(true);
+						});
+					},
+					function(error) {
+						$scope.updateModel(function() {
+							$scope.cluster_health = null;
+							$scope.setConnected(false);
+							AlertService.error("Error connecting to [" + $scope.host + "]",error);						
+						});
+					}
+				);
+			}, 100);			
+		}
 	};
 
 	$scope.autoRefreshCluster=function() {
@@ -1720,16 +1788,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		return $scope.host;
 	};
 	
-	$scope.readablizeBytes=function(bytes) {
-		if (bytes > 0) {
-			var s = ['b', 'KB', 'MB', 'GB', 'TB', 'PB'];
-			var e = Math.floor(Math.log(bytes) / Math.log(1024));
-			return (bytes / Math.pow(1024, e)).toFixed(2) + s[e];	
-		} else {
-			return 0;
-		}
-	};
-
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
@@ -2016,7 +2074,8 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			function() {
 				$scope.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
-						$scope.client.refreshIndex(query.index, 
+						var refreshIndex = $scope.client.is1() ? query.index : '_percolator';
+						$scope.client.refreshIndex(refreshIndex, 
 							function(response) {
 								$scope.updateModel(function() {
 									AlertService.success("Query successfully deleted", response);
@@ -2045,7 +2104,8 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 		if (!isDefined($scope.editor.error)) {
 			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
-					$scope.client.refreshIndex($scope.new_query.index.name, 
+					var refreshIndex = $scope.client.is1() ? $scope.new_query.index.name : '_percolator';
+					$scope.client.refreshIndex(refreshIndex, 
 						function(response) {
 							$scope.updateModel(function() {
 								AlertService.success("Percolator Query successfully created", response);
@@ -2068,33 +2128,37 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 		}
 	};
 	
+	$scope.searchPercolatorQueries=function() {
+		if (isDefined($scope.index)) {
+			$scope.loadPercolatorQueries();
+		} else {
+			AlertService.info("No index is selected");
+		}
+	};
+	
 	$scope.loadPercolatorQueries=function() {
 		var params = {};
 		try {
-			if (isDefined($scope.index)) {
-				var queries = $scope.parseSearchParams();
-				if (queries.length > 0) {
-					params.query = {"bool": {"must": queries}};
-				}
-				params.from = (($scope.page - 1) * 10);
-				$scope.client.fetchPercolateQueries($scope.index.name, JSON.stringify(params),
-					function(response) {
-						$scope.updateModel(function() {
-							$scope.total = response.hits.total;
-							$scope.queries = response.hits.hits.map(function(q) { return new PercolateQuery(q); });
-						});
-					},
-					function(error) {
-						if (!(isDefined(error.responseJSON) && error.responseJSON.error == "IndexMissingException[[_percolator] missing]")) {
-							$scope.updateModel(function() {
-								AlertService.error("Error while reading loading percolate queries", error);
-							});
-						}
-					}
-				);				
-			} else {
-				AlertService.info("No index is selected");
+			var queries = $scope.parseSearchParams();
+			if (queries.length > 0) {
+				params.query = {"bool": {"must": queries}};
 			}
+			params.from = (($scope.page - 1) * 10);
+			$scope.client.fetchPercolateQueries($scope.index.name, JSON.stringify(params),
+				function(response) {
+					$scope.updateModel(function() {
+						$scope.total = response.hits.total;
+						$scope.queries = response.hits.hits.map(function(q) { return new PercolateQuery(q); });
+					});
+				},
+				function(error) {
+					if (!(isDefined(error.responseJSON) && error.responseJSON.error == "IndexMissingException[[_percolator] missing]")) {
+						$scope.updateModel(function() {
+							AlertService.error("Error while reading loading percolate queries", error);
+						});
+					}
+				}
+			);				
 		} catch (error) {
 			AlertService.error("Filter is not a valid JSON");
 			return;
@@ -2470,3 +2534,12 @@ function AceEditor(target) {
 		return content;
 	};
 }
+function readablizeBytes(bytes) {
+	if (bytes > 0) {
+		var s = ['b', 'KB', 'MB', 'GB', 'TB', 'PB'];
+		var e = Math.floor(Math.log(bytes) / Math.log(1024));
+		return (bytes / Math.pow(1024, e)).toFixed(2) + s[e];	
+	} else {
+		return 0;
+	}
+};

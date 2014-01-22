@@ -13,6 +13,15 @@ function Node(node_id, node_info, node_stats) {
 	this.client = client || !master && !data;
 	this.current_master = false;
 	this.stats = node_stats;
+	
+	// FIXME: 0.90/1.0 check
+	if (isDefined(this.stats.jvm.mem.heap_used)) {
+		this.heap_used = this.stats.jvm.mem.heap_used;
+		this.heap_committed = this.stats.jvm.mem.heap_committed;
+	} else {
+		this.heap_used = readablizeBytes(this.stats.jvm.mem.heap_used_in_bytes);
+		this.heap_committed = readablizeBytes(this.stats.jvm.mem.heap_committed_in_bytes);
+	}
 
 	this.setCurrentMaster=function() {
 		this.current_master = true;

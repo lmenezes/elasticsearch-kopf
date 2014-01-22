@@ -13,8 +13,16 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
-	this.num_of_shards = index_metadata.settings.index.number_of_shards;
-	this.num_of_replicas = parseInt(index_metadata.settings.index.number_of_replicas);
+
+	// FIXME: 0.90/1.0 check
+	if (isDefined(index_metadata.settings['index.number_of_shards'])) {
+		this.num_of_shards = index_metadata.settings['index.number_of_shards'];
+		this.num_of_replicas = parseInt(index_metadata.settings['index.number_of_replicas']);
+	} else {
+		this.num_of_shards = index_metadata.settings.index.number_of_shards;
+		this.num_of_replicas = parseInt(index_metadata.settings.index.number_of_replicas);
+	}
+	
 	this.state_class = index_metadata.state === "open" ? "success" : "active";
 	this.visible = true;
 	var unassigned = [];

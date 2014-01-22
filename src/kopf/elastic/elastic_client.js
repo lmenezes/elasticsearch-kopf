@@ -3,6 +3,44 @@ function ElasticClient(host,username,password) {
 	this.username = username;
 	this.password = password;
 	
+	this.createAuthToken=function(username,password) {
+		var auth = null;
+		if (isDefined(username) && isDefined(password)) {
+			auth = "Basic " + window.btoa(username + ":" + password);
+		}
+		return auth;
+	};
+	
+	var auth = this.createAuthToken(username,password);
+	var fetch_version = $.ajax({
+		type: 'GET',
+		url: host,
+		beforeSend: function(xhr) { 
+			if (isDefined(auth)) {
+				xhr.setRequestHeader("Authorization", auth);
+			} 
+		},
+		data: {},
+		async: false
+	});
+	
+	var client = this;
+	fetch_version.done(function(response) {
+		try {
+			client.version = response.version.number;	
+		} catch (error) {
+			throw "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + host + "]?";
+		}
+	});
+	
+	fetch_version.fail(function(error) {
+		throw error.statusText;
+	});
+
+	this.is1=function() {
+		return this.version.substring(0, 3) == "1.0";
+	};
+
 	this.createIndex=function(name, settings, callback_success, callback_error) {
 		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);
 	};
@@ -134,16 +172,30 @@ function ElasticClient(host,username,password) {
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		var path = "/" + index + "/.percolator/_search";
+		// FIXME: 0.90/1.0 check
+		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
+		if (this.is1()) {
+			path = "/" + index + "/.percolator/_search";	
+		} 
 		this.executeElasticRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		this.executeElasticRequest('DELETE', "/" + index + "/.percolator/" + id, {}, callback_success, callback_error);
+		// FIXME: 0.90/1.0 check
+		var path = "/_percolator/" + index + "/" + id;
+		if (this.is1()) {
+			path = "/" + index + "/.percolator/" + id;
+		}
+		this.executeElasticRequest('DELETE', path, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		this.executeElasticRequest('PUT', "/" + index + "/.percolator/" + id, body, callback_success, callback_error);
+		// FIXME: 0.90/1.0 check
+		var path = "/_percolator/" + index + "/" + id;
+		if (this.is1()) {
+			path = "/" + index + "/.percolator/" + id;
+		}
+		this.executeElasticRequest('PUT', path, body, callback_success, callback_error);
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
@@ -165,14 +217,6 @@ function ElasticClient(host,username,password) {
 	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
 		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
-	};
-	
-	this.createAuthToken=function(username,password) {
-		var auth = null;
-		if (isDefined(username) && isDefined(password)) {
-			auth = "Basic " + window.btoa(username + ":" + password);
-		}
-		return auth;
 	};
 	
 	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {

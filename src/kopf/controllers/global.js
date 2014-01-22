@@ -32,8 +32,13 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			$scope.host = url;
 		}
 		$scope.setConnected(false);
-		$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
-		$scope.broadcastMessage('hostChanged',{});
+		try {
+			$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
+			$scope.broadcastMessage('hostChanged',{});	
+		} catch (error) {
+			AlertService.error(error);
+		}
+		
 	};
 	
 	if ($location.host() === "") { // when opening from filesystem
@@ -67,38 +72,40 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 		
 	$scope.refreshClusterState=function() {
-		$timeout(function() { 
-			$scope.client.getClusterDetail(
-				function(cluster) {
-					$scope.updateModel(function() { 
-						$scope.alertClusterChanges(cluster);
-						$scope.cluster = cluster; 
-					});
-				},
-				function(error) {
-					$scope.updateModel(function() { 
-						AlertService.error("Error while retrieving cluster information", error);
-						$scope.cluster = null; 
-					});
-				}
-			);
+		if (isDefined($scope.client)) {
+			$timeout(function() { 
+				$scope.client.getClusterDetail(
+					function(cluster) {
+						$scope.updateModel(function() { 
+							$scope.alertClusterChanges(cluster);
+							$scope.cluster = cluster; 
+						});
+					},
+					function(error) {
+						$scope.updateModel(function() { 
+							AlertService.error("Error while retrieving cluster information", error);
+							$scope.cluster = null; 
+						});
+					}
+				);
 			
-			$scope.client.getClusterHealth( 
-				function(cluster) {
-					$scope.updateModel(function() { 
-						$scope.cluster_health = cluster;
-						$scope.setConnected(true);
-					});
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						$scope.cluster_health = null;
-						$scope.setConnected(false);
-						AlertService.error("Error connecting to [" + $scope.host + "]",error);						
-					});
-				}
-			);
-		}, 100);	
+				$scope.client.getClusterHealth( 
+					function(cluster) {
+						$scope.updateModel(function() { 
+							$scope.cluster_health = cluster;
+							$scope.setConnected(true);
+						});
+					},
+					function(error) {
+						$scope.updateModel(function() {
+							$scope.cluster_health = null;
+							$scope.setConnected(false);
+							AlertService.error("Error connecting to [" + $scope.host + "]",error);						
+						});
+					}
+				);
+			}, 100);			
+		}
 	};
 
 	$scope.autoRefreshCluster=function() {
@@ -120,16 +127,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		return $scope.host;
 	};
 	
-	$scope.readablizeBytes=function(bytes) {
-		if (bytes > 0) {
-			var s = ['b', 'KB', 'MB', 'GB', 'TB', 'PB'];
-			var e = Math.floor(Math.log(bytes) / Math.log(1024));
-			return (bytes / Math.pow(1024, e)).toFixed(2) + s[e];	
-		} else {
-			return 0;
-		}
-	};
-
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
