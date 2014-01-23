@@ -87,13 +87,32 @@ function Index(index_name,index_info, index_metadata, index_status) {
 		return analyzers.sort(function(a, b) { return a.localeCompare(b); });
 	};
 	
+	function isAnalyzable(type) {
+		var non_analyzable_types = ['integer', 'long', 'float', 'double', 'multi_field'];
+		return non_analyzable_types.indexOf(type) == -1;
+	}
+	
 	this.getFields=function(type) {
 		if (isDefined(this.mappings[type])) {
 			var fields = this.mappings[type].properties;
-			var numeric_fields = ['integer', 'long', 'float', 'double'];
 			var validFields = [];
 			Object.keys(fields).forEach(function(field) {
-				if (numeric_fields.indexOf(fields[field].type) == -1) {
+				// multi fields
+				if (isDefined(fields[field].fields)) {
+					var full_path = fields[field].path != 'just_name';
+					var multi_fields = fields[field].fields;
+					Object.keys(multi_fields).forEach(function(multi_field) {
+						if (isAnalyzable(multi_fields[multi_field].type)) {
+							if (field != multi_field && full_path) {
+								validFields.push(field + "." + multi_field);		
+							} else {
+								validFields.push(multi_field);	
+							}
+						}
+					});
+				}
+				// normal fields
+				if (isAnalyzable(fields[field].type)) {
 					validFields.push(field);
 				}
 			});
@@ -101,5 +120,5 @@ function Index(index_name,index_info, index_metadata, index_status) {
 		} else {
 			return [];
 		}
-	};	
+	};
 }
