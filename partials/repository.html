@@ -46,6 +46,7 @@
 					</div>
 				</div>
 			</div>
+			<!-- repositories table -->
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
@@ -82,6 +83,143 @@
 					</div>
 				</div>
 			</div>
+			<!-- end repositories table -->
+
+			<!-- snapshot create/restore -->
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#controlSnapshotAccordion" href="#newSnapshot">
+							create snapshot
+						</a>
+					</h4>
+				</div>
+				<div id="newSnapshot" class="panel-collapse collapse">
+					<div class="panel-body">
+						<form role="form">
+							<div class="row">
+							    <div class="col-md-8">
+							        <div class="row">
+							            <div class="col-md-6">
+							            	<div class="form-group">
+											    <label class="form-label">snapshot name</label>
+												<input ng-model="new_snap.name" class="form-control input-sm" placeholder="snapshot name">
+											</div>
+							        	</div>
+							            <div class="col-md-6">
+							            	<div class="form-group">
+											    <label class="form-label">repository</label>
+												<select class="form-control input-sm" ng-model="new_snap.repository" ng-options="r.name as r.value for r in repositories_names">
+													<option value="">select repository</option>
+												</select>											    
+											</div>
+							            </div>
+							        </div>
+							        <div class="row">
+							            <div class="col-md-6">
+											<div class="row">
+												<div class="form-group">
+													<label class="form-label form-label-repository">ignore_unavailable</label>
+													<div class="row row-nomargin">
+														<label class="checkbox-inline">
+															<!-- input type checkbox margin-top -5px -->
+															<input type="checkbox" ng-model="new_snap.ignore_unavailable" ng-true-value="true"  class=""> True
+														</label>
+														<label class="checkbox-inline">
+															<input type="checkbox" ng-model="new_snap.ignore_unavailable" ng-true-value="false"  class=""> False
+														</label>
+													</div>
+												</div>
+											</div>
+							           	</div>
+							            <div class="col-md-6">
+											<div class="row">
+												<div class="form-group">
+													<label class="form-label form-label-repository">include_global_state</label>
+													<div class="row row-nomargin">
+														<label class="checkbox-inline">
+															<input type="checkbox" ng-model="new_snap.include_global_state" ng-true-value="true" > True
+														</label>
+														<label class="checkbox-inline">
+															<input type="checkbox" ng-model="new_snap.include_global_state" ng-true-value="false" > False
+														</label>
+													</div>
+												</div>
+											</div>											  
+							            </div>
+							        </div>
+							    </div>
+							    <div class="col-md-4">
+									<div class="form-group">
+									 	<label class="form-label">indices (default is all)</label>
+										<select multiple="multiple" ng-model="new_snap.indices" ng-options="i.name as i.name for i in indices" class="form-control input-sm-twoxheight">
+											<option value="">Default is All</option>
+										</select>
+									</div>
+							    </div>
+								<div class="row">
+									<div class="col-lg-12">
+										<span class="pull-right">
+											<button type="submit" class="btn btn-primary rest-client-execute input-sm pull-right" ng-click="createSnapshot()">
+												  <i class="icon-file-alt"></i> create
+											</button>
+										</span>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- END snapshot create/restore -->
+
+			<!-- snapshots table -->
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#snapshotAccordion" href="#snapshotList">
+							snapshots
+						</a>
+					</h4>
+				</div>
+				<div id="snapshotList" class="panel-collapse collapse in">
+					<div class="panel-body">
+						<div class="table-panel">
+							<div class="row">
+								<div class="col-lg-12">
+									<table class="table table-bordered table-striped">
+										<tr class="header-row">
+											<td>snapshot</td>
+											<td>repository</td>
+											<td>state</td>
+											<td>indices</td>
+											<td>started</td>
+											<td>completed</td>
+										</tr>
+										<tr ng-repeat="s in snapshots" class="content-row">
+											<td>{{s.snapshot}}</td>
+											<td>{{s.repository}}</td>
+											<td>{{s.state}}</td>
+											<td>{{s.indices}}</td>
+											<td>{{s.start_time_in_millis | date:'short'}}</td>
+											<td>{{s.end_time_in_millis | date:'short'}}
+												<a data-toggle="modal" href="#confirm_dialog" 
+												class="remove-icon" data-backdrop="static" data-keyboard="false">
+													<i class="icon-remove remove-icon" ng-click="deleteSnapshot(s)"></i>
+												</a>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- end repositories table -->
+
 		</div>
 	</div>
 </div>
