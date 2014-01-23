@@ -118,7 +118,7 @@ function ElasticClient(host,username,password) {
 			var tokens = response.tokens.map(function (token) {
 				return new Token(token.token,token.start_offset,token.end_offset,token.position);
 			});
-			callback_success(tokens);	
+			callback_success(tokens);
 		};
 		this.executeElasticRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
 	};
@@ -128,7 +128,7 @@ function ElasticClient(host,username,password) {
 			var tokens = response.tokens.map(function (token) {
 				return new Token(token.token,token.start_offset,token.end_offset,token.position);
 			});
-			callback_success(tokens);	
+			callback_success(tokens);
 		};
 		this.executeElasticRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
 	};
@@ -199,7 +199,7 @@ function ElasticClient(host,username,password) {
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
-		this.executeElasticRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);	
+		this.executeElasticRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);
 	};
 
 	this.createRepository=function(repository, body, callback_success, callback_error) {
@@ -211,7 +211,20 @@ function ElasticClient(host,username,password) {
 	};
 
 	this.getSnapshots=function(repository, callback_success, callback_error){
-		this.executeElasticRequest('GET', "/_snapshot/" + repository + "/_all", callback_success, callback_error);
+		var path = "/_snapshot/" + repository + "/_all";
+		this.executeElasticRequest('GET', path, {}, callback_success, callback_error);
+	};
+
+	this.deleteSnapshot=function(repository, snapshot, callback_success, callback_error){
+		this.executeElasticRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
+	};
+
+	this.restoreSnapshot=function(repository, snapshot, callback_success, callback_error){
+		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", {}, callback_success, callback_error);
+	};
+
+	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
+		this.executeElasticRequest('PUT', "/_snapshot/" + repository + "/" +snapshot, body, callback_success, callback_error );
 	};
 
 	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
@@ -225,18 +238,18 @@ function ElasticClient(host,username,password) {
 			$.ajax({
 				type: method,
 				url: url,
-				beforeSend: function(xhr) { 
+				beforeSend: function(xhr) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
-					} 
+					}
 				},
 				data: data
 		})).then(
-			function(r) { 
-				callback_success(r); 
+			function(r) {
+				callback_success(r);
 			},
 			function(error) {
-				callback_error(error); 
+				callback_error(error);
 			}
 		);
 	};
@@ -247,15 +260,15 @@ function ElasticClient(host,username,password) {
 		var url = this.host + "/_cluster/health";
 		var auth = this.createAuthToken(this.username,this.password);
 		$.when(
-			$.ajax({ 
+			$.ajax({
 				type: 'GET',
 				url: url,
 				dataType: 'json',
 				data: {},
-				beforeSend: function(xhr) { 
+				beforeSend: function(xhr) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
-					} 
+					}
 				},
 			})).then(
 				function(cluster_health) {
@@ -282,8 +295,8 @@ function ElasticClient(host,username,password) {
 					} 
 				}
 			}),
-			$.ajax({ 
-				type: 'GET', 
+			$.ajax({
+				type: 'GET',
 				url: host+"/_nodes/stats?all=true", 
 				dataType: 'json', 
 				data: {}, 
@@ -293,8 +306,8 @@ function ElasticClient(host,username,password) {
 					} 
 				}
 			}),
-			$.ajax({ 
-				type: 'GET', 
+			$.ajax({
+				type: 'GET',
 				url: host+"/_status", 
 				dataType: 'json', 
 				data: {}, 
@@ -304,8 +317,8 @@ function ElasticClient(host,username,password) {
 					}
 				}
 			}),
-			$.ajax({ 
-				type: 'GET', 
+			$.ajax({
+				type: 'GET',
 				url: host+"/_cluster/settings", 
 				dataType: 'json', 
 				data: {}, 
