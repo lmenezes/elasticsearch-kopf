@@ -16,12 +16,18 @@ function getProperty(object, property_path, default_value) {
 	var value = default_value;
 	if (property_path instanceof Array) {
 		var ref = object;
-		property_path.forEach(function(property) {
+		for (var i = 0; i < property_path.length; i++) {
+			var property = property_path[i];
 			if (isDefined(ref[property])) {
 				ref = ref[property];
-			} // could break earlier, but is it worth it?
-		});
-		value = ref;
+			} else {
+				ref = null;
+				break;
+			}
+		}
+		if (isDefined(ref)) {
+			value = ref;			
+		}
 	}
 	return value;
 }

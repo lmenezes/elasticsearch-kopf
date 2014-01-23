@@ -651,22 +651,33 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	};
 	
 	this.getAnalyzers=function() {
-		var analyzers = [];
-		Object.keys(this.settings).forEach(function(setting) {
-			if (setting.indexOf('index.analysis.analyzer') === 0) {
-				var analyzer = setting.substring('index.analysis.analyzer.'.length);
-				analyzer = analyzer.substring(0,analyzer.indexOf("."));
-				if ($.inArray(analyzer, analyzers) == -1) {
-					analyzers.push(analyzer);
+		// FIXME: 0.90/1.0 check
+		var analyzers = Object.keys(getProperty(this.settings,['index', 'analysis', 'analyzer'], {}));
+		if (analyzers.length === 0) {
+			Object.keys(this.settings).forEach(function(setting) {
+				if (setting.indexOf('index.analysis.analyzer') === 0) {
+					var analyzer = setting.substring('index.analysis.analyzer.'.length);
+					analyzer = analyzer.substring(0,analyzer.indexOf("."));
+					if ($.inArray(analyzer, analyzers) == -1) {
+						analyzers.push(analyzer);
+					}
 				}
-			}
-		});
+			});			
+		}
 		return analyzers.sort(function(a, b) { return a.localeCompare(b); });
 	};
 	
 	this.getFields=function(type) {
 		if (isDefined(this.mappings[type])) {
-			return Object.keys(this.mappings[type].properties).sort(function(a, b) { return a.localeCompare(b); });
+			var fields = this.mappings[type].properties;
+			var numeric_fields = ['integer', 'long', 'float', 'double'];
+			var validFields = [];
+			Object.keys(fields).forEach(function(field) {
+				if (numeric_fields.indexOf(fields[field].type) == -1) {
+					validFields.push(field);
+				}
+			});
+			return validFields.sort(function(a, b) { return a.localeCompare(b); });
 		} else {
 			return [];
 		}
@@ -1138,7 +1149,6 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 }
 function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.indices = null;
-	$scope.alert_service = AlertService;
 
 	// by index
 	$scope.field_index = null;
@@ -1165,7 +1175,7 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 				function(error) {
 					$scope.updateModel(function() {
 						$scope.field_tokens = null;
-						$scope.alert_service.error("Error while analyzing text", error);
+						AlertService.error("Error while analyzing text", error);
 					});
 				}
 			);
@@ -1175,16 +1185,16 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
 			$scope.field_tokens = null;
-			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
+			$scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.field_tokens = response;
+						$scope.analyzer_tokens = response;
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.field_tokens = null;
-						$scope.alert_service.error("Error while analyzing text", error);
+						$scope.analyzer_tokens = null;
+						AlertService.error("Error while analyzing text", error);
 					});
 				}
 			);
@@ -2555,12 +2565,18 @@ function getProperty(object, property_path, default_value) {
 	var value = default_value;
 	if (property_path instanceof Array) {
 		var ref = object;
-		property_path.forEach(function(property) {
+		for (var i = 0; i < property_path.length; i++) {
+			var property = property_path[i];
 			if (isDefined(ref[property])) {
 				ref = ref[property];
-			} // could break earlier, but is it worth it?
-		});
-		value = ref;
+			} else {
+				ref = null;
+				break;
+			}
+		}
+		if (isDefined(ref)) {
+			value = ref;			
+		}
 	}
 	return value;
 }

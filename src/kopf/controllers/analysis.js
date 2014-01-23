@@ -1,6 +1,5 @@
 function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.indices = null;
-	$scope.alert_service = AlertService;
 
 	// by index
 	$scope.field_index = null;
@@ -27,7 +26,7 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 				function(error) {
 					$scope.updateModel(function() {
 						$scope.field_tokens = null;
-						$scope.alert_service.error("Error while analyzing text", error);
+						AlertService.error("Error while analyzing text", error);
 					});
 				}
 			);
@@ -37,16 +36,16 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
 			$scope.field_tokens = null;
-			$scope.analyzer_tokens = $scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
+			$scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.field_tokens = response;
+						$scope.analyzer_tokens = response;
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.field_tokens = null;
-						$scope.alert_service.error("Error while analyzing text", error);
+						$scope.analyzer_tokens = null;
+						AlertService.error("Error while analyzing text", error);
 					});
 				}
 			);

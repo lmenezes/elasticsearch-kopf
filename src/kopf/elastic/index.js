@@ -71,22 +71,33 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	};
 	
 	this.getAnalyzers=function() {
-		var analyzers = [];
-		Object.keys(this.settings).forEach(function(setting) {
-			if (setting.indexOf('index.analysis.analyzer') === 0) {
-				var analyzer = setting.substring('index.analysis.analyzer.'.length);
-				analyzer = analyzer.substring(0,analyzer.indexOf("."));
-				if ($.inArray(analyzer, analyzers) == -1) {
-					analyzers.push(analyzer);
+		// FIXME: 0.90/1.0 check
+		var analyzers = Object.keys(getProperty(this.settings,['index', 'analysis', 'analyzer'], {}));
+		if (analyzers.length === 0) {
+			Object.keys(this.settings).forEach(function(setting) {
+				if (setting.indexOf('index.analysis.analyzer') === 0) {
+					var analyzer = setting.substring('index.analysis.analyzer.'.length);
+					analyzer = analyzer.substring(0,analyzer.indexOf("."));
+					if ($.inArray(analyzer, analyzers) == -1) {
+						analyzers.push(analyzer);
+					}
 				}
-			}
-		});
+			});			
+		}
 		return analyzers.sort(function(a, b) { return a.localeCompare(b); });
 	};
 	
 	this.getFields=function(type) {
 		if (isDefined(this.mappings[type])) {
-			return Object.keys(this.mappings[type].properties).sort(function(a, b) { return a.localeCompare(b); });
+			var fields = this.mappings[type].properties;
+			var numeric_fields = ['integer', 'long', 'float', 'double'];
+			var validFields = [];
+			Object.keys(fields).forEach(function(field) {
+				if (numeric_fields.indexOf(fields[field].type) == -1) {
+					validFields.push(field);
+				}
+			});
+			return validFields.sort(function(a, b) { return a.localeCompare(b); });
 		} else {
 			return [];
 		}
