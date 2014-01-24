@@ -103,6 +103,33 @@ function ClusterHealth(health) {
 	this.status = health.status;
 	this.name = health.cluster_name;
 }
+function ClusterSettings(settings) {
+	// FIXME: 0.90/1.0 check
+	var valid = [
+	'cluster.blocks.read_only',
+	'indices.ttl.interval',
+	'indices.cache.filter.size',
+	'discovery.zen.minimum_master_nodes',
+	// wtf
+	'indices.recovery.concurrent_streams',
+	'indices.recovery.compress',
+	'indices.recovery.file_chunk_size',
+	'indices.recovery.translog_ops',
+	'indices.recovery.translog_size',
+	'indices.recovery.max_bytes_per_sec',
+	// wtf2
+	'cluster.routing.allocation.node_initial_primaries_recoveries',
+	'cluster.routing.allocation.cluster_concurrent_rebalance',
+	'cluster.routing.allocation.awareness.attributes',
+	'cluster.routing.allocation.node_concurrent_recoveries',
+	'cluster.routing.allocation.disable_allocation',
+	'cluster.routing.allocation.disable_replica_allocation'
+	];
+	var instance = this;
+	valid.forEach(function(setting) {
+		instance[setting] = getProperty(settings, setting);
+	});
+}
 function Cluster(state,status,nodes,settings) {
 	if (isDefined(state) && isDefined(status) && isDefined(nodes) && isDefined(settings)) {
 		this.disableAllocation = false;
@@ -113,7 +140,7 @@ function Cluster(state,status,nodes,settings) {
 		if (isDefined(settings.transient) && isDefined(settings.transient['cluster.routing.allocation.disable_allocation'])) {
 			this.disableAllocation = settings.transient['cluster.routing.allocation.disable_allocation'];
 		} else {
-			this.disableAllocation = getProperty(settings,['transient', 'cluster','routing', 'allocation', 'disable_allocation'], "false");
+			this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
 		}
 		this.settings = $.extend({}, settings.persistent, settings.transient);
 		this.master_node = state.master_node;
@@ -312,7 +339,7 @@ function ElasticClient(host,username,password) {
 			var tokens = response.tokens.map(function (token) {
 				return new Token(token.token,token.start_offset,token.end_offset,token.position);
 			});
-			callback_success(tokens);	
+			callback_success(tokens);
 		};
 		this.executeElasticRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
 	};
@@ -322,7 +349,7 @@ function ElasticClient(host,username,password) {
 			var tokens = response.tokens.map(function (token) {
 				return new Token(token.token,token.start_offset,token.end_offset,token.position);
 			});
-			callback_success(tokens);	
+			callback_success(tokens);
 		};
 		this.executeElasticRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
 	};
@@ -393,7 +420,7 @@ function ElasticClient(host,username,password) {
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
-		this.executeElasticRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);	
+		this.executeElasticRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);
 	};
 
 	this.createRepository=function(repository, body, callback_success, callback_error) {
@@ -405,7 +432,20 @@ function ElasticClient(host,username,password) {
 	};
 
 	this.getSnapshots=function(repository, callback_success, callback_error){
-		this.executeElasticRequest('GET', "/_snapshot/" + repository + "/_all", callback_success, callback_error);
+		var path = "/_snapshot/" + repository + "/_all";
+		this.executeElasticRequest('GET', path, {}, callback_success, callback_error);
+	};
+
+	this.deleteSnapshot=function(repository, snapshot, callback_success, callback_error){
+		this.executeElasticRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
+	};
+
+	this.restoreSnapshot=function(repository, snapshot, callback_success, callback_error){
+		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", {}, callback_success, callback_error);
+	};
+
+	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
+		this.executeElasticRequest('PUT', "/_snapshot/" + repository + "/" +snapshot, body, callback_success, callback_error );
 	};
 
 	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
@@ -419,18 +459,18 @@ function ElasticClient(host,username,password) {
 			$.ajax({
 				type: method,
 				url: url,
-				beforeSend: function(xhr) { 
+				beforeSend: function(xhr) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
-					} 
+					}
 				},
 				data: data
 		})).then(
-			function(r) { 
-				callback_success(r); 
+			function(r) {
+				callback_success(r);
 			},
 			function(error) {
-				callback_error(error); 
+				callback_error(error);
 			}
 		);
 	};
@@ -441,15 +481,15 @@ function ElasticClient(host,username,password) {
 		var url = this.host + "/_cluster/health";
 		var auth = this.createAuthToken(this.username,this.password);
 		$.when(
-			$.ajax({ 
+			$.ajax({
 				type: 'GET',
 				url: url,
 				dataType: 'json',
 				data: {},
-				beforeSend: function(xhr) { 
+				beforeSend: function(xhr) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
-					} 
+					}
 				},
 			})).then(
 				function(cluster_health) {
@@ -476,8 +516,8 @@ function ElasticClient(host,username,password) {
 					} 
 				}
 			}),
-			$.ajax({ 
-				type: 'GET', 
+			$.ajax({
+				type: 'GET',
 				url: host+"/_nodes/stats?all=true", 
 				dataType: 'json', 
 				data: {}, 
@@ -487,8 +527,8 @@ function ElasticClient(host,username,password) {
 					} 
 				}
 			}),
-			$.ajax({ 
-				type: 'GET', 
+			$.ajax({
+				type: 'GET',
 				url: host+"/_status", 
 				dataType: 'json', 
 				data: {}, 
@@ -498,8 +538,8 @@ function ElasticClient(host,username,password) {
 					}
 				}
 			}),
-			$.ajax({ 
-				type: 'GET', 
+			$.ajax({
+				type: 'GET',
 				url: host+"/_cluster/settings", 
 				dataType: 'json', 
 				data: {}, 
@@ -652,7 +692,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	
 	this.getAnalyzers=function() {
 		// FIXME: 0.90/1.0 check
-		var analyzers = Object.keys(getProperty(this.settings,['index', 'analysis', 'analyzer'], {}));
+		var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
 		if (analyzers.length === 0) {
 			Object.keys(this.settings).forEach(function(setting) {
 				if (setting.indexOf('index.analysis.analyzer') === 0) {
@@ -1603,7 +1643,7 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
-		$scope.settings = $scope.cluster.settings;
+		$scope.settings = new ClusterSettings($scope.cluster.settings);
     });
 
 	$scope.save=function() {
@@ -2213,18 +2253,36 @@ function PercolateQuery(query_info) {
 		}
 	};
 }
-function RepositoryController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService) {
 
 	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
 	
 	$scope.editor = new AceEditor('repository-settings-editor');
+
 	$scope.repositories = [];
-	
+	$scope.repositories_names = [];
+	$scope.snapshots = [];
+	$scope.indices = [];
+	$scope.new_repo = {};
+	$scope.new_snap = {};
+
     $scope.$on('loadRepositoryEvent', function() {
-		$scope.loadRepositories();
+		$scope.reload();
     });
 	
+	$scope.loadIndices=function() {
+		$scope.indices = $scope.cluster.indices;
+	};
+
+    $scope.reload=function(){
+		$scope.loadRepositories().then(
+							function() {
+								$scope.allSnapshots($scope.repositories)
+							});
+		$scope.loadIndices();
+    };
+
 	$scope.deleteRepository=function(name, value){
 		$scope.dialog_service.open(
 			"are you sure you want to delete repository " + name + "?",
@@ -2234,7 +2292,7 @@ function RepositoryController($scope, $location, $timeout, ConfirmDialogService,
 				$scope.client.deleteRepository(name,
 					function(response) {
 						$scope.alert_service.success("Repository successfully deleted", response);
-						$scope.loadRepositories();
+						$scope.reload();
 					},
 					function(error) {
 						$scope.updateModel(function() {
@@ -2244,36 +2302,17 @@ function RepositoryController($scope, $location, $timeout, ConfirmDialogService,
 				);
 			}
 		);
-	}
+	};
 
-	/*
-		createRepository
-
-		example:
-			POST /_snapshot/my_repository/
-			{
-				"type": "fs",
-				"settings": {
-					"location": "/mount/backups/my_backup",
-					"compress": true
-				}
-			}
-
-		settings field from editor should contain:
-		{
-    		"location": "/mount/backups/my_backup",
-    		"compress": true
-		}
-	*/
 	$scope.createRepository=function(){
 		$scope.new_repo.settings = $scope.editor.format();
-		if ($scope.editor.error == null) {
+		if ($scope.editor.error === null){
 			var body = {
 				type: $scope.new_repo.type,
 				settings: JSON.parse($scope.new_repo.settings)
 			}
 
-			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body), 
+			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
 				function(response) {
 					$scope.alert_service.success("Repository created");
 					$scope.loadRepositories();
@@ -2284,17 +2323,21 @@ function RepositoryController($scope, $location, $timeout, ConfirmDialogService,
 					});
 				}
 			);
-			
-		}		
-	}
+		}
+	};
 
 	$scope.loadRepositories=function() {
-		try {			
+		var deferred = $q.defer();
+		try {
 			$scope.client.getRepositories(
 				function(response) {
 					$scope.updateModel(function() {
 						$scope.repositories = response;
+						$.each($scope.repositories, function(key, value){
+							$scope.repositories_names.push({"name":key, "value":key});
+						});
 					});
+					deferred.resolve(true);
 				},
 				function(error) {
 					if (!(error['responseJSON'] != null )) {
@@ -2302,13 +2345,142 @@ function RepositoryController($scope, $location, $timeout, ConfirmDialogService,
 							$scope.alert_service.error("Error while reading repositories", error);
 						});
 					}
+					deferred.reject(true);
 				}
 			)
 		} catch (error) {
 			$scope.alert_service.error("Failed to load repositories");
-			return;
+			deferred.reject(false);
+		}
+		return deferred.promise
+	};
+
+	$scope.createSnapshot=function(){
+		var body = {}
+
+		// name and repo required
+		if(!angular.isDefined($scope.new_snap.repository))
+		{
+			$scope.alert_service.warn("Repository is required");
+			return
 		}
 
+		if(!angular.isDefined($scope.new_snap.name))
+		{
+			$scope.alert_service.warn("Snapshot name is required");
+			return
+		}
+
+		// dont add to body if not present, these are optional, all indices included by default
+		if(angular.isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0)
+		{
+			body["indices"] = $scope.new_snap.indices.join(",");
+		}
+
+		if(angular.isDefined($scope.new_snap.ignore_unavailable))
+		{
+			body["ignore_unavailable"] = $scope.new_snap.ignore_unavailable;
+		}
+
+		if(angular.isDefined($scope.new_snap.include_global_state))
+		{
+			body["include_global_state"] = true; //$scope.new_snap.include_global_state;
+		}
+		
+		$scope.client.createSnapshot($scope.new_snap.repository, $scope.new_snap.name, JSON.stringify(body),
+			function(response) {
+				$scope.alert_service.success("Snapshot created");
+				$scope.reload();
+			},
+			function(error) {
+				$scope.updateModel(function() {
+					$scope.alert_service.error("Error while creating snapshot", error);
+				});
+			}
+		);
+	};
+
+	$scope.deleteSnapshot=function(snapshot){
+			$scope.dialog_service.open(
+			"are you sure you want to delete snapshot " + snapshot.snapshot + "?",
+			snapshot,
+			"Delete",
+			function() {
+				$scope.client.deleteSnapshot(
+					snapshot.repository,
+					snapshot.snapshot,
+					function(response) {
+						$scope.alert_service.success("Snapshot successfully deleted", response);
+						$scope.reload();
+					},
+					function(error) {
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while deleting snapshot", error);
+						});
+					}
+				);
+			}
+		);
+	};
+
+	$scope.allSnapshots=function(repositories) {
+		var all = [];
+		$.each( repositories, function( index, value ){
+			$scope.fetchSnapshots(index).then(
+					function(data){
+						$.merge($scope.snapshots, data );
+					});
+		});
+		$scope.snapshots = all;
+	};
+
+	$scope.fetchSnapshots=function(repository) {
+		var deferred = $q.defer();
+		try {
+			$scope.client.getSnapshots(repository,
+				function(response) {
+					var arr = response["snapshots"];
+					if(arr && arr.constructor==Array && arr.length!=0){
+						$.each(arr, function(index, value){
+							value["repository"] = repository;
+						});
+					}
+					deferred.resolve(response["snapshots"]);
+				},
+				function(error) {
+					$scope.updateModel(function() {
+						$scope.alert_service.error("Error while fetching snapshots", error);
+					});
+					deferred.resolve([]);
+				}
+			)
+		} catch (error) {
+			$scope.alert_service.error("Failed to load snapshots");
+			deferred.resolve([]);
+		}
+		return deferred.promise;
+	};
+
+	$scope.loadSnapshots=function(repository) {
+		try {
+			$scope.client.getSnapshots(repository,
+				function(response) {
+					$scope.updateModel(function() {
+						$scope.snapshots = response["snapshots"];
+					});
+				},
+				function(error) {
+					if (!(error['responseJSON'] != null )) {
+						$scope.updateModel(function() {
+							$scope.alert_service.error("Error while reading snapshots", error);
+						});
+					}
+				}
+			)
+		} catch (error) {
+			$scope.alert_service.error("Failed to load snapshots");
+			return;
+		}
 	};
 
 }
@@ -2582,20 +2754,22 @@ function readablizeBytes(bytes) {
 // where property_path is [a,b,c,d]
 function getProperty(object, property_path, default_value) {
 	var value = default_value;
-	if (property_path instanceof Array) {
-		var ref = object;
-		for (var i = 0; i < property_path.length; i++) {
-			var property = property_path[i];
-			if (isDefined(ref[property])) {
-				ref = ref[property];
-			} else {
-				ref = null;
-				break;
-			}
+	if (isDefined(object[property_path])) {
+		return object[property_path];
+	}
+	var path_parts = property_path.split('.');
+	var ref = object;
+	for (var i = 0; i < path_parts.length; i++) {
+		var property = path_parts[i];
+		if (isDefined(ref[property])) {
+			ref = ref[property];
+		} else {
+			ref = null;
+			break;
 		}
-		if (isDefined(ref)) {
-			value = ref;			
-		}
+	}
+	if (isDefined(ref)) {
+		value = ref;
 	}
 	return value;
 }

@@ -14,20 +14,22 @@ function readablizeBytes(bytes) {
 // where property_path is [a,b,c,d]
 function getProperty(object, property_path, default_value) {
 	var value = default_value;
-	if (property_path instanceof Array) {
-		var ref = object;
-		for (var i = 0; i < property_path.length; i++) {
-			var property = property_path[i];
-			if (isDefined(ref[property])) {
-				ref = ref[property];
-			} else {
-				ref = null;
-				break;
-			}
+	if (isDefined(object[property_path])) {
+		return object[property_path];
+	}
+	var path_parts = property_path.split('.');
+	var ref = object;
+	for (var i = 0; i < path_parts.length; i++) {
+		var property = path_parts[i];
+		if (isDefined(ref[property])) {
+			ref = ref[property];
+		} else {
+			ref = null;
+			break;
 		}
-		if (isDefined(ref)) {
-			value = ref;			
-		}
+	}
+	if (isDefined(ref)) {
+		value = ref;
 	}
 	return value;
 }

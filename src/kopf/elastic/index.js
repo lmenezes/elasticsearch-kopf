@@ -72,7 +72,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	
 	this.getAnalyzers=function() {
 		// FIXME: 0.90/1.0 check
-		var analyzers = Object.keys(getProperty(this.settings,['index', 'analysis', 'analyzer'], {}));
+		var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
 		if (analyzers.length === 0) {
 			Object.keys(this.settings).forEach(function(setting) {
 				if (setting.indexOf('index.analysis.analyzer') === 0) {

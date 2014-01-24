@@ -47,6 +47,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/aliases.js',
 					'src/kopf/elastic/cluster_changes.js',
 					'src/kopf/elastic/cluster_health.js',
+					'src/kopf/elastic/cluster_settings.js',
 					'src/kopf/elastic/cluster.js',
 					'src/kopf/elastic/elastic_client.js',
 					'src/kopf/elastic/index.js',

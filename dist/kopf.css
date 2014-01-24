@@ -954,3 +954,18 @@ a.header-index-action-mini:hover {
 	text-align: left;
 	width: 100%;
 }
+
+select.input-sm-twoxheight {
+	height: 100px;
+	line-height: 30px;
+}
+
+.row-nomargin {
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 15px;
+}
+
+.form-label-repository {
+	padding-left: 15px;
+}

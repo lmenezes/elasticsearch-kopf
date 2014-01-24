@@ -8,7 +8,7 @@ function Cluster(state,status,nodes,settings) {
 		if (isDefined(settings.transient) && isDefined(settings.transient['cluster.routing.allocation.disable_allocation'])) {
 			this.disableAllocation = settings.transient['cluster.routing.allocation.disable_allocation'];
 		} else {
-			this.disableAllocation = getProperty(settings,['transient', 'cluster','routing', 'allocation', 'disable_allocation'], "false");
+			this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
 		}
 		this.settings = $.extend({}, settings.persistent, settings.transient);
 		this.master_node = state.master_node;
