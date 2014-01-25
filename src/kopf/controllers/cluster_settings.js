@@ -8,6 +8,7 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
+		$(".setting-info").popover();
 		$scope.settings = new ClusterSettings($scope.cluster.settings);
     });
 

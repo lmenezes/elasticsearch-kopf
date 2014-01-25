@@ -1,18 +1,19 @@
 function ClusterSettings(settings) {
 	// FIXME: 0.90/1.0 check
 	var valid = [
+	// cluster
 	'cluster.blocks.read_only',
 	'indices.ttl.interval',
 	'indices.cache.filter.size',
 	'discovery.zen.minimum_master_nodes',
-	// wtf
+	// recovery
 	'indices.recovery.concurrent_streams',
 	'indices.recovery.compress',
 	'indices.recovery.file_chunk_size',
 	'indices.recovery.translog_ops',
 	'indices.recovery.translog_size',
 	'indices.recovery.max_bytes_per_sec',
-	// wtf2
+	// routing
 	'cluster.routing.allocation.node_initial_primaries_recoveries',
 	'cluster.routing.allocation.cluster_concurrent_rebalance',
 	'cluster.routing.allocation.awareness.attributes',

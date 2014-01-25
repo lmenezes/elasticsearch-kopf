@@ -106,18 +106,19 @@ function ClusterHealth(health) {
 function ClusterSettings(settings) {
 	// FIXME: 0.90/1.0 check
 	var valid = [
+	// cluster
 	'cluster.blocks.read_only',
 	'indices.ttl.interval',
 	'indices.cache.filter.size',
 	'discovery.zen.minimum_master_nodes',
-	// wtf
+	// recovery
 	'indices.recovery.concurrent_streams',
 	'indices.recovery.compress',
 	'indices.recovery.file_chunk_size',
 	'indices.recovery.translog_ops',
 	'indices.recovery.translog_size',
 	'indices.recovery.max_bytes_per_sec',
-	// wtf2
+	// routing
 	'cluster.routing.allocation.node_initial_primaries_recoveries',
 	'cluster.routing.allocation.cluster_concurrent_rebalance',
 	'cluster.routing.allocation.awareness.attributes',
@@ -629,7 +630,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.visibleAliases=function() {
 		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
 	};
-	this.settings = index_metadata.settings;
+	this.settings = new IndexSettings(index_metadata.settings);
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
@@ -741,6 +742,62 @@ function Index(index_name,index_info, index_metadata, index_status) {
 			return [];
 		}
 	};
+}
+function IndexSettings(settings) {
+	// FIXME: 0.90/1.0 check
+	this.valid_settings = [
+		// blocks
+		'index.blocks.read_only',
+		'index.blocks.read',
+		'index.blocks.write',
+		'index.blocks.metadata',
+		// cache
+		'index.cache.filter.max_size',
+		'index.cache.filter.expire',
+		// index
+		'index.number_of_replicas',
+		'index.index_concurrency',
+		'index.warmer.enabled',
+		'index.refresh_interval',
+		'index.term_index_divisor',
+		'index.ttl.disable_purge',
+		'index.fail_on_merge_failure',
+		'index.gc_deletes',
+		'index.codec',
+		'index.compound_on_flush',
+		'index.term_index_interval',
+		'index.auto_expand_replicas',
+		'index.recovery.initial_shards',
+		'index.compound_format',
+		// routing
+		'index.routing.allocation.disable_allocation',
+		'index.routing.allocation.disable_new_allocation',
+		'index.routing.allocation.disable_replica_allocation',
+		'index.routing.allocation.total_shards_per_node',
+		// slowlog
+		'index.search.slowlog.threshold.query.warn',
+		'index.search.slowlog.threshold.query.info',
+		'index.search.slowlog.threshold.query.debug',
+		'index.search.slowlog.threshold.query.trace',
+		'index.search.slowlog.threshold.fetch.warn',
+		'index.search.slowlog.threshold.fetch.info',
+		'index.search.slowlog.threshold.fetch.debug',
+		'index.search.slowlog.threshold.fetch.trace',
+		'index.indexing.slowlog.threshold.index.warn',
+		'index.indexing.slowlog.threshold.index.info',
+		'index.indexing.slowlog.threshold.index.debug',
+		'index.indexing.slowlog.threshold.index.trace',
+		// translog
+		'index.translog.flush_threshold_ops',
+		'index.translog.flush_threshold_size',
+		'index.translog.flush_threshold_period',
+		'index.translog.disable_flush',
+		'index.translog.fs.type'		
+	];
+	var instance = this;
+	this.valid_settings.forEach(function(setting) {
+		instance[setting] = getProperty(settings, setting);
+	});
 }
 function Node(node_id, node_info, node_stats) {
 	this.id = node_id;	
@@ -993,14 +1050,6 @@ function ModalControls() {
 	this.active = false;
 	this.title = '';
 	this.info = '';
-}
-
-function isDefined(value) {
-	return value !== null && typeof value != 'undefined';
-}
-
-function notEmpty(value) {
-	return isDefined(value) && value.trim().length > 0;
 }
 
 function hierachyJson(json) {
@@ -1552,7 +1601,8 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			return i.name == index;
 		});
 		$scope.idxSettingsSrv.index = indices[0];
-		$('#idx_settings_tabs a:first').tab('show');		
+		$('#idx_settings_tabs a:first').tab('show');
+		$(".setting-info").popover();		
 	};
 	
 	
@@ -1643,6 +1693,7 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
+		$(".setting-info").popover();
 		$scope.settings = new ClusterSettings($scope.cluster.settings);
     });
 
@@ -1890,57 +1941,6 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 	$scope.alert_service = AlertService;
 	$scope.service = IndexSettingsService;
 	
-	//index.cache.filter.max_size,index.cache.filter.expire
-	var allowed_properties = [
-		// INDEX
-		'index.number_of_replicas', 
-		'index.auto_expand_replicas', 
-		'index.refresh_interval',
-		'index.index_concurrency',
-		'index.warmer.enabled',
-		'index.term_index_interval',
-		'index.term_index_divisor', 
-		'index.recovery.initial_shards',
-		'index.gc_deletes',
-		'index.ttl.disable_purge',
-		'index.fail_on_merge_failure',
-		'index.codec',
-		'index.compound_format',
-		'index.compound_on_flush',
-		// BLOCKS
-		'index.blocks.read_only',
-		'index.blocks.read',
-		'index.blocks.write',
-		'index.blocks.metadata',
-		// TRANSLOG		
-		'index.translog.flush_threshold_ops',
-		'index.translog.flush_threshold_size', 
-		'index.translog.flush_threshold_period',
-		'index.translog.disable_flush',
-		'index.translog.fs.type',
-		// ROUTING
-		'index.routing.allocation.disable_allocation',
-		'index.routing.allocation.disable_new_allocation',
-		'index.routing.allocation.disable_replica_allocation',
-		'index.routing.allocation.total_shards_per_node',
-		// CACHE
-		'index.cache.filter.max_size',
-		'index.cache.filter.expire',
-		// SLOWLOG
-		'index.search.slowlog.threshold.query.warn',
-		'index.search.slowlog.threshold.query.info',
-		'index.search.slowlog.threshold.query.debug',
-		'index.search.slowlog.threshold.query.trace',
-		'index.search.slowlog.threshold.fetch.warn',
-		'index.search.slowlog.threshold.fetch.info',
-		'index.search.slowlog.threshold.fetch.debug',
-		'index.search.slowlog.threshold.fetch.trace',
-		'index.indexing.slowlog.threshold.index.warn',
-		'index.indexing.slowlog.threshold.index.info',
-		'index.indexing.slowlog.threshold.index.debug',
-		'index.indexing.slowlog.threshold.index.trace'
-	];
-	 
 	$scope.back=function() {
 		$('#cluster_option a').tab('show');
 	};
@@ -1948,8 +1948,8 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 	$scope.save=function() {
 		var index = $scope.service.index;
 		var new_settings = {};
-		allowed_properties.forEach(function(setting) {
-			if (isDefined(index.settings[setting]) && index.settings[setting].length > 0) {
+		index.settings.valid_settings.forEach(function(setting) {
+			if (notEmpty(index.settings[setting])) {
 				new_settings[setting] = index.settings[setting];
 			}
 		});
@@ -2772,4 +2772,12 @@ function getProperty(object, property_path, default_value) {
 		value = ref;
 	}
 	return value;
+}
+
+function isDefined(value) {
+	return value !== null && typeof value != 'undefined';
+}
+
+function notEmpty(value) {
+	return isDefined(value) && value.trim().length > 0;
 }

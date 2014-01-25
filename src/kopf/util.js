@@ -33,3 +33,11 @@ function getProperty(object, property_path, default_value) {
 	}
 	return value;
 }
+
+function isDefined(value) {
+	return value !== null && typeof value != 'undefined';
+}
+
+function notEmpty(value) {
+	return isDefined(value) && value.trim().length > 0;
+}

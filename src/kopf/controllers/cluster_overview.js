@@ -219,7 +219,8 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			return i.name == index;
 		});
 		$scope.idxSettingsSrv.index = indices[0];
-		$('#idx_settings_tabs a:first').tab('show');		
+		$('#idx_settings_tabs a:first').tab('show');
+		$(".setting-info").popover();		
 	};
 	
 	

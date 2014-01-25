@@ -9,7 +9,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.visibleAliases=function() {
 		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
 	};
-	this.settings = index_metadata.settings;
+	this.settings = new IndexSettings(index_metadata.settings);
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;

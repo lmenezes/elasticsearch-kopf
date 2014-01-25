@@ -170,14 +170,6 @@ function ModalControls() {
 	this.info = '';
 }
 
-function isDefined(value) {
-	return value !== null && typeof value != 'undefined';
-}
-
-function notEmpty(value) {
-	return isDefined(value) && value.trim().length > 0;
-}
-
 function hierachyJson(json) {
 	var jsonObject = JSON.parse(json);
 	var resultObject = {};
