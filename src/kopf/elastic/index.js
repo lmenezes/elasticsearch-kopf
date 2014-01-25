@@ -9,7 +9,9 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.visibleAliases=function() {
 		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
 	};
-	this.settings = new IndexSettings(index_metadata.settings);
+	this.settings = index_metadata.settings;
+	// FIXME: 0.90/1.0 check
+	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
@@ -63,7 +65,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
-		return hierachyJson(JSON.stringify(this.settings, undefined, ""));
+		return hierachyJson(JSON.stringify(this.metadata, undefined, ""));
 	};
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);

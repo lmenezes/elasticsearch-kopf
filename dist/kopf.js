@@ -630,7 +630,9 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.visibleAliases=function() {
 		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
 	};
-	this.settings = new IndexSettings(index_metadata.settings);
+	this.settings = index_metadata.settings;
+	// FIXME: 0.90/1.0 check
+	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
@@ -684,7 +686,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
-		return hierachyJson(JSON.stringify(this.settings, undefined, ""));
+		return hierachyJson(JSON.stringify(this.metadata, undefined, ""));
 	};
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
@@ -746,7 +748,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 		}
 	};
 }
-function IndexSettings(settings) {
+function EditableIndexSettings(settings) {
 	// FIXME: 0.90/1.0 check
 	this.valid_settings = [
 		// blocks
@@ -1719,6 +1721,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
+	$scope.indices = [];
 
 	$scope.editor = new AceEditor('index-settings-editor');
 	
@@ -1731,6 +1734,10 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 		$scope.prepareCreateIndex();
     });
 
+	$scope.updateEditor=function() {
+		$scope.editor.setValue($scope.settings);
+	};
+	
 	$scope.createIndex=function() {
 		if ($scope.name.trim().length === 0) {
 			AlertService.error("You must specify a valid index name", null);	
@@ -1773,6 +1780,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	};
 	
 	$scope.prepareCreateIndex=function() {
+		$scope.indices = $scope.cluster.indices;
 		$scope.settings = "";
 		$scope.editor.setValue("{}");
 		$scope.shards = '';
@@ -1946,9 +1954,10 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 	$scope.save=function() {
 		var index = $scope.service.index;
 		var new_settings = {};
-		index.settings.valid_settings.forEach(function(setting) {
-			if (notEmpty(index.settings[setting])) {
-				new_settings[setting] = index.settings[setting];
+		// TODO: could move that to editable_index_settings model
+		index.editable_settings.valid_settings.forEach(function(setting) {
+			if (notEmpty(index.editable_settings[setting])) {
+				new_settings[setting] = index.editable_settings[setting];
 			}
 		});
 		$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),

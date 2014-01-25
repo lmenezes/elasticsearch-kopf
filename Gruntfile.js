@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/cluster.js',
 					'src/kopf/elastic/elastic_client.js',
 					'src/kopf/elastic/index.js',
-					'src/kopf/elastic/index_settings.js',
+					'src/kopf/elastic/editable_index_settings.js',
 					'src/kopf/elastic/node.js',
 					'src/kopf/elastic/shard.js',
 					'src/kopf/elastic/token.js',

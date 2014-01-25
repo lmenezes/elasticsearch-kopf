@@ -24,7 +24,7 @@
 			</div>
 			<div class="col-lg-6">
 				<div class="form-group">
-					<select ng-model="settings" ng-options="i.settingsAsString() as i.name for i in pagination.results" class="form-control input-sm" ng-change="updateEditor()">
+					<select ng-model="settings" ng-options="i.settingsAsString() as i.name for i in indices" class="form-control input-sm" ng-change="updateEditor()">
 						<option value="">load settings from an existing index</option>
 					</select>
 				</div>

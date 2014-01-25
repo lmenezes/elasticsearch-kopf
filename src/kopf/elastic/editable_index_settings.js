@@ -1,4 +1,4 @@
-function IndexSettings(settings) {
+function EditableIndexSettings(settings) {
 	// FIXME: 0.90/1.0 check
 	this.valid_settings = [
 		// blocks

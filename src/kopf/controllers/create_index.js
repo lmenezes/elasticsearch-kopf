@@ -4,6 +4,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
+	$scope.indices = [];
 
 	$scope.editor = new AceEditor('index-settings-editor');
 	
@@ -16,6 +17,10 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 		$scope.prepareCreateIndex();
     });
 
+	$scope.updateEditor=function() {
+		$scope.editor.setValue($scope.settings);
+	};
+	
 	$scope.createIndex=function() {
 		if ($scope.name.trim().length === 0) {
 			AlertService.error("You must specify a valid index name", null);	
@@ -58,6 +63,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	};
 	
 	$scope.prepareCreateIndex=function() {
+		$scope.indices = $scope.cluster.indices;
 		$scope.settings = "";
 		$scope.editor.setValue("{}");
 		$scope.shards = '';

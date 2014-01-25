@@ -9,9 +9,10 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 	$scope.save=function() {
 		var index = $scope.service.index;
 		var new_settings = {};
-		index.settings.valid_settings.forEach(function(setting) {
-			if (notEmpty(index.settings[setting])) {
-				new_settings[setting] = index.settings[setting];
+		// TODO: could move that to editable_index_settings model
+		index.editable_settings.valid_settings.forEach(function(setting) {
+			if (notEmpty(index.editable_settings[setting])) {
+				new_settings[setting] = index.editable_settings[setting];
 			}
 		});
 		$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
