@@ -44,7 +44,7 @@ function Cluster(state,status,nodes,settings) {
 		this.shards = status._shards.total;
 		this.failed_shards = status._shards.failed;
 		this.successful_shards = status._shards.successful;
-		this.total_size = total_size;
+		this.total_size = readablizeBytes(total_size);
 		this.getNodes=function(name, data, master, client) { 
 			return $.map(this.nodes,function(n) {
 				if (name.trim().length > 0 && n.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {

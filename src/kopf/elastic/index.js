@@ -59,6 +59,9 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.deleted_docs = has_status && isDefined(index_status.docs) ? index_status.docs.deleted_docs : 0;
 	this.size = has_status ? index_status.index.primary_size_in_bytes : 0;
 	this.total_size = has_status ? index_status.index.size_in_bytes : 0;
+	
+	this.size_in_bytes = readablizeBytes(this.size);
+	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
 		return hierachyJson(JSON.stringify(this.settings, undefined, ""));
 	};
