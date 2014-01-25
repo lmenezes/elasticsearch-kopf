@@ -883,13 +883,8 @@ function Token(token, start_offset, end_offset, position) {
 	this.end_offset = end_offset;
 	this.position = position;
 }
-function getTimeString(date) {
-	date = isDefined(date) ? date : new Date();
-	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
-}
-
 function Request(url, method, body) {
-	this.timestamp = getTimeString();
+	this.timestamp = getTimeString(new Date());
 	this.url = url;
 	this.method = method;
 	this.body = body;
@@ -1925,7 +1920,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 	
 	$scope.getCurrentTime=function() {
-		return getTimeString();
+		return getTimeString(new Date());
 	};
 	
 	$scope.selectTab=function(event) {
@@ -2752,7 +2747,7 @@ function readablizeBytes(bytes) {
 };
 
 // Gets the value of a nested property from an object if it exists.
-// Otherwise returns the default_value given
+// Otherwise returns the default_value given.
 // Example: get the value of object[a][b][c][d]
 // where property_path is [a,b,c,d]
 function getProperty(object, property_path, default_value) {
@@ -2777,10 +2772,18 @@ function getProperty(object, property_path, default_value) {
 	return value;
 }
 
+// Checks if value is both non null and undefined
 function isDefined(value) {
 	return value !== null && typeof value != 'undefined';
 }
 
+// Checks if the String representation of value is a non empty string
+// string.trim().length is grater than 0
 function notEmpty(value) {
-	return isDefined(value) && value.trim().length > 0;
+	return isDefined(value) && value.toString().trim().length > 0;
+}
+
+// Returns the given date as a String formatted as hh:MM:ss
+function getTimeString(date) {
+	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
 }

@@ -138,7 +138,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 	
 	$scope.getCurrentTime=function() {
-		return getTimeString();
+		return getTimeString(new Date());
 	};
 	
 	$scope.selectTab=function(event) {

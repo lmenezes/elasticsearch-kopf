@@ -1,10 +1,5 @@
-function getTimeString(date) {
-	date = isDefined(date) ? date : new Date();
-	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
-}
-
 function Request(url, method, body) {
-	this.timestamp = getTimeString();
+	this.timestamp = getTimeString(new Date());
 	this.url = url;
 	this.method = method;
 	this.body = body;
