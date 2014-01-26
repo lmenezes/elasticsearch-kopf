@@ -50,6 +50,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/cluster_settings.js',
 					'src/kopf/elastic/cluster.js',
 					'src/kopf/elastic/elastic_client.js',
+					'src/kopf/elastic/es_connection.js',
 					'src/kopf/elastic/index.js',
 					'src/kopf/elastic/editable_index_settings.js',
 					'src/kopf/elastic/node.js',

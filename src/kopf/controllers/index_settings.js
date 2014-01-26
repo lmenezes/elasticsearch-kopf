@@ -1,9 +1,5 @@
 function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
 	$scope.service = IndexSettingsService;
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
 
 	$scope.save=function() {
 		var index = $scope.service.index;

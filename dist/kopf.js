@@ -220,10 +220,10 @@ function Cluster(state,status,nodes,settings) {
 		};
 	}
 }
-function ElasticClient(host,username,password) {
-	this.host = host;
-	this.username = username;
-	this.password = password;
+function ElasticClient(connection) {
+	this.host = connection.host;
+	this.username = connection.username;
+	this.password = connection.password;
 	
 	this.createAuthToken=function(username,password) {
 		var auth = null;
@@ -233,10 +233,10 @@ function ElasticClient(host,username,password) {
 		return auth;
 	};
 	
-	var auth = this.createAuthToken(username,password);
+	var auth = this.createAuthToken(connection.username, connection.password);
 	var fetch_version = $.ajax({
 		type: 'GET',
-		url: host,
+		url: connection.host,
 		beforeSend: function(xhr) { 
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
@@ -619,6 +619,25 @@ function ElasticClient(host,username,password) {
 
 
 
+// Expects URL according to /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
+// Examples:
+// http://localhost:9200
+// http://user:password@localhost:9200
+// https://localhost:9200
+function ESConnection(url) {
+	var protected_url = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
+	this.host = "http://localhost:9200"; // default
+	if (notEmpty(url)) {
+		var connection_parts = protected_url.exec(url);
+		if (isDefined(connection_parts)) {
+			this.host = connection_parts[1] + "://" + url_parts[4];
+			this.username = connection_parts[2];
+			this.password = connection_parts[3];
+		} else {
+			this.host = url;
+		}		
+	}
+}
 function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;
 	var index_shards = {};
@@ -1215,10 +1234,6 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		);
 	};
 	
-	$scope.$on('hostChanged',function() {
-		$scope.loadAliases();
-	});
-	
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
     });
@@ -1278,10 +1293,6 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		}
 	};
 	
-	$scope.$on('hostChanged',function() {
-		$scope.indices = $scope.cluster.indices;
-	});
-	
     $scope.$on('loadAnalysisEvent', function() {
 		$scope.indices = $scope.cluster.indices;
     });
@@ -1291,11 +1302,6 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 	$scope.shared_url = '';
 	$scope.cluster_health = {};
 	$scope.state = '';
-	
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
 	
     $scope.$on('loadClusterHealth', function() {
 		$('#cluster_health_option a').tab('show');
@@ -1653,10 +1659,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 }
 function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
-	
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
@@ -1690,10 +1692,6 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	$scope.indices = [];
 
 	$scope.editor = new AceEditor('index-settings-editor');
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
 	
     $scope.$on('loadCreateIndex', function() {
 		$('#create_index_option a').tab('show');
@@ -1761,7 +1759,15 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.password = null;
 	$scope.alert_service = AlertService;
 	
+	$scope.home_screen=function() {
+		$('#cluster_option a').tab('show');
+	};
+	
 	$scope.setConnected=function(status) {
+		if (!status) {
+			$scope.cluster = null;
+			$scope.cluster_health = null;
+		}
 		$scope.is_connected = status;
 	};
 
@@ -1775,38 +1781,34 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 	
 	$scope.setHost=function(url) {
-		var exp = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
-		// expected: "http://user:password@host", "http", "user", "password", "host"]
-		var url_parts = exp.exec(url);
-		if (isDefined(url_parts)) {
-			$scope.host = url_parts[1] + "://" + url_parts[4];
-			$scope.username = url_parts[2];
-			$scope.password = url_parts[3];
-		} else {
-			$scope.username = null;
-			$scope.password = null;
-			$scope.host = url;
-		}
+		$scope.connection = new ESConnection(url);
 		$scope.setConnected(false);
 		try {
-			$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
-			$scope.broadcastMessage('hostChanged',{});	
+			$scope.client = new ElasticClient($scope.connection);
+			$scope.home_screen();
 		} catch (error) {
+			$scope.client = null;
 			AlertService.error(error);
 		}
-		
 	};
 	
-	if ($location.host() === "") { // when opening from filesystem
-		$scope.setHost("http://localhost:9200");
-	} else {
-		var location = $scope.readParameter('location');
-		if (isDefined(location)) {
-			$scope.setHost(location);
+	$scope.connect=function() {
+		// when opening from filesystem, just try default ES location
+		if ($location.host() === "") {
+			$scope.setHost("http://localhost:9200");
 		} else {
-			$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
-		}
-	}
+			var location = $scope.readParameter('location');
+			// reads ES location from url parameter
+			if (isDefined(location)) {
+				$scope.setHost(location);
+			} else { // uses current location as ES location
+				$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
+			}
+		}		
+	};
+	
+	$scope.connect();
+
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
@@ -1903,14 +1905,10 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.updateModel=function(action) {
 		$scope.$apply(action);
 	};
-	
+
 }
 function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
 	$scope.service = IndexSettingsService;
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
 
 	$scope.save=function() {
 		var index = $scope.service.index;

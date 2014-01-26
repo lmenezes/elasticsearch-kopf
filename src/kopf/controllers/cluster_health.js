@@ -3,11 +3,6 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 	$scope.cluster_health = {};
 	$scope.state = '';
 	
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
-	
     $scope.$on('loadClusterHealth', function() {
 		$('#cluster_health_option a').tab('show');
 		$scope.cluster_health = null; // otherwise we see past version, then new

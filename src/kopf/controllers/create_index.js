@@ -7,10 +7,6 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 
 	$scope.editor = new AceEditor('index-settings-editor');
 	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
-	
     $scope.$on('loadCreateIndex', function() {
 		$('#create_index_option a').tab('show');
 		$scope.prepareCreateIndex();

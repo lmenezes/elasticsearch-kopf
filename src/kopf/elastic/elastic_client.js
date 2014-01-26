@@ -1,7 +1,7 @@
-function ElasticClient(host,username,password) {
-	this.host = host;
-	this.username = username;
-	this.password = password;
+function ElasticClient(connection) {
+	this.host = connection.host;
+	this.username = connection.username;
+	this.password = connection.password;
 	
 	this.createAuthToken=function(username,password) {
 		var auth = null;
@@ -11,10 +11,10 @@ function ElasticClient(host,username,password) {
 		return auth;
 	};
 	
-	var auth = this.createAuthToken(username,password);
+	var auth = this.createAuthToken(connection.username, connection.password);
 	var fetch_version = $.ajax({
 		type: 'GET',
-		url: host,
+		url: connection.host,
 		beforeSend: function(xhr) { 
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);

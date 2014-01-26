@@ -130,10 +130,6 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 		);
 	};
 	
-	$scope.$on('hostChanged',function() {
-		$scope.loadAliases();
-	});
-	
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
     });

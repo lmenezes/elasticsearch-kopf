@@ -52,10 +52,6 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		}
 	};
 	
-	$scope.$on('hostChanged',function() {
-		$scope.indices = $scope.cluster.indices;
-	});
-	
     $scope.$on('loadAnalysisEvent', function() {
 		$scope.indices = $scope.cluster.indices;
     });
