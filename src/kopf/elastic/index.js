@@ -65,7 +65,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
-		return hierachyJson(JSON.stringify(this.metadata, undefined, ""));
+		return prettyPrintObject(this.metadata);
 	};
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);

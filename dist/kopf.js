@@ -686,7 +686,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
-		return hierachyJson(JSON.stringify(this.metadata, undefined, ""));
+		return prettyPrintObject(this.metadata);
 	};
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
@@ -1050,37 +1050,6 @@ function ModalControls() {
 	this.active = false;
 	this.title = '';
 	this.info = '';
-}
-
-function hierachyJson(json) {
-	var jsonObject = JSON.parse(json);
-	var resultObject = {};
-	Object.keys(jsonObject).forEach(function(key) {
-		var parts = key.split(".");
-		var property = null;
-		var reference = resultObject;
-		var previous = null;
-		for (var i = 0; i<parts.length; i++) {
-			if (i == parts.length - 1) {
-				if (isNaN(parts[i])) {
-					reference[parts[i]] = jsonObject[key];	
-				} else {
-					if (!(previous[property] instanceof Array)) {
-						previous[property] = [];
-					}
-					previous[property].push(jsonObject[key]);
-				}
-			} else {
-				property = parts[i];
-				if (!isDefined(reference[property])) {
-					reference[property] = {};
-				}
-				previous = reference;
-				reference = reference[property];
-			}
-		}
-	});
-	return JSON.stringify(resultObject,undefined,4);
 }
 var kopf = angular.module('kopf', []);
 
@@ -2795,4 +2764,34 @@ function notEmpty(value) {
 // Returns the given date as a String formatted as hh:MM:ss
 function getTimeString(date) {
 	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
+}
+
+function prettyPrintObject(object) {
+	var prettyObject = {};
+	Object.keys(object).forEach(function(key) {
+		var parts = key.split(".");
+		var property = null;
+		var reference = prettyObject;
+		var previous = null;
+		for (var i = 0; i<parts.length; i++) {
+			if (i == parts.length - 1) {
+				if (isNaN(parts[i])) {
+					reference[parts[i]] = object[key];	
+				} else {
+					if (!(previous[property] instanceof Array)) {
+						previous[property] = [];
+					}
+					previous[property].push(object[key]);
+				}
+			} else {
+				property = parts[i];
+				if (!isDefined(reference[property])) {
+					reference[property] = {};
+				}
+				previous = reference;
+				reference = reference[property];
+			}
+		}
+	});
+	return JSON.stringify(prettyObject,undefined,4);
 }

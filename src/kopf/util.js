@@ -49,3 +49,33 @@ function notEmpty(value) {
 function getTimeString(date) {
 	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
 }
+
+function prettyPrintObject(object) {
+	var prettyObject = {};
+	Object.keys(object).forEach(function(key) {
+		var parts = key.split(".");
+		var property = null;
+		var reference = prettyObject;
+		var previous = null;
+		for (var i = 0; i<parts.length; i++) {
+			if (i == parts.length - 1) {
+				if (isNaN(parts[i])) {
+					reference[parts[i]] = object[key];	
+				} else {
+					if (!(previous[property] instanceof Array)) {
+						previous[property] = [];
+					}
+					previous[property].push(object[key]);
+				}
+			} else {
+				property = parts[i];
+				if (!isDefined(reference[property])) {
+					reference[property] = {};
+				}
+				previous = reference;
+				reference = reference[property];
+			}
+		}
+	});
+	return JSON.stringify(prettyObject,undefined,4);
+}
