@@ -3,7 +3,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.version = "0.5.0";
 	$scope.username = null;
 	$scope.password = null;
-	$scope.alerts_service = AlertService;
+	$scope.alert_service = AlertService;
 	
 	$scope.setConnected=function(status) {
 		$scope.is_connected = status;
@@ -131,10 +131,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$scope.modal.title = title;
 		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
 		$('#modal_info').modal({show:true,backdrop:true});
-	};
-	
-	$scope.isInModal=function() {
-		return ($('.modal-backdrop').length > 0);
 	};
 	
 	$scope.getCurrentTime=function() {

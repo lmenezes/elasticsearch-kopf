@@ -1,5 +1,4 @@
 function RestController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
 	
 	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
@@ -55,7 +54,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 		if (!isDefined($scope.editor.error) && notEmpty($scope.request.url)) {
 			// TODO: deal with basic auth here
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
-				$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
+				AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 			}
 			$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
 				function(response) {
@@ -74,9 +73,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 				function(error) {
 					$scope.updateModel(function() {
 						if (error.status !== 0) {
-							$scope.alert_service.error("Request was not successful: " + error.statusText);
+							AlertService.error("Request was not successful: " + error.statusText);
 						} else {
-							$scope.alert_service.error($scope.request.url + " is unreachable");	
+							AlertService.error($scope.request.url + " is unreachable");	
 						}
 					});
 					try {

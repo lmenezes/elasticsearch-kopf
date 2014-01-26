@@ -1354,7 +1354,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
 	$scope.pagination= new ClusterNavigation();
-	$scope.alert_service = AlertService;
 	
 	$scope.getNodes=function() {
 		if (isDefined($scope.cluster)) {
@@ -1378,13 +1377,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				var response = $scope.client.shutdownNode(node_id,
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Node [" + node_id + "] successfully shutdown", response);
+							AlertService.success("Node [" + node_id + "] successfully shutdown", response);
 						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while shutting down node",error);
+							AlertService.error("Error while shutting down node",error);
 						});
 					}
 				);
@@ -1402,12 +1401,12 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.optimizeIndex(index, 
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Index was successfully optimized", response);
+							AlertService.success("Index was successfully optimized", response);
 						});
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while optimizing index", error);
+							AlertService.error("Error while optimizing index", error);
 						});
 					}				
 				);
@@ -1424,13 +1423,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.deleteIndex(index, 
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Index was successfully deleted", response);
+							AlertService.success("Index was successfully deleted", response);
 						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting index", error);
+							AlertService.error("Error while deleting index", error);
 						});
 					}	
 				);
@@ -1447,13 +1446,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.clearCache(index,
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Index cache was successfully cleared", response);
+							AlertService.success("Index cache was successfully cleared", response);
 						});
 						$scope.refreshClusterState();						
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while clearing index cache", error);
+							AlertService.error("Error while clearing index cache", error);
 						});
 					}
 				);
@@ -1470,12 +1469,12 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.refreshIndex(index, 
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Index was successfully refreshed", response);
+							AlertService.success("Index was successfully refreshed", response);
 						});
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while refreshing index", error);	
+							AlertService.error("Error while refreshing index", error);	
 						});
 					}
 				);
@@ -1487,13 +1486,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var response = $scope.client.enableShardAllocation(
 			function(response) {
 				$scope.updateModel(function() {
-					$scope.alert_service.success("Shard allocation was successfully enabled", response);
+					AlertService.success("Shard allocation was successfully enabled", response);
 				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while enabling shard allocation", error);	
+					AlertService.error("Error while enabling shard allocation", error);	
 				});
 			}
 		);
@@ -1503,13 +1502,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var response = $scope.client.disableShardAllocation(
 			function(response) {
 				$scope.updateModel(function() {
-					$scope.alert_service.success("Shard allocation was successfully disabled", response);
+					AlertService.success("Shard allocation was successfully disabled", response);
 				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while disabling shard allocation", error);	
+					AlertService.error("Error while disabling shard allocation", error);	
 				});
 			}
 		);
@@ -1526,13 +1525,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.closeIndex(index, 
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Index was successfully closed", response);
+							AlertService.success("Index was successfully closed", response);
 						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while closing index", error);	
+							AlertService.error("Error while closing index", error);	
 						});
 					}
 				);
@@ -1550,13 +1549,13 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 				$scope.client.openIndex(index,
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Index was successfully opened", response);
+							AlertService.success("Index was successfully opened", response);
 						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while opening index", error);
+							AlertService.error("Error while opening index", error);
 						});
 					}
 				);
@@ -1653,7 +1652,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	
 }
 function ClusterSettingsController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
 
 	$scope.back=function() {
 		$('#cluster_option a').tab('show');
@@ -1672,20 +1670,19 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.alert_service.success("Cluster settings were successfully updated",response);
+						AlertService.success("Cluster settings were successfully updated",response);
 					});
 					$scope.refreshClusterState();
 				}, 
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while updating cluster settings",error);
+						AlertService.error("Error while updating cluster settings",error);
 					});
 				}
 		);
 	};
 }
 function CreateIndexController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
@@ -1762,7 +1759,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.version = "0.5.0";
 	$scope.username = null;
 	$scope.password = null;
-	$scope.alerts_service = AlertService;
+	$scope.alert_service = AlertService;
 	
 	$scope.setConnected=function(status) {
 		$scope.is_connected = status;
@@ -1892,10 +1889,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$('#modal_info').modal({show:true,backdrop:true});
 	};
 	
-	$scope.isInModal=function() {
-		return ($('.modal-backdrop').length > 0);
-	};
-	
 	$scope.getCurrentTime=function() {
 		return getTimeString(new Date());
 	};
@@ -1913,7 +1906,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 }
 function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
-	$scope.alert_service = AlertService;
 	$scope.service = IndexSettingsService;
 	
 	$scope.back=function() {
@@ -1932,13 +1924,13 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			function(response) {
 				$scope.updateModel(function() {
-					$scope.alert_service.success("Index settings were successfully updated", response);
+					AlertService.success("Index settings were successfully updated", response);
 				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while updating index settings", error);
+					AlertService.error("Error while updating index settings", error);
 				});
 			}
 		);
@@ -1946,7 +1938,6 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
  }
 function NavbarController($scope, $location, $timeout, AlertService, SettingsService) {
 	$scope.settings_service = SettingsService;
-	$scope.alert_service = AlertService;
 	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
 	
     $scope.connectToHost=function() {
@@ -1963,7 +1954,6 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 }
 
 function RestController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
 	
 	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
@@ -2019,7 +2009,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 		if (!isDefined($scope.editor.error) && notEmpty($scope.request.url)) {
 			// TODO: deal with basic auth here
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
-				$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
+				AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 			}
 			$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
 				function(response) {
@@ -2038,9 +2028,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 				function(error) {
 					$scope.updateModel(function() {
 						if (error.status !== 0) {
-							$scope.alert_service.error("Request was not successful: " + error.statusText);
+							AlertService.error("Request was not successful: " + error.statusText);
 						} else {
-							$scope.alert_service.error($scope.request.url + " is unreachable");	
+							AlertService.error($scope.request.url + " is unreachable");	
 						}
 					});
 					try {
@@ -2231,7 +2221,6 @@ function PercolateQuery(query_info) {
 }
 function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService) {
 
-	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
 	
 	$scope.editor = new AceEditor('repository-settings-editor');
@@ -2267,12 +2256,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 			function() {
 				$scope.client.deleteRepository(name,
 					function(response) {
-						$scope.alert_service.success("Repository successfully deleted", response);
+						AlertService.success("Repository successfully deleted", response);
 						$scope.reload();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting repositor", error);
+							AlertService.error("Error while deleting repositor", error);
 						});
 					}
 				);
@@ -2290,12 +2279,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 
 			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
 				function(response) {
-					$scope.alert_service.success("Repository created");
+					AlertService.success("Repository created");
 					$scope.loadRepositories();
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while creating repository", error);
+						AlertService.error("Error while creating repository", error);
 					});
 				}
 			);
@@ -2318,14 +2307,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 				function(error) {
 					if (!(error['responseJSON'] != null )) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while reading repositories", error);
+							AlertService.error("Error while reading repositories", error);
 						});
 					}
 					deferred.reject(true);
 				}
 			)
 		} catch (error) {
-			$scope.alert_service.error("Failed to load repositories");
+			AlertService.error("Failed to load repositories");
 			deferred.reject(false);
 		}
 		return deferred.promise
@@ -2337,13 +2326,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		// name and repo required
 		if(!angular.isDefined($scope.new_snap.repository))
 		{
-			$scope.alert_service.warn("Repository is required");
+			AlertService.warn("Repository is required");
 			return
 		}
 
 		if(!angular.isDefined($scope.new_snap.name))
 		{
-			$scope.alert_service.warn("Snapshot name is required");
+			AlertService.warn("Snapshot name is required");
 			return
 		}
 
@@ -2365,12 +2354,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		
 		$scope.client.createSnapshot($scope.new_snap.repository, $scope.new_snap.name, JSON.stringify(body),
 			function(response) {
-				$scope.alert_service.success("Snapshot created");
+				AlertService.success("Snapshot created");
 				$scope.reload();
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while creating snapshot", error);
+					AlertService.error("Error while creating snapshot", error);
 				});
 			}
 		);
@@ -2386,12 +2375,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 					snapshot.repository,
 					snapshot.snapshot,
 					function(response) {
-						$scope.alert_service.success("Snapshot successfully deleted", response);
+						AlertService.success("Snapshot successfully deleted", response);
 						$scope.reload();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting snapshot", error);
+							AlertService.error("Error while deleting snapshot", error);
 						});
 					}
 				);
@@ -2425,13 +2414,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while fetching snapshots", error);
+						AlertService.error("Error while fetching snapshots", error);
 					});
 					deferred.resolve([]);
 				}
 			)
 		} catch (error) {
-			$scope.alert_service.error("Failed to load snapshots");
+			AlertService.error("Failed to load snapshots");
 			deferred.resolve([]);
 		}
 		return deferred.promise;
@@ -2448,13 +2437,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 				function(error) {
 					if (!(error['responseJSON'] != null )) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while reading snapshots", error);
+							AlertService.error("Error while reading snapshots", error);
 						});
 					}
 				}
 			)
 		} catch (error) {
-			$scope.alert_service.error("Failed to load snapshots");
+			AlertService.error("Failed to load snapshots");
 			return;
 		}
 	};
@@ -2475,7 +2464,6 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 	
 }
 function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
-	$scope.alert_service = AlertService;	
 	$scope.dialog_service = ConfirmDialogService;
 	
 	$scope.editor = ace.edit("warmup-query-editor");
@@ -2512,12 +2500,12 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.alert_service.success("Warmup query successfully registered", response);						
+						AlertService.success("Warmup query successfully registered", response);						
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Request did not return a valid JSON", error);						
+						AlertService.error("Request did not return a valid JSON", error);						
 					});
 				}
 			);
@@ -2533,13 +2521,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Warmup query successfully deleted", response);
+							AlertService.success("Warmup query successfully deleted", response);
 							$scope.loadIndexWarmers();
 						});
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting warmup query", error);
+							AlertService.error("Error while deleting warmup query", error);
 						});
 					}
 				);
@@ -2561,7 +2549,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while fetching warmup queries", error);
+						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
 			);

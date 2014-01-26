@@ -1,6 +1,5 @@
 function NavbarController($scope, $location, $timeout, AlertService, SettingsService) {
 	$scope.settings_service = SettingsService;
-	$scope.alert_service = AlertService;
 	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
 	
     $scope.connectToHost=function() {

@@ -1,6 +1,5 @@
 function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService) {
 
-	$scope.alert_service = AlertService;
 	$scope.dialog_service = ConfirmDialogService;
 	
 	$scope.editor = new AceEditor('repository-settings-editor');
@@ -36,12 +35,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 			function() {
 				$scope.client.deleteRepository(name,
 					function(response) {
-						$scope.alert_service.success("Repository successfully deleted", response);
+						AlertService.success("Repository successfully deleted", response);
 						$scope.reload();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting repositor", error);
+							AlertService.error("Error while deleting repositor", error);
 						});
 					}
 				);
@@ -59,12 +58,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 
 			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
 				function(response) {
-					$scope.alert_service.success("Repository created");
+					AlertService.success("Repository created");
 					$scope.loadRepositories();
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while creating repository", error);
+						AlertService.error("Error while creating repository", error);
 					});
 				}
 			);
@@ -87,14 +86,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 				function(error) {
 					if (!(error['responseJSON'] != null )) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while reading repositories", error);
+							AlertService.error("Error while reading repositories", error);
 						});
 					}
 					deferred.reject(true);
 				}
 			)
 		} catch (error) {
-			$scope.alert_service.error("Failed to load repositories");
+			AlertService.error("Failed to load repositories");
 			deferred.reject(false);
 		}
 		return deferred.promise
@@ -106,13 +105,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		// name and repo required
 		if(!angular.isDefined($scope.new_snap.repository))
 		{
-			$scope.alert_service.warn("Repository is required");
+			AlertService.warn("Repository is required");
 			return
 		}
 
 		if(!angular.isDefined($scope.new_snap.name))
 		{
-			$scope.alert_service.warn("Snapshot name is required");
+			AlertService.warn("Snapshot name is required");
 			return
 		}
 
@@ -134,12 +133,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		
 		$scope.client.createSnapshot($scope.new_snap.repository, $scope.new_snap.name, JSON.stringify(body),
 			function(response) {
-				$scope.alert_service.success("Snapshot created");
+				AlertService.success("Snapshot created");
 				$scope.reload();
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while creating snapshot", error);
+					AlertService.error("Error while creating snapshot", error);
 				});
 			}
 		);
@@ -155,12 +154,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 					snapshot.repository,
 					snapshot.snapshot,
 					function(response) {
-						$scope.alert_service.success("Snapshot successfully deleted", response);
+						AlertService.success("Snapshot successfully deleted", response);
 						$scope.reload();
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting snapshot", error);
+							AlertService.error("Error while deleting snapshot", error);
 						});
 					}
 				);
@@ -194,13 +193,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while fetching snapshots", error);
+						AlertService.error("Error while fetching snapshots", error);
 					});
 					deferred.resolve([]);
 				}
 			)
 		} catch (error) {
-			$scope.alert_service.error("Failed to load snapshots");
+			AlertService.error("Failed to load snapshots");
 			deferred.resolve([]);
 		}
 		return deferred.promise;
@@ -217,13 +216,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 				function(error) {
 					if (!(error['responseJSON'] != null )) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while reading snapshots", error);
+							AlertService.error("Error while reading snapshots", error);
 						});
 					}
 				}
 			)
 		} catch (error) {
-			$scope.alert_service.error("Failed to load snapshots");
+			AlertService.error("Failed to load snapshots");
 			return;
 		}
 	};
