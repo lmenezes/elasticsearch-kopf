@@ -642,13 +642,11 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;
 	var index_shards = {};
 	this.shards = index_shards;
-	this.state = index_metadata.state;
 	this.metadata = {};
-	this.aliases = index_metadata.aliases;
-	this.total_aliases = isDefined(index_metadata.aliases) ? index_metadata.aliases.length : 0;
-	this.visibleAliases=function() {
-		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
-	};
+	this.aliases = getProperty(index_metadata,'aliases', []);
+
+	this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
+	
 	this.settings = index_metadata.settings;
 	// FIXME: 0.90/1.0 check
 	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
@@ -657,16 +655,18 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.metadata.mappings = this.mappings;
 
 	// FIXME: 0.90/1.0 check
-	if (isDefined(index_metadata.settings['index.number_of_shards'])) {
-		this.num_of_shards = index_metadata.settings['index.number_of_shards'];
-		this.num_of_replicas = parseInt(index_metadata.settings['index.number_of_replicas']);
-	} else {
-		this.num_of_shards = index_metadata.settings.index.number_of_shards;
-		this.num_of_replicas = parseInt(index_metadata.settings.index.number_of_replicas);
-	}
+	this.num_of_shards = getProperty(index_metadata.settings, 'index.number_of_shards');
+	this.num_of_replicas = parseInt(getProperty(index_metadata.settings, 'index.number_of_replicas'));
+	this.state = index_metadata.state;
 	
-	this.state_class = index_metadata.state === "open" ? "success" : "active";
-	this.visible = true;
+	this.num_docs = getProperty(index_status, 'docs.num_docs', 0);
+	this.max_doc = getProperty(index_status, 'docs.max_doc', 0);
+	this.deleted_docs = getProperty(index_status, 'docs.deleted_docs', 0);
+	this.size = getProperty(index_status, 'index.primary_size_in_bytes', 0);
+	this.total_size = getProperty(index_status, 'index.size_in_bytes', 0);	
+	this.size_in_bytes = readablizeBytes(this.size);
+	this.total_size_in_bytes = readablizeBytes(this.total_size);
+	
 	var unassigned = [];
 
 	// adds shard information
@@ -695,15 +695,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 
 
 	this.unassigned = unassigned;
-	var has_status = this.state === 'open' && isDefined(index_status);
-	this.num_docs = has_status && isDefined(index_status.docs) ? index_status.docs.num_docs : 0;
-	this.max_doc = has_status && isDefined(index_status.docs) ? index_status.docs.max_doc : 0;
-	this.deleted_docs = has_status && isDefined(index_status.docs) ? index_status.docs.deleted_docs : 0;
-	this.size = has_status ? index_status.index.primary_size_in_bytes : 0;
-	this.total_size = has_status ? index_status.index.size_in_bytes : 0;
 	
-	this.size_in_bytes = readablizeBytes(this.size);
-	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
 		return prettyPrintObject(this.metadata);
 	};
@@ -2715,25 +2707,16 @@ function readablizeBytes(bytes) {
 // Example: get the value of object[a][b][c][d]
 // where property_path is [a,b,c,d]
 function getProperty(object, property_path, default_value) {
-	var value = default_value;
-	if (isDefined(object[property_path])) {
-		return object[property_path];
-	}
-	var path_parts = property_path.split('.');
-	var ref = object;
-	for (var i = 0; i < path_parts.length; i++) {
-		var property = path_parts[i];
-		if (isDefined(ref[property])) {
-			ref = ref[property];
-		} else {
-			ref = null;
-			break;
+	if (isDefined(object)) {
+		if (isDefined(object[property_path])) {
+			return object[property_path];
+		}
+		var path_parts = property_path.split('.'); // path as nested properties
+		for (var i = 0; i < path_parts.length && isDefined(object); i++) {
+			object = object[path_parts[i]];
 		}
 	}
-	if (isDefined(ref)) {
-		value = ref;
-	}
-	return value;
+	return isDefined(object) ? object : default_value;
 }
 
 // Checks if value is both non null and undefined

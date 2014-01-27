@@ -13,25 +13,16 @@ function readablizeBytes(bytes) {
 // Example: get the value of object[a][b][c][d]
 // where property_path is [a,b,c,d]
 function getProperty(object, property_path, default_value) {
-	var value = default_value;
-	if (isDefined(object[property_path])) {
-		return object[property_path];
-	}
-	var path_parts = property_path.split('.');
-	var ref = object;
-	for (var i = 0; i < path_parts.length; i++) {
-		var property = path_parts[i];
-		if (isDefined(ref[property])) {
-			ref = ref[property];
-		} else {
-			ref = null;
-			break;
+	if (isDefined(object)) {
+		if (isDefined(object[property_path])) {
+			return object[property_path];
+		}
+		var path_parts = property_path.split('.'); // path as nested properties
+		for (var i = 0; i < path_parts.length && isDefined(object); i++) {
+			object = object[path_parts[i]];
 		}
 	}
-	if (isDefined(ref)) {
-		value = ref;
-	}
-	return value;
+	return isDefined(object) ? object : default_value;
 }
 
 // Checks if value is both non null and undefined
