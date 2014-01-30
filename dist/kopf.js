@@ -438,8 +438,8 @@ function ElasticClient(connection) {
 		this.executeElasticRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
 	};
 
-	this.restoreSnapshot=function(repository, snapshot, callback_success, callback_error){
-		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", {}, callback_success, callback_error);
+	this.restoreSnapshot=function(repository, snapshot, body, callback_success, callback_error){
+		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", body, callback_success, callback_error);
 	};
 
 	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
@@ -2207,8 +2207,10 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	$scope.repositories_names = [];
 	$scope.snapshots = [];
 	$scope.indices = [];
+	$scope.restorable_indices = [];
 	$scope.new_repo = {};
 	$scope.new_snap = {};
+	$scope.restore_snap = {};
 
     $scope.$on('loadRepositoryEvent', function() {
 		$scope.reload();
@@ -2224,6 +2226,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 								$scope.allSnapshots($scope.repositories)
 							});
 		$scope.loadIndices();
+    };
+
+    $scope.optionalParam=function(body, object, paramname){
+		if(angular.isDefined(object[paramname]))
+		{
+			body[paramname] = object[paramname];
+		}
+		return body;
     };
 
 	$scope.deleteRepository=function(name, value){
@@ -2243,6 +2253,38 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 						});
 					}
 				);
+			}
+		);
+	};
+
+	$scope.restoreSnapshot=function(){
+
+		var body = {}
+		// dont add to body if not present, these are optional, all indices included by default
+		if(angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0)
+		{
+			body["indices"] = $scope.restore_snap.indices.join(",");
+		}
+
+		if(angular.isDefined($scope.restore_snap.include_global_state))
+		{
+			//TODO : when es fixes bug [https://github.com/elasticsearch/elasticsearch/issues/4949], this extra "true/false" -> true/false handling will go away
+			body["include_global_state"] = ($scope.restore_snap.include_global_state == 'true');
+		}
+
+		$scope.optionalParam(body, $scope.restore_snap, "ignore_unavailable");
+		$scope.optionalParam(body, $scope.restore_snap, "rename_replacement");
+		$scope.optionalParam(body, $scope.restore_snap, "rename_pattern");
+
+		$scope.client.restoreSnapshot($scope.restore_snap.snapshot.repository, $scope.restore_snap.snapshot.snapshot, JSON.stringify(body),
+			function(response) {
+				AlertService.success("Snapshot Restored Started");
+				$scope.reload();
+			},
+			function(error) {
+				$scope.updateModel(function() {
+					AlertService.error("Error while started restor of snapshot", error);
+				});
 			}
 		);
 	};
@@ -2298,6 +2340,8 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		return deferred.promise
 	};
 
+	$scope.resolve_
+
 	$scope.createSnapshot=function(){
 		var body = {}
 
@@ -2320,16 +2364,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 			body["indices"] = $scope.new_snap.indices.join(",");
 		}
 
-		if(angular.isDefined($scope.new_snap.ignore_unavailable))
-		{
-			body["ignore_unavailable"] = $scope.new_snap.ignore_unavailable;
-		}
-
 		if(angular.isDefined($scope.new_snap.include_global_state))
 		{
-			body["include_global_state"] = true; //$scope.new_snap.include_global_state;
+			//TODO : when es fixes bug [https://github.com/elasticsearch/elasticsearch/issues/4949], this extra "true/false" -> true/false handling will go away
+			body["include_global_state"] = ($scope.new_snap.include_global_state == 'true');
 		}
 		
+		$scope.optionalParam(body, $scope.restore_snap, "ignore_unavailable");
+
 		$scope.client.createSnapshot($scope.new_snap.repository, $scope.new_snap.name, JSON.stringify(body),
 			function(response) {
 				AlertService.success("Snapshot created");

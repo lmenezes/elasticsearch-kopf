@@ -966,6 +966,10 @@ select.input-sm-twoxheight {
 	padding-left: 15px;
 }
 
+.row-nomargin-button{
+	margin-right: 15px;
+}
+
 .form-label-repository {
 	padding-left: 15px;
 }

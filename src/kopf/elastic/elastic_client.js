@@ -219,8 +219,8 @@ function ElasticClient(connection) {
 		this.executeElasticRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
 	};
 
-	this.restoreSnapshot=function(repository, snapshot, callback_success, callback_error){
-		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", {}, callback_success, callback_error);
+	this.restoreSnapshot=function(repository, snapshot, body, callback_success, callback_error){
+		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", body, callback_success, callback_error);
 	};
 
 	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
