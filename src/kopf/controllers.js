@@ -146,7 +146,7 @@ function AliasesPagination(page, results) {
 
 function ClusterNavigation() {
 	this.page = 1;
-	this.page_size = 4; // TODO: allow to change it?
+	this.page_size = 5; // TODO: move it to a single place?
 
 	this.query = "";
 	this.previous_query = null;

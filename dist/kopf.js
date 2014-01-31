@@ -1032,7 +1032,7 @@ function AliasesPagination(page, results) {
 
 function ClusterNavigation() {
 	this.page = 1;
-	this.page_size = 4; // TODO: allow to change it?
+	this.page_size = 5; // TODO: move it to a single place?
 
 	this.query = "";
 	this.previous_query = null;
@@ -1617,6 +1617,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			return i;
 		});
 		return page;
+	};
+	
+	$scope.index=function(index) {
+		var page = $scope.getPage();
+		if (isDefined(page[index])) {
+			return page[index];
+		} else {
+			return null;
+		}
 	};
 	
 	$scope.getResults=function() {

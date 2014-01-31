@@ -1,3 +1,4 @@
+table.overview tr td { width: 16.60%; }
 .cluster-map-header-cluster-actions {
 	font-size: 32px;
 	vertical-align: middle !important;
@@ -17,8 +18,6 @@ a.cluster-map-header-cluster-action {
 	text-decoration: none;
 }
 .cluster-map-header-index-cell {
-	width: 230px !important;
-	max-width: 230px !important;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
@@ -218,8 +217,6 @@ a.header-action:hover {
 }
 
 .header-index-cell {
-    max-width: 230px;
-    min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
@@ -266,8 +263,6 @@ a.header-index-action-mini:hover {
 	text-decoration: none;
 }
 .shards {
-    max-width: 230px;
-    min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	word-wrap:break-word;

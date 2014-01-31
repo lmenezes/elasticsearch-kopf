@@ -122,7 +122,7 @@ h4 { color: #666; font-variant:small-caps; font-weight: 500; }
 h5 { color: #777; font-variant:small-caps; font-weight: 500; }
 h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
-#page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 0px 60px; }
+#page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 25px 60px; }
 
 .settings-section-header {
 	top: 15px;
@@ -403,6 +403,7 @@ body {
 	background: #fff;
 	font-size: 10px;
 }
+table.overview tr td { width: 16.60%; }
 .cluster-map-header-cluster-actions {
 	font-size: 32px;
 	vertical-align: middle !important;
@@ -422,8 +423,6 @@ a.cluster-map-header-cluster-action {
 	text-decoration: none;
 }
 .cluster-map-header-index-cell {
-	width: 230px !important;
-	max-width: 230px !important;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
@@ -623,8 +622,6 @@ a.header-action:hover {
 }
 
 .header-index-cell {
-    max-width: 230px;
-    min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
@@ -671,8 +668,6 @@ a.header-index-action-mini:hover {
 	text-decoration: none;
 }
 .shards {
-    max-width: 230px;
-    min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	word-wrap:break-word;
@@ -872,7 +867,8 @@ a.header-index-action-mini:hover {
 	padding-right: 10px;
 }
 .navbar-host-input {
-	width: 250px;
+	padding-right: 25px;
+	width: 280px;
 	padding-top: 2px;
 	vertical-align: middle;
 }

@@ -1,0 +1,66 @@
+<!-- index name -->
+<span ng-show="index(position) != null">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="cluster-map-header-index-name normal-action" ng-click="displayInfo('settings for index ' + index(position).name,index(position).metadata)" title="view index information">{{index(position).name}}</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="cluster-map-header-index-alias">
+				<span title="{{index(position).num_of_shards}} shards and {{index(position).num_of_replicas}} replicas">shards: {{index(position).num_of_shards}} * {{index(position).num_of_replicas + 1}} |</span>
+				<span title="{{index(position).num_docs}} docs, {{index(position).max_doc}} max docs, {{index(position).deleted_docs}} deleted docs">docs: {{index(position).num_docs}} |</span> 
+				<span title="size: {{index(position).size_in_bytes}}, total size: {{index(position).total_size_in_bytes}}">size: {{index(position).size_in_bytes}}</span>
+			</div>
+		</div>	
+	</div>
+	<!-- index actions -->
+	<div class="row cluster-map-header-index-actions">
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static">
+					<i ng-show="index(position).state == 'close'" class="icon-folder-close" title="open index" ng-click="openIndex(index(position).name)"></i>
+					<i ng-show="index(position).state == 'open'" class="icon-folder-open" title="close index" ng-click="closeIndex(index(position).name)"></i>
+				</a>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="optimize index" data-backdrop="static">
+					<i class="icon-wrench" ng-click="optimizeIndex(index(position).name)"></i>
+				</a>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="refresh index" data-backdrop="static">
+					<i class="icon-refresh" ng-click="refreshIndex(index(position).name)"></i>
+				</a>
+			</div>
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="clear index cache" data-backdrop="static" data-keyboard="false">
+					<i class="icon-circle-blank" ng-click="clearCache(index(position).name)"></i>
+				</a>
+			</div>
+			<div class="col-lg-2">
+				<a href="#" ng-click="loadIndexSettings(index(position).name)" class="cluster-map-header-index-action">
+					<i class="icon-cogs"></i>
+				</a>
+			</div>		
+			<div class="col-lg-2">
+				<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="delete index" data-backdrop="static">
+					<i class="icon-trash" ng-click="deleteIndex(index(position).name)"></i>
+				</a>
+			</div>	
+	</div>
+	<!-- index info -->
+	<div ng-show="index(position).aliases.length <= 5" class="row" ng-repeat="alias in index(position).visibleAliases()">
+		<div class="col-lg-12">
+			<div class="cluster-map-header-index-alias">
+				<i class="icon-tag"></i> {{alias}}
+			</div>
+		</div>
+	</div>
+	<div ng-show="index(position).aliases.length > 5" class="row">
+		<div class="col-lg-12">
+			<div class="cluster-map-header-index-alias">
+				<i class="icon-tags"></i> {{index(position).aliases.length}} total aliases
+			</div>
+		</div>
+	</div>
+</span>

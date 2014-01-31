@@ -282,6 +282,15 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		return page;
 	};
 	
+	$scope.index=function(index) {
+		var page = $scope.getPage();
+		if (isDefined(page[index])) {
+			return page[index];
+		} else {
+			return null;
+		}
+	};
+	
 	$scope.getResults=function() {
 		var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
 		var query = $scope.pagination.query;

@@ -111,7 +111,8 @@
 	padding-right: 10px;
 }
 .navbar-host-input {
-	width: 250px;
+	padding-right: 25px;
+	width: 280px;
 	padding-top: 2px;
 	vertical-align: middle;
 }

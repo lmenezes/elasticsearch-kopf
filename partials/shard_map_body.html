@@ -32,14 +32,11 @@
 			</div>
 		</div>
 	</td>
-	<td ng-repeat="index in getPage()">
-		<div class="cluster-map-shards">
-			<span id="{{shard.id}}" ng-switch on="shard.primary" ng-click="displayInfo('shard info',shard.info)" ng-repeat="shard in index.shards[node.id]">
-				<span ng-switch-when="true" class="shard shard-primary" ng-class="{STARTED:'shard-started', INITIALIZING:'shard-initializing', 'RELOCATED':'shard-relocated', 	'RECOVERING':'shard-recovering','CLOSED':'shard-closed'}[shard.state]">{{shard.shard}}</span>
-				<span ng-switch-default class="shard" ng-class="{STARTED:'shard-started', INITIALIZING:'shard-initializing', 'RELOCATED':'shard-relocated', 	'RECOVERING':'shard-recovering','CLOSED':'shard-closed'}[shard.state]">{{shard.shard}}</span>
-			</span>
-		</div>
-	</td>
+	<td ng-init="position = 0" ng-include src="'partials/index_body.html'"></td>
+	<td ng-init="position = 1" ng-include src="'partials/index_body.html'"></td>
+	<td ng-init="position = 2" ng-include src="'partials/index_body.html'"></td>
+	<td ng-init="position = 3" ng-include src="'partials/index_body.html'"></td>
+	<td ng-init="position = 4" ng-include src="'partials/index_body.html'"></td>
 </tr>
 <!-- Unassigned shards -->
 <tr>
@@ -61,11 +58,9 @@
 			</div>
 		</div>
 	</td>
-	<td ng-repeat="index in getPage()" class="shards">
-		<div class="cluster-map-shards">
-			<span ng-repeat="shard in index.unassigned" >
-				<span class="shard shard-unallocated">{{shard.shard}}</span>
-			</span>
-		</div>
-	</td>
+	<td ng-init="position = 0" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
+	<td ng-init="position = 1" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
+	<td ng-init="position = 2" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
+	<td ng-init="position = 3" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
+	<td ng-init="position = 4" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
 </tr>

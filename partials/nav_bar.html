@@ -1,10 +1,10 @@
-<div ng-controller="NavbarController">
-	<div class="navbar navbar-fixed-top navbar-cluster-status-{{cluster_health.status}}">
-		<div class="container">
+
+	<div class="navbar navbar-fixed-top navbar-cluster-status-{{cluster_health.status}}" ng-controller="NavbarController">
+		<div class="container-fluid">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span></button>
 			<ul class="nav navbar-nav">
 				<li class="dropdown">
-					<a href="#" class="navbar-brand navbar-cluster-status-{{cluster_health.status}} dropdown-toggle navbar-logo" data-toggle="dropdown">kopf <i class="icon-caret-down navbar-logo-action"></i></a>
+					<a href="#" class="navbar-brand navbar-cluster-status-{{cluster_health.status}} dropdown-toggle navbar-logo" data-toggle="dropdown" style="padding-left: 25px; padding-right: 15px;">kopf <i class="icon-caret-down navbar-logo-action"></i></a>
 					<ul class="dropdown-menu form-horizontal navbar-app-settings">
 						<form class="form-inline" role="form">
 							<li class="active navbar-menu-section">
@@ -83,7 +83,7 @@
 			</ul>
 		</div>
 	</div>
-	<div class="container app-container">
+	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="connection-status-console" ng-switch on="hasConnection()">
@@ -93,4 +93,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+
