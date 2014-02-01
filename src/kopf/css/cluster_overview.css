@@ -1,4 +1,4 @@
-table.overview tr td { width: 16.60%; }
+table.overview tr td { width: 16.67%; }
 .cluster-map-header-cluster-actions {
 	font-size: 32px;
 	vertical-align: middle !important;
@@ -62,7 +62,6 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-cell {
 	width: 220px;
-	max-width: 220px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
