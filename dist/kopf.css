@@ -195,7 +195,7 @@ html,body {
 .alert-block {
 	font-size: 12px;
 	font-weight: 300;
-	padding-top: 0px;
+	padding-top: 10px;
 	padding-bottom: 0px;
 	text-align: left;
 }
