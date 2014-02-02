@@ -1,4 +1,8 @@
 table.overview tr td { width: 16.67%; }
+
+.dropdown-menu .divider {
+	margin: 5px 0px;
+}
 .cluster-map-header-cluster-actions {
 	font-size: 32px;
 	vertical-align: middle !important;
@@ -36,6 +40,19 @@ a.cluster-map-header-cluster-action {
 .cluster-map-header-index-actions {
 	padding: 6px;
 }
+.cluster-map-header-index-name {
+	color: #555555;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+}
+a.cluster-map-header-index-name:hover {
+	color: #555555;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+}
+
 .cluster-map-header-index-action {
 	color: #555555;
 	font-size: 12px;
