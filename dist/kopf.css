@@ -199,6 +199,10 @@ html,body {
 	padding-bottom: 0px;
 	text-align: left;
 }
+
+.alert {
+	margin-bottom: 0px;
+}
 .alert-server-response {
 	padding-top: 25px;
 }
@@ -548,29 +552,24 @@ a.cluster-map-node-action {
 }
 .cluster-map-stats-section {
 	background: #f9f9f9;
-	text-align: justify;
-	padding-left: 15px;
-	padding-right: 15px;
-	border: 1px solid #dddddd;
-	border-radius: 3px 3px 3px 3px;
-	height: 50px;
-	margin-bottom: 40px;
+	padding-left: 10px;
+	border: 1px solid #ccc;
 	margin-top: 10px;
+	border-radius: 4px 4px 4px 4px;
+	margin-bottom: 30px;
 }
 .cluster-map-stat-block {
 	display: inline-block;
-	padding-top: 3px;
 }
 .cluster-map-stats-section:after {
 	content: "";
 	width: 100%;
-	display: inline-block;
 }
 .cluster-map-stat-number {
 	color: #555555;
 	font-size: 28px;
 	text-align: center;
-	font-weight: 600;
+	font-weight: 500;
 }
 .cluster-map-stat-description {
 	color: #555555;

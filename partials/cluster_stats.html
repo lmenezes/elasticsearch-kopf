@@ -1,32 +1,36 @@
-<div class="cluster-map-stats-section">
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of nodes in the cluster">
-	 	<span class="cluster-map-stat-number">{{cluster.number_of_nodes}}</span>
-		<span class="cluster-map-stat-description"><small>nodes</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of indices on the cluster, either open or closed">
-	 	<span class="cluster-map-stat-number">{{cluster.total_indices}}</span>
-		<span class="cluster-map-stat-description"><small>indices</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of shards, replicas are not taken into account">
-		<span class="cluster-map-stat-number"><small>{{cluster.shards}}</small></span>
-		<span class="cluster-map-stat-description"><small>shards</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="number of failed shards">
-	 	<span class="cluster-map-stat-number">{{cluster.failed_shards}}</span>
-		<span class="cluster-map-stat-description"><small>failed shards</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="number of unassigned shards">
-	 	<span class="cluster-map-stat-number">{{cluster.unassigned_shards}}</span>
-		<span class="cluster-map-stat-description"><small>unassigned shards</small></span>
-	</span>
-	<span class="cluster-map-stat-block tooltip-enabled" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of unique documents. replicas are not taken into account">
-	 	<span class="cluster-map-stat-number">{{cluster.num_docs}}</span>
-		<span class="cluster-map-stat-description"><small>docs</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total size of the cluster. replicas are taken into account">
-	 	<span class="cluster-map-stat-number">{{cluster.total_size}}</span>
-		<span class="cluster-map-stat-description"><small>total size</small></span>
-	</span>
+<div class="row">
+	<div class="col-md-12">
+		<div class="cluster-map-stats-section">
+			<div class="row">
+				<div class="col-lg-2 col-sm-4 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of nodes in the cluster">
+				 	<span class="cluster-map-stat-number">{{cluster.number_of_nodes}}</span>
+					<span class="cluster-map-stat-description"><small>nodes</small></span>
+				</div>
+				<div class="col-lg-2 col-sm-4 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of indices on the cluster, either open or closed">
+				 	<span class="cluster-map-stat-number">{{cluster.total_indices}}</span>
+					<span class="cluster-map-stat-description"><small>indices</small></span>
+				</div>
+				<div class="col-lg-2 col-sm-4 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of shards, replicas are not taken into account">
+					<span class="cluster-map-stat-number"><small>{{cluster.shards}}</small></span>
+					<span class="cluster-map-stat-description"><small>shards</small></span>
+				</div>
+				<div class="col-lg-2 col-sm-4 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="number of failed shards">
+				 	<span ng-show="cluster.unassigned_shards === 0 || cluster.failed_shards !== 0" class="cluster-map-stat-number">{{cluster.failed_shards}}</span>
+					<span ng-show="cluster.unassigned_shards === 0 || cluster.failed_shards !== 0" class="cluster-map-stat-description"><small>failed</small></span>
+				 	<span ng-show="cluster.failed_shards === 0 && cluster.unassigned_shards !== 0" class="cluster-map-stat-number">{{cluster.unassigned_shards}}</span>
+					<span ng-show="cluster.failed_shards === 0 && cluster.unassigned_shards !== 0" class="cluster-map-stat-description"><small>unassigned</small></span>
+				</div>
+				<div class="col-lg-2 col-sm-4 col-xs-6 cluster-map-stat-block tooltip-enabled" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total number of unique documents. replicas are not taken into account">
+				 	<span class="cluster-map-stat-number">{{cluster.num_docs}}</span>
+					<span class="cluster-map-stat-description"><small>docs</small></span>
+				</div>
+				<div class="col-lg-2 col-sm-4 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total size of the cluster. replicas are taken into account">
+				 	<span class="cluster-map-stat-number">{{cluster.total_size}}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>
 <script>  
 	$(function () { $(".cluster-map-stat-block").tooltip();});  

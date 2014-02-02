@@ -191,6 +191,10 @@ html,body {
 	padding-bottom: 0px;
 	text-align: left;
 }
+
+.alert {
+	margin-bottom: 0px;
+}
 .alert-server-response {
 	padding-top: 25px;
 }
