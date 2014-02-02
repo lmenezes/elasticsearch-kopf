@@ -405,6 +405,10 @@ body {
 }
 table.overview tr td { width: 16.67%; }
 
+.index-menu-icon {
+	padding-right: 5px;
+}
+
 .dropdown-menu .divider {
 	margin: 5px 0px;
 }
@@ -476,11 +480,18 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-types {
 	padding-top: 5px;
-	padding-left: 0px;
 	font-size: 12px;
 }
 .cluster-map-node-type {
-	padding-right: 12px;
+	font-weight: 300;
+	padding-left: 5px;
+}
+.cluster-overview-filter {
+	padding-bottom: 10px;
+}
+.node-type-icon {
+	padding-left: 2px;
+	padding-right: 2px;
 }
 .cluster-map-node-cell {
 	width: 220px;

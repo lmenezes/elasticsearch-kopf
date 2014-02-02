@@ -7,41 +7,41 @@
 			  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
   				  <li role="presentation">
 					  <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="displayInfo('settings for index ' + index(position).name,index(position).metadata)">
-						  <i class="icon-info-sign"></i> settings and stats
+						  <i class="icon-info-sign index-menu-icon"></i> settings and stats
 	  				</a>
 				  </li>
   				  <li role="presentation">
 					  <a ng-show="index(position).state == 'open'" data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="closeIndex(index(position).name)">
-						  <i class="icon-folder-open"></i> close index
+						  <i class="icon-folder-open index-menu-icon"></i> close index
 					  </a>
 					  <a data-toggle="modal" ng-show="index(position).state == 'close'" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="openIndex(index(position).name)">
-						  <i class="icon-folder-close" title="open index" ></i>  open index
+						  <i class="icon-folder-close index-menu-icon" title="open index" ></i>  open index
 					  </a>
 				  </li>
   				  <li role="presentation">
 	  				<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="optimizeIndex(index(position).name)">
-	  					<i class="icon-wrench"></i> optimize index
+	  					<i class="icon-wrench index-menu-icon"></i> optimize index
 	  				</a>
 				  </li>
   				  <li role="presentation">
 					  <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="refresh index" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="refreshIndex(index(position).name)">
-						  <i class="icon-refresh"></i> refresh index
+						  <i class="icon-refresh index-menu-icon"></i> refresh index
 					  </a>
 				  </li>
   				  <li role="presentation">
 					  <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" role="menuitem" tabindex="-1" data-backdrop="static" data-keyboard="false" ng-click="clearCache(index(position).name)">
-						  <i class="icon-circle-blank"></i> clear cache
+						  <i class="icon-circle-blank index-menu-icon"></i> clear cache
 					  </a>
 				  </li>
   				  <li role="presentation">
 					  <a href="#" ng-click="loadIndexSettings(index(position).name)" class="cluster-map-header-index-action" role="menuitem" tabindex="-1">
-						  <i class="icon-cogs"></i> index settings
+						  <i class="icon-cog index-menu-icon"></i> index settings
 					  </a>
 				  </li>
 				  <li role="presentation" class="divider"></li>
   				  <li role="presentation">
 					  <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="delete index" role="menuitem" tabindex="-1" data-backdrop="static">
-						  <i class="icon-trash" ng-click="deleteIndex(index(position).name)"></i> delete index
+						  <i class="icon-trash index-menu-icon" ng-click="deleteIndex(index(position).name)"></i> delete index
 					  </a>
 				  </li>
 			  </ul>

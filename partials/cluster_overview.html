@@ -3,40 +3,40 @@
 	<div ng-include src="'partials/cluster_stats.html'"></div>
 	<div class="row">
 		<div class="col-lg-10">
-			<form class="form-inline" role="form">
-				<div class="row">
-					<div class="col-lg-3 form-group">
-						<input type="text" ng-model="pagination.query" class="form-control input-sm" placeholder="filter indices by name">
-					</div>
-					<div class="col-lg-2 form-group">
-						<select ng-model="pagination.state" class="form-control input-sm">
-							<option selected="selected" value="">open / closed</option>
-							<option value="open">open</option>
-							<option value="close">closed</option>
-						</select>
-					</div>
-					<div class="col-lg-3 form-group">
-						<input type="text" ng-model="pagination.node_name" class="form-control input-sm" placeholder="filter nodes by name">
-					</div>
-					<div class="col-lg-4 cluster-map-node-types">
-							<div class="checkbox cluster-map-node-type">
-					    	  <label>
-					    	    <input type="checkbox" ng-model="pagination.master"> <i class="icon-star-empty"></i> master
-					    	  </label>
-					    	</div>
-							<div class="checkbox cluster-map-node-type">
-								<label>
-									<input type="checkbox" ng-model="pagination.data"> <i class="icon-hdd"></i> data
-								</label>
-							</div>
-							<div class="checkbox cluster-map-node-type">
-					    	  <label>
-					    	    <input type="checkbox" ng-model="pagination.client"> <i class="icon-search"></i> client
-					    	  </label>
-					    	</div>
+			<div class="row">
+				<div class="col-lg-3 col-sm-6 cluster-overview-filter">
+					<input type="text" ng-model="pagination.query" class="form-control input-sm" placeholder="filter indices by name">
+				</div>
+				<div class="col-lg-2 col-sm-6 cluster-overview-filter">
+					<select ng-model="pagination.state" class="form-control input-sm">
+						<option selected="selected" value="">open / closed</option>
+						<option value="open">open</option>
+						<option value="close">closed</option>
+					</select>
+				</div>
+				<div class="col-lg-3 col-sm-6 cluster-overview-filter">
+					<input type="text" ng-model="pagination.node_name" class="form-control input-sm" placeholder="filter nodes by name">
+				</div>
+				<div class="col-lg-4 col-sm-6 cluster-map-node-types cluster-overview-filter">
+					<div class="row">
+						<div class="col-xs-4">
+				    	  <label class="cluster-map-node-type">
+				    	    <input type="checkbox" ng-model="pagination.master"> <i class="icon-star-empty node-type-icon"> </i> master
+				    	  </label>
+						</div>
+						<div class="col-xs-4">
+				    	  <label class="cluster-map-node-type">
+								<input type="checkbox" ng-model="pagination.data"> <i class="icon-hdd node-type-icon"> </i> data
+							</label>
+						</div>
+						<div class="col-xs-4">
+				    	  <label class="cluster-map-node-type">
+				    	    <input type="checkbox" ng-model="pagination.client"> <i class="icon-search node-type-icon"> </i> client
+				    	  </label>
+						</div>
 					</div>
 				</div>
-			</form>
+			</div>
 		</div>
 		<div class="col-lg-2 form-group" style="text-align: right;">
 			<div class="cluster-map-pagination">
