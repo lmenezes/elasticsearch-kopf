@@ -127,10 +127,6 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		return $('#' + tab).hasClass('active');
 	};
 	
-	$scope.getHost=function() {
-		return $scope.host;
-	};
-	
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));

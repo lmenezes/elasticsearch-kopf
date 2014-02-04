@@ -1,6 +1,6 @@
 function RestController($scope, $location, $timeout, AlertService) {
 	
-	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
+	$scope.request = new Request($scope.connection.host + "/_search","GET","{}");
 	$scope.validation_error = null;
 
 	$scope.loadHistory=function() {
