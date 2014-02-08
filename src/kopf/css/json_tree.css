@@ -6,6 +6,7 @@
 	content: '-';
 }
 
+/* properties for expand icon */
 .json-object-expand {
 	display: inline-block;
 	font-weight: 500;
@@ -41,14 +42,6 @@
 /* json string style */
 .json-string {
 	color: #2DB669;
-}
-/* json string right " */
-.json-string:after {
-	content: "\"";
-}
-/* json string left " */
-.json-string:before {
-	content: "\"";
 }
 /* json boolean style */
 .json-boolean {
