@@ -75,11 +75,11 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-types {
 	padding-top: 5px;
-	font-size: 12px;
 }
 .cluster-map-node-type {
 	font-weight: 300;
 	padding-left: 5px;
+	font-size: 12px;
 }
 .cluster-overview-filter {
 	padding-bottom: 10px;

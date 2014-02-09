@@ -40,25 +40,25 @@ kopf.factory('AlertService', function() {
 	// creates an error alert
 	this.error=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 15000;
-		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
+		return this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
 	};
 	
 	// creates an info alert
 	this.info=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 5000;
-		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
+		return this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
 	};
 	
 	// creates success alert
 	this.success=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 5000;
-		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
+		return this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
 	};
 	
 	// creates a warn alert
 	this.warn=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 10000;
-		this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
+		return this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
 	};
 	
 	this.addAlert=function(alert, timeout) {
@@ -68,6 +68,7 @@ kopf.factory('AlertService', function() {
 		if (this.alerts.length >= this.max_alerts) {
 			this.alerts.length = 3;
 		}
+		return alert.id;
 	};
 	
 	return this;

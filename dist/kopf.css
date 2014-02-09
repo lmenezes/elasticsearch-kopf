@@ -404,8 +404,26 @@ body {
 	color: #666;
 }
 .cluster-health-content {
-	background: #fff;
 	font-size: 10px;
+	color: #666;
+	font-family: "Lucida Console", Monaco, monospace;
+}
+
+.cluster-health-form-group {
+	padding-left: 5px;
+	float: right;
+}
+.gist-timestamp-col {
+	width: 70px;
+}
+.gist-link-col {
+	width: 240px;
+}
+.gist-title-col {
+	width: auto;
+}
+.cluster-health-filters {
+	padding-top: 6px;
 }
 table.overview tr td { width: 16.67%; }
 
@@ -484,11 +502,11 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-types {
 	padding-top: 5px;
-	font-size: 12px;
 }
 .cluster-map-node-type {
 	font-weight: 300;
 	padding-left: 5px;
+	font-size: 12px;
 }
 .cluster-overview-filter {
 	padding-bottom: 10px;

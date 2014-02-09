@@ -557,50 +557,77 @@ function ElasticClient(connection) {
 		);
 	};
 
-	this.getClusterDiagnosis=function(callback_success,callback_error) {
+	this.getClusterDiagnosis=function(health, state, stats, hotthreads, callback_success,callback_error) {
 		var host = this.host;
 		var auth = this.createAuthToken(this.username,this.password);
-		$.when(
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_cluster/state", 
-				dataType: 'json', 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_nodes/stats?all=true", 
-				dataType: 'json', 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_nodes/hot_threads", 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			})
-		).then(
-				function(state, stats, hot_threads) {
-					callback_success(state[0], stats[0], hot_threads[0]);
-				},
-				function(failed_request) {
-					callback_error(failed_request);
-				}
+		var deferreds = [];
+		if (health) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_cluster/health", 
+					dataType: 'json', 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})
 			);
+		}
+		if (state) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_cluster/state", 
+					dataType: 'json', 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})
+			);
+		}
+		if (stats) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_nodes/stats?all=true", 
+					dataType: 'json', 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})
+			);
+		}
+		if (hotthreads) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_nodes/hot_threads", 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})	
+			);
+		}
+		$.when.apply($, deferreds).then(
+			function() {
+				callback_success(arguments);
+			},
+			function(failed_request) {
+				callback_error(failed_request);
+			}
+		);
 	};
 }
 
@@ -1278,52 +1305,87 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
     });
 	
 }
-function ClusterHealthController($scope,$location,$timeout, AlertService) {
+function ClusterHealthController($scope,$location,$timeout,$sce, AlertService) {
 	$scope.shared_url = '';
-	$scope.cluster_health = {};
-	$scope.state = '';
+	$scope.results = null;
 	
     $scope.$on('loadClusterHealth', function() {
 		$('#cluster_health_option a').tab('show');
-		$scope.cluster_health = null; // otherwise we see past version, then new
-		$scope.state = ''; // informs about loading state
+		$scope.results = null;
+		// selects which info should be retrieved
+		$scope.retrieveHealth = true;
+		$scope.retrieveState = true;
+		$scope.retrieveStats = true;
+		$scope.retrieveHotThreads = true;
+		
+		$scope.gist_title = '';
     });
 	
 	$scope.loadClusterHealth=function() {
-		var cluster_health = null;
-		$scope.cluster_health = null; // otherwise we see past version, then new
-		$scope.state = "loading cluster health state. this could take a few moments...";
-		$scope.client.getClusterDiagnosis(
-			function(state, stats, hot_threads) {
-				cluster_health = {};
-				cluster_health.state = JSON.stringify(state, undefined, 4);
-				cluster_health.stats = JSON.stringify(stats, undefined, 4);
-				cluster_health.hot_threads = hot_threads;
+		var results = {};
+		$scope.results = null;
+		var info_id = AlertService.info("Loading cluster health state. This could take a few moments.",{},30000);
+		$scope.client.getClusterDiagnosis($scope.retrieveHealth, $scope.retrieveState, $scope.retrieveStats, $scope.retrieveHotThreads,
+			function(responses) {
+				$scope.state = '';
+				if (!(responses[0] instanceof Array)) {
+					responses = [responses]; // so logic bellow remains the same in case result is not an array
+				}
+				var idx = 0;
+				if ($scope.retrieveHealth) {
+					results.health_raw = responses[idx++][0];
+					results.health = $sce.trustAsHtml(JSONTree.create(results.health_raw));
+				}
+				if ($scope.retrieveState) {
+					results.state_raw = responses[idx++][0];
+					results.state =  $sce.trustAsHtml(JSONTree.create(results.state_raw));
+				}
+				if ($scope.retrieveStats) {
+					results.stats_raw = responses[idx++][0];
+					results.stats = $sce.trustAsHtml(JSONTree.create(results.stats_raw));
+				}
+				if ($scope.retrieveHotThreads) {
+					results.hot_threads = responses[idx][0];
+				}
 				$scope.updateModel(function() {
-					$scope.cluster_health = cluster_health;
+					$scope.results = results;
 					$scope.state = '';
+					AlertService.remove(info_id);
 				});
 			},
 			function(failed_request) {
 				$scope.updateModel(function() {
-					$scope.state = '';
+					AlertService.remove(info_id);
 					AlertService.error("Error while retrieving cluster health information", failed_request.responseText);
 				});
-		});
+			}
+		);
 	};
 
 	$scope.publishClusterHealth=function() {
 		var gist = {};
-		gist.description = 'Cluster information delivered by kopf';
+		gist.description = isDefined($scope.gist_title) ? $scope.gist_title : 'Cluster information delivered by kopf';
 		gist.public = true;
 		gist.files = {};
-		gist.files.state = {'content': $scope.cluster_health.state,'indent':'2', 'language':'JSON'};
-		gist.files.stats = {'content': $scope.cluster_health.stats,'indent':'2', 'language':'JSON'} ;
-		gist.files.hot_threads = {'content':$scope.cluster_health.hot_threads,'indent':'2', 'language':'JSON'};
+		if (isDefined($scope.results)) {
+			if (isDefined($scope.results.health_raw)) {
+				gist.files.health = {'content': JSON.stringify($scope.results.health_raw, undefined, 4),'indent':'2', 'language':'JSON'};
+			}
+			if (isDefined($scope.results.state_raw)) {
+				gist.files.state = {'content': JSON.stringify($scope.results.state_raw, undefined, 4),'indent':'2', 'language':'JSON'};	
+			}
+			if (isDefined($scope.results.stats_raw)) {
+				gist.files.stats = {'content': JSON.stringify($scope.results.stats_raw, undefined, 4),'indent':'2', 'language':'JSON'} ;
+			}
+			if (isDefined($scope.results.hot_threads)) {
+				gist.files.hot_threads = {'content':$scope.results.hot_threads,'indent':'2', 'language':'JSON'};
+			}
+		}
 		var data = JSON.stringify(gist, undefined, 4);
 		$.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data})
 			.done(function(response) { 
 				$scope.updateModel(function() {
+					$scope.addToHistory(new Gist(gist.description, response.html_url));
 					AlertService.success("Cluster health information successfully shared at: " + response.html_url, null, 60000);
 				});
 			})
@@ -1334,6 +1396,31 @@ function ClusterHealthController($scope,$location,$timeout, AlertService) {
 			}
 		);
 	};
+	
+	$scope.addToHistory=function(gist) {
+		$scope.gist_history.unshift(gist);
+		if ($scope.gist_history.length > 30) {
+			$scope.gist_history.length = 30;
+		}
+		localStorage.kopf_gist_history = JSON.stringify($scope.gist_history);
+	};
+	
+	$scope.loadHistory=function() {
+		var history = [];
+		if (isDefined(localStorage.kopf_gist_history)) {
+			try {
+				history = JSON.parse(localStorage.kopf_gist_history).map(function(h) {
+					return new Gist().loadFromJSON(h);
+				});
+			} catch (error) {
+				localStorage.kopf_gist_history = null;
+			}
+		} 
+		return history;
+	};
+	
+	$scope.gist_history = $scope.loadHistory();
+
 }
 function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.settings_service = SettingsService;
@@ -2642,25 +2729,25 @@ kopf.factory('AlertService', function() {
 	// creates an error alert
 	this.error=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 15000;
-		this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
+		return this.addAlert(new Alert(message, response, "error", "alert-danger", "icon-warning-sign"), timeout);
 	};
 	
 	// creates an info alert
 	this.info=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 5000;
-		this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
+		return this.addAlert(new Alert(message, response, "info", "alert-info", "icon-info"), timeout);
 	};
 	
 	// creates success alert
 	this.success=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 5000;
-		this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
+		return this.addAlert(new Alert(message, response, "success", "alert-success", "icon-ok"), timeout);
 	};
 	
 	// creates a warn alert
 	this.warn=function(message, response, timeout) {
 		timeout = isDefined(timeout) ? timeout : 10000;
-		this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
+		return this.addAlert(new Alert(message, response, "warn", "alert-warning", "icon-info"), timeout);
 	};
 	
 	this.addAlert=function(alert, timeout) {
@@ -2670,6 +2757,7 @@ kopf.factory('AlertService', function() {
 		if (this.alerts.length >= this.max_alerts) {
 			this.alerts.length = 3;
 		}
+		return alert.id;
 	};
 	
 	return this;
@@ -2728,6 +2816,19 @@ function AceEditor(target) {
 		}
 		return content;
 	};
+}
+function Gist(title, url) {
+	this.timestamp = getTimeString(new Date());
+	this.title = title;
+	this.url = url;
+	
+	this.loadFromJSON=function(json) {
+		this.title = json.title;
+		this.url = json.url;
+		this.timestamp = json.timestamp;
+		return this;
+	};
+
 }
 function readablizeBytes(bytes) {
 	if (bytes > 0) {
