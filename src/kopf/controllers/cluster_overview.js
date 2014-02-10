@@ -295,6 +295,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
 		var query = $scope.pagination.query;
 		var state = $scope.pagination.state;
+		var hide_special = $scope.pagination.hide_special;
 		return $.map(indices,function(i) {
 			if (isDefined(query) && query.length > 0) {
 				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
@@ -304,6 +305,9 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			if (state.length > 0 && state != i.state) {
 				return null;
 			} 
+			if (hide_special && i.isSpecial()) {
+				return null;
+			}
 			return i;
 		});
 	};

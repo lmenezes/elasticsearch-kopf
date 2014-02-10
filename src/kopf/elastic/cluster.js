@@ -29,15 +29,20 @@ function Cluster(state,status,nodes,settings) {
 		var unassigned_shards = 0;
 		var total_size = 0;
 		var num_docs = 0;
+		var special_indices = 0;
 		this.indices = Object.keys(iMetadata).map(
 			function(x) { 
 				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+				if (index.isSpecial()) {
+					special_indices++;
+				}
 				unassigned_shards += index.unassigned.length;
 				total_size += parseInt(index.total_size);
 				num_docs += index.num_docs;
 				return index;
 			}
 		).sort(function(a,b) { return a.compare(b); });
+		this.special_indices = special_indices;
 		this.num_docs = num_docs;
 		this.unassigned_shards = unassigned_shards;
 		this.total_indices = this.indices.length;

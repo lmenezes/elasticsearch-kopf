@@ -150,6 +150,7 @@ function ClusterNavigation() {
 
 	this.query = "";
 	this.previous_query = null;
+	this.hide_special = true;
 	
 	this.data = true;
 	this.master = true;

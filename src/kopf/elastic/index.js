@@ -118,4 +118,12 @@ function Index(index_name,index_info, index_metadata, index_status) {
 			return [];
 		}
 	};
+	
+	this.isSpecial=function() {
+		return (
+			this.name.indexOf(".marvel-") === 0 || 
+			this.name.indexOf("_river") === 0 || 
+			this.name == "_percolator"
+		);
+	};
 }

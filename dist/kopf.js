@@ -162,15 +162,20 @@ function Cluster(state,status,nodes,settings) {
 		var unassigned_shards = 0;
 		var total_size = 0;
 		var num_docs = 0;
+		var special_indices = 0;
 		this.indices = Object.keys(iMetadata).map(
 			function(x) { 
 				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+				if (index.isSpecial()) {
+					special_indices++;
+				}
 				unassigned_shards += index.unassigned.length;
 				total_size += parseInt(index.total_size);
 				num_docs += index.num_docs;
 				return index;
 			}
 		).sort(function(a,b) { return a.compare(b); });
+		this.special_indices = special_indices;
 		this.num_docs = num_docs;
 		this.unassigned_shards = unassigned_shards;
 		this.total_indices = this.indices.length;
@@ -782,6 +787,14 @@ function Index(index_name,index_info, index_metadata, index_status) {
 			return [];
 		}
 	};
+	
+	this.isSpecial=function() {
+		return (
+			this.name.indexOf(".marvel-") === 0 || 
+			this.name.indexOf("_river") === 0 || 
+			this.name == "_percolator"
+		);
+	};
 }
 function EditableIndexSettings(settings) {
 	// FIXME: 0.90/1.0 check
@@ -1063,6 +1076,7 @@ function ClusterNavigation() {
 
 	this.query = "";
 	this.previous_query = null;
+	this.hide_special = true;
 	
 	this.data = true;
 	this.master = true;
@@ -1719,6 +1733,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
 		var query = $scope.pagination.query;
 		var state = $scope.pagination.state;
+		var hide_special = $scope.pagination.hide_special;
 		return $.map(indices,function(i) {
 			if (isDefined(query) && query.length > 0) {
 				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
@@ -1728,6 +1743,9 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			if (state.length > 0 && state != i.state) {
 				return null;
 			} 
+			if (hide_special && i.isSpecial()) {
+				return null;
+			}
 			return i;
 		});
 	};
