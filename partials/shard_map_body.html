@@ -13,7 +13,9 @@
 			<div class="col-lg-10">
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="cluster-map-node-name normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)" title="view node stats">{{node.name}}</div>
+						<div class="cluster-map-node-name normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)" title="view node stats">
+							<span class="cluster-map-header-index-name">{{node.name}}</span>
+						</div>
 					</div>
 				</div>
 				<div class="row">

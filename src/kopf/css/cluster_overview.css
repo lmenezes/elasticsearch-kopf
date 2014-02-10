@@ -1,3 +1,6 @@
+table.overview {
+	table-layout:fixed;
+}
 table.overview tr td { width: 16.67%; }
 
 .index-menu-icon {
@@ -7,6 +10,11 @@ table.overview tr td { width: 16.67%; }
 .dropdown-menu .divider {
 	margin: 5px 0px;
 }
+
+.cluster-map-header-index-icon {
+	padding-right: 5px;
+}
+
 .cluster-map-header-cluster-actions {
 	font-size: 32px;
 	vertical-align: middle !important;
@@ -32,8 +40,11 @@ a.cluster-map-header-cluster-action {
 	border-bottom: 0px !important;
 }
 .cluster-map-header-index-name {
-	word-wrap:break-word;
+	overflow: hidden;
+	white-space: nowrap;
 	font-weight: 500;
+	text-overflow: ellipsis;
+	display: block;
 }
 .cluster-map-header-index-alias {
 	word-wrap:break-word;
@@ -72,6 +83,10 @@ a.cluster-map-header-index-action:hover {
 .cluster-map-node-name {
 	word-wrap:break-word;
 	font-weight: 500;
+	font-size: 13px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	display: block;
 }
 .cluster-map-node-types {
 	padding-top: 5px;
