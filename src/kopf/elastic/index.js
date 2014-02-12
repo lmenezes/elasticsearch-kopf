@@ -125,4 +125,8 @@ function Index(index_name,index_info, index_metadata, index_status) {
 			this.name.indexOf("_") === 0
 		);
 	};
+	
+	this.equals=function(index) {
+		return index.name == this.name;
+	};
 }

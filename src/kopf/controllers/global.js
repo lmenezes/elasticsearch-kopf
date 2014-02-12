@@ -71,6 +71,14 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 					var leaves = changes.nodeLeaves.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
 					AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
 				}
+				if (changes.hasCreatedIndices()) {
+					var created = changes.indicesCreated.map(function(index) { return index.name; });
+					AlertService.info(changes.indicesCreated.length + " indices created: [" + created.join(",") + "]");
+				}
+				if (changes.hasDeletedIndices()) {
+					var deleted = changes.indicesDeleted.map(function(index) { return index.name; });
+					AlertService.info(changes.indicesDeleted.length + " indices deleted: [" + deleted.join(",") + "]");
+				}
 			}
 		}
 	};

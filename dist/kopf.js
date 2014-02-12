@@ -67,10 +67,15 @@ function ClusterChanges() {
 
 	this.nodeJoins = null;
 	this.nodeLeaves = null;
+	this.indicesCreated = null;
+	this.indicesDeleted = null;
 
 	this.hasChanges=function() {
-		return (isDefined(this.nodeJoins) ||
-			isDefined(this.nodeLeaves)
+		return (
+			isDefined(this.nodeJoins) ||
+			isDefined(this.nodeLeaves) ||
+			isDefined(this.indicesCreated) ||
+			isDefined(this.indicesDeleted)
 		);
 	};
 
@@ -96,6 +101,28 @@ function ClusterChanges() {
 
 	this.hasLeaves=function() {
 		return isDefined(this.nodeLeaves);
+	};
+	
+	this.hasCreatedIndices=function() {
+		return isDefined(this.indicesCreated);
+	};
+	
+	this.hasDeletedIndices=function() {
+		return isDefined(this.indicesDeleted);
+	};
+	
+	this.addCreatedIndex=function(index) {
+		if (!isDefined(this.indicesCreated)) {
+			this.indicesCreated = [];
+		}
+		this.indicesCreated.push(index);
+	};
+	
+	this.addDeletedIndex=function(index) {
+		if (!isDefined(this.indicesDeleted)) {
+			this.indicesDeleted = [];
+		}
+		this.indicesDeleted.push(index);
 	};
 
 }
@@ -191,8 +218,10 @@ function Cluster(state,status,nodes,settings) {
 
 		this.getChanges=function(new_cluster) {
 			var nodes = this.nodes;
+			var indices = this.indices;
 			var changes = new ClusterChanges();
 			if (isDefined(new_cluster)) {
+				// checks for node differences
 				nodes.forEach(function(node) {
 					for (var i = 0; i < new_cluster.nodes.length; i++) {
 						if (new_cluster.nodes[i].equals(node)) {
@@ -214,6 +243,32 @@ function Cluster(state,status,nodes,settings) {
 							}	
 						if (isDefined(node)) {
 							changes.addJoiningNode(node);	
+						}
+					});
+				}
+				
+				// checks for indices differences
+				indices.forEach(function(index) {
+					for (var i = 0; i < new_cluster.indices.length; i++) {
+						if (new_cluster.indices[i].equals(index)) {
+							index = null;
+							break;
+						}
+					}
+					if (isDefined(index)) {
+						changes.addDeletedIndex(index);
+					}
+				});
+				if (new_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
+						new_cluster.indices.forEach(function(index) {
+							for (var i = 0; i < indices.length; i++) {
+								if (indices[i].equals(index)) {
+									index = null;
+									break;
+								}
+							}	
+						if (isDefined(index)) {
+							changes.addCreatedIndex(index);	
 						}
 					});
 				}
@@ -793,6 +848,10 @@ function Index(index_name,index_info, index_metadata, index_status) {
 			this.name.indexOf(".") === 0 ||
 			this.name.indexOf("_") === 0
 		);
+	};
+	
+	this.equals=function(index) {
+		return index.name == this.name;
 	};
 }
 function EditableIndexSettings(settings) {
@@ -1508,9 +1567,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.deleteIndex(index, 
 					function(response) {
-						$scope.updateModel(function() {
-							AlertService.success("Index was successfully deleted", response);
-						});
 						$scope.refreshClusterState();
 					},
 					function(error) {
@@ -1823,9 +1879,6 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			}
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
-					$scope.updateModel(function() {
-						AlertService.success('Index successfully created', response);
-					});
 					$scope.refreshClusterState();
 				}, function(error) { 
 					$scope.updateModel(function() {
@@ -1917,6 +1970,14 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 				if (changes.hasLeaves()) {
 					var leaves = changes.nodeLeaves.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
 					AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
+				}
+				if (changes.hasCreatedIndices()) {
+					var created = changes.indicesCreated.map(function(index) { return index.name; });
+					AlertService.info(changes.indicesCreated.length + " indices created: [" + created.join(",") + "]");
+				}
+				if (changes.hasDeletedIndices()) {
+					var deleted = changes.indicesDeleted.map(function(index) { return index.name; });
+					AlertService.info(changes.indicesDeleted.length + " indices deleted: [" + deleted.join(",") + "]");
 				}
 			}
 		}

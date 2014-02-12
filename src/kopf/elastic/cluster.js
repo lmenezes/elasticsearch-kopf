@@ -58,8 +58,10 @@ function Cluster(state,status,nodes,settings) {
 
 		this.getChanges=function(new_cluster) {
 			var nodes = this.nodes;
+			var indices = this.indices;
 			var changes = new ClusterChanges();
 			if (isDefined(new_cluster)) {
+				// checks for node differences
 				nodes.forEach(function(node) {
 					for (var i = 0; i < new_cluster.nodes.length; i++) {
 						if (new_cluster.nodes[i].equals(node)) {
@@ -81,6 +83,32 @@ function Cluster(state,status,nodes,settings) {
 							}	
 						if (isDefined(node)) {
 							changes.addJoiningNode(node);	
+						}
+					});
+				}
+				
+				// checks for indices differences
+				indices.forEach(function(index) {
+					for (var i = 0; i < new_cluster.indices.length; i++) {
+						if (new_cluster.indices[i].equals(index)) {
+							index = null;
+							break;
+						}
+					}
+					if (isDefined(index)) {
+						changes.addDeletedIndex(index);
+					}
+				});
+				if (new_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
+						new_cluster.indices.forEach(function(index) {
+							for (var i = 0; i < indices.length; i++) {
+								if (indices[i].equals(index)) {
+									index = null;
+									break;
+								}
+							}	
+						if (isDefined(index)) {
+							changes.addCreatedIndex(index);	
 						}
 					});
 				}

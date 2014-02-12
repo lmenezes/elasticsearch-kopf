@@ -71,9 +71,6 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			function() {
 				$scope.client.deleteIndex(index, 
 					function(response) {
-						$scope.updateModel(function() {
-							AlertService.success("Index was successfully deleted", response);
-						});
 						$scope.refreshClusterState();
 					},
 					function(error) {

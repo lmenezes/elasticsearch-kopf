@@ -2,10 +2,15 @@ function ClusterChanges() {
 
 	this.nodeJoins = null;
 	this.nodeLeaves = null;
+	this.indicesCreated = null;
+	this.indicesDeleted = null;
 
 	this.hasChanges=function() {
-		return (isDefined(this.nodeJoins) ||
-			isDefined(this.nodeLeaves)
+		return (
+			isDefined(this.nodeJoins) ||
+			isDefined(this.nodeLeaves) ||
+			isDefined(this.indicesCreated) ||
+			isDefined(this.indicesDeleted)
 		);
 	};
 
@@ -31,6 +36,28 @@ function ClusterChanges() {
 
 	this.hasLeaves=function() {
 		return isDefined(this.nodeLeaves);
+	};
+	
+	this.hasCreatedIndices=function() {
+		return isDefined(this.indicesCreated);
+	};
+	
+	this.hasDeletedIndices=function() {
+		return isDefined(this.indicesDeleted);
+	};
+	
+	this.addCreatedIndex=function(index) {
+		if (!isDefined(this.indicesCreated)) {
+			this.indicesCreated = [];
+		}
+		this.indicesCreated.push(index);
+	};
+	
+	this.addDeletedIndex=function(index) {
+		if (!isDefined(this.indicesDeleted)) {
+			this.indicesDeleted = [];
+		}
+		this.indicesDeleted.push(index);
 	};
 
 }
