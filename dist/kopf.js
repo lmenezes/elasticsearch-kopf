@@ -1927,6 +1927,9 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 	
 	$scope.setHost=function(url) {
+		if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+			url = "http://" + url;
+		}
 		$scope.connection = new ESConnection(url);
 		$scope.setConnected(false);
 		try {
