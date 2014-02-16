@@ -30,29 +30,27 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	var unassigned = [];
 
 	// adds shard information
-	if (isDefined(index_status)) {
-		$.map(index_status.shards, function(shards, shard_num) {
-			$.map(shards, function(shard_info, shard_copy) {
-				if (!isDefined(index_shards[shard_info.routing.node])) {
-					index_shards[shard_info.routing.node] = [];
-				}
-				index_shards[shard_info.routing.node].push(new Shard(shard_info));
-			});
-		});
-		this.metadata.stats = index_status;
-	}
-	// adds unassigned shards information
-	if (index_info) {
-		Object.keys(index_info.shards).forEach(function(x) { 
-			var shards_info = index_info.shards[x];
-			shards_info.forEach(function(shard_info) {
-				if (shard_info.state === 'UNASSIGNED') {
-					unassigned.push(new UnassignedShard(shard_info));	
-				}
-			});
-		});
-	}
 
+	$.map(index_info.shards, function(shards, shard_num) {
+		$.map(shards, function(shard_routing, shard_copy) {
+			if (shard_routing.node === null) {
+				unassigned.push(new UnassignedShard(shard_routing));	
+			} else {
+				if (!isDefined(index_shards[shard_routing.node])) {
+					index_shards[shard_routing.node] = [];
+				}
+				var shard_status = null;
+				if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
+					index_status.shards[shard_routing.shard].forEach(function(status) {
+						if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
+							shard_status = status;
+						}
+					});
+				}
+				index_shards[shard_routing.node].push(new Shard(shard_routing, shard_status));				
+			}
+		});
+	});
 
 	this.unassigned = unassigned;
 	
