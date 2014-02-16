@@ -173,15 +173,15 @@ a.cluster-map-node-action {
 }
 .cluster-map-stat-number {
 	color: #555555;
-	font-size: 28px;
+	font-size: 20px;
 	text-align: center;
 	font-weight: 500;
 }
 .cluster-map-stat-description {
 	color: #555555;
-	font-size: 18px;
+	font-size: 12px;
 	text-align: center;
-	font-weight: 200;
+	font-weight: 300;
 }
 .shard {
 	text-align: center;
