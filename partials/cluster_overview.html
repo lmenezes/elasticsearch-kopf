@@ -52,7 +52,12 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-lg-12" style="text-align: right;">
+		<div class="col-xs-6" style="text-align: left;">
+			<div class="cluster-map-pagination" data-toggle="tooltip" data-placement="top" data-original-title="number of shards in the cluster (closed indices are not taken into account)">
+				{{cluster_health.fetched_at}} - {{cluster_health.cluster_name}}
+			</div>
+		</div>
+		<div class="col-xs-6" style="text-align: right;">
 			<div class="cluster-map-pagination">
 				<span ng-switch on="hasPreviousPage()">
 					<i class="icon-double-angle-left normal-action" ng-click="previousPage()" ng-switch-when="true"></i>

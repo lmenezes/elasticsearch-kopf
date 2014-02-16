@@ -138,6 +138,7 @@ function ClusterHealth(health) {
 	this.number_of_data_nodes = health.number_of_data_nodes;
 	this.timed_out = health.timed_out;
 	this.shards = this.active_shards + this.relocating_shards + this.unassigned_shards + this.initializing_shards;
+	this.fetched_at = getTimeString(new Date());
 }
 function ClusterSettings(settings) {
 	// FIXME: 0.90/1.0 check
