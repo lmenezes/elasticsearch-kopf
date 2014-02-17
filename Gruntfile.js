@@ -76,6 +76,7 @@ module.exports = function(grunt) {
 					// SERVICES
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',
+					'src/kopf/services/aceeditor.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',

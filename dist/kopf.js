@@ -1123,15 +1123,20 @@ kopf.factory('ConfirmDialogService', function() {
 	return this;
 });
 
-function AliasesController($scope, $location, $timeout, AlertService) {
+function AliasesController($scope, $location, $timeout, AlertService, AceEditorService) {
 	$scope.aliases = null;
 	$scope.new_index = {};
 	$scope.pagination= new AliasesPagination(1, []);
-	
-	$scope.editor = new AceEditor('alias-filter-editor');
+	$scope.editor = undefined;
 	
 	$scope.viewDetails=function(alias) {
 		$scope.details = alias;
+	};
+
+	$scope.initEditor=function(){
+		if(!angular.isDefined($scope.editor)){
+			$scope.editor = AceEditorService.init('alias-filter-editor');
+		}
 	};
 
 	$scope.addAlias=function() {
@@ -1140,14 +1145,14 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			try {
 				$scope.new_alias.validate();
 				// if alias already exists, check if its already associated with index
-				if (isDefined($scope.aliases.info[$scope.new_alias.alias])) { 
+				if (isDefined($scope.aliases.info[$scope.new_alias.alias])) {
 					var aliases = $scope.aliases.info[$scope.new_alias.alias];
 					$.each(aliases,function(i, alias) {
 						if (alias.index === $scope.new_alias.index) {
 							throw "Alias is already associated with this index";
-						} 
+						}
 					});
-				} else { 
+				} else {
 					$scope.aliases.info[$scope.new_alias.alias] = [];
 				}
 				$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
@@ -1185,9 +1190,9 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			var aliases = $scope.aliases.info[alias_name];
 			aliases.forEach(function(alias) {
 				// if alias didnt exist, just add it
-				if (!isDefined($scope.originalAliases.info[alias_name])) { 
+				if (!isDefined($scope.originalAliases.info[alias_name])) {
 					adds.push(alias);
-				} else { 
+				} else {
 					var originalAliases = $scope.originalAliases.info[alias_name];
 					var addAlias = true;
 					for (var i = 0; i < originalAliases.length; i++) {
@@ -1199,7 +1204,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 					if (addAlias) {
 						adds.push(alias);
 					}
-				} 
+				}
 			});
 		});
 		Object.keys($scope.originalAliases.info).forEach(function(alias_name) {
@@ -1222,7 +1227,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 				}
 			});
 		});
-		$scope.client.updateAliases(adds,deletes, 
+		$scope.client.updateAliases(adds,deletes,
 			function(response) {
 				$scope.updateModel(function() {
 					AlertService.success("Aliases were successfully updated",response);
@@ -1249,7 +1254,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					AlertService.error("Error while fetching aliases",error);		
+					AlertService.error("Error while fetching aliases",error);
 				});
 			}
 		);
@@ -1257,6 +1262,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
+		$scope.initEditor();
     });
 
 }
@@ -2043,7 +2049,7 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 
 }
 
-function RestController($scope, $location, $timeout, AlertService) {
+function RestController($scope, $location, $timeout, AlertService, AceEditorService) {
 	
 	$scope.request = new Request($scope.connection.host + "/_search","GET","{}");
 	$scope.validation_error = null;
@@ -2058,16 +2064,19 @@ function RestController($scope, $location, $timeout, AlertService) {
 			} catch (error) {
 				localStorage.kopf_request_history = null;
 			}
-		} 
+		}
 		return history;
 	};
 	
 	$scope.history = $scope.loadHistory();
 	$scope.history_request = null;
-		
-	$scope.editor = new AceEditor('rest-client-editor');
+
+	if(!angular.isDefined($scope.editor)){
+		$scope.editor = AceEditorService.init('rest-client-editor');
+	}
+
 	$scope.editor.setValue($scope.request.body);
-	
+
 	$scope.loadFromHistory=function(history_request) {
 		$scope.request.url = history_request.url;
 		$scope.request.body = history_request.body;
@@ -2089,7 +2098,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 			if ($scope.history.length > 30) {
 				$scope.history.length = 30;
 			}
-			localStorage.kopf_request_history = JSON.stringify($scope.history);			
+			localStorage.kopf_request_history = JSON.stringify($scope.history);
 		}
 	};
 
@@ -2120,7 +2129,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 						if (error.status !== 0) {
 							AlertService.error("Request was not successful: " + error.statusText);
 						} else {
-							AlertService.error($scope.request.url + " is unreachable");	
+							AlertService.error($scope.request.url + " is unreachable");
 						}
 					});
 					try {
@@ -2133,11 +2142,10 @@ function RestController($scope, $location, $timeout, AlertService) {
 		}
 	};
 }
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.dialog_service = ConfirmDialogService;
 	
-	$scope.editor = new AceEditor('percolator-query-editor');
-		
+	$scope.editor = undefined;
 	$scope.total = 0;
 	$scope.queries = [];
 	$scope.page = 1;
@@ -2150,8 +2158,15 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	
 	$scope.$on('loadPercolatorEvent', function() {
 		$scope.indices = $scope.cluster.indices;
+		$scope.initEditor();
     });
 	
+	$scope.initEditor=function(){
+		if(!angular.isDefined($scope.editor)){
+			$scope.editor = AceEditorService.init('percolator-query-editor');
+		}
+	};
+
 	$scope.previousPage=function() {
 		$scope.page -= 1;
 		$scope.loadPercolatorQueries();
@@ -2203,7 +2218,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				$scope.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
 						var refreshIndex = $scope.client.is1() ? query.index : '_percolator';
-						$scope.client.refreshIndex(refreshIndex, 
+						$scope.client.refreshIndex(refreshIndex,
 							function(response) {
 								$scope.updateModel(function() {
 									AlertService.success("Query successfully deleted", response);
@@ -2233,7 +2248,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					var refreshIndex = $scope.client.is1() ? $scope.new_query.index.name : '_percolator';
-					$scope.client.refreshIndex(refreshIndex, 
+					$scope.client.refreshIndex(refreshIndex,
 						function(response) {
 							$scope.updateModel(function() {
 								AlertService.success("Percolator Query successfully created", response);
@@ -2286,7 +2301,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 						});
 					}
 				}
-			);				
+			);
 		} catch (error) {
 			AlertService.error("Filter is not a valid JSON");
 			return;
@@ -2309,7 +2324,7 @@ function PercolateQuery(query_info) {
 		}
 	};
 }
-function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 
 	$scope.dialog_service = ConfirmDialogService;
 	$scope.repositories = [];
@@ -2329,7 +2344,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	
 	$scope.initEditor=function(){
 		if(!angular.isDefined($scope.editor)){
-			$scope.editor = new AceEditor('repository-settings-editor');
+			$scope.editor = AceEditorService.init('repository-settings-editor');
 		}
 	};
 
@@ -2589,14 +2604,9 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 	};
 	
 }
-function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.dialog_service = ConfirmDialogService;
-	
-	$scope.editor = ace.edit("warmup-query-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
-
+	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.warmers = {};
 	$scope.index = null;
@@ -2610,8 +2620,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
     $scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
+		$scope.initEditor();
     });
 	
+	$scope.initEditor=function(){
+		if(!angular.isDefined($scope.editor)){
+			$scope.editor = AceEditorService.init('warmup-query-editor');
+		}
+	};
+
 	$scope.totalWarmers=function() {
 		return Object.keys($scope.warmers).length;
 	};
@@ -2626,12 +2643,12 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
 					$scope.updateModel(function() {
-						AlertService.success("Warmup query successfully registered", response);						
+						AlertService.success("Warmup query successfully registered", response);
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						AlertService.error("Request did not return a valid JSON", error);						
+						AlertService.error("Request did not return a valid JSON", error);
 					});
 				}
 			);
@@ -2791,6 +2808,15 @@ kopf.factory('SettingsService', function() {
 		}
 	};
 	
+	return this;
+});
+
+kopf.factory('AceEditorService', function() {
+
+	this.init=function(name) {
+		return new AceEditor(name);
+	};
+
 	return this;
 });
 function AceEditor(target) {

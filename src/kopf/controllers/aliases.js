@@ -1,12 +1,17 @@
-function AliasesController($scope, $location, $timeout, AlertService) {
+function AliasesController($scope, $location, $timeout, AlertService, AceEditorService) {
 	$scope.aliases = null;
 	$scope.new_index = {};
 	$scope.pagination= new AliasesPagination(1, []);
-	
-	$scope.editor = new AceEditor('alias-filter-editor');
+	$scope.editor = undefined;
 	
 	$scope.viewDetails=function(alias) {
 		$scope.details = alias;
+	};
+
+	$scope.initEditor=function(){
+		if(!angular.isDefined($scope.editor)){
+			$scope.editor = AceEditorService.init('alias-filter-editor');
+		}
 	};
 
 	$scope.addAlias=function() {
@@ -15,14 +20,14 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			try {
 				$scope.new_alias.validate();
 				// if alias already exists, check if its already associated with index
-				if (isDefined($scope.aliases.info[$scope.new_alias.alias])) { 
+				if (isDefined($scope.aliases.info[$scope.new_alias.alias])) {
 					var aliases = $scope.aliases.info[$scope.new_alias.alias];
 					$.each(aliases,function(i, alias) {
 						if (alias.index === $scope.new_alias.index) {
 							throw "Alias is already associated with this index";
-						} 
+						}
 					});
-				} else { 
+				} else {
 					$scope.aliases.info[$scope.new_alias.alias] = [];
 				}
 				$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
@@ -60,9 +65,9 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			var aliases = $scope.aliases.info[alias_name];
 			aliases.forEach(function(alias) {
 				// if alias didnt exist, just add it
-				if (!isDefined($scope.originalAliases.info[alias_name])) { 
+				if (!isDefined($scope.originalAliases.info[alias_name])) {
 					adds.push(alias);
-				} else { 
+				} else {
 					var originalAliases = $scope.originalAliases.info[alias_name];
 					var addAlias = true;
 					for (var i = 0; i < originalAliases.length; i++) {
@@ -74,7 +79,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 					if (addAlias) {
 						adds.push(alias);
 					}
-				} 
+				}
 			});
 		});
 		Object.keys($scope.originalAliases.info).forEach(function(alias_name) {
@@ -97,7 +102,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 				}
 			});
 		});
-		$scope.client.updateAliases(adds,deletes, 
+		$scope.client.updateAliases(adds,deletes,
 			function(response) {
 				$scope.updateModel(function() {
 					AlertService.success("Aliases were successfully updated",response);
@@ -124,7 +129,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					AlertService.error("Error while fetching aliases",error);		
+					AlertService.error("Error while fetching aliases",error);
 				});
 			}
 		);
@@ -132,6 +137,7 @@ function AliasesController($scope, $location, $timeout, AlertService) {
 	
     $scope.$on('loadAliasesEvent', function() {
 		$scope.loadAliases();
+		$scope.initEditor();
     });
 
 }

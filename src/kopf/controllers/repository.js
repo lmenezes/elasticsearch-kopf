@@ -1,4 +1,4 @@
-function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 
 	$scope.dialog_service = ConfirmDialogService;
 	$scope.repositories = [];
@@ -18,7 +18,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	
 	$scope.initEditor=function(){
 		if(!angular.isDefined($scope.editor)){
-			$scope.editor = new AceEditor('repository-settings-editor');
+			$scope.editor = AceEditorService.init('repository-settings-editor');
 		}
 	};
 

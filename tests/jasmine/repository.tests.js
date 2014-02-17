@@ -17,9 +17,11 @@ describe('RepositoryController', function(){
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         var AlertService = $injector.get('AlertService');
         this.AlertService = AlertService;
+        var AceEditorService = $injector.get('AceEditorService');
+        this.AceEditorService = AceEditorService;
 
         this.createController = function() {
-            return $controller('RepositoryController', {$scope: this.scope}, $location, $timeout, this.ConfirmDialogService, AlertService);
+            return $controller('RepositoryController', {$scope: this.scope}, $location, $timeout, this.ConfirmDialogService, AlertService, AceEditorService);
         };
 
         this._controller = this.createController();
@@ -39,10 +41,13 @@ describe('RepositoryController', function(){
 
     it('on : makes calls reload and initEditor', function() {
         spyOn(this.scope, 'reload').andReturn(true);
-        spyOn(this.scope, 'initEditor').andReturn(true);
+        spyOn(this.scope, 'initEditor').andCallThrough();
+        spyOn(this.AceEditorService, 'init').andReturn("fakeaceeditor");
         this.scope.$emit("loadRepositoryEvent");
         expect(this.scope.reload).toHaveBeenCalled();
         expect(this.scope.initEditor).toHaveBeenCalled();
+        expect(this.AceEditorService.init).toHaveBeenCalledWith('repository-settings-editor');
+        expect(this.scope.editor).toEqual("fakeaceeditor");
     });
 
     it('loadIndices : assigns a value to indices from cluster.indices', function() {
