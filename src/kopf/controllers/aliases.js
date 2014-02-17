@@ -117,14 +117,18 @@ function AliasesController($scope, $location, $timeout, AlertService, AceEditorS
 		);
 	};
 	
+	$scope._parseAliases = function(aliases) {
+		$scope.originalAliases = aliases;
+		$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
+		$scope.pagination.setResults($scope.aliases.info);
+	};
+
 	$scope.loadAliases=function() {
 		$scope.new_alias = new Alias();
 		$scope.client.fetchAliases(
 			function(aliases) {
 				$scope.updateModel(function() {
-					$scope.originalAliases = aliases;
-					$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
-					$scope.pagination.setResults($scope.aliases.info);
+					$scope._parseAliases(aliases);
 				});
 			},
 			function(error) {
