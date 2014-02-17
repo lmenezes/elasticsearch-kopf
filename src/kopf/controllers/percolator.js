@@ -1,8 +1,7 @@
-function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
+function PercolatorController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.dialog_service = ConfirmDialogService;
 	
-	$scope.editor = new AceEditor('percolator-query-editor');
-		
+	$scope.editor = undefined;
 	$scope.total = 0;
 	$scope.queries = [];
 	$scope.page = 1;
@@ -15,8 +14,15 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 	
 	$scope.$on('loadPercolatorEvent', function() {
 		$scope.indices = $scope.cluster.indices;
+		$scope.initEditor();
     });
 	
+	$scope.initEditor=function(){
+		if(!angular.isDefined($scope.editor)){
+			$scope.editor = AceEditorService.init('percolator-query-editor');
+		}
+	};
+
 	$scope.previousPage=function() {
 		$scope.page -= 1;
 		$scope.loadPercolatorQueries();
@@ -68,7 +74,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 				$scope.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
 						var refreshIndex = $scope.client.is1() ? query.index : '_percolator';
-						$scope.client.refreshIndex(refreshIndex, 
+						$scope.client.refreshIndex(refreshIndex,
 							function(response) {
 								$scope.updateModel(function() {
 									AlertService.success("Query successfully deleted", response);
@@ -98,7 +104,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			$scope.client.createPercolatorQuery($scope.new_query.index.name, $scope.new_query.id, $scope.new_query.source,
 				function(response) {
 					var refreshIndex = $scope.client.is1() ? $scope.new_query.index.name : '_percolator';
-					$scope.client.refreshIndex(refreshIndex, 
+					$scope.client.refreshIndex(refreshIndex,
 						function(response) {
 							$scope.updateModel(function() {
 								AlertService.success("Percolator Query successfully created", response);
@@ -151,7 +157,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 						});
 					}
 				}
-			);				
+			);
 		} catch (error) {
 			AlertService.error("Filter is not a valid JSON");
 			return;
