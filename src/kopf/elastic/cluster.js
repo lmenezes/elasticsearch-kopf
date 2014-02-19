@@ -29,15 +29,20 @@ function Cluster(state,status,nodes,settings) {
 		var unassigned_shards = 0;
 		var total_size = 0;
 		var num_docs = 0;
+		var special_indices = 0;
 		this.indices = Object.keys(iMetadata).map(
 			function(x) { 
 				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+				if (index.isSpecial()) {
+					special_indices++;
+				}
 				unassigned_shards += index.unassigned.length;
 				total_size += parseInt(index.total_size);
 				num_docs += index.num_docs;
 				return index;
 			}
 		).sort(function(a,b) { return a.compare(b); });
+		this.special_indices = special_indices;
 		this.num_docs = num_docs;
 		this.unassigned_shards = unassigned_shards;
 		this.total_indices = this.indices.length;
@@ -46,18 +51,17 @@ function Cluster(state,status,nodes,settings) {
 		this.successful_shards = status._shards.successful;
 		this.total_size = readablizeBytes(total_size);
 		this.getNodes=function(name, data, master, client) { 
-			return $.map(this.nodes,function(n) {
-				if (name.trim().length > 0 && n.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
-					return null;
-				} 
-				return (data && n.data || master && n.master || client && n.client) ? n : null;
+			return $.map(this.nodes,function(node) {
+				return node.matches(name, data, master, client) ? node : null;
 			});
 		};
 
 		this.getChanges=function(new_cluster) {
 			var nodes = this.nodes;
+			var indices = this.indices;
 			var changes = new ClusterChanges();
 			if (isDefined(new_cluster)) {
+				// checks for node differences
 				nodes.forEach(function(node) {
 					for (var i = 0; i < new_cluster.nodes.length; i++) {
 						if (new_cluster.nodes[i].equals(node)) {
@@ -79,6 +83,32 @@ function Cluster(state,status,nodes,settings) {
 							}	
 						if (isDefined(node)) {
 							changes.addJoiningNode(node);	
+						}
+					});
+				}
+				
+				// checks for indices differences
+				indices.forEach(function(index) {
+					for (var i = 0; i < new_cluster.indices.length; i++) {
+						if (new_cluster.indices[i].equals(index)) {
+							index = null;
+							break;
+						}
+					}
+					if (isDefined(index)) {
+						changes.addDeletedIndex(index);
+					}
+				});
+				if (new_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
+						new_cluster.indices.forEach(function(index) {
+							for (var i = 0; i < indices.length; i++) {
+								if (indices[i].equals(index)) {
+									index = null;
+									break;
+								}
+							}	
+						if (isDefined(index)) {
+							changes.addCreatedIndex(index);	
 						}
 					});
 				}

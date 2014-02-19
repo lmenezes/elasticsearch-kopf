@@ -1,3 +1,20 @@
+table.overview {
+	table-layout:fixed;
+}
+table.overview tr td { width: 16.67%; }
+
+.index-menu-icon {
+	padding-right: 5px;
+}
+
+.dropdown-menu .divider {
+	margin: 5px 0px;
+}
+
+.cluster-map-header-index-icon {
+	padding-right: 5px;
+}
+
 .cluster-map-header-cluster-actions {
 	font-size: 32px;
 	vertical-align: middle !important;
@@ -17,16 +34,27 @@ a.cluster-map-header-cluster-action {
 	text-decoration: none;
 }
 .cluster-map-header-index-cell {
-	width: 230px !important;
-	max-width: 230px !important;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
 	border-bottom: 0px !important;
 }
+
+.closed-index {
+	color: #D0D0D0 !important;
+	font-weight: 300 !important;
+}
+
+.closed-index-cell {
+	background: #F9F9F9;
+}
+
 .cluster-map-header-index-name {
-	word-wrap:break-word;
+	overflow: hidden;
+	white-space: nowrap;
 	font-weight: 500;
+	text-overflow: ellipsis;
+	display: block;
 }
 .cluster-map-header-index-alias {
 	word-wrap:break-word;
@@ -37,6 +65,19 @@ a.cluster-map-header-cluster-action {
 .cluster-map-header-index-actions {
 	padding: 6px;
 }
+.cluster-map-header-index-name {
+	color: #555555;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+}
+a.cluster-map-header-index-name:hover {
+	color: #555555;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+}
+
 .cluster-map-header-index-action {
 	color: #555555;
 	font-size: 12px;
@@ -52,18 +93,28 @@ a.cluster-map-header-index-action:hover {
 .cluster-map-node-name {
 	word-wrap:break-word;
 	font-weight: 500;
+	font-size: 13px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	display: block;
 }
 .cluster-map-node-types {
-	padding-top: 5px;
-	padding-left: 0px;
-	font-size: 12px;
+	padding-top: 4px;
 }
 .cluster-map-node-type {
-	padding-right: 12px;
+	font-weight: 300;
+	padding-left: 5px;
+	font-size: 12px;
+}
+.cluster-overview-filter {
+	padding-bottom: 10px;
+}
+.node-type-icon {
+	padding-left: 2px;
+	padding-right: 2px;
 }
 .cluster-map-node-cell {
 	width: 220px;
-	max-width: 220px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
@@ -92,8 +143,8 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-pagination {
 	padding-top: 5px;
-	font-weight: 400;
-	height: 30px;
+	font-weight: 300;
+	font-size: 12px;
 }
 .cluster-map-node-action {
 	color: #555555;
@@ -117,35 +168,30 @@ a.cluster-map-node-action {
 }
 .cluster-map-stats-section {
 	background: #f9f9f9;
-	text-align: justify;
-	padding-left: 15px;
-	padding-right: 15px;
-	border: 1px solid #dddddd;
-	border-radius: 3px 3px 3px 3px;
-	height: 50px;
-	margin-bottom: 40px;
-	margin-top: 20px;
+	padding-left: 10px;
+	border: 1px solid #ccc;
+	margin-top: 10px;
+	border-radius: 4px 4px 4px 4px;
+	margin-bottom: 30px;
 }
 .cluster-map-stat-block {
 	display: inline-block;
-	padding-top: 3px;
 }
 .cluster-map-stats-section:after {
 	content: "";
 	width: 100%;
-	display: inline-block;
 }
 .cluster-map-stat-number {
 	color: #555555;
-	font-size: 28px;
+	font-size: 20px;
 	text-align: center;
-	font-weight: 600;
+	font-weight: 500;
 }
 .cluster-map-stat-description {
 	color: #555555;
-	font-size: 18px;
+	font-size: 12px;
 	text-align: center;
-	font-weight: 200;
+	font-weight: 300;
 }
 .shard {
 	text-align: center;
@@ -218,8 +264,6 @@ a.header-action:hover {
 }
 
 .header-index-cell {
-    max-width: 230px;
-    min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	background: #f9f9f9;
@@ -266,8 +310,6 @@ a.header-index-action-mini:hover {
 	text-decoration: none;
 }
 .shards {
-    max-width: 230px;
-    min-width: 230px;
 	max-height: 40px !important;
 	vertical-align: top !important;
 	word-wrap:break-word;

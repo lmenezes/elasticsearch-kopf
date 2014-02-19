@@ -114,7 +114,7 @@ h4 { color: #666; font-variant:small-caps; font-weight: 500; }
 h5 { color: #777; font-variant:small-caps; font-weight: 500; }
 h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
-#page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 0px 60px; }
+#page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 25px 60px; }
 
 .settings-section-header {
 	top: 15px;
@@ -187,9 +187,13 @@ html,body {
 .alert-block {
 	font-size: 12px;
 	font-weight: 300;
-	padding-top: 0px;
+	padding-top: 10px;
 	padding-bottom: 0px;
 	text-align: left;
+}
+
+.alert {
+	margin-bottom: 0px;
 }
 .alert-server-response {
 	padding-top: 25px;

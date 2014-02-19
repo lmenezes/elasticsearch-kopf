@@ -1,10 +1,10 @@
-function Shard(shard_info) {
-	this.info = shard_info;
-	this.primary = shard_info.routing.primary;
-	this.shard = shard_info.routing.shard;
-	this.state = shard_info.routing.state;
-	this.node = shard_info.routing.node;
-	this.index = shard_info.routing.index;
+function Shard(shard_routing, shard_info) {
+	this.info = isDefined(shard_info) ? shard_info : shard_routing;
+	this.primary = shard_routing.primary;
+	this.shard = shard_routing.shard;
+	this.state = shard_routing.state;
+	this.node = shard_routing.node;
+	this.index = shard_routing.index;
 	this.id = this.node + "_" + this.shard + "_" + this.index;
 }
 

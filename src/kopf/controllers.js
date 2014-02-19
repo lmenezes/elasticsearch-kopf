@@ -146,10 +146,11 @@ function AliasesPagination(page, results) {
 
 function ClusterNavigation() {
 	this.page = 1;
-	this.page_size = 4; // TODO: allow to change it?
+	this.page_size = 5; // TODO: move it to a single place?
 
 	this.query = "";
 	this.previous_query = null;
+	this.hide_special = true;
 	
 	this.data = true;
 	this.master = true;
@@ -163,35 +164,4 @@ function ModalControls() {
 	this.active = false;
 	this.title = '';
 	this.info = '';
-}
-
-function hierachyJson(json) {
-	var jsonObject = JSON.parse(json);
-	var resultObject = {};
-	Object.keys(jsonObject).forEach(function(key) {
-		var parts = key.split(".");
-		var property = null;
-		var reference = resultObject;
-		var previous = null;
-		for (var i = 0; i<parts.length; i++) {
-			if (i == parts.length - 1) {
-				if (isNaN(parts[i])) {
-					reference[parts[i]] = jsonObject[key];	
-				} else {
-					if (!(previous[property] instanceof Array)) {
-						previous[property] = [];
-					}
-					previous[property].push(jsonObject[key]);
-				}
-			} else {
-				property = parts[i];
-				if (!isDefined(reference[property])) {
-					reference[property] = {};
-				}
-				previous = reference;
-				reference = reference[property];
-			}
-		}
-	});
-	return JSON.stringify(resultObject,undefined,4);
 }

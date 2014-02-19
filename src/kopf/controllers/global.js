@@ -1,11 +1,19 @@
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.5.1";
+	$scope.version = "0.5.2";
 	$scope.username = null;
 	$scope.password = null;
-	$scope.alerts_service = AlertService;
+	$scope.alert_service = AlertService;
+	
+	$scope.home_screen=function() {
+		$('#cluster_option a').tab('show');
+	};
 	
 	$scope.setConnected=function(status) {
+		if (!status) {
+			$scope.cluster = null;
+			$scope.cluster_health = null;
+		}
 		$scope.is_connected = status;
 	};
 
@@ -19,38 +27,39 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	};
 	
 	$scope.setHost=function(url) {
-		var exp = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
-		// expected: "http://user:password@host", "http", "user", "password", "host"]
-		var url_parts = exp.exec(url);
-		if (isDefined(url_parts)) {
-			$scope.host = url_parts[1] + "://" + url_parts[4];
-			$scope.username = url_parts[2];
-			$scope.password = url_parts[3];
-		} else {
-			$scope.username = null;
-			$scope.password = null;
-			$scope.host = url;
+		if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+			url = "http://" + url;
 		}
+		$scope.connection = new ESConnection(url);
 		$scope.setConnected(false);
 		try {
-			$scope.client = new ElasticClient($scope.host,$scope.username,$scope.password);
-			$scope.broadcastMessage('hostChanged',{});	
+			$scope.client = new ElasticClient($scope.connection);
+			$scope.home_screen();
 		} catch (error) {
+			$scope.client = null;
 			AlertService.error(error);
 		}
-		
 	};
 	
-	if ($location.host() === "") { // when opening from filesystem
-		$scope.setHost("http://localhost:9200");
-	} else {
-		var location = $scope.readParameter('location');
-		if (isDefined(location)) {
-			$scope.setHost(location);
+	$scope.connect=function() {
+		// when opening from filesystem, just try default ES location
+		if ($location.host() === "") {
+			$scope.setHost("http://localhost:9200");
 		} else {
-			$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
-		}
-	}
+			var location = $scope.readParameter('location');
+			// reads ES location from url parameter
+			if (isDefined(location)) {
+				$scope.setHost(location);
+			} else { // uses current location as ES location
+				var absUrl = $location.absUrl();
+				var cutIndex = absUrl.indexOf("/_plugin/kopf");
+				$scope.setHost(absUrl.substring(0,cutIndex));
+			}
+		}		
+	};
+	
+	$scope.connect();
+
 	$scope.modal = new ModalControls();
 	$scope.alert = null;
 	$scope.is_connected = false;
@@ -66,6 +75,14 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 				if (changes.hasLeaves()) {
 					var leaves = changes.nodeLeaves.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
 					AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
+				}
+				if (changes.hasCreatedIndices()) {
+					var created = changes.indicesCreated.map(function(index) { return index.name; });
+					AlertService.info(changes.indicesCreated.length + " indices created: [" + created.join(",") + "]");
+				}
+				if (changes.hasDeletedIndices()) {
+					var deleted = changes.indicesDeleted.map(function(index) { return index.name; });
+					AlertService.info(changes.indicesDeleted.length + " indices deleted: [" + deleted.join(",") + "]");
 				}
 			}
 		}
@@ -123,18 +140,10 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		return $('#' + tab).hasClass('active');
 	};
 	
-	$scope.getHost=function() {
-		return $scope.host;
-	};
-	
 	$scope.displayInfo=function(title,info) {
 		$scope.modal.title = title;
 		$scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
 		$('#modal_info').modal({show:true,backdrop:true});
-	};
-	
-	$scope.isInModal=function() {
-		return ($('.modal-backdrop').length > 0);
 	};
 	
 	$scope.getCurrentTime=function() {
@@ -151,5 +160,5 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.updateModel=function(action) {
 		$scope.$apply(action);
 	};
-	
+
 }

@@ -2,13 +2,11 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;
 	var index_shards = {};
 	this.shards = index_shards;
-	this.state = index_metadata.state;
 	this.metadata = {};
-	this.aliases = index_metadata.aliases;
-	this.total_aliases = isDefined(index_metadata.aliases) ? index_metadata.aliases.length : 0;
-	this.visibleAliases=function() {
-		return this.total_aliases > 5 ? this.aliases.slice(0,5) : this.aliases;
-	};
+	this.aliases = getProperty(index_metadata,'aliases', []);
+
+	this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
+	
 	this.settings = index_metadata.settings;
 	// FIXME: 0.90/1.0 check
 	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
@@ -17,55 +15,49 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.metadata.mappings = this.mappings;
 
 	// FIXME: 0.90/1.0 check
-	if (isDefined(index_metadata.settings['index.number_of_shards'])) {
-		this.num_of_shards = index_metadata.settings['index.number_of_shards'];
-		this.num_of_replicas = parseInt(index_metadata.settings['index.number_of_replicas']);
-	} else {
-		this.num_of_shards = index_metadata.settings.index.number_of_shards;
-		this.num_of_replicas = parseInt(index_metadata.settings.index.number_of_replicas);
-	}
+	this.num_of_shards = getProperty(index_metadata.settings, 'index.number_of_shards');
+	this.num_of_replicas = parseInt(getProperty(index_metadata.settings, 'index.number_of_replicas'));
+	this.state = index_metadata.state;
 	
-	this.state_class = index_metadata.state === "open" ? "success" : "active";
-	this.visible = true;
+	this.num_docs = getProperty(index_status, 'docs.num_docs', 0);
+	this.max_doc = getProperty(index_status, 'docs.max_doc', 0);
+	this.deleted_docs = getProperty(index_status, 'docs.deleted_docs', 0);
+	this.size = getProperty(index_status, 'index.primary_size_in_bytes', 0);
+	this.total_size = getProperty(index_status, 'index.size_in_bytes', 0);	
+	this.size_in_bytes = readablizeBytes(this.size);
+	this.total_size_in_bytes = readablizeBytes(this.total_size);
+	
 	var unassigned = [];
 
 	// adds shard information
-	if (isDefined(index_status)) {
-		$.map(index_status.shards, function(shards, shard_num) {
-			$.map(shards, function(shard_info, shard_copy) {
-				if (!isDefined(index_shards[shard_info.routing.node])) {
-					index_shards[shard_info.routing.node] = [];
+	
+	if (isDefined(index_info)) {
+		$.map(index_info.shards, function(shards, shard_num) {
+			$.map(shards, function(shard_routing, shard_copy) {
+				if (shard_routing.node === null) {
+					unassigned.push(new UnassignedShard(shard_routing));	
+				} else {
+					if (!isDefined(index_shards[shard_routing.node])) {
+						index_shards[shard_routing.node] = [];
+					}
+					var shard_status = null;
+					if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
+						index_status.shards[shard_routing.shard].forEach(function(status) {
+							if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
+								shard_status = status;
+							}
+						});
+					}
+					index_shards[shard_routing.node].push(new Shard(shard_routing, shard_status));				
 				}
-				index_shards[shard_info.routing.node].push(new Shard(shard_info));
 			});
 		});
-		this.metadata.stats = index_status;
 	}
-	// adds unassigned shards information
-	if (index_info) {
-		Object.keys(index_info.shards).forEach(function(x) { 
-			var shards_info = index_info.shards[x];
-			shards_info.forEach(function(shard_info) {
-				if (shard_info.state === 'UNASSIGNED') {
-					unassigned.push(new UnassignedShard(shard_info));	
-				}
-			});
-		});
-	}
-
 
 	this.unassigned = unassigned;
-	var has_status = this.state === 'open' && isDefined(index_status);
-	this.num_docs = has_status && isDefined(index_status.docs) ? index_status.docs.num_docs : 0;
-	this.max_doc = has_status && isDefined(index_status.docs) ? index_status.docs.max_doc : 0;
-	this.deleted_docs = has_status && isDefined(index_status.docs) ? index_status.docs.deleted_docs : 0;
-	this.size = has_status ? index_status.index.primary_size_in_bytes : 0;
-	this.total_size = has_status ? index_status.index.size_in_bytes : 0;
 	
-	this.size_in_bytes = readablizeBytes(this.size);
-	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	this.settingsAsString=function() {
-		return hierachyJson(JSON.stringify(this.metadata, undefined, ""));
+		return prettyPrintObject(this.metadata);
 	};
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
@@ -125,5 +117,24 @@ function Index(index_name,index_info, index_metadata, index_status) {
 		} else {
 			return [];
 		}
+	};
+	
+	this.isSpecial=function() {
+		return (
+			this.name.indexOf(".") === 0 ||
+			this.name.indexOf("_") === 0
+		);
+	};
+	
+	this.equals=function(index) {
+		return index.name == this.name;
+	};
+	
+	this.closed=function() {
+		return this.state === "close";
+	};
+	
+	this.open=function() {
+		return this.state === "open";
 	};
 }

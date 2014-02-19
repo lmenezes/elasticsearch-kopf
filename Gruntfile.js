@@ -7,13 +7,13 @@ module.exports = function(grunt) {
 			}
 		},
 		watch: {
-		  scripts: {
-		    files: ['src/kopf/**/*.*','src/kopf/*.*'],
-		    tasks: ['build'],
-		    options: {
-		      spawn: false,
-		    },
-		  },
+			scripts: {
+					files: ['src/kopf/**/*.*','src/kopf/*.*'],
+					tasks: ['build'],
+					options: {
+					spawn: false,
+				},
+			},
 		},
 		copy: {
 			main: {
@@ -50,6 +50,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/cluster_settings.js',
 					'src/kopf/elastic/cluster.js',
 					'src/kopf/elastic/elastic_client.js',
+					'src/kopf/elastic/es_connection.js',
 					'src/kopf/elastic/index.js',
 					'src/kopf/elastic/editable_index_settings.js',
 					'src/kopf/elastic/node.js',
@@ -75,8 +76,10 @@ module.exports = function(grunt) {
 					// SERVICES
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',
+					'src/kopf/services/aceeditor.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js',
+					'src/kopf/models/gist.js',
 					// UTIL
 					'src/kopf/util.js',
 					
@@ -152,7 +155,10 @@ module.exports = function(grunt) {
 		},
 		qunit: {
 			all: ['tests/all.html']
-		}
+		},
+		karma: {
+			unit: { configFile: 'tests/karma.config.js', keepalive: true },
+		},
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -161,7 +167,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
+	grunt.loadNpmTasks('grunt-karma');
+	grunt.registerTask('dev', ['karma', 'watch'])
+	grunt.registerTask('test', ['karma'])
 	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat']);
 	grunt.registerTask('server', ['clean', 'jshint', 'qunit', 'copy', 'concat','connect:server']);
-
 };

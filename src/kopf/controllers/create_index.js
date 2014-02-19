@@ -1,5 +1,4 @@
 function CreateIndexController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
@@ -7,10 +6,6 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 	$scope.indices = [];
 
 	$scope.editor = new AceEditor('index-settings-editor');
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
 	
     $scope.$on('loadCreateIndex', function() {
 		$('#create_index_option a').tab('show');
@@ -49,9 +44,6 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 			}
 			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
-					$scope.updateModel(function() {
-						AlertService.success('Index successfully created', response);
-					});
 					$scope.refreshClusterState();
 				}, function(error) { 
 					$scope.updateModel(function() {

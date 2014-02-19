@@ -1,10 +1,5 @@
 function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
-	$scope.alert_service = AlertService;
 	$scope.service = IndexSettingsService;
-	
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
 
 	$scope.save=function() {
 		var index = $scope.service.index;
@@ -18,13 +13,13 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 		$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
 			function(response) {
 				$scope.updateModel(function() {
-					$scope.alert_service.success("Index settings were successfully updated", response);
+					AlertService.success("Index settings were successfully updated", response);
 				});
 				$scope.refreshClusterState();
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.alert_service.error("Error while updating index settings", error);
+					AlertService.error("Error while updating index settings", error);
 				});
 			}
 		);

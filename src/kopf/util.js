@@ -13,25 +13,16 @@ function readablizeBytes(bytes) {
 // Example: get the value of object[a][b][c][d]
 // where property_path is [a,b,c,d]
 function getProperty(object, property_path, default_value) {
-	var value = default_value;
-	if (isDefined(object[property_path])) {
-		return object[property_path];
-	}
-	var path_parts = property_path.split('.');
-	var ref = object;
-	for (var i = 0; i < path_parts.length; i++) {
-		var property = path_parts[i];
-		if (isDefined(ref[property])) {
-			ref = ref[property];
-		} else {
-			ref = null;
-			break;
+	if (isDefined(object)) {
+		if (isDefined(object[property_path])) {
+			return object[property_path];
+		}
+		var path_parts = property_path.split('.'); // path as nested properties
+		for (var i = 0; i < path_parts.length && isDefined(object); i++) {
+			object = object[path_parts[i]];
 		}
 	}
-	if (isDefined(ref)) {
-		value = ref;
-	}
-	return value;
+	return isDefined(object) ? object : default_value;
 }
 
 // Checks if value is both non null and undefined
@@ -48,4 +39,34 @@ function notEmpty(value) {
 // Returns the given date as a String formatted as hh:MM:ss
 function getTimeString(date) {
 	return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
+}
+
+function prettyPrintObject(object) {
+	var prettyObject = {};
+	Object.keys(object).forEach(function(key) {
+		var parts = key.split(".");
+		var property = null;
+		var reference = prettyObject;
+		var previous = null;
+		for (var i = 0; i<parts.length; i++) {
+			if (i == parts.length - 1) {
+				if (isNaN(parts[i])) {
+					reference[parts[i]] = object[key];	
+				} else {
+					if (!(previous[property] instanceof Array)) {
+						previous[property] = [];
+					}
+					previous[property].push(object[key]);
+				}
+			} else {
+				property = parts[i];
+				if (!isDefined(reference[property])) {
+					reference[property] = {};
+				}
+				previous = reference;
+				reference = reference[property];
+			}
+		}
+	});
+	return JSON.stringify(prettyObject,undefined,4);
 }

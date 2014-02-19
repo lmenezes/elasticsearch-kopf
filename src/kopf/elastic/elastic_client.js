@@ -1,7 +1,7 @@
-function ElasticClient(host,username,password) {
-	this.host = host;
-	this.username = username;
-	this.password = password;
+function ElasticClient(connection) {
+	this.host = connection.host;
+	this.username = connection.username;
+	this.password = connection.password;
 	
 	this.createAuthToken=function(username,password) {
 		var auth = null;
@@ -11,10 +11,10 @@ function ElasticClient(host,username,password) {
 		return auth;
 	};
 	
-	var auth = this.createAuthToken(username,password);
+	var auth = this.createAuthToken(connection.username, connection.password);
 	var fetch_version = $.ajax({
 		type: 'GET',
-		url: host,
+		url: connection.host,
 		beforeSend: function(xhr) { 
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
@@ -219,8 +219,8 @@ function ElasticClient(host,username,password) {
 		this.executeElasticRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
 	};
 
-	this.restoreSnapshot=function(repository, snapshot, callback_success, callback_error){
-		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", {}, callback_success, callback_error);
+	this.restoreSnapshot=function(repository, snapshot, body, callback_success, callback_error){
+		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", body, callback_success, callback_error);
 	};
 
 	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
@@ -338,50 +338,77 @@ function ElasticClient(host,username,password) {
 		);
 	};
 
-	this.getClusterDiagnosis=function(callback_success,callback_error) {
+	this.getClusterDiagnosis=function(health, state, stats, hotthreads, callback_success,callback_error) {
 		var host = this.host;
 		var auth = this.createAuthToken(this.username,this.password);
-		$.when(
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_cluster/state", 
-				dataType: 'json', 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_nodes/stats?all=true", 
-				dataType: 'json', 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_nodes/hot_threads", 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			})
-		).then(
-				function(state, stats, hot_threads) {
-					callback_success(state[0], stats[0], hot_threads[0]);
-				},
-				function(failed_request) {
-					callback_error(failed_request);
-				}
+		var deferreds = [];
+		if (health) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_cluster/health", 
+					dataType: 'json', 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})
 			);
+		}
+		if (state) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_cluster/state", 
+					dataType: 'json', 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})
+			);
+		}
+		if (stats) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_nodes/stats?all=true", 
+					dataType: 'json', 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})
+			);
+		}
+		if (hotthreads) {
+			deferreds.push(
+				$.ajax({ 
+					type: 'GET', 
+					url: host+"/_nodes/hot_threads", 
+					data: {},
+					beforeSend: function(xhr) { 
+						if (isDefined(auth)) {
+							xhr.setRequestHeader("Authorization", auth);
+						} 
+					}
+				})	
+			);
+		}
+		$.when.apply($, deferreds).then(
+			function() {
+				callback_success(arguments);
+			},
+			function(failed_request) {
+				callback_error(failed_request);
+			}
+		);
 	};
 }
 

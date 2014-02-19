@@ -1,7 +1,6 @@
-function RestController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
+function RestController($scope, $location, $timeout, AlertService, AceEditorService) {
 	
-	$scope.request = new Request($scope.getHost() + "/_search","GET","{}");
+	$scope.request = new Request($scope.connection.host + "/_search","GET","{}");
 	$scope.validation_error = null;
 
 	$scope.loadHistory=function() {
@@ -14,16 +13,19 @@ function RestController($scope, $location, $timeout, AlertService) {
 			} catch (error) {
 				localStorage.kopf_request_history = null;
 			}
-		} 
+		}
 		return history;
 	};
 	
 	$scope.history = $scope.loadHistory();
 	$scope.history_request = null;
-		
-	$scope.editor = new AceEditor('rest-client-editor');
+
+	if(!angular.isDefined($scope.editor)){
+		$scope.editor = AceEditorService.init('rest-client-editor');
+	}
+
 	$scope.editor.setValue($scope.request.body);
-	
+
 	$scope.loadFromHistory=function(history_request) {
 		$scope.request.url = history_request.url;
 		$scope.request.body = history_request.body;
@@ -45,7 +47,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 			if ($scope.history.length > 30) {
 				$scope.history.length = 30;
 			}
-			localStorage.kopf_request_history = JSON.stringify($scope.history);			
+			localStorage.kopf_request_history = JSON.stringify($scope.history);
 		}
 	};
 
@@ -55,7 +57,7 @@ function RestController($scope, $location, $timeout, AlertService) {
 		if (!isDefined($scope.editor.error) && notEmpty($scope.request.url)) {
 			// TODO: deal with basic auth here
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
-				$scope.alert_service.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
+				AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 			}
 			$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
 				function(response) {
@@ -74,9 +76,9 @@ function RestController($scope, $location, $timeout, AlertService) {
 				function(error) {
 					$scope.updateModel(function() {
 						if (error.status !== 0) {
-							$scope.alert_service.error("Request was not successful: " + error.statusText);
+							AlertService.error("Request was not successful: " + error.statusText);
 						} else {
-							$scope.alert_service.error($scope.request.url + " is unreachable");	
+							AlertService.error($scope.request.url + " is unreachable");
 						}
 					});
 					try {

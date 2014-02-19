@@ -1,12 +1,6 @@
-function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService) {
-	$scope.alert_service = AlertService;	
+function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.dialog_service = ConfirmDialogService;
-	
-	$scope.editor = ace.edit("warmup-query-editor");
-	$scope.editor.setFontSize("10px");
-	$scope.editor.setTheme("ace/theme/kopf");
-	$scope.editor.getSession().setMode("ace/mode/json");
-
+	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.warmers = {};
 	$scope.index = null;
@@ -20,8 +14,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
     $scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
+		$scope.initEditor();
     });
 	
+	$scope.initEditor=function(){
+		if(!angular.isDefined($scope.editor)){
+			$scope.editor = AceEditorService.init('warmup-query-editor');
+		}
+	};
+
 	$scope.totalWarmers=function() {
 		return Object.keys($scope.warmers).length;
 	};
@@ -36,12 +37,12 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.alert_service.success("Warmup query successfully registered", response);						
+						AlertService.success("Warmup query successfully registered", response);
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Request did not return a valid JSON", error);						
+						AlertService.error("Request did not return a valid JSON", error);
 					});
 				}
 			);
@@ -57,13 +58,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
 					function(response) {
 						$scope.updateModel(function() {
-							$scope.alert_service.success("Warmup query successfully deleted", response);
+							AlertService.success("Warmup query successfully deleted", response);
 							$scope.loadIndexWarmers();
 						});
 					},
 					function(error) {
 						$scope.updateModel(function() {
-							$scope.alert_service.error("Error while deleting warmup query", error);
+							AlertService.error("Error while deleting warmup query", error);
 						});
 					}
 				);
@@ -85,7 +86,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				},
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while fetching warmup queries", error);
+						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
 			);

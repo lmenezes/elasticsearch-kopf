@@ -2,23 +2,23 @@
 	<!-- cluster actions -->
 	<th class="cluster-map-header-cluster-actions">
 		<div class="row">
-			<div class="col-lg-3">
+			<div class="col-sm-3 col-xs-6">
 				<a href="#" class="cluster-map-header-cluster-action" ng-click="selectTab('loadCreateIndex')">
 					<i class="icon-file-alt" title="create new index"></i>
 				</a>
 			</div>
-			<div class="col-lg-3">
+			<div class="col-sm-3 col-xs-6">
 				<a class="cluster-map-header-cluster-action">
 					<i class="icon-lock" ng-show="cluster.disableAllocation === 'true'" ng-click="enableAllocation()" title="enabled shard allocation"></i>
 					<i class="icon-unlock-alt" ng-show="cluster.disableAllocation !== 'true'" ng-click="disableAllocation()" title="disable shard allocation"></i>
 				</a>
 			</div>
-			<div class="col-lg-3">
+			<div class="col-sm-3 col-xs-6">
 				<a href="#" ng-click="selectTab('loadClusterSettingsEvent')" class="cluster-map-header-cluster-action">
-					<i class="icon-cogs" title="cluster settings"></i>
+					<i class="icon-cog" title="cluster settings"></i>
 				</a>
 			</div>
-			<div class="col-lg-3">
+			<div class="col-sm-3 col-xs-6">
 				<a href="#" ng-click="selectTab('loadClusterHealth')" class="cluster-map-header-cluster-action">
 					<i class="icon-stethoscope" title="cluster health information"></i>
 				</a>
@@ -26,70 +26,9 @@
 		</div>
 	</th>
 	<!-- indices -->
-	<th class="cluster-map-header-index-cell" ng-repeat="index in getPage()">
-		<!-- index name -->
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="cluster-map-header-index-name normal-action" ng-click="displayInfo('settings for index ' + index.name,index.metadata)" title="view index information">{{index.name}}</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="cluster-map-header-index-alias">
-					<span title="{{index.num_of_shards}} shards and {{index.num_of_replicas}} replicas">shards: {{index.num_of_shards}} * {{index.num_of_replicas + 1}} |</span>
-					<span title="{{index.num_docs}} docs, {{index.max_doc}} max docs, {{index.deleted_docs}} deleted docs">docs: {{index.num_docs}} |</span> 
-					<span title="size: {{index.size_in_bytes}}, total size: {{index.total_size_in_bytes}}">size: {{index.size_in_bytes}}</span>
-				</div>
-			</div>	
-		</div>
-		<!-- index actions -->
-		<div class="row cluster-map-header-index-actions">
-				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static">
-						<i ng-show="index.state == 'close'" class="icon-folder-close" title="open index" ng-click="openIndex(index.name)"></i>
-						<i ng-show="index.state == 'open'" class="icon-folder-open" title="close index" ng-click="closeIndex(index.name)"></i>
-					</a>
-				</div>
-				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="optimize index" data-backdrop="static">
-						<i class="icon-wrench" ng-click="optimizeIndex(index.name)"></i>
-					</a>
-				</div>
-				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="refresh index" data-backdrop="static">
-						<i class="icon-refresh" ng-click="refreshIndex(index.name)"></i>
-					</a>
-				</div>
-				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="clear index cache" data-backdrop="static" data-keyboard="false">
-						<i class="icon-circle-blank" ng-click="clearCache(index.name)"></i>
-					</a>
-				</div>
-				<div class="col-lg-2">
-					<a href="#" ng-click="loadIndexSettings(index.name)" class="cluster-map-header-index-action">
-						<i class="icon-cogs"></i>
-					</a>
-				</div>		
-				<div class="col-lg-2">
-					<a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="delete index" data-backdrop="static">
-						<i class="icon-trash" ng-click="deleteIndex(index.name)"></i>
-					</a>
-				</div>	
-		</div>
-		<!-- index info -->
-		<div ng-show="index.total_aliases <= 5" class="row" ng-repeat="alias in index.visibleAliases()">
-			<div class="col-lg-12">
-				<div class="cluster-map-header-index-alias">
-					<i class="icon-tag"></i> {{alias}}
-				</div>
-			</div>
-		</div>
-		<div ng-show="index.total_aliases > 5" class="row">
-			<div class="col-lg-12">
-				<div class="cluster-map-header-index-alias">
-					<i class="icon-tags"></i> {{index.total_aliases}} total aliases
-				</div>
-			</div>
-		</div>
-	</th>
+	<th class="cluster-map-header-index-cell" ng-init="position = 0" ng-include src="'partials/index_header.html'"></th>
+	<th class="cluster-map-header-index-cell" ng-init="position = 1" ng-include src="'partials/index_header.html'"></th>
+	<th class="cluster-map-header-index-cell" ng-init="position = 2" ng-include src="'partials/index_header.html'"></th>
+	<th class="cluster-map-header-index-cell" ng-init="position = 3" ng-include src="'partials/index_header.html'"></th>
+	<th class="cluster-map-header-index-cell" ng-init="position = 4" ng-include src="'partials/index_header.html'"></th>
 </tr>

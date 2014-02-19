@@ -1,32 +1,56 @@
-<div class="cluster-map-stats-section">
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="total number of nodes in the cluster">
-	 	<span class="cluster-map-stat-number">{{cluster.number_of_nodes}}</span>
-		<span class="cluster-map-stat-description"><small>nodes</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="total number of indices on the cluster, either open or closed">
-	 	<span class="cluster-map-stat-number">{{cluster.total_indices}}</span>
-		<span class="cluster-map-stat-description"><small>indices</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="total number of shards, replicas are not taken into account">
-		<span class="cluster-map-stat-number"><small>{{cluster.shards}}</small></span>
-		<span class="cluster-map-stat-description"><small>shards</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="number of failed shards">
-	 	<span class="cluster-map-stat-number">{{cluster.failed_shards}}</span>
-		<span class="cluster-map-stat-description"><small>failed shards</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="number of unassigned shards">
-	 	<span class="cluster-map-stat-number">{{cluster.unassigned_shards}}</span>
-		<span class="cluster-map-stat-description"><small>unassigned shards</small></span>
-	</span>
-	<span class="cluster-map-stat-block tooltip-enabled" data-toggle="tooltip" data-placement="top" title="" data-original-title="total number of unique documents. replicas are not taken into account">
-	 	<span class="cluster-map-stat-number">{{cluster.num_docs}}</span>
-		<span class="cluster-map-stat-description"><small>docs</small></span>
-	</span>
-	<span class="cluster-map-stat-block" data-toggle="tooltip" data-placement="top" title="" data-original-title="total size of the cluster. replicas are taken into account">
-	 	<span class="cluster-map-stat-number">{{cluster.total_size}}</span>
-		<span class="cluster-map-stat-description"><small>total size</small></span>
-	</span>
+<div class="row">
+	<div class="col-md-12">
+		<div class="cluster-map-stats-section">
+			<div class="row">
+				<div class="col-sm-12 col-md-6">
+					<div class="row">
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="number of nodes in the cluster">
+						 	<span class="cluster-map-stat-number">{{cluster_health.number_of_nodes}}</span>
+							<span class="cluster-map-stat-description">nodes</span>
+						</div>
+				
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" data-original-title="number of indices on the cluster (open or closed)">
+						 	<span class="cluster-map-stat-number">{{cluster.total_indices}}</span>
+							<span class="cluster-map-stat-description">indices</span>
+						</div>
+				
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" data-original-title="number of shards in the cluster (closed indices are not taken into account)">
+							<span class="cluster-map-stat-number">{{cluster_health.shards}}</span>
+							<span class="cluster-map-stat-description">shards</span>
+						</div>
+				
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" data-original-title="initializing shards">
+						 	<span class="cluster-map-stat-number">{{cluster_health.initializing_shards}}</span>
+							<span class="cluster-map-stat-description">initializing</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-6">
+					<div class="row">
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" data-original-title="relocating shards">
+						 	<span class="cluster-map-stat-number">{{cluster_health.relocating_shards}}</span>
+							<span class="cluster-map-stat-description">relocating</span>
+						</div>
+				
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" data-original-title="unassigned shards">
+						 	<span class="cluster-map-stat-number">{{cluster_health.unassigned_shards}}</span>
+							<span class="cluster-map-stat-description">unassigned</span>
+						</div>
+				
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block tooltip-enabled" data-toggle="tooltip" data-placement="bottom" data-original-title="number of documents (replicas are not taken into account)">
+						 	<span class="cluster-map-stat-number">{{cluster.num_docs}}</span>
+							<span class="cluster-map-stat-description">docs</span>
+						</div>
+				
+						<div class="col-sm-3 col-xs-6 cluster-map-stat-block" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total data in the cluster(replicas are taken into account)">
+						 	<span class="cluster-map-stat-number">{{cluster.total_size}}</span>
+						</div>
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+
 </div>
 <script>  
 	$(function () { $(".cluster-map-stat-block").tooltip();});  

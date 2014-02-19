@@ -1,10 +1,5 @@
 function ClusterSettingsController($scope, $location, $timeout, AlertService) {
-	$scope.alert_service = AlertService;
 
-	$scope.back=function() {
-		$('#cluster_option a').tab('show');
-	};
-	
     $scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
@@ -18,13 +13,13 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
 				function(response) {
 					$scope.updateModel(function() {
-						$scope.alert_service.success("Cluster settings were successfully updated",response);
+						AlertService.success("Cluster settings were successfully updated",response);
 					});
 					$scope.refreshClusterState();
 				}, 
 				function(error) {
 					$scope.updateModel(function() {
-						$scope.alert_service.error("Error while updating cluster settings",error);
+						AlertService.error("Error while updating cluster settings",error);
 					});
 				}
 		);
