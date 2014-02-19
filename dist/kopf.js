@@ -1969,7 +1969,9 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			if (isDefined(location)) {
 				$scope.setHost(location);
 			} else { // uses current location as ES location
-				$scope.setHost($location.protocol() + "://" + $location.host() + ":" + $location.port());			
+				var absUrl = $location.absUrl();
+				var cutIndex = absUrl.indexOf("/_plugin/kopf");
+				$scope.setHost(absUrl.substring(0,cutIndex));
 			}
 		}		
 	};
