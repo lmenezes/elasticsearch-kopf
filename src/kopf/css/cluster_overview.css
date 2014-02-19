@@ -39,6 +39,16 @@ a.cluster-map-header-cluster-action {
 	background: #f9f9f9;
 	border-bottom: 0px !important;
 }
+
+.closed-index {
+	color: #D0D0D0 !important;
+	font-weight: 300 !important;
+}
+
+.closed-index-cell {
+	background: #F9F9F9;
+}
+
 .cluster-map-header-index-name {
 	overflow: hidden;
 	white-space: nowrap;

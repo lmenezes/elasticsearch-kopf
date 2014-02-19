@@ -34,15 +34,15 @@
 			</div>
 		</div>
 	</td>
-	<td ng-init="position = 0" ng-include src="'partials/index_body.html'"></td>
-	<td ng-init="position = 1" ng-include src="'partials/index_body.html'"></td>
-	<td ng-init="position = 2" ng-include src="'partials/index_body.html'"></td>
-	<td ng-init="position = 3" ng-include src="'partials/index_body.html'"></td>
-	<td ng-init="position = 4" ng-include src="'partials/index_body.html'"></td>
+	<td ng-init="position = 0" ng-include src="'partials/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
+	<td ng-init="position = 1" ng-include src="'partials/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
+	<td ng-init="position = 2" ng-include src="'partials/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
+	<td ng-init="position = 3" ng-include src="'partials/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
+	<td ng-init="position = 4" ng-include src="'partials/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
 </tr>
 <!-- Unassigned shards -->
 <tr>
-	<td class="node-cell">
+	<td class="node-cell closed-index-cell">
 		<div class="row">
 			<div class="col-lg-1">
 				<div class="row">
@@ -60,9 +60,9 @@
 			</div>
 		</div>
 	</td>
-	<td ng-init="position = 0" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
-	<td ng-init="position = 1" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
-	<td ng-init="position = 2" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
-	<td ng-init="position = 3" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
-	<td ng-init="position = 4" ng-include src="'partials/index_unassigned.html'" class="shards"></td>
+	<td ng-init="position = 0" ng-include src="'partials/index_unassigned.html'" class="shards closed-index-cell"></td>
+	<td ng-init="position = 1" ng-include src="'partials/index_unassigned.html'" class="shards closed-index-cell"></td>
+	<td ng-init="position = 2" ng-include src="'partials/index_unassigned.html'" class="shards closed-index-cell"></td>
+	<td ng-init="position = 3" ng-include src="'partials/index_unassigned.html'" class="shards closed-index-cell"></td>
+	<td ng-init="position = 4" ng-include src="'partials/index_unassigned.html'" class="shards closed-index-cell"></td>
 </tr>

@@ -30,27 +30,29 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	var unassigned = [];
 
 	// adds shard information
-
-	$.map(index_info.shards, function(shards, shard_num) {
-		$.map(shards, function(shard_routing, shard_copy) {
-			if (shard_routing.node === null) {
-				unassigned.push(new UnassignedShard(shard_routing));	
-			} else {
-				if (!isDefined(index_shards[shard_routing.node])) {
-					index_shards[shard_routing.node] = [];
+	
+	if (isDefined(index_info)) {
+		$.map(index_info.shards, function(shards, shard_num) {
+			$.map(shards, function(shard_routing, shard_copy) {
+				if (shard_routing.node === null) {
+					unassigned.push(new UnassignedShard(shard_routing));	
+				} else {
+					if (!isDefined(index_shards[shard_routing.node])) {
+						index_shards[shard_routing.node] = [];
+					}
+					var shard_status = null;
+					if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
+						index_status.shards[shard_routing.shard].forEach(function(status) {
+							if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
+								shard_status = status;
+							}
+						});
+					}
+					index_shards[shard_routing.node].push(new Shard(shard_routing, shard_status));				
 				}
-				var shard_status = null;
-				if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
-					index_status.shards[shard_routing.shard].forEach(function(status) {
-						if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
-							shard_status = status;
-						}
-					});
-				}
-				index_shards[shard_routing.node].push(new Shard(shard_routing, shard_status));				
-			}
+			});
 		});
-	});
+	}
 
 	this.unassigned = unassigned;
 	
@@ -126,5 +128,13 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	
 	this.equals=function(index) {
 		return index.name == this.name;
+	};
+	
+	this.closed=function() {
+		return this.state === "close";
+	};
+	
+	this.open=function() {
+		return this.state === "open";
 	};
 }
