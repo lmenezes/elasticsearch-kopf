@@ -303,7 +303,7 @@ function ElasticClient(connection) {
 	var auth = this.createAuthToken(connection.username, connection.password);
 	var fetch_version = $.ajax({
 		type: 'GET',
-		url: connection.host,
+		url: connection.host + "/",
 		beforeSend: function(xhr) { 
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
