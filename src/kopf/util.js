@@ -6,7 +6,7 @@ function readablizeBytes(bytes) {
 	} else {
 		return 0;
 	}
-};
+}
 
 // Gets the value of a nested property from an object if it exists.
 // Otherwise returns the default_value given.

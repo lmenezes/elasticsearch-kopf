@@ -81,8 +81,7 @@ module.exports = function(grunt) {
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',
 					// UTIL
-					'src/kopf/util.js',
-					
+					'src/kopf/util.js'					
 				],
 				dest: 'dist/kopf.js'
 			},
@@ -149,7 +148,11 @@ module.exports = function(grunt) {
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',
 					// MODELS
-					'src/kopf/models/ace_editor.js'
+					'src/kopf/models/ace_editor.js',
+					'src/kopf/models/gist.js',
+					'src/kopf/models/searchable_list.js',
+					// UTIL
+					'src/kopf/util.js'
 				]
 			}
 		},
