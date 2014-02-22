@@ -164,8 +164,12 @@ function ClusterSettings(settings) {
 	'cluster.routing.allocation.disable_replica_allocation'
 	];
 	var instance = this;
-	valid.forEach(function(setting) {
-		instance[setting] = getProperty(settings, setting);
+	['persistent','transient'].forEach(function(type) {
+		instance[type] = {};
+		var current_settings = settings[type];
+		valid.forEach(function(setting) {
+			instance[type][setting] = getProperty(current_settings, setting);
+		});		
 	});
 }
 function Cluster(state,status,nodes,settings) {
@@ -180,7 +184,7 @@ function Cluster(state,status,nodes,settings) {
 		} else {
 			this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
 		}
-		this.settings = $.extend({}, settings.persistent, settings.transient);
+		this.settings = settings;
 		this.master_node = state.master_node;
 		var num_nodes = 0;
 		this.nodes = Object.keys(state.nodes).map(function(x) { 
@@ -1836,28 +1840,27 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 }
 function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 
-    $scope.$on('loadClusterSettingsEvent', function() {
+	$scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
 		$(".setting-info").popover();
+		$scope.active_settings = "transient"; // remember last active?
 		$scope.settings = new ClusterSettings($scope.cluster.settings);
-    });
+	});
 
 	$scope.save=function() {
-			var new_settings = {};
-			new_settings.transient = $scope.settings;
-			var response = $scope.client.updateClusterSettings(JSON.stringify(new_settings, undefined, ""),
-				function(response) {
-					$scope.updateModel(function() {
-						AlertService.success("Cluster settings were successfully updated",response);
-					});
-					$scope.refreshClusterState();
-				}, 
-				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while updating cluster settings",error);
-					});
-				}
+		var response = $scope.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ""),
+			function(response) {
+				$scope.updateModel(function() {
+					AlertService.success("Cluster settings were successfully updated",response);
+				});
+				$scope.refreshClusterState();
+			}, 
+			function(error) {
+				$scope.updateModel(function() {
+					AlertService.error("Error while updating cluster settings",error);
+				});
+			}
 		);
 	};
 }

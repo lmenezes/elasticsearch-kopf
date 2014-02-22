@@ -22,7 +22,11 @@ function ClusterSettings(settings) {
 	'cluster.routing.allocation.disable_replica_allocation'
 	];
 	var instance = this;
-	valid.forEach(function(setting) {
-		instance[setting] = getProperty(settings, setting);
+	['persistent','transient'].forEach(function(type) {
+		instance[type] = {};
+		var current_settings = settings[type];
+		valid.forEach(function(setting) {
+			instance[type][setting] = getProperty(current_settings, setting);
+		});		
 	});
 }

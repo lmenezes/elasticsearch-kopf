@@ -46,7 +46,6 @@
 	padding-top: 10px;
 	float: right;
 	color: #666;
-	font-size: 13px;
 }
 
 
@@ -152,6 +151,8 @@ a.setting-info:hover {
 html,body {
   height: 100%;
   color: #555555;
+	font-weight: 300;
+	font-size: 12px;
 }
 
 .response-pre {
@@ -530,7 +531,7 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-type {
 	font-weight: 300;
-	padding-left: 5px;
+	padding-right: 5px;
 	font-size: 12px;
 }
 .cluster-overview-filter {
@@ -823,6 +824,8 @@ a.header-index-action-mini:hover {
 
 .navbar-nav {
 	margin-top: 0px;
+	font-weight: 400;
+	font-size: 13px;
 }
 
 .navbar-collapse {
@@ -1017,6 +1020,13 @@ a.header-index-action-mini:hover {
 	line-height: 36px;
 	padding-top: 0px;
 	padding-bottom:0px;
+	padding-left: 13px;
+	padding-right: 13px;
+}
+
+.nav-pills > li > a {
+	font-weight: 400;
+	font-size: 13px;
 }
 .rest-client-body {
 	padding-top: 10px;

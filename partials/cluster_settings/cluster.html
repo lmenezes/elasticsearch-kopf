@@ -1,41 +1,42 @@
 <div class="row">
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			blocks.read_only
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="makes the cluster read only. indices won't accept write operations and metadata can't be updated(create or delete indices)" data-original-title="blocks.read_only">
 				<i class="icon-info-sign"></i>
 			</a>
-			<select ng-model="settings['cluster.blocks.read_only']" class="form-control input-sm">
+			<select ng-model="settings[active_settings]['cluster.blocks.read_only']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
 		</div>
+	</div>
+	
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			indices.ttl.interval
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="indices.ttl.interval" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.ttl.interval']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.ttl.interval']" placeholder="">
 		</div>
 	</div>
-	
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			indices.cache.filter.size
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="indices.cache.filter.size" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.cache.filter.size']" placeholder=""/>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.cache.filter.size']" placeholder=""/>
 		</div>
 	</div>
-	
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			discovery.zen.minimum_master_nodes
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="discovery.zen.minimum_master_nodes" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['discovery.zen.minimum_master_nodes']" placeholder=""/>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['discovery.zen.minimum_master_nodes']" placeholder=""/>
 		</div>
 	</div>
 </div>

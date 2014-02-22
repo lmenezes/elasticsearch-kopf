@@ -103,7 +103,7 @@ a.cluster-map-header-index-action:hover {
 }
 .cluster-map-node-type {
 	font-weight: 300;
-	padding-left: 5px;
+	padding-right: 5px;
 	font-size: 12px;
 }
 .cluster-overview-filter {

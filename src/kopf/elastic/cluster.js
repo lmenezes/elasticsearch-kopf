@@ -10,7 +10,7 @@ function Cluster(state,status,nodes,settings) {
 		} else {
 			this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
 		}
-		this.settings = $.extend({}, settings.persistent, settings.transient);
+		this.settings = settings;
 		this.master_node = state.master_node;
 		var num_nodes = 0;
 		this.nodes = Object.keys(state.nodes).map(function(x) { 

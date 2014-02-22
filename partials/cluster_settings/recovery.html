@@ -1,54 +1,59 @@
 <div class="row">
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			concurrent_streams
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="concurrent_streams" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.recovery.concurrent_streams']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.concurrent_streams']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			compress
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="compress" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<select ng-model="settings['indices.recovery.compress']" class="form-control input-sm">
+			<select ng-model="settings[active_settings]['indices.recovery.compress']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
 		</div>
 	</div>
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			file_chunk_size
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="file_chunk_size" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.recovery.file_chunk_size']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.file_chunk_size']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			translog_ops
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="translog_ops" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.recovery.translog_ops']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.translog_ops']" placeholder="">
 		</div>
 	</div>
-	
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			ranslog_size
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="translog_size" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.recovery.translog_size']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.translog_size']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			max_bytes_per_sec
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="max_bytes_per_sec" title="">
 				<i class="icon-info-sign"></i>
 			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings['indices.recovery.max_bytes_per_sec']" placeholder="">
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.max_bytes_per_sec']" placeholder="">
 		</div>
 	</div>
 </div>
