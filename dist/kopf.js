@@ -728,7 +728,7 @@ function ESConnection(url) {
 	if (notEmpty(url)) {
 		var connection_parts = protected_url.exec(url);
 		if (isDefined(connection_parts)) {
-			this.host = connection_parts[1] + "://" + url_parts[4];
+			this.host = connection_parts[1] + "://" + connection_parts[4];
 			this.username = connection_parts[2];
 			this.password = connection_parts[3];
 		} else {
