@@ -6,6 +6,14 @@
 	text-align: left;
 	width: 100%;
 }
+html,body {
+  height: 100%;
+  color: #555555;
+	font-weight: 300;
+	font-size: 12px;
+}
+
+/** ------- **/
 /** GENERIC CONTAIENR FOR MAIN AGE */
 .content-panel {
 	padding-top: 10px;
@@ -148,12 +156,7 @@ a.setting-info:hover {
 	text-decoration: none;
 }
 
-html,body {
-  height: 100%;
-  color: #555555;
-	font-weight: 300;
-	font-size: 12px;
-}
+
 
 .response-pre {
 	font-size: 9px;
