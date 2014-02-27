@@ -41,7 +41,19 @@ test("cluster creating", function() {
 		ok(kopf_index.num_docs == 6, "Checking num docs");
 		ok(kopf_index.max_doc == 6, "Checking max doc");
 		ok(kopf_index.deleted_docs == 0, "Checking deleted docs");
+		
+		// shards
+		ok(Object.keys(kopf_index.shards).length == 1, "There is only one node with shards");
+		ok(Object.keys(kopf_index.shards)[0] == "JvYCtd57Tne-fxlK1GVHRw", "Should be in the node");
+		ok(kopf_index.shards["JvYCtd57Tne-fxlK1GVHRw"].length == 5, "There should be 5 active shards for index");
+		ok(kopf_index.unassigned.length == 5, "There should be 5 unassigned  shards for index");
 
+		kopf_index.shards["JvYCtd57Tne-fxlK1GVHRw"].forEach(function(shard) {
+			ok(shard.primary === true, "Shards should be marked as primary");
+			ok(shard.state == 'STARTED', "Shards should be started");
+			ok(shard.node == 'JvYCtd57Tne-fxlK1GVHRw', "Shards should have referece to correct node");
+		});
+				
 		// check aliases
 		ok(kopf_index.getTypes().length == 1, "Checking types length");
 		ok(kopf_index.getTypes()[0] == 'kopf', "Checking type name");
