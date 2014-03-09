@@ -1,14 +1,14 @@
 <div class="row">
 	<div class="col-lg-4">
 		<div class="form-group">
-			translog.flush_threshold_ops
+			<label class="form-label">translog.flush_threshold_ops</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when to flush based on operations" data-original-title="index.translog.flush_threshold ops" title="">
 				<i class="icon-info-sign"></i>
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.translog.flush_threshold_ops']" placeholder="">
 		</div>
 		<div class="form-group">
-			translog.flush_threshold_size
+			<label class="form-label">translog.flush_threshold_size</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when to flush based on translog (bytes) size" data-original-title="index.translog.flush_threshold_size" title="">
 				<i class="icon-info-sign"></i>
 			</a>
@@ -17,14 +17,14 @@
 	</div>
 	<div class="col-lg-4">
 		<div class="form-group">
-			translog.flush_threshold_period
+			<label class="form-label">translog.flush_threshold_period</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when to flush based on a period of not flushing" data-original-title="index.translog.flush_threshold_period" title="">
 				<i class="icon-info-sign"></i>
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.translog.flush_threshold_period']" placeholder="">
 		</div>
 		<div class="form-group">
-			translog.disable_flush
+			<label class="form-label">translog.disable_flush</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="disables flushing. Note, should be set for a short interval and then enabled." data-original-title="index.translog.disable_flush" title="">
 				<i class="icon-info-sign"></i>
 			</a>
@@ -36,7 +36,7 @@
 	</div>
 	<div class="col-lg-4">
 		<div class="form-group">
-			translog.fs.type
+			<label class="form-label">translog.fs.type</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="either simple or buffered (default)" data-original-title="index.translog.fs.type" title="">
 				<i class="icon-info-sign"></i>
 			</a>
