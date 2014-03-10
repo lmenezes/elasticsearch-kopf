@@ -11,17 +11,13 @@ html,body {
   color: #555555;
 	font-weight: 300;
 	font-size: 12px;
+	padding-top: 38px;
 }
 
 /** ------- **/
 /** GENERIC CONTAIENR FOR MAIN AGE */
 .content-panel {
 	padding-top: 10px;
-}
-
-.form-label {
-	font-size: 13px;
-	color: #666;
 }
 
 .header-row {
@@ -223,10 +219,6 @@ a.setting-info:hover {
    width: auto;
 }
 
-body {
-	padding-top: 38px;
-}
-
 .entity_settings {
 	font-size: 18px;
 }
@@ -261,10 +253,6 @@ body {
 	float: right;
 	line-height: 18px;
 	padding-left: 5px;
-}
-.content-row {
-	font-size: 13px;
-	color: #555555;
 }
 .index-settings-panel {
 	padding-top: 10px;
@@ -308,28 +296,11 @@ body {
 	padding-top: 8px;
 	padding-left: 5px;
 }
-.aliases-add-index-input {
-	font-size: 11px;
-	border: 0px;
-	border-top: 0px solid #333;
-	width: 100px;
-	line-height: 10px;
-	background: #CCCCCC;
-}
+
 .aliases-add-index-action {
 	font-size: 12px;
 }
-.aliases-new-index {
-	float: right;
-	background: #CCCCCC;
-	border: 1px solid #333;
-	border-radius: 5px 5px 5px 5px;
-	font-size: 12px;
-	margin-right: 10px;
-	padding-right: 3px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
+
 .aliases-section {
 	padding-top: 10px;
 }
@@ -1097,4 +1068,7 @@ select.input-sm-twoxheight {
 
 .form-label-repository {
 	padding-left: 15px;
+}
+.form-label {
+	color: #666;
 }

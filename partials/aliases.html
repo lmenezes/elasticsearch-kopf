@@ -95,7 +95,7 @@
 										<td class="aliases-alias-cell"><i class="icon-tag"></i> alias name</th>
 										<td><i class="icon-pushpin"></i> target indices</th>
 									</tr>
-									<tr ng-repeat="(alias_name, aliases) in pagination.getPage()" class="content-row">
+									<tr ng-repeat="(alias_name, aliases) in pagination.getPage()">
 										<td>
 											<i class="icon-remove remove-icon" ng-click="removeAlias(alias_name)"></i>
 											<span class="aliases-new-alias-input">{{alias_name}}</span>
