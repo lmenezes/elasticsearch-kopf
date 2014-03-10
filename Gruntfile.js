@@ -100,7 +100,8 @@ module.exports = function(grunt) {
 					'src/kopf/css/navbar.css',
 					'src/kopf/css/rest_client.css',
 					'src/kopf/css/warmup.css',
-					'src/kopf/css/repository.css'
+					'src/kopf/css/repository.css',
+					'src/kopf/css/light_style.css'
 				],
 				dest: 'dist/kopf.css'
 			},
