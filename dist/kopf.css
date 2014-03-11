@@ -6,14 +6,6 @@
 	text-align: left;
 	width: 100%;
 }
-html,body {
-  height: 100%;
-  color: #555555;
-	font-weight: 300;
-	font-size: 12px;
-	padding-top: 38px;
-}
-
 /** ------- **/
 /** GENERIC CONTAIENR FOR MAIN AGE */
 .content-panel {
@@ -258,8 +250,7 @@ a.setting-info:hover {
 	padding-top: 10px;
 }
 .aliases-index-alias {
-	background: #F0F0F0;
-	border: 1px solid #666;
+	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
 	margin-left: 5px;
 	padding-left: 3px;
@@ -1068,6 +1059,14 @@ select.input-sm-twoxheight {
 
 .form-label-repository {
 	padding-left: 15px;
+}
+html,body {
+  height: 100%;
+  color: #555555;
+	font-weight: 300;
+	font-size: 12px;
+	padding-top: 38px;
+	border-color: #555555;
 }
 .form-label {
 	color: #666;
