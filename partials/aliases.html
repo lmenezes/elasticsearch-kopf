@@ -12,40 +12,50 @@
 				<div id="newAlias" class="panel-collapse collapse">
 					<div class="panel-body">
 							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-sm-6">
 									<form role="form">
-									  <div class="form-group">
-									    <label class="form-label">alias name</label>
-										<input type="text" class="form-control input-sm" placeholder="alias" ng-model="new_alias.alias">
-									  </div>
-									  <div class="form-group">
-									    <label class="form-label">target index</label>
-										<select class="form-control input-sm" ng-model="new_alias.index" ng-options="i for i in aliases.indices">
-											<option value="">select index</option>
-										</select>
-									  </div>
-									  <div class="form-group">
-									    <label class="form-label">index routing</label>
-									    <input type="text" class="form-control input-sm" placeholder="index_routing value" ng-model="new_alias.index_routing">
-									  </div>
-									  <div class="form-group">
-									    <label class="form-label">search routing</label>
-										<input type="text" class="form-control input-sm" placeholder="search_routing value" ng-model="new_alias.search_routing">
-									  </div>
-									  <button type="submit" class="btn btn-primary btn-sm" ng-click="addAlias()"><i class="icon-plus-sign"></i> add</button>
+										<div class="row">
+											<div class="col-xs-6">
+											  <div class="form-group">
+											    <label class="form-label">alias name</label>
+												<input type="text" class="form-control input-sm" placeholder="alias" ng-model="new_alias.alias">
+											  </div>
+											</div>
+											<div class="col-xs-6">
+											  <div class="form-group">
+											    <label class="form-label">target index</label>
+													<select class="form-control input-sm" ng-model="new_alias.index" ng-options="i for i in aliases.indices">
+														<option value="">select index</option>
+													</select>
+											  </div>
+											</div>
+											<div class="col-xs-6">
+											  <div class="form-group">
+											    <label class="form-label">index routing</label>
+											    <input type="text" class="form-control input-sm" placeholder="index_routing value" ng-model="new_alias.index_routing">
+											  </div>
+											</div>
+											<div class="col-xs-6">
+											  <div class="form-group">
+											    <label class="form-label">search routing</label>
+												<input type="text" class="form-control input-sm" placeholder="search_routing value" ng-model="new_alias.search_routing">
+											  </div>
+											</div>
+										</div>
 									</form>
 								</div>
-								<div class="col-lg-8">
+								<div class="col-sm-6">
 									<div class="form-group">
 										<label class="form-label">filter</label>
 										<div id="alias-filter-editor" class="alias-filter-editor"></div>
 									</div>
 									<div class="row">
-										<div class="col-lg-12">
+										<div class="col-lg-12 aliases-save-changes">
 											<span class="validation-error">{{editor.error}}</span>
-											<button type="submit" class="btn btn-default input-sm pull-right" ng-click="editor.format()">
+											<button type="submit" class="btn btn-default input-sm" ng-click="editor.format()">
 												<i class="icon-align-left"></i> format body
 											</button>
+											<button type="submit" class="btn btn-primary input-sm" ng-click="addAlias()"><i class="icon-plus-sign"></i> add</button>
 										</div>
 									</div>
 								</div>
@@ -65,10 +75,10 @@
 					<div class="panel-body">
 						<div class="row">
 							<form class="form-inline" role="form">
-								<div class="col-lg-6 form-group">
+								<div class="col-xs-6 form-group">
 									<input type="text" ng-model="pagination.alias_query" class="form-control input-sm" placeholder="filter by alias name">
 								</div>
-								<div class="col-lg-6 form-group">
+								<div class="col-xs-6 form-group">
 									<input type="text" ng-model="pagination.index_query" class="form-control input-sm" placeholder="filter by index name">
 								</div>
 							</form>
