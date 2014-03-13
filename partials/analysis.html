@@ -28,7 +28,7 @@
 								</div>
 								<div class="col-sm-2">
 								  <div class="form-group">
-								    <label class="form-label">doc type</label>
+								    <label class="form-label">analyzer name</label>
 										<select class="form-control input-sm" ng-model="analyzer_analyzer" ng-options="analyzer for analyzer in analyzer_index.getAnalyzers()">
 										</select>
 								  </div>
@@ -83,7 +83,7 @@
 							</div>
 							<div class="col-sm-2">
 							  <div class="form-group">
-							    <label class="form-label">doc type</label>
+							    <label class="form-label">type</label>
 									<select class="form-control input-sm" ng-model="field_type" ng-options="type for type in field_index.getTypes(field_index)">
 									</select>
 							  </div>
@@ -91,7 +91,7 @@
 							<div class="col-sm-2">
 							  <div class="form-group">
 							    <label class="form-label">field name</label>
-									<select class="form-control input-sm" ng-model="field_index" ng-options="i as i.name for i in indices">
+									<select class="form-control input-sm" ng-model="field_field" ng-options="field for field in field_index.getFields(field_type)">
 									</select>
 							  </div>
 							</div>
