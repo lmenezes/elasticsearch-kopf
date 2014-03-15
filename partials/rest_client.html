@@ -12,13 +12,18 @@
 							</h4>
 						</div>
 						<div id="restHistory" class="panel-collapse collapse">
-							<table class="table table-striped table-hover table-condensed" style="width: 100%; margin-bottom: 0px">
-								<tr ng-repeat="h in history" ng-click="loadFromHistory(h)" title="{{h.body}}" class="normal-action" style="font-size: 13px">
-									<td style="width: 80px">{{h.timestamp}}</td>
-									<td style="width: 80px">{{h.method}}</td>
-									<td>{{h.url}}</td>
-								</tr>
-							</table>
+							<a data-toggle="collapse" data-parent="#restAccordion" href="#restHistory">
+								<span>
+									<table class="table table-striped table-hover table-condensed" style="width: 100%; margin-bottom: 0px">
+										<tr ng-repeat="h in history" ng-click="loadFromHistory(h)" title="{{h.body}}" class="normal-action">
+											<td style="width: 80px">{{h.timestamp}}</td>
+											<td style="width: 80px">{{h.method}}</td>
+											<td>{{h.url}}</td>
+										</tr>
+									</table>
+									</span>
+							</a>
+
 						</div>
 					</div>
 				</div>
