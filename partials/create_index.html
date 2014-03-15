@@ -1,39 +1,40 @@
 <div ng-controller="CreateIndexController">
 	<div class="content-panel">
 		<div class="row">
-			<div class="col-lg-6">
-				<div class="form-group">
-					<input type="text" ng-model="name" class="form-control input-sm" placeholder="New index name">
-				</div>
+			<div class="col-sm-6">
+					<div class="row">
+						<div class="col-xs-12">
+						  <div class="form-group">
+						    <label class="form-label">name</label>
+								<input type="text" ng-model="name" class="form-control input-sm" placeholder="New index name">
+						  </div>
+						</div>
+						<div class="col-sm-6">
+						  <div class="form-group">
+						    <label class="form-label">number of shards</label>
+								<input type="text" ng-model="shards" class="form-control input-sm" placeholder="# of shards" type="number">
+						  </div>
+						</div>
+						<div class="col-sm-6">
+						  <div class="form-group">
+						    <label class="form-label">number of replicas</label>
+								<input type="text" ng-model="replicas" class="form-control input-sm" placeholder="# of replicas" type="number">
+						  </div>
+						</div>
+						<div class="col-xs-12">
+						  <div class="form-group">
+						    <label class="form-label">load settings from existing index</label>
+								<select ng-model="settings" ng-options="i.settingsAsString() as i.name for i in indices" class="form-control input-sm" ng-change="updateEditor()">
+								</select>
+						  </div>
+						</div>
+					</div>
 			</div>
-			<div class="col-lg-3">
-				<div class="form-group">
-					<input type="text" ng-model="shards" class="form-control input-sm" placeholder="# of shards" type="number">
-				</div>
-			</div>
-			<div class="col-lg-3">
-				<div class="form-group">
-					<input type="text" ng-model="replicas" class="form-control input-sm" placeholder="# of replicas" type="number">
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-6">
-				<h4>Index settings</h4>
-			</div>
-			<div class="col-lg-6">
-				<div class="form-group">
-					<select ng-model="settings" ng-options="i.settingsAsString() as i.name for i in indices" class="form-control input-sm" ng-change="updateEditor()">
-						<option value="">load settings from an existing index</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="form-group">
+			<div class="col-sm-6">
+			  <div class="form-group">
+			    <label class="form-label">settings</label>
 					<div id="index-settings-editor" class="kopf-ace-editor create-index-editor"></div>
-				</div>
+			  </div>
 			</div>
 		</div>
 		<div class="row">
