@@ -49,33 +49,34 @@ a.cluster-map-header-cluster-action {
 	background: #F9F9F9;
 }
 
+.invisible-node-badge {
+	color: #F9F9F9;
+}
+
 .cluster-map-header-index-name {
 	overflow: hidden;
 	white-space: nowrap;
 	font-weight: 500;
 	text-overflow: ellipsis;
 	display: block;
+	font-size: 13px;
+	font-weight: 500;
 }
+
+a.cluster-map-header-index-name:hover {
+	text-decoration: none;
+	cursor: pointer;
+}
+
 .cluster-map-header-index-alias {
 	word-wrap:break-word;
 	font-size: 10px;
 	color: #555555;
 	font-weight: 300;
 }
+
 .cluster-map-header-index-actions {
 	padding: 6px;
-}
-.cluster-map-header-index-name {
-	color: #555555;
-	font-size: 13px;
-	font-weight: 500;
-	cursor: pointer;
-}
-a.cluster-map-header-index-name:hover {
-	color: #555555;
-	font-size: 13px;
-	font-weight: 500;
-	text-decoration: none;
 }
 
 .cluster-map-header-index-action {

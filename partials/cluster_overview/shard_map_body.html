@@ -1,36 +1,44 @@
 <tr ng-repeat="node in getNodes()">
 	<td class="cluster-map-node-cell">
 		<div class="row">
-			<div class="col-lg-1" class="cluster-map-node-badges">
-				<div ng-show="node.master">
-					<div ng-show="node.current_master"><i class="icon-star" title="current master"></i></div>
-					<div ng-show="!node.current_master"><i class="icon-star-empty" title="master eligible"></i></div>
-				</div>
-				<div><i ng-class="{true:'icon-search',false:''}[node.client]" title="client node"></i></div>
-				<div><i ng-class="{true:'icon-hdd',false:''}[node.data]" title="data node"></i></div>
-				<div><a data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action"><i class="icon-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i></a></div>
+			<div class="col-lg-12 cluster-map-header-index-name">
+				<span ng-show="node.master">
+					<i ng-show="node.current_master" class="icon-star" title="current master"></i>
+					<i ng-show="!node.current_master" class="icon-star-empty" title="master eligible"></i>
+				</span>
+				<span ng-show="!node.master">
+					<i ng-class="{true:'icon-search',false:''}[node.client]" title="client node"></i>
+					<i ng-class="{true:'icon-hdd',false:''}[node.data]" title="data node"></i>
+				</span>
+				<span class="normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)" title="view node stats">
+					{{node.name}}
+				</span>
 			</div>
-			<div class="col-lg-10">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="cluster-map-node-name normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)" title="view node stats">
-							<span class="cluster-map-header-index-name">{{node.name}}</span>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="cluster-map-node-detail">{{node.transport_address}}</div>
-						<div class="cluster-map-node-detail"><small>{{node.id}}</small></div>
-					</div>
-				</div>
-				<div class="row">
-						<div class="col-lg-12">
-							<span class="cluster-map-node-stat" title="current load average">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
-							<span class="cluster-map-node-stat" title="used heap / commited heap">heap: {{node.heap_used}}/{{node.heap_committed}}</span>
-						</div>
-					</div>
-				</div>
+			<div class="col-lg-12 cluster-map-header-index-name">
+				<span ng-show="node.master">
+					<i ng-class="{true:'icon-hdd',false:''}[node.data]" title="data node"></i>
+					<a ng-show="!node.data" data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
+						<i class="icon-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i>
+					</a>
+				</span>
+				<span ng-show="!node.master">
+					<a data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
+						<i class="icon-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i>
+					</a>
+				</span>
+				<span class="cluster-map-node-detail">{{node.transport_address}}</span>
+			</div>
+			<div class="col-lg-12 cluster-map-header-index-name">
+				<span ng-show="node.master && node.data">
+					<a data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
+						<i class="icon-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i>
+					</a>
+				</span>
+				<span ng-show="!node.master || !node.data">
+					<i class="icon-power-off invisible-node-badge"></i>
+				</span>
+				<span class="cluster-map-node-detail" title="current load average">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
+				<span class="cluster-map-node-detail" title="used heap / commited heap">heap: {{node.heap_used}}/{{node.heap_committed}}</span>
 			</div>
 		</div>
 	</td>
@@ -44,19 +52,9 @@
 <tr>
 	<td class="node-cell closed-index-cell">
 		<div class="row">
-			<div class="col-lg-1">
-				<div class="row">
-					<div class="col-lg-12">
-						<i class="icon-exclamation-sign"></i>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-10">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="cluster-map-node-name">unassigned shards</div>
-					</div>
-				</div>
+			<div class="col-lg-12 cluster-map-node-name">
+				<span><i class="icon-exclamation-sign"></i></span>
+				<span>unassigned shards</span>
 			</div>
 		</div>
 	</td>
