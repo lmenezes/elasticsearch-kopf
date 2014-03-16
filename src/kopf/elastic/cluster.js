@@ -1,4 +1,5 @@
 function Cluster(state,status,nodes,settings) {
+	this.created_at = new Date().getTime();
 	if (isDefined(state) && isDefined(status) && isDefined(nodes) && isDefined(settings)) {
 		this.disableAllocation = false;
 		if (isDefined(settings.persistent) && isDefined(settings.persistent.disable_allocation)) {
@@ -50,21 +51,24 @@ function Cluster(state,status,nodes,settings) {
 		this.failed_shards = status._shards.failed;
 		this.successful_shards = status._shards.successful;
 		this.total_size = readablizeBytes(total_size);
+		this.total_size_in_bytes = total_size;
 		this.getNodes=function(name, data, master, client) { 
 			return $.map(this.nodes,function(node) {
 				return node.matches(name, data, master, client) ? node : null;
 			});
 		};
+		
+		this.changes = null;
 
-		this.getChanges=function(new_cluster) {
+		this.computeChanges=function(old_cluster) {
 			var nodes = this.nodes;
 			var indices = this.indices;
 			var changes = new ClusterChanges();
-			if (isDefined(new_cluster)) {
+			if (isDefined(old_cluster)) {
 				// checks for node differences
-				nodes.forEach(function(node) {
-					for (var i = 0; i < new_cluster.nodes.length; i++) {
-						if (new_cluster.nodes[i].equals(node)) {
+				old_cluster.nodes.forEach(function(node) {
+					for (var i = 0; i < nodes.length; i++) {
+						if (nodes[i].equals(node)) {
 							node = null;
 							break;
 						}
@@ -73,10 +77,11 @@ function Cluster(state,status,nodes,settings) {
 						changes.addLeavingNode(node);
 					}
 				});
-				if (new_cluster.nodes.length != nodes.length || !changes.hasJoins()) {
-						new_cluster.nodes.forEach(function(node) {
-							for (var i = 0; i < nodes.length; i++) {
-								if (nodes[i].equals(node)) {
+				
+				if (old_cluster.nodes.length != nodes.length || !changes.hasJoins()) {
+						nodes.forEach(function(node) {
+							for (var i = 0; i < old_cluster.nodes.length; i++) {
+								if (old_cluster.nodes[i].equals(node)) {
 									node = null;
 									break;
 								}
@@ -86,11 +91,11 @@ function Cluster(state,status,nodes,settings) {
 						}
 					});
 				}
-				
+			
 				// checks for indices differences
-				indices.forEach(function(index) {
-					for (var i = 0; i < new_cluster.indices.length; i++) {
-						if (new_cluster.indices[i].equals(index)) {
+				old_cluster.indices.forEach(function(index) {
+					for (var i = 0; i < indices.length; i++) {
+						if (indices[i].equals(index)) {
 							index = null;
 							break;
 						}
@@ -99,10 +104,11 @@ function Cluster(state,status,nodes,settings) {
 						changes.addDeletedIndex(index);
 					}
 				});
-				if (new_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
-						new_cluster.indices.forEach(function(index) {
-							for (var i = 0; i < indices.length; i++) {
-								if (indices[i].equals(index)) {
+				
+				if (old_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
+						indices.forEach(function(index) {
+							for (var i = 0; i < old_cluster.indices.length; i++) {
+								if (old_cluster.indices[i].equals(index)) {
 									index = null;
 									break;
 								}
@@ -112,8 +118,16 @@ function Cluster(state,status,nodes,settings) {
 						}
 					});
 				}
+				
+				var docDelta = this.num_docs - old_cluster.num_docs;
+				// var docRate = docDelta / ((this.created_at - old_cluster.created_at) / 1000);
+				changes.setDocDelta(docDelta);
+				
+				var dataDelta = this.total_size_in_bytes - old_cluster.total_size_in_bytes;
+				changes.setDataDelta(dataDelta);
+			
 			}
-			return changes;
+			this.changes = changes;
 		};
 	}
 }

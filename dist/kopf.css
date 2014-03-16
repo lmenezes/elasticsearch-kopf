@@ -380,6 +380,11 @@ a.setting-info:hover {
 .cluster-health-filters {
 	padding-top: 6px;
 }
+.doc-growth-rate {
+	font-size: 9px;
+	vertical-align: top;
+	position: fixed;
+}
 table.overview {
 	table-layout:fixed;
 }

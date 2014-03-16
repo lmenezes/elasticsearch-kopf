@@ -5,6 +5,33 @@ function ClusterChanges() {
 	this.indicesCreated = null;
 	this.indicesDeleted = null;
 
+	this.docDelta = 0;
+	this.dataDelta = 0;
+	
+	this.setDocDelta=function(delta) {
+		this.docDelta = delta;
+	};
+	
+	this.getDocDelta=function() {
+		return this.docDelta;
+	};
+	
+	this.absDocDelta=function() {
+		return Math.abs(this.docDelta);
+	};
+	
+	this.absDataDelta=function() {
+		return readablizeBytes(Math.abs(this.dataDelta));
+	};
+	
+	this.getDataDelta=function() {
+		return this.dataDelta;
+	};
+	
+	this.setDataDelta=function(delta) {
+		this.dataDelta = delta;
+	};
+
 	this.hasChanges=function() {
 		return (
 			isDefined(this.nodeJoins) ||

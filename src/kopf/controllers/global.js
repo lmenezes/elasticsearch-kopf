@@ -64,9 +64,9 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	$scope.alert = null;
 	$scope.is_connected = false;
 
-	$scope.alertClusterChanges=function(cluster) {
-		if (isDefined($scope.cluster) && isDefined(cluster)) {
-			var changes = $scope.cluster.getChanges(cluster);
+	$scope.alertClusterChanges=function() {
+		if (isDefined($scope.cluster)) {
+			var changes = $scope.cluster.changes;
 			if (changes.hasChanges()) {
 				if (changes.hasJoins()) {
 					var joins = changes.nodeJoins.map(function(node) { return node.name + "[" + node.transport_address + "]"; });
@@ -94,8 +94,9 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 				$scope.client.getClusterDetail(
 					function(cluster) {
 						$scope.updateModel(function() { 
-							$scope.alertClusterChanges(cluster);
-							$scope.cluster = cluster; 
+							cluster.computeChanges($scope.cluster);
+							$scope.cluster = cluster;
+							$scope.alertClusterChanges();
 						});
 					},
 					function(error) {
