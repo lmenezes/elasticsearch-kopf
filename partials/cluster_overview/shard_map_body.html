@@ -51,11 +51,9 @@
 <!-- Unassigned shards -->
 <tr>
 	<td class="node-cell closed-index-cell">
-		<div class="row">
-			<div class="col-lg-12 cluster-map-node-name">
-				<span><i class="icon-exclamation-sign"></i></span>
-				<span>unassigned shards</span>
-			</div>
+		<div class="cluster-map-header-index-name">
+			<i class="icon-exclamation-sign"></i>
+			<span>unassigned shards</span>
 		</div>
 	</td>
 	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards closed-index-cell"></td>
