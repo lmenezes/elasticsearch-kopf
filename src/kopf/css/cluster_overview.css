@@ -1,7 +1,6 @@
-.doc-growth-rate {
+.cluster-stat-detail {
 	font-size: 9px;
-	vertical-align: top;
-	position: fixed;
+	float: left;
 }
 table.overview {
 	table-layout:fixed;
@@ -174,7 +173,7 @@ a.cluster-map-node-action {
 }
 .cluster-map-stats-section {
 	background: #f9f9f9;
-	padding-left: 10px;
+	padding-left: 50px;
 	border: 1px solid #ccc;
 	margin-top: 10px;
 	border-radius: 4px 4px 4px 4px;
