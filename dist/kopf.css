@@ -321,8 +321,8 @@ a.setting-info:hover {
 }
 .cluster-stat-detail {
 	font-size: 9px;
-	float: left;
 }
+
 table.overview {
 	table-layout:fixed;
 }
@@ -478,13 +478,17 @@ a.cluster-map-node-action {
 }
 .cluster-map-stats-section {
 	background: #f9f9f9;
-	padding-left: 50px;
 	border: 1px solid #ccc;
 	margin-top: 10px;
 	border-radius: 4px 4px 4px 4px;
 	margin-bottom: 30px;
 }
 .cluster-map-stat-block {
+	display: inline-block;
+}
+.stat-block {
+	width: 100%;
+	text-align: center;
 	display: inline-block;
 }
 .cluster-map-stats-section:after {
