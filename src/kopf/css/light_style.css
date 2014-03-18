@@ -4,7 +4,6 @@ html,body {
 	font-weight: 300;
 	font-size: 12px;
 	padding-top: 20px;
-	border-color: #555555;
 }
 .form-label {
 	color: #666;
@@ -15,3 +14,42 @@ a:link    {color:inherit;}
 a:visited {color:inherit;}
 a:hover   {color:inherit;}
 a:active  {color:inherit;}
+
+.danger-action {
+	color: #b94a48;
+}
+
+.box {
+	background: #f9f9f9;
+}
+
+.box-invisible-content {
+	color: #F9F9F9;
+}
+
+h1 { color: #555; font-variant:small-caps; font-weight: 400; }
+h2 { color: #555; font-variant:small-caps; font-weight: 400; }
+h3 { color: #555; font-variant:small-caps; font-weight: 500; }
+h4 { color: #666; font-variant:small-caps; font-weight: 500; }
+h5 { color: #777; font-variant:small-caps; font-weight: 500; }
+h6 { color: #999; font-variant:small-caps; font-weight: 500; }
+
+.kopf-ace-editor { 
+	width: auto;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+	margin-top: 10px;
+}
+
+.tooltip {
+  font-size: 13px;
+  opacity: 1.0 !important;
+} 
+
+.tooltip-inner {
+		background: #f9f9f9;
+    color: #333;
+		border: 1px solid #ccc;
+		padding: 5px 5px 5px 5px;
+}

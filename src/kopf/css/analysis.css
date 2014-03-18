@@ -1,21 +1,7 @@
 .analysis-section {
 	padding-top: 10px;
 }
-.analysis-origin-cell {
-	width: 250px;
-	max-width: 250px;
-	min-width: 250px;
-	font-size: 12px;
-	font-variant: small-caps;
-	font-weight: 300;
-	color: #666;
-}
-
-.analysis-tokens {
-
-}
 .analysis-token {
-	background: #FFF;
 	border: 1px solid #333;
 	border-radius: 1px 1px 1px 1px;
 	margin-right: 10px;
@@ -32,7 +18,6 @@
 .analysis-token-info {
 	font-size:9px;
 	display: inline;
-	color: #555;
 }
 .analysis-text-input {
 	overflow: hidden;

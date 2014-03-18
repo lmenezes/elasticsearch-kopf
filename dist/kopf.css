@@ -37,9 +37,7 @@
 .pagination-block  {
 	padding-top: 10px;
 	float: right;
-	color: #666;
 }
-
 
 .kopf-table-header {
 	font-weight: 500; 
@@ -67,10 +65,8 @@
 }
 .confirm-dialog-body {
 	background: #fff;
-	color: #666;
 	font-size: 13px;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-weight: 300;
 	border: 0px;
 	line-height: 18px;
 	margin: 0px;
@@ -82,10 +78,7 @@
 	padding: 0px;
 }
 .modal-body {
-	font-size: 12px;
-	font-weight: 400;
 	padding: 12px;
-	color: #666;
 	
 }
 .modal-footer {
@@ -103,15 +96,6 @@
 	word-break: break-word;
 }
 /** ############### END - modals - END ############### **/
-
-
-/**###################### HEADERS /**######################**/
-h1 { color: #555; font-variant:small-caps; font-weight: 400; }
-h2 { color: #555; font-variant:small-caps; font-weight: 400; }
-h3 { color: #555; font-variant:small-caps; font-weight: 500; }
-h4 { color: #666; font-variant:small-caps; font-weight: 500; }
-h5 { color: #777; font-variant:small-caps; font-weight: 500; }
-h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
 #page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 25px 60px; }
 
@@ -140,8 +124,6 @@ a.setting-info:hover {
 	text-decoration: none;
 }
 
-
-
 .response-pre {
 	font-size: 9px;
 	border: 0px;
@@ -151,13 +133,7 @@ a.setting-info:hover {
 	font-size: 9px;
 	background: #ffffff;
 }
-.kopf-ace-editor { 
-	width: auto;
-	border: 1px solid #ccc;
-	border-radius: 3px 3px 3px 3px;
-	text-align: left;
-	margin-top: 10px;
-}
+
 .connection-status-console {
 	float:right;
 	text-align: right;
@@ -221,16 +197,6 @@ a.setting-info:hover {
 	vertical-align: top;
 	margin-left: 5px;
 }
-/* TOOLTIP STYLE */
-.tooltip {
-  font-size: 13px;
-  opacity: 1.0 !important;
-} 
-.tooltip-inner {
-    background: #c0c0c0;
-    color: white;
-}
-
 .table-actions > a:hover {
 	text-decoration: none;	
 }
@@ -241,14 +207,11 @@ a.setting-info:hover {
 	line-height: 18px;
 	padding-left: 5px;
 }
+
 .details-icon {
-	color: #555;
 	float: right;
 	line-height: 18px;
 	padding-left: 5px;
-}
-.index-settings-panel {
-	padding-top: 10px;
 }
 .aliases-index-alias {
 	border: 1px solid;
@@ -276,10 +239,6 @@ a.setting-info:hover {
 
 .aliases-save-changes {
 	text-align: right;
-}
-
-.aliases-remove-alias-action {
-	color: #b94a48;
 }
 
 .aliases-remove-new-alias-action {
@@ -313,21 +272,7 @@ a.setting-info:hover {
 .analysis-section {
 	padding-top: 10px;
 }
-.analysis-origin-cell {
-	width: 250px;
-	max-width: 250px;
-	min-width: 250px;
-	font-size: 12px;
-	font-variant: small-caps;
-	font-weight: 300;
-	color: #666;
-}
-
-.analysis-tokens {
-
-}
 .analysis-token {
-	background: #FFF;
 	border: 1px solid #333;
 	border-radius: 1px 1px 1px 1px;
 	margin-right: 10px;
@@ -344,7 +289,6 @@ a.setting-info:hover {
 .analysis-token-info {
 	font-size:9px;
 	display: inline;
-	color: #555;
 }
 .analysis-text-input {
 	overflow: hidden;
@@ -352,11 +296,6 @@ a.setting-info:hover {
 }
 .cluster-health-top-actions {
 	text-align: right;
-}
-.cluster-health-state {
-	font-size: 12px;
-	font-weight: 300;
-	color: #666;
 }
 .cluster-health-content {
 	font-size: 10px;
@@ -408,35 +347,25 @@ table.overview tr td { width: 16.67%; }
 	border-bottom: 0px !important;
 }
 .cluster-map-header-cluster-action {
-	color: #555555;
 	font-size: 32px;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.cluster-map-header-cluster-action {
-	color: #555555;
+	color: inherit;
 	font-weight: 200;
 	text-decoration: none;
 }
-.cluster-map-header-index-cell {
+.index-cell {
 	max-height: 40px !important;
 	vertical-align: top !important;
-	background: #f9f9f9;
 	border-bottom: 0px !important;
 }
 
 .closed-index {
 	color: #D0D0D0 !important;
 	font-weight: 300 !important;
-}
-
-.closed-index-cell {
-	background: #F9F9F9;
-}
-
-.invisible-node-badge {
-	color: #F9F9F9;
 }
 
 .cluster-map-header-index-name {
@@ -455,9 +384,8 @@ a.cluster-map-header-index-name:hover {
 }
 
 .cluster-map-header-index-alias {
-	word-wrap:break-word;
+	word-wrap: break-word;
 	font-size: 10px;
-	color: #555555;
 	font-weight: 300;
 }
 
@@ -466,13 +394,11 @@ a.cluster-map-header-index-name:hover {
 }
 
 .cluster-map-header-index-action {
-	color: #555555;
 	font-size: 12px;
 	font-weight: 200;
 	cursor: pointer;
 }
 a.cluster-map-header-index-action:hover {
-	color: #555555;
 	font-size: 12px;
 	font-weight: 200;
 	text-decoration: none;
@@ -513,14 +439,13 @@ a.cluster-map-header-index-action:hover {
 .cluster-map-node-detail {
 	word-wrap: break-word;
 	font-size: 9px;
-	font-color: #303030 !important;
 	font-weight: normal !important;
 	padding-right: 0px;
 	text-align: left;
 }
+
 .cluster-map-node-stat {
 	font-size: 9px;
-	font-color: #303030 !important;
 	font-weight: 500 !important;
 	padding-right: 0px;
 	text-align: left;
@@ -534,13 +459,11 @@ a.cluster-map-header-index-action:hover {
 	font-size: 12px;
 }
 .cluster-map-node-action {
-	color: #555555;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.cluster-map-node-action {
-	color: #555555;
 	font-weight: 200;
 	text-decoration: none;
 }
@@ -569,13 +492,11 @@ a.cluster-map-node-action {
 	width: 100%;
 }
 .cluster-map-stat-number {
-	color: #555555;
 	font-size: 20px;
 	text-align: center;
 	font-weight: 500;
 }
 .cluster-map-stat-description {
-	color: #555555;
 	font-size: 12px;
 	text-align: center;
 	font-weight: 300;
@@ -624,77 +545,8 @@ a.cluster-map-node-action {
 }
 
 /** CLUSTER ACTIONS **/
-.cluster-action-legend {
-	font-size: 9px;
-	line-height: 10px;
-	font-weight: 400;
-	text-align: center;
-}
 .big-icon {
 	font-size: 18px;
-}
-.hide-overflow {
-	overflow: hidden; 
-	white-space: nowrap;
-}
-.header-action {
-	color: #555555;
-	font-size: 32px;
-	text-align: center;
-	vertical-align: middle;
-	cursor: pointer;
-}
-a.header-action:hover {
-	color: #555555;
-	font-weight: 200;
-	text-decoration: none;
-}
-
-.header-index-cell {
-	max-height: 40px !important;
-	vertical-align: top !important;
-	background: #f9f9f9;
-	border-bottom: 2px solid #a0a0a0;
-}
-.header-index-name {
-	vertical-align: top !important;
-}
-
-.header-index-alias {
-	font-size: 11px;
-	font-style: italic;
-	color: #808080;
-	font-weight: 300;
-}
-.header-index-details {
-	font-size: 9px;
-	font-weight: 400;
-}
-.header-index-actions {
-	padding-top: 5px;
-}
-.header-index-action {
-	color: #555555;
-	font-size: 11px;
-	font-weight: 200;
-	cursor: pointer;
-}
-a.header-index-action:hover {
-	color: #555555;
-	font-size: 11px;
-	font-weight: 200;
-	text-decoration: none;
-}
-.header-index-action-mini {
-	color: #555555;
-	font-size: 9px;
-	font-weight: 200;
-}
-a.header-index-action-mini:hover {
-	color: #555555;
-	font-size: 9px;
-	font-weight: 200;
-	text-decoration: none;
 }
 .shards {
 	max-height: 40px !important;
@@ -1017,12 +869,6 @@ a.header-index-action-mini:hover {
 .rest-client-format-body {
 	margin-top: 10px;
 }
-.rest-body-validation-error {
-	color: red;
-	padding-top: 5px;
-	font-size: 12px;
-	font-weight: 300;
-}
 .request-client-request-body-options {
 	overflow: hidden;
 	display: block;
@@ -1071,7 +917,6 @@ html,body {
 	font-weight: 300;
 	font-size: 12px;
 	padding-top: 20px;
-	border-color: #555555;
 }
 .form-label {
 	color: #666;
@@ -1082,3 +927,42 @@ a:link    {color:inherit;}
 a:visited {color:inherit;}
 a:hover   {color:inherit;}
 a:active  {color:inherit;}
+
+.danger-action {
+	color: #b94a48;
+}
+
+.box {
+	background: #f9f9f9;
+}
+
+.box-invisible-content {
+	color: #F9F9F9;
+}
+
+h1 { color: #555; font-variant:small-caps; font-weight: 400; }
+h2 { color: #555; font-variant:small-caps; font-weight: 400; }
+h3 { color: #555; font-variant:small-caps; font-weight: 500; }
+h4 { color: #666; font-variant:small-caps; font-weight: 500; }
+h5 { color: #777; font-variant:small-caps; font-weight: 500; }
+h6 { color: #999; font-variant:small-caps; font-weight: 500; }
+
+.kopf-ace-editor { 
+	width: auto;
+	border: 1px solid #ccc;
+	border-radius: 3px 3px 3px 3px;
+	text-align: left;
+	margin-top: 10px;
+}
+
+.tooltip {
+  font-size: 13px;
+  opacity: 1.0 !important;
+} 
+
+.tooltip-inner {
+		background: #f9f9f9;
+    color: #333;
+		border: 1px solid #ccc;
+		padding: 5px 5px 5px 5px;
+}

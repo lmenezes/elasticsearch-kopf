@@ -35,30 +35,30 @@
 					</a>
 				</span>
 				<span ng-show="!node.master || !node.data">
-					<i class="icon-power-off invisible-node-badge"></i>
+					<i class="icon-power-off box-invisible-content"></i>
 				</span>
 				<span class="cluster-map-node-detail" title="current load average">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
 				<span class="cluster-map-node-detail" title="used heap / commited heap">heap: {{node.heap_used}}/{{node.heap_committed}}</span>
 			</div>
 		</div>
 	</td>
-	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
-	<td ng-init="position = 1" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
-	<td ng-init="position = 2" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
-	<td ng-init="position = 3" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
-	<td ng-init="position = 4" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'closed-index-cell': index(position).closed()}"></td>
+	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 1" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 2" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 3" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 4" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
 </tr>
 <!-- Unassigned shards -->
 <tr>
-	<td class="node-cell closed-index-cell">
+	<td class="node-cell box">
 		<div class="cluster-map-header-index-name">
 			<i class="icon-exclamation-sign"></i>
 			<span>unassigned shards</span>
 		</div>
 	</td>
-	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards closed-index-cell"></td>
-	<td ng-init="position = 1" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards closed-index-cell"></td>
-	<td ng-init="position = 2" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards closed-index-cell"></td>
-	<td ng-init="position = 3" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards closed-index-cell"></td>
-	<td ng-init="position = 4" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards closed-index-cell"></td>
+	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 1" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 2" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 3" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 4" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
 </tr>

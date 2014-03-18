@@ -29,9 +29,7 @@
 .pagination-block  {
 	padding-top: 10px;
 	float: right;
-	color: #666;
 }
-
 
 .kopf-table-header {
 	font-weight: 500; 
@@ -59,10 +57,8 @@
 }
 .confirm-dialog-body {
 	background: #fff;
-	color: #666;
 	font-size: 13px;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-weight: 300;
 	border: 0px;
 	line-height: 18px;
 	margin: 0px;
@@ -74,10 +70,7 @@
 	padding: 0px;
 }
 .modal-body {
-	font-size: 12px;
-	font-weight: 400;
 	padding: 12px;
-	color: #666;
 	
 }
 .modal-footer {
@@ -95,15 +88,6 @@
 	word-break: break-word;
 }
 /** ############### END - modals - END ############### **/
-
-
-/**###################### HEADERS /**######################**/
-h1 { color: #555; font-variant:small-caps; font-weight: 400; }
-h2 { color: #555; font-variant:small-caps; font-weight: 400; }
-h3 { color: #555; font-variant:small-caps; font-weight: 500; }
-h4 { color: #666; font-variant:small-caps; font-weight: 500; }
-h5 { color: #777; font-variant:small-caps; font-weight: 500; }
-h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
 #page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 25px 60px; }
 
@@ -132,8 +116,6 @@ a.setting-info:hover {
 	text-decoration: none;
 }
 
-
-
 .response-pre {
 	font-size: 9px;
 	border: 0px;
@@ -143,13 +125,7 @@ a.setting-info:hover {
 	font-size: 9px;
 	background: #ffffff;
 }
-.kopf-ace-editor { 
-	width: auto;
-	border: 1px solid #ccc;
-	border-radius: 3px 3px 3px 3px;
-	text-align: left;
-	margin-top: 10px;
-}
+
 .connection-status-console {
 	float:right;
 	text-align: right;
@@ -213,16 +189,6 @@ a.setting-info:hover {
 	vertical-align: top;
 	margin-left: 5px;
 }
-/* TOOLTIP STYLE */
-.tooltip {
-  font-size: 13px;
-  opacity: 1.0 !important;
-} 
-.tooltip-inner {
-    background: #c0c0c0;
-    color: white;
-}
-
 .table-actions > a:hover {
 	text-decoration: none;	
 }
@@ -233,8 +199,8 @@ a.setting-info:hover {
 	line-height: 18px;
 	padding-left: 5px;
 }
+
 .details-icon {
-	color: #555;
 	float: right;
 	line-height: 18px;
 	padding-left: 5px;

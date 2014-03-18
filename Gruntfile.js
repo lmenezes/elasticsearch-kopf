@@ -90,7 +90,6 @@ module.exports = function(grunt) {
 					'src/kopf/kopf.css',
 					'src/kopf/css/percolator.css',
 					'src/kopf/css/common.css',
-					'src/kopf/css/index_settings.css',
 					'src/kopf/css/aliases.css',
 					'src/kopf/css/analysis.css',
 					'src/kopf/css/cluster_health.css',

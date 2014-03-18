@@ -26,35 +26,25 @@ table.overview tr td { width: 16.67%; }
 	border-bottom: 0px !important;
 }
 .cluster-map-header-cluster-action {
-	color: #555555;
 	font-size: 32px;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.cluster-map-header-cluster-action {
-	color: #555555;
+	color: inherit;
 	font-weight: 200;
 	text-decoration: none;
 }
-.cluster-map-header-index-cell {
+.index-cell {
 	max-height: 40px !important;
 	vertical-align: top !important;
-	background: #f9f9f9;
 	border-bottom: 0px !important;
 }
 
 .closed-index {
 	color: #D0D0D0 !important;
 	font-weight: 300 !important;
-}
-
-.closed-index-cell {
-	background: #F9F9F9;
-}
-
-.invisible-node-badge {
-	color: #F9F9F9;
 }
 
 .cluster-map-header-index-name {
@@ -73,9 +63,8 @@ a.cluster-map-header-index-name:hover {
 }
 
 .cluster-map-header-index-alias {
-	word-wrap:break-word;
+	word-wrap: break-word;
 	font-size: 10px;
-	color: #555555;
 	font-weight: 300;
 }
 
@@ -84,13 +73,11 @@ a.cluster-map-header-index-name:hover {
 }
 
 .cluster-map-header-index-action {
-	color: #555555;
 	font-size: 12px;
 	font-weight: 200;
 	cursor: pointer;
 }
 a.cluster-map-header-index-action:hover {
-	color: #555555;
 	font-size: 12px;
 	font-weight: 200;
 	text-decoration: none;
@@ -131,14 +118,13 @@ a.cluster-map-header-index-action:hover {
 .cluster-map-node-detail {
 	word-wrap: break-word;
 	font-size: 9px;
-	font-color: #303030 !important;
 	font-weight: normal !important;
 	padding-right: 0px;
 	text-align: left;
 }
+
 .cluster-map-node-stat {
 	font-size: 9px;
-	font-color: #303030 !important;
 	font-weight: 500 !important;
 	padding-right: 0px;
 	text-align: left;
@@ -152,13 +138,11 @@ a.cluster-map-header-index-action:hover {
 	font-size: 12px;
 }
 .cluster-map-node-action {
-	color: #555555;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
 }
 a.cluster-map-node-action {
-	color: #555555;
 	font-weight: 200;
 	text-decoration: none;
 }
@@ -187,13 +171,11 @@ a.cluster-map-node-action {
 	width: 100%;
 }
 .cluster-map-stat-number {
-	color: #555555;
 	font-size: 20px;
 	text-align: center;
 	font-weight: 500;
 }
 .cluster-map-stat-description {
-	color: #555555;
 	font-size: 12px;
 	text-align: center;
 	font-weight: 300;
@@ -242,77 +224,8 @@ a.cluster-map-node-action {
 }
 
 /** CLUSTER ACTIONS **/
-.cluster-action-legend {
-	font-size: 9px;
-	line-height: 10px;
-	font-weight: 400;
-	text-align: center;
-}
 .big-icon {
 	font-size: 18px;
-}
-.hide-overflow {
-	overflow: hidden; 
-	white-space: nowrap;
-}
-.header-action {
-	color: #555555;
-	font-size: 32px;
-	text-align: center;
-	vertical-align: middle;
-	cursor: pointer;
-}
-a.header-action:hover {
-	color: #555555;
-	font-weight: 200;
-	text-decoration: none;
-}
-
-.header-index-cell {
-	max-height: 40px !important;
-	vertical-align: top !important;
-	background: #f9f9f9;
-	border-bottom: 2px solid #a0a0a0;
-}
-.header-index-name {
-	vertical-align: top !important;
-}
-
-.header-index-alias {
-	font-size: 11px;
-	font-style: italic;
-	color: #808080;
-	font-weight: 300;
-}
-.header-index-details {
-	font-size: 9px;
-	font-weight: 400;
-}
-.header-index-actions {
-	padding-top: 5px;
-}
-.header-index-action {
-	color: #555555;
-	font-size: 11px;
-	font-weight: 200;
-	cursor: pointer;
-}
-a.header-index-action:hover {
-	color: #555555;
-	font-size: 11px;
-	font-weight: 200;
-	text-decoration: none;
-}
-.header-index-action-mini {
-	color: #555555;
-	font-size: 9px;
-	font-weight: 200;
-}
-a.header-index-action-mini:hover {
-	color: #555555;
-	font-size: 9px;
-	font-weight: 200;
-	text-decoration: none;
 }
 .shards {
 	max-height: 40px !important;
