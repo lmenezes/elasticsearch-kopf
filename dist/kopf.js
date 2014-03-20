@@ -1972,7 +1972,7 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 }
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.5.3";
+	$scope.version = "0.5.4";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alert_service = AlertService;
