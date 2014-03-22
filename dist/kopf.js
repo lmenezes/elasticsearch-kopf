@@ -1204,6 +1204,36 @@ function ClusterNavigation() {
 	this.client = true;
 	this.state = "";
 	this.node_name = "";
+	this.cached_result = [];
+	this.cluster_timestamp = null;	
+	
+	this.clone=function() {
+		var instance = new ClusterNavigation();
+		instance.page = this.page;
+		instance.query = this.query;
+		instance.hide_special = this.hide_special;
+		instance.data = this.data;
+		instance.master = this.master;
+		instance.client = this.client;
+		instance.state = this.state;
+		instance.node_name = this.node_name;
+		return instance;
+	};
+	
+	this.equals=function(other) {
+		return (
+			other !== null &&
+			this.page == other.page &&
+			this.query == other.query &&
+			this.hide_special == other.hide_special &&
+			this.data == other.data &&
+			this.master == other.master &&
+			this.client == other.client &&
+			this.state == other.state &&
+			this.node_name == other.node_name 
+		);
+	};
+	
 }
 
 function ModalControls() {
@@ -1571,7 +1601,9 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	$scope.settings_service = SettingsService;
 	$scope.idxSettingsSrv = IndexSettingsService;
 	$scope.dialog_service = ConfirmDialogService;
-	$scope.pagination= new ClusterNavigation();
+	$scope.pagination = new ClusterNavigation();
+	$scope.previous_pagination = null;
+	
 	
 	$scope.getNodes=function() {
 		if (isDefined($scope.cluster)) {
@@ -1858,24 +1890,29 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.getResults=function() {
-		var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
-		var query = $scope.pagination.query;
-		var state = $scope.pagination.state;
-		var hide_special = $scope.pagination.hide_special;
-		return $.map(indices,function(i) {
-			if (isDefined(query) && query.length > 0) {
-				if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
+		if ($scope.cluster !== null && ($scope.pagination.cluster_timestamp === null || !$scope.pagination.equals($scope.previous_pagination))) {
+			var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
+			var query = $scope.pagination.query;
+			var state = $scope.pagination.state;
+			var hide_special = $scope.pagination.hide_special;
+			$scope.pagination.cached_result = $.map(indices,function(i) {
+				if (notEmpty(query)) {
+					if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
+						return null;
+					} 
+				}
+				if (state.length > 0 && state != i.state) {
 					return null;
 				} 
-			}
-			if (state.length > 0 && state != i.state) {
-				return null;
-			} 
-			if (hide_special && i.isSpecial()) {
-				return null;
-			}
-			return i;
-		});
+				if (hide_special && i.isSpecial()) {
+					return null;
+				}
+				return i;
+			});
+			$scope.previous_pagination = $scope.pagination.clone();
+			$scope.pagination.cluster_timestamp = $scope.cluster.created_at;
+		}
+		return $scope.pagination.cached_result;
 	};
 	
 }
