@@ -2,9 +2,7 @@
 	text-align: right;
 }
 .cluster-health-content {
-	font-size: 10px;
-	color: #666;
-	font-family: "Lucida Console", Monaco, monospace;
+	font-family: inherit;
 }
 
 .cluster-health-form-group {

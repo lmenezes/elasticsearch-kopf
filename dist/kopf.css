@@ -155,7 +155,6 @@ a.setting-info:hover {
 
 .create-index-editor {
 	height: 424px;
-	margin-top: 0px !important;
 }
 .alert-block {
 	font-size: 12px;
@@ -262,11 +261,6 @@ a.setting-info:hover {
 	float: right;
 }
 .alias-filter-editor {
-	width: auto;
-	border: 1px solid #ccc;
-	border-radius: 3px 3px 3px 3px;
-	text-align: left;
-	width: 100%;
 	height: 200px;
 }
 .analysis-section {
@@ -298,9 +292,7 @@ a.setting-info:hover {
 	text-align: right;
 }
 .cluster-health-content {
-	font-size: 10px;
-	color: #666;
-	font-family: "Lucida Console", Monaco, monospace;
+	font-family: inherit;
 }
 
 .cluster-health-form-group {
@@ -879,6 +871,7 @@ a.cluster-map-node-action {
 }
 .rest-client-editor {
 	height: 612px;
+	margin-top: 10px;
 }
 .warmup-query-editor {
 	height: 400px;
@@ -956,7 +949,6 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	border: 1px solid #ccc;
 	border-radius: 3px 3px 3px 3px;
 	text-align: left;
-	margin-top: 10px;
 }
 
 .tooltip {
