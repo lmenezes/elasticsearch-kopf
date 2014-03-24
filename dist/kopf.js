@@ -2550,7 +2550,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					AlertService.error("Error while started restor of snapshot", error);
+					AlertService.error("Error while started restore of snapshot", error);
 				});
 			}
 		);
