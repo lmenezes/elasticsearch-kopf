@@ -1890,7 +1890,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.getResults=function() {
-		if ($scope.cluster !== null && ($scope.pagination.cluster_timestamp === null || !$scope.pagination.equals($scope.previous_pagination))) {
+		if ($scope.cluster !== null && ($scope.pagination.cluster_timestamp === null || $scope.pagination.cluster_timestamp != $scope.cluster.created_at|| !$scope.pagination.equals($scope.previous_pagination))) {
 			var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
 			var query = $scope.pagination.query;
 			var state = $scope.pagination.state;
