@@ -9,12 +9,6 @@
 	font-weight: 700;
 }
 
-.validation-error {
-	color: #b94a48;
-	padding-top: 5px;
-	font-size: 13px;
-	font-weight: 300;
-}
 
 .editor-format-block {
 	padding-top: 5px;
@@ -31,40 +25,12 @@
 	float: right;
 }
 
-.kopf-table-header {
-	font-weight: 500; 
-	font-color: #c0c0c0;
-}
-
-/* selected pill color to grey */
-.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-	background-color: #eeeeee;
-	color: #333;
-}
-
 /* smaller padding for stacked pills */
 .nav-stacked > li > a {
 	padding: 6px 15px;
 }
 
 /** ############### START - modals - START ############### **/
-.modal-close-icon {
-	float: right;
-	font-size: 20px;
-	color: #b94a48;
-	padding-top: 2px;
-	cursor: pointer;
-}
-.confirm-dialog-body {
-	background: #fff;
-	font-size: 13px;
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	border: 0px;
-	line-height: 18px;
-	margin: 0px;
-	word-break: normal;
-	padding: 0px;
-}
 
 .modal-title {
 	padding: 0px;
@@ -91,19 +57,6 @@
 
 #page-wrap { min-height: 100%; height: auto !important; height: 100%; margin: 0 auto -60px; padding: 0px 25px 60px; }
 
-.settings-section-header {
-	top: 15px;
-	left: 15px;
-	font-size: 11px;
-	font-weight: 500;
-	color: #bbb;
-	text-transform: uppercase;
-	letter-spacing: 1px;
-	padding-bottom: 15px;
-}
-.settings-section {
-	border-bottom: 1px solid #c0c0c0;
-}
 .popover {
 	z-index: 1050;
 }
@@ -121,22 +74,6 @@ a.setting-info:hover {
 	border: 0px;
 }
 
-.modal-json {
-	font-size: 9px;
-	background: #ffffff;
-}
-
-.connection-status-console {
-	float:right;
-	text-align: right;
-	font-size: 10px;
-	color: #CCC;
-	font-variant:small-caps;
-	font-weight: 200;
-}
-.inactive-action {
-	color: #f0f0f0;	
-}
 .normal-action {
 	cursor: pointer;
 }
@@ -170,11 +107,6 @@ a.setting-info:hover {
 	padding-top: 15px;
 }
 
-.node_detail {
-	color: #808080;
-	font-size: 10px;
-}
-
 .table-nonfluid {
    width: auto;
 }
@@ -190,13 +122,6 @@ a.setting-info:hover {
 }
 .table-actions > a:hover {
 	text-decoration: none;	
-}
-
-.remove-icon {
-	color: #b94a48;
-	float: right;
-	line-height: 18px;
-	padding-left: 5px;
 }
 
 .details-icon {
