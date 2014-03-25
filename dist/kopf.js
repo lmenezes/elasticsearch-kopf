@@ -810,6 +810,8 @@ function Index(index_name,index_info, index_metadata, index_status) {
 
 	// adds shard information
 	
+	var unhealthy = false;
+	
 	if (isDefined(index_info)) {
 		$.map(index_info.shards, function(shards, shard_num) {
 			$.map(shards, function(shard_routing, shard_copy) {
@@ -827,12 +829,19 @@ function Index(index_name,index_info, index_metadata, index_status) {
 							}
 						});
 					}
-					index_shards[shard_routing.node].push(new Shard(shard_routing, shard_status));				
+					var new_shard = new Shard(shard_routing, shard_status);
+					
+					if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
+						unhealthy = true;
+					}
+					
+					index_shards[shard_routing.node].push(new_shard);				
 				}
 			});
 		});
 	}
 
+	this.unhealthy = unhealthy || unassigned.length > 0;
 	this.unassigned = unassigned;
 	
 	this.settingsAsString=function() {
@@ -1896,17 +1905,25 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			var state = $scope.pagination.state;
 			var hide_special = $scope.pagination.hide_special;
 			$scope.pagination.cached_result = $.map(indices,function(i) {
+				if (hide_special && i.isSpecial()) {
+					return null;
+				}
+				
 				if (notEmpty(query)) {
 					if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
 						return null;
 					} 
 				}
-				if (state.length > 0 && state != i.state) {
-					return null;
+				
+				if (state.length > 0) {
+					if (state == "unhealthy") {
+						if (!i.unhealthy) {
+							return null;							
+						}
+					} else if ((state == "open" || state == "close") && state != i.state) {
+						return null;						
+					}
 				} 
-				if (hide_special && i.isSpecial()) {
-					return null;
-				}
 				return i;
 			});
 			$scope.previous_pagination = $scope.pagination.clone();

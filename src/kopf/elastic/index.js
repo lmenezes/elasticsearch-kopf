@@ -31,6 +31,8 @@ function Index(index_name,index_info, index_metadata, index_status) {
 
 	// adds shard information
 	
+	var unhealthy = false;
+	
 	if (isDefined(index_info)) {
 		$.map(index_info.shards, function(shards, shard_num) {
 			$.map(shards, function(shard_routing, shard_copy) {
@@ -48,12 +50,19 @@ function Index(index_name,index_info, index_metadata, index_status) {
 							}
 						});
 					}
-					index_shards[shard_routing.node].push(new Shard(shard_routing, shard_status));				
+					var new_shard = new Shard(shard_routing, shard_status);
+					
+					if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
+						unhealthy = true;
+					}
+					
+					index_shards[shard_routing.node].push(new_shard);				
 				}
 			});
 		});
 	}
 
+	this.unhealthy = unhealthy || unassigned.length > 0;
 	this.unassigned = unassigned;
 	
 	this.settingsAsString=function() {

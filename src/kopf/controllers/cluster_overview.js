@@ -297,17 +297,25 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			var state = $scope.pagination.state;
 			var hide_special = $scope.pagination.hide_special;
 			$scope.pagination.cached_result = $.map(indices,function(i) {
+				if (hide_special && i.isSpecial()) {
+					return null;
+				}
+				
 				if (notEmpty(query)) {
 					if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
 						return null;
 					} 
 				}
-				if (state.length > 0 && state != i.state) {
-					return null;
+				
+				if (state.length > 0) {
+					if (state == "unhealthy") {
+						if (!i.unhealthy) {
+							return null;							
+						}
+					} else if ((state == "open" || state == "close") && state != i.state) {
+						return null;						
+					}
 				} 
-				if (hide_special && i.isSpecial()) {
-					return null;
-				}
 				return i;
 			});
 			$scope.previous_pagination = $scope.pagination.clone();
