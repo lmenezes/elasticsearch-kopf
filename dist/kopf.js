@@ -2804,10 +2804,10 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	$scope.new_source = '';
 	$scope.new_types = '';
 	
-    $scope.$on('loadWarmupEvent', function() {
+	$scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
 		$scope.initEditor();
-    });
+	});
 	
 	$scope.initEditor=function(){
 		if(!angular.isDefined($scope.editor)){
@@ -2824,11 +2824,12 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	};
 	
 	$scope.createWarmerQuery=function() {
-		$scope.formatBody();
-		if (!isDefined($scope.validation_error)) {
-			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.new_source,
+		$scope.editor.format();
+		if (!isDefined($scope.editor.error)) {
+			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.editor.getValue(),
 				function(response) {
 					$scope.updateModel(function() {
+						$scope.loadIndexWarmers();
 						AlertService.success("Warmup query successfully registered", response);
 					});
 				},
@@ -2884,20 +2885,6 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 			);
 		} else {
 			$scope.warmers = {};
-		}
-	};
-	
-	$scope.formatBody=function() {
-		var source = $scope.editor.getValue();
-		try {
-			$scope.validation_error = null;
-			var sourceObj = JSON.parse(source);
-			var formattedSource = JSON.stringify(sourceObj,undefined,4);
-			$scope.editor.setValue(formattedSource,0);
-			$scope.editor.gotoLine(0,0,false);
-			$scope.new_source = formattedSource;
-		} catch (error) {
-			$scope.validation_error = error.toString();
 		}
 	};
 	
