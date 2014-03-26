@@ -2824,21 +2824,25 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	};
 	
 	$scope.createWarmerQuery=function() {
-		$scope.editor.format();
-		if (!isDefined($scope.editor.error)) {
-			$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.editor.getValue(),
-				function(response) {
-					$scope.updateModel(function() {
-						$scope.loadIndexWarmers();
-						AlertService.success("Warmup query successfully registered", response);
-					});
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Request did not return a valid JSON", error);
-					});
-				}
-			);
+		if ($scope.editor.getValue().trim().length > 0) {
+			$scope.editor.format();
+			if (!isDefined($scope.editor.error)) {
+				$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.editor.getValue(),
+					function(response) {
+						$scope.updateModel(function() {
+							$scope.loadIndexWarmers();
+							AlertService.success("Warmup query successfully registered", response);
+						});
+					},
+					function(error) {
+						$scope.updateModel(function() {
+							AlertService.error("Request did not return a valid JSON", error);
+						});
+					}
+				);
+			}
+		} else {
+			AlertService.error("Warmup query body can't be empty");
 		}
 	};
 	
