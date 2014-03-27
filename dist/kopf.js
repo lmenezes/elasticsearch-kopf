@@ -1001,6 +1001,11 @@ function Node(node_id, node_info, node_stats) {
 	// FIXME: 0.90/1.0 check
 	this.heap_used = readablizeBytes(getProperty(this.stats,'jvm.mem.heap_used_in_bytes'));
 	this.heap_committed = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes'));
+	this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
+	this.cpu_user = getProperty(this.stats, 'os.cpu.user');
+	this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
+	this.docs = getProperty(this.stats, 'indices.docs.count');
+	this.size = readablizeBytes(getProperty(this.stats, 'indices.store.size_in_bytes'));
 
 	this.setCurrentMaster=function() {
 		this.current_master = true;

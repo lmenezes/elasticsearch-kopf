@@ -187,3 +187,8 @@ a.cluster-map-node-action {
 	vertical-align: top !important;
 	word-wrap:break-word;
 }
+.node-progress {
+	height: 6px;
+	margin-bottom: 0px;
+	margin-top: 4px;
+}

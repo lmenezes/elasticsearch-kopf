@@ -37,8 +37,25 @@
 				<span ng-show="!node.master || !node.data">
 					<i class="icon-power-off box-invisible-content"></i>
 				</span>
-				<span class="cluster-map-node-detail" title="current load average">load: {{node.stats.os.load_average[0].toFixed(2)}}</span>
-				<span class="cluster-map-node-detail" title="used heap / commited heap">heap: {{node.heap_used}}/{{node.heap_committed}}</span>
+				
+				<span class="cluster-map-node-detail">docs: {{node.docs}}</span>
+				<span class="cluster-map-node-detail">size: {{node.size}}</span>
+			</div>
+			<div class="col-lg-6">
+				<div class="progress node-progress">
+			  	<div ng-show="{{node.heap_used_percent}} <= 75" class="progress-bar" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.heap_used_percent}}%;">
+					</div>
+			  	<div ng-show="{{node.heap_used_percent}} > 75" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.heap_used_percent}}%;">
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<div class="progress node-progress">
+					<div class="progress-bar" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100"  style="width: {{node.cpu_user}}%">
+					</div>
+					<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100"  style="width: {{node.cpu_sys}}%">
+					</div>
+				</div>
 			</div>
 		</div>
 	</td>
