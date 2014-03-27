@@ -86,6 +86,7 @@ test("cluster creating", function() {
 		ok(node.cpu_sys == '11', "Checking os sys cpu " + node.cpu_sys);
 		ok(node.docs == '6', "Checking number of documents per node " + node.docs);	
 		ok(node.size == '16.49KB', "Checking node sotre size " + node.size);
+		ok(node.heap_max == '1007.38MB', "Checking max heap size " + node.heap_max);
 
 	});
 

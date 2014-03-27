@@ -1006,7 +1006,8 @@ function Node(node_id, node_info, node_stats) {
 	this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
 	this.docs = getProperty(this.stats, 'indices.docs.count');
 	this.size = readablizeBytes(getProperty(this.stats, 'indices.store.size_in_bytes'));
-
+	this.heap_max = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_max_in_bytes'));	
+	
 	this.setCurrentMaster=function() {
 		this.current_master = true;
 	};
