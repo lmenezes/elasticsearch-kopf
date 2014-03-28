@@ -129,5 +129,15 @@ function Cluster(state,status,nodes,settings) {
 			}
 			this.changes = changes;
 		};
+		
+		this.open_indices=function() {
+			return $.map(this.indices, function(index) {
+				if (index.state == 'open') {
+					return index;
+				} else {
+					return null;
+				}
+			});
+		};
 	}
 }

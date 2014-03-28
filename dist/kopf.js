@@ -330,6 +330,16 @@ function Cluster(state,status,nodes,settings) {
 			}
 			this.changes = changes;
 		};
+		
+		this.open_indices=function() {
+			return $.map(this.indices, function(index) {
+				if (index.state == 'open') {
+					return index;
+				} else {
+					return null;
+				}
+			});
+		};
 	}
 }
 function ElasticClient(connection) {
@@ -1490,9 +1500,9 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		}
 	};
 	
-    $scope.$on('loadAnalysisEvent', function() {
-		$scope.indices = $scope.cluster.indices;
-    });
+	$scope.$on('loadAnalysisEvent', function() {
+		$scope.indices = $scope.cluster.open_indices();
+	});
 	
 }
 function ClusterHealthController($scope,$location,$timeout,$sce, AlertService) {

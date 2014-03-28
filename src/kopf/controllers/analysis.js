@@ -52,8 +52,8 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		}
 	};
 	
-    $scope.$on('loadAnalysisEvent', function() {
-		$scope.indices = $scope.cluster.indices;
-    });
+	$scope.$on('loadAnalysisEvent', function() {
+		$scope.indices = $scope.cluster.open_indices();
+	});
 	
 }
