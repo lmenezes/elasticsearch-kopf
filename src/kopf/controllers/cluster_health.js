@@ -1,8 +1,8 @@
-function ClusterHealthController($scope,$location,$timeout,$sce, AlertService) {
+function ClusterHealthController($scope,$location,$timeout,$sce, AlertService, ConfirmDialogService) {
 	$scope.shared_url = '';
 	$scope.results = null;
 	
-    $scope.$on('loadClusterHealth', function() {
+  $scope.$on('loadClusterHealth', function() {
 		$('#cluster_health_option a').tab('show');
 		$scope.results = null;
 		// selects which info should be retrieved
@@ -12,7 +12,20 @@ function ClusterHealthController($scope,$location,$timeout,$sce, AlertService) {
 		$scope.retrieveHotThreads = true;
 		
 		$scope.gist_title = '';
-    });
+  });
+	
+	$scope.checkPublishClusterHealth=function() {
+		ConfirmDialogService.open(
+			"Are you share you want to share your cluster information through a Gist?",
+			"By sharing information through a public Gist you might be exposing sensitive information about your cluster, such as " +
+			"host name, indices names and etc.",
+			"Agree",
+			function() {
+				$scope.confirm_share = true;
+				$scope.publishClusterHealth();
+			}
+		);
+	};
 	
 	$scope.loadClusterHealth=function() {
 		var results = {};
