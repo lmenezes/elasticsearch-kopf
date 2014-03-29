@@ -1,6 +1,3 @@
-.rest-client-body {
-	padding-top: 10px;
-}
 .rest-client-request-url {
 	overflow: hidden;
 	display: block;
@@ -25,14 +22,7 @@
 	padding: 5px;
 	min-height: 614px;
 }
-.rest-client-format-body {
-	margin-top: 10px;
-}
 .request-client-request-body-options {
 	overflow: hidden;
 	display: block;
-}
-.rest-client-editor {
-	height: 612px;
-	margin-top: 10px;
 }

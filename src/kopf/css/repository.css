@@ -1,27 +1,4 @@
-.repository-settings-editor {
-	height: 400px;
-	width: auto;
-	border: 1px solid #ccc;
-	border-radius: 3px 3px 3px 3px;
-	text-align: left;
-	width: 100%;
-}
-
 select.input-sm-twoxheight {
 	height: 100px;
 	line-height: 30px;
-}
-
-.row-nomargin {
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-left: 15px;
-}
-
-.row-nomargin-button{
-	margin-right: 15px;
-}
-
-.form-label-repository {
-	padding-left: 15px;
 }

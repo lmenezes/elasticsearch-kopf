@@ -31,21 +31,6 @@
 	padding-top: 8px;
 	padding-left: 5px;
 }
-
-.aliases-add-index-action {
-	font-size: 12px;
-}
-
-.aliases-section {
-	padding-top: 10px;
-}
-.aliases-alias {
-	font-weight: 300;
-	font-size: 12px;
-}
 .alias-remove-index {
 	float: right;
-}
-.alias-filter-editor {
-	height: 200px;
 }
