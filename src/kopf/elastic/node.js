@@ -18,6 +18,14 @@ function Node(node_id, node_info, node_stats) {
 	this.heap_used = readablizeBytes(getProperty(this.stats,'jvm.mem.heap_used_in_bytes'));
 	this.heap_committed = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes'));
 	this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
+	
+	// FIXME: 0.90/1.0 check. HEap max and heap_percent are not available on 0.90.0
+	if (!isDefined(this.heap_used_percent)) {
+		var heap_used = getProperty(this.stats,'jvm.mem.heap_used_in_bytes');
+		var heap_commited = getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes');
+		this.heap_used_percent = Math.round(100 * (heap_used / heap_commited));
+	}
+	
 	this.cpu_user = getProperty(this.stats, 'os.cpu.user');
 	this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
 	this.docs = getProperty(this.stats, 'indices.docs.count');
