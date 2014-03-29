@@ -37,7 +37,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			$scope.home_screen();
 		} catch (error) {
 			$scope.client = null;
-			AlertService.error(error);
+			AlertService.error(error.message, error.body);
 		}
 	};
 	

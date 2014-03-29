@@ -373,7 +373,7 @@ function ElasticClient(connection) {
 		try {
 			client.version = response.version.number;	
 		} catch (error) {
-			throw "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + host + "]?";
+			throw { message: "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + connection.host + "]?", body: response };
 		}
 	});
 	
@@ -382,7 +382,7 @@ function ElasticClient(connection) {
 	});
 
 	this.is1=function() {
-		return this.version.substring(0, 3) == "1.0";
+		return (this.version.substring(0, 2) == "1.");
 	};
 
 	this.createIndex=function(name, settings, callback_success, callback_error) {
@@ -2100,7 +2100,7 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 			$scope.home_screen();
 		} catch (error) {
 			$scope.client = null;
-			AlertService.error(error);
+			AlertService.error(error.message, error.body);
 		}
 	};
 	
