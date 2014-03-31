@@ -1,10 +1,10 @@
-
 html,body {
   height: 100%;
-  color: #555555;
-	font-weight: 300;
-	font-size: 12px;
-	padding-top: 20px;
+  color: #999;
+  font-weight: 300;
+  font-size: 12px;
+  padding-top: 20px;
+  background-color: #333;
 }
 .form-label {
 	color: #666;
@@ -21,11 +21,11 @@ a:active  {color:inherit;}
 }
 
 .box {
-	background: #f9f9f9;
+	background: #222;
 }
 
 .box-invisible-content {
-	color: #F9F9F9;
+	color: #222;
 }
 
 h1 { color: #555; font-variant:small-caps; font-weight: 400; }
@@ -37,25 +37,26 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
 .kopf-ace-editor { 
 	width: auto;
-	border: 1px solid #ccc;
+	border: 1px solid #444;
 	border-radius: 3px 3px 3px 3px;
 	text-align: left;
+	background: #333 !important;
 }
 
 .tooltip {
   font-size: 13px;
   opacity: 1.0 !important;
-} 
+}
 
 .tooltip-inner {
-		background: #f9f9f9;
-    color: #333;
-		border: 1px solid #ccc;
-		padding: 5px 5px 5px 5px;
+	background: #222;
+    color: #999;
+	border: 1px solid #444;
+	padding: 5px 5px 5px 5px;
 }
 
 .bordered {
-	border: 1px solid #ccc;
+	border: 1px solid #444;
 }
 
 .shard {
@@ -64,7 +65,7 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	display: inline-block;
 	width: 22px;
 	height: 22px;
-	border: 1px solid #666;
+	border: 1px solid #444;
 	border-radius: 1px 1px 1px 1px;
 	vertical-align: middle;
 	text-align: center;
@@ -265,9 +266,69 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	width: auto;
 	padding-left: 10px;
 	padding-right: 10px;
+	background: #333;
 }
 .navbar-menu-item {
 	font-size: 13px;
 	color: #555;
 	font-weight: 300;
+}
+.closed-index {
+	color: #D0D0D0 !important;
+	font-weight: 300 !important;
+}
+table.overview {
+	table-layout:fixed;
+}
+table {
+	border: 1px solid #444;
+}
+thead.overview {
+	border: 1px solid #444;
+}
+.index-cell {
+	max-height: 40px !important;
+	vertical-align: top !important;
+	border-bottom: 0px !important;
+	border: 1px solid #444 !important;
+}
+.form-control {
+	background: #333;
+	border: 1px solid #444;
+	color: #999;
+}
+.panel-body {
+	background: #222;
+}
+.panel-default > .panel-heading {
+	background: #222;
+}
+.panel-default {
+	background: #222;
+	border: 1px solid #444;
+}
+.panel-default > .panel-heading + .panel-collapse .panel-body {
+	border-top-color: #444;
+}
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td {
+	border: 1px solid #444;
+}
+.table thead:first-child tr:first-child th {
+	border-top: 1px solid #444;
+}
+.header-row {
+	font-weight: 700;
+}
+.header-row > td {
+	background: #222 !important;
+}
+.ace-kopf .ace_gutter {
+	color: #444 !important;
+	background: #222 !important;
+}
+.dropdown-menu .divider {
+	background: #444;
+}
+.table-striped > tbody > tr:nth-child(odd) > td {
+	background: #333;
 }

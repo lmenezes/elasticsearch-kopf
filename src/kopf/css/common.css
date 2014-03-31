@@ -1,14 +1,6 @@
-/** ------- **/
-/** GENERIC CONTAIENR FOR MAIN AGE */
 .content-panel {
 	padding-top: 10px;
 }
-
-.header-row {
-	font-size: 12px;
-	font-weight: 700;
-}
-
 /* BOOTSTRAP CUSTOMIZATION */
 .btn {
 	font-size: 13px;
@@ -57,7 +49,6 @@
 }
 .setting-info {
 	padding-left: 1px;
-	font-size: 12px;
 }
 
 a.setting-info:hover {
@@ -91,9 +82,6 @@ a.setting-info:hover {
 .alert {
 	margin-bottom: 0px;
 }
-.alert-server-response {
-	padding-top: 25px;
-}
 .settings-area {
 	font-size: 9px;
 }
@@ -105,11 +93,6 @@ a.setting-info:hover {
 .table-nonfluid {
    width: auto;
 }
-
-.entity_settings {
-	font-size: 18px;
-}
-
 .node-info {
 	display: inline-block;
 	vertical-align: top;

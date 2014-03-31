@@ -16,11 +16,8 @@
 	font-size: 11px;
 	margin-top: 20px;
 }
-.rest-client-response {
-	border: 1px solid #cccccc;
-	border-radius: 3px 3px 3px 3px;
+.rest-response {
 	padding: 5px;
-	min-height: 614px;
 }
 .request-client-request-body-options {
 	overflow: hidden;

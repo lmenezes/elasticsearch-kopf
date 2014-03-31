@@ -2,9 +2,6 @@
 	font-size: 9px;
 }
 
-table.overview {
-	table-layout:fixed;
-}
 table.overview tr td { width: 16.67%; }
 
 .index-menu-icon {
@@ -24,6 +21,7 @@ table.overview tr td { width: 16.67%; }
 	vertical-align: middle !important;
 	text-align: center;
 	border-bottom: 0px !important;
+	background: inherit;
 }
 .cluster-map-header-cluster-action {
 	font-size: 32px;
@@ -36,17 +34,6 @@ a.cluster-map-header-cluster-action {
 	font-weight: 200;
 	text-decoration: none;
 }
-.index-cell {
-	max-height: 40px !important;
-	vertical-align: top !important;
-	border-bottom: 0px !important;
-}
-
-.closed-index {
-	color: #D0D0D0 !important;
-	font-weight: 300 !important;
-}
-
 .cluster-map-header-index-name {
 	overflow: hidden;
 	white-space: nowrap;
@@ -104,12 +91,6 @@ a.cluster-map-header-index-action:hover {
 .node-type-icon {
 	padding-left: 2px;
 	padding-right: 2px;
-}
-.cluster-map-node-cell {
-	width: 220px;
-	max-height: 40px !important;
-	vertical-align: top !important;
-	background: #f9f9f9;
 }
 .cluster-map-node-badges {
 	display: inline-block;
@@ -177,8 +158,6 @@ a.cluster-map-node-action {
 	text-align: center;
 	font-weight: 300;
 }
-
-/** CLUSTER ACTIONS **/
 .big-icon {
 	font-size: 18px;
 }

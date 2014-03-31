@@ -18,9 +18,11 @@ module.exports = function(grunt) {
 		copy: {
 			main: {
 				files: [
-				{expand: true, flatten: true, src: ['src/lib/ace/mode-json.js'], dest: './'},
-				{expand: true, flatten: true, src: ['src/lib/ace/worker-json.js'], dest: './'},
-				{expand: true, flatten: true, src: ['src/kopf/theme-kopf.js'], dest: './'}
+					{expand: true, flatten: true, src: ['src/lib/ace/mode-json.js'], dest: './'},
+					{expand: true, flatten: true, src: ['src/lib/ace/worker-json.js'], dest: './'},
+					{expand: true, flatten: true, src: ['src/kopf/theme-kopf.js'], dest: './'},
+					{expand: true, flatten: true, src: ['src/kopf/css/dark_style.css'], dest: './dist/'},
+					{expand: true, flatten: true, src: ['src/kopf/css/default_style.css'], dest: './dist/'}
 				]
 			}
 		},
@@ -77,11 +79,12 @@ module.exports = function(grunt) {
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',
 					'src/kopf/services/aceeditor.js',
+					'src/kopf/services/theme.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',
 					// UTIL
-					'src/kopf/util.js'					
+					'src/kopf/util.js'
 				],
 				dest: 'dist/kopf.js'
 			},
@@ -99,8 +102,7 @@ module.exports = function(grunt) {
 					'src/kopf/css/navbar.css',
 					'src/kopf/css/rest_client.css',
 					'src/kopf/css/warmup.css',
-					'src/kopf/css/repository.css',
-					'src/kopf/css/light_style.css'
+					'src/kopf/css/repository.css'
 				],
 				dest: 'dist/kopf.css'
 			},

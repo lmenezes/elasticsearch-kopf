@@ -1,4 +1,4 @@
-function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService) {
+function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "0.5.5";
 	$scope.username = null;
@@ -7,6 +7,10 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 	
 	$scope.home_screen=function() {
 		$('#cluster_option a').tab('show');
+	};
+	
+	$scope.getTheme=function() {
+		return ThemeService.getTheme();
 	};
 	
 	$scope.setConnected=function(status) {
