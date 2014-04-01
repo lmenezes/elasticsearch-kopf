@@ -37,9 +37,10 @@
 				<span ng-show="!node.master || !node.data">
 					<i class="icon-power-off box-invisible-content"></i>
 				</span>
-				
-				<span class="cluster-map-node-detail">docs: {{node.docs}}</span>
-				<span class="cluster-map-node-detail">size: {{node.size}}</span>
+				<span ng-show="node.data">
+					<span class="cluster-map-node-detail">docs: {{node.docs}}</span>
+					<span class="cluster-map-node-detail">size: {{node.size}}</span>
+				</span>
 			</div>
 			<div class="col-lg-6">
 				<div class="progress node-progress" title="Heap usage: {{node.heap_used}} out of {{node.heap_max}}">
