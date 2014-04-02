@@ -267,6 +267,7 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	padding-left: 10px;
 	padding-right: 10px;
 	background: #fff;
+	border: 1px solid #ccc;
 }
 .navbar-menu-item {
 	font-size: 13px;
@@ -331,4 +332,16 @@ thead.overview {
 }
 .table-striped > tbody > tr:nth-child(odd) > td {
 	background: #f9f9f9;
+}
+.progress {
+	background: #f5f5f5;
+}
+.modal-content {
+	background: #fff;
+}
+.modal-header {
+	border-bottom: 1px solid #e5e5e5;
+}
+.table tbody > tr > td {
+	border-top: 1px solid #ddd;
 }

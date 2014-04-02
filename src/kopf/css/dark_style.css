@@ -1,10 +1,10 @@
 html,body {
   height: 100%;
-  color: #999;
+  color: #d0d0d0;
   font-weight: 300;
   font-size: 12px;
   padding-top: 20px;
-  background-color: #333;
+  background-color: #222;
 }
 .form-label {
 	color: #666;
@@ -21,19 +21,19 @@ a:active  {color:inherit;}
 }
 
 .box {
-	background: #222;
+	background: #2C2C2C;
 }
 
 .box-invisible-content {
 	color: #222;
 }
 
-h1 { color: #555; font-variant:small-caps; font-weight: 400; }
-h2 { color: #555; font-variant:small-caps; font-weight: 400; }
-h3 { color: #555; font-variant:small-caps; font-weight: 500; }
-h4 { color: #666; font-variant:small-caps; font-weight: 500; }
-h5 { color: #777; font-variant:small-caps; font-weight: 500; }
-h6 { color: #999; font-variant:small-caps; font-weight: 500; }
+h1 { color: #d0d0d0; font-variant:small-caps; font-weight: 400; }
+h2 { color: #d0d0d0; font-variant:small-caps; font-weight: 400; }
+h3 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
+h4 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
+h5 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
+h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 
 .kopf-ace-editor { 
 	width: auto;
@@ -135,7 +135,7 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 
 .modal-json {
 	font-size: 9px;
-	background: #ffffff;
+	background: #222;
 }
 
 .inactive-action {
@@ -266,7 +266,8 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	width: auto;
 	padding-left: 10px;
 	padding-right: 10px;
-	background: #333;
+	background: #222;
+	border: 1px solid #444;
 }
 .navbar-menu-item {
 	font-size: 13px;
@@ -301,7 +302,7 @@ thead.overview {
 	background: #222;
 }
 .panel-default > .panel-heading {
-	background: #222;
+	background: #2c2c2c;
 }
 .panel-default {
 	background: #222;
@@ -320,7 +321,7 @@ thead.overview {
 	font-weight: 700;
 }
 .header-row > td {
-	background: #222 !important;
+	background: #2c2c2c !important;
 }
 .ace-kopf .ace_gutter {
 	color: #444 !important;
@@ -331,4 +332,16 @@ thead.overview {
 }
 .table-striped > tbody > tr:nth-child(odd) > td {
 	background: #333;
+}
+.progress {
+	background: #444;
+}
+.modal-content {
+	background: #222;
+}
+.modal-header {
+	border-bottom: 1px solid #444;
+}
+.table tbody > tr > td {
+	border-top: 1px solid #444;
 }
