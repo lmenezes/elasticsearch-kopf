@@ -123,7 +123,7 @@ h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 	cursor: pointer;
 }
 .confirm-dialog-body {
-	background: #fff;
+	background: #222;
 	font-size: 13px;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	border: 0px;
