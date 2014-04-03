@@ -131,6 +131,7 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	margin: 0px;
 	word-break: normal;
 	padding: 0px;
+	color: #333;
 }
 
 .modal-json {
