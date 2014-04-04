@@ -346,3 +346,50 @@ thead.overview {
 .table tbody > tr > td {
 	border-top: 1px solid #ddd;
 }
+/* JSON TREE CSS */
+/* json string right " */
+.json-object-expand:after {
+	content: '+';
+}
+.json-object-collapse:after {
+	content: '-';
+}
+
+/* properties for expand icon */
+.json-object-expand {
+	display: inline-block;
+	font-weight: 500;
+	color: #999;
+	margin-left: 1px;
+	margin-right: 1px;
+	cursor: pointer;
+}
+/* properties for collapse icon */
+.json-object-collapse {
+	display: inline-block;
+	font-weight: 500;
+	color: #999;
+	margin-left: 1px;
+	margin-right: 1px;
+	cursor: pointer;
+}
+/* global properties for json object */
+.json-content {
+	color: #666;
+}
+/* json number style */
+.json-number {
+	color: #D036D0;
+}
+/* json string style */
+.json-string {
+	color: #2DB669;
+}
+/* json boolean style */
+.json-boolean {
+	color: #2525CC;
+}
+/* json null style */
+.json-null {
+	color: gray;
+}
