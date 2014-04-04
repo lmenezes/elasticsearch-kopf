@@ -324,9 +324,21 @@ thead.overview {
 .header-row > td {
 	background: #f9f9f9 !important;
 }
+.ace-kopf {
+	color: #666 !important;
+}
+.ace-kopf .ace_marker-layer .ace_active-line {
+	background: #FFFFCC !important;
+}
+.ace-kopf .ace_marker-layer .ace_selection {
+	background: #b5d5ff !important;
+}
 .ace-kopf .ace_gutter {
-	color: #AAA;
-	background: #e8e8e8;
+	color: #AAA !important;
+	background: #e8e8e8 !important;
+}
+.ace-kopf .ace_indent-guide {
+	opacity: 1.0 !important;
 }
 .dropdown-menu .divider {
 	background: #e5e5e5;
