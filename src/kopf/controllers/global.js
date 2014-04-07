@@ -1,6 +1,6 @@
 function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
 	$scope.dialog = ConfirmDialogService;
-	$scope.version = "0.5.5";
+	$scope.version = "0.5.6";
 	$scope.username = null;
 	$scope.password = null;
 	$scope.alert_service = AlertService;
