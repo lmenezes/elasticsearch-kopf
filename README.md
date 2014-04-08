@@ -22,20 +22,20 @@ Install on a ElasticSearch instance:
     ./elasticsearch/bin/plugin -install lmenezes/elasticsearch-kopf
     open http://localhost:9200/_plugin/kopf
 
-Try it online:
+Try it online: http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
 
-http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
+Basic HTTP Auth is also supported, so http://lmenezes.com/elasticsearch-kopf/?location=http://user:pwd@localhost:9200 also works
 
 Screenshots
 ------------
-Reactive header reflects cluster state
-![cluster state](imgs/cluster_state.png)
-------------
-Full cluster overview
+####Cluster overview
 ![cluster overview](imgs/cluster_view.png)
-------------
-Rest Client
+
+####Header reflects cluster state
+![cluster state](imgs/cluster_state.png)
+
+####Rest Client
 ![rest client](imgs/rest_client.png)
-------------
-Aliases management
+
+####Aliases management
 ![aliases management](imgs/aliases.png)
