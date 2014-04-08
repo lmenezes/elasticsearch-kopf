@@ -340,6 +340,12 @@ thead.overview {
 .ace-kopf .ace_indent-guide {
 	opacity: 1.0 !important;
 }
+.ace-kopf .ace_cursor {
+	border-left: 2px solid #000;
+}
+.ace_hidden-cursors .ace_cursor {
+	opacity: 0.2;
+}
 .dropdown-menu .divider {
 	background: #e5e5e5;
 }
