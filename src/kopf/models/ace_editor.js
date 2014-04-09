@@ -33,4 +33,8 @@ function AceEditor(target) {
 		}
 		return content;
 	};
+	
+	this.hasContent=function() {
+		return this.editor.getValue().trim().length > 0;
+	};
 }

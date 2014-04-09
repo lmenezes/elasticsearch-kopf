@@ -2838,7 +2838,6 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 	
 }
 function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
-	$scope.dialog_service = ConfirmDialogService;
 	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.warmers = {};
@@ -2871,7 +2870,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	};
 	
 	$scope.createWarmerQuery=function() {
-		if ($scope.editor.getValue().trim().length > 0) {
+		if ($scope.editor.hasContent()) {
 			$scope.editor.format();
 			if (!isDefined($scope.editor.error)) {
 				$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.editor.getValue(),
@@ -2894,7 +2893,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	};
 	
 	$scope.deleteWarmupQuery=function(warmer_id, source) {
-		$scope.dialog_service.open(
+		ConfirmDialogService.open(
 			"are you sure you want to delete query " + warmer_id + "?",
 			source,
 			"Delete",
@@ -3096,6 +3095,10 @@ function AceEditor(target) {
 			this.error = error.toString();
 		}
 		return content;
+	};
+	
+	this.hasContent=function() {
+		return this.editor.getValue().trim().length > 0;
 	};
 }
 function Gist(title, url) {
