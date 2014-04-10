@@ -1492,7 +1492,7 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 	
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
-			$scope.field_tokens = null;
+			$scope.analyzer_tokens = null;
 			$scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
 					$scope.updateModel(function() {
