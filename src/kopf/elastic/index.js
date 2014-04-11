@@ -136,7 +136,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	};
 	
 	this.equals=function(index) {
-		return index.name == this.name;
+		return index !== null && index.name == this.name;
 	};
 	
 	this.closed=function() {
