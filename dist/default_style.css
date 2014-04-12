@@ -411,3 +411,19 @@ thead.overview {
 .json-null {
 	color: gray;
 }
+.popover-content {
+	background: #fff;
+	border-left: 1px solid rgba(0,0,0,.2);
+	border-right: 1px solid rgba(0,0,0,.2);
+	border-bottom: 1px solid rgba(0,0,0,.2);
+	border-radius: 0 0 5px 5px;
+}
+.popover-title {
+	background: #f7f7f7;
+	border: 1px solid rgba(0,0,0,.2);
+	border-radius: 5px 5px 0 0;
+}
+.popover {
+	border: 0px;
+	padding: 0px;
+}

@@ -140,7 +140,7 @@ h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 }
 
 .inactive-action {
-	color: #f0f0f0;	
+	color: #444;	
 }
 
 .remove-icon {
@@ -410,4 +410,20 @@ thead.overview {
 /* json null style */
 .json-null {
 	color: gray;
+}
+.popover-content {
+	background: #222;
+	border-left: 1px solid #444;
+	border-right: 1px solid #444;
+	border-bottom: 1px solid #444;
+	border-radius: 0 0 5px 5px;
+}
+.popover-title {
+	background: #2c2c2c;
+	border: 1px solid #444;
+	border-radius: 5px 5px 0 0;
+}
+.popover {
+	border: 0px;
+	padding: 0px;
 }
