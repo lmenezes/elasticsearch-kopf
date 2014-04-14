@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">number_of_replicas</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="number of replicas each shard has. value must be a number equal or greather than 0" data-original-title="index.number_of_replicas" title="">
@@ -7,6 +7,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.number_of_replicas']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">index_concurrency</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="limit on the number of concurrent threads that are allowed to perform indexing at the same time. defaults to 8" data-original-title="" title="index.index_concurrency">
@@ -14,6 +16,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.index_concurrency']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">warmer.enabled</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="enables/disables warmpup" data-original-title="index.warmer.enabled" title="">
@@ -21,6 +25,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.warmer.enabled']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">refresh_interval</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="the async refresh interval of a shard" data-original-title="index.refresh_interval" title="">
@@ -28,6 +34,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.refresh_interval']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">term_index_divisor</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="the lucene reader term index divisor" data-original-title="index.term_index_divisor" title="">
@@ -36,7 +44,7 @@
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.term_index_divisor']" placeholder="">
 		</div>
 	</div>
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">ttl.disable_purge</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="disables temporarily the purge of expired docs" data-original-title="index.ttl.disable_purge" title="">
@@ -47,6 +55,8 @@
 				<option value="false">false</option>
 			</select>
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">fail_on_merge_failure</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
@@ -54,6 +64,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.fail_on_merge_failure']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">gc_deletes</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="time for which elasticsearch keeps information about deleted documents. value should be a time interval(defaults to 1m)" data-original-title="index.gc_deletes" title="">
@@ -61,6 +73,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.gc_deletes']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">codec</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="codec. defaults to default" data-original-title="index.codec" title="">
@@ -68,6 +82,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.codec']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">compound_on_flush</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
@@ -76,7 +92,7 @@
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.compound_on_flush']" placeholder="">
 		</div>
 	</div>
-	<div class="col-lg-4">
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">term_index_interval</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="the lucene index term interval. only applies to newly created docs" data-original-title="index.term_index_interval" title="">
@@ -84,6 +100,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.term_index_interval']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">auto_expand_replicas</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="set to an actual value (like 0-all) or false to disable it" data-original-title="index.auto_expand_replicas" title="">
@@ -91,6 +109,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.auto_expand_replicas']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">recovery.initial_shards</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="when using local gateway a particular shard is recovered only if there can be allocated quorum shards in the cluster. it can be set to quorum (default), quorum-1 (or half), full and full-1. number values are also supported, e.g. 1" data-original-title="index.recovery.initial_shards" title="">
@@ -98,6 +118,8 @@
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.recovery.initial_shards']" placeholder="">
 		</div>
+	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">compound_format</label>
 			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
