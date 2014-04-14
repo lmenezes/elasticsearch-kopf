@@ -276,7 +276,7 @@ h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 	font-weight: 300;
 }
 .closed-index {
-	color: #D0D0D0 !important;
+	color: #444 !important;
 	font-weight: 300 !important;
 }
 table.overview {
