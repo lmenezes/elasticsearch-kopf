@@ -1021,7 +1021,18 @@ function Node(node_id, node_info, node_stats) {
 		this.heap_used_percent = Math.round(100 * (heap_used / heap_committed));
 		this.heap_max = this.heap_committed;
 	}
-	
+
+	this.fs_total = readablizeBytes(getProperty(this.stats,'fs.total.total_in_bytes'));
+	this.fs_free = readablizeBytes(getProperty(this.stats, 'fs.total.free_in_bytes'));
+	this.fs_used = readablizeBytes(Math.round(getProperty(this.stats,'fs.total.total_in_bytes') - getProperty(this.stats, 'fs.total.free_in_bytes')));
+
+	if (!isDefined(this.fs_used_percent)) {
+		var fs_total = getProperty(this.stats,'fs.total.total_in_bytes');
+		var fs_free = getProperty(this.stats, 'fs.total.free_in_bytes');
+		var fs_used = Math.round(fs_total - fs_free);
+		this.fs_used_percent = Math.round(100 * (fs_used / fs_total));
+	}
+
 	this.cpu_user = getProperty(this.stats, 'os.cpu.user');
 	this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
 	this.docs = getProperty(this.stats, 'indices.docs.count');
