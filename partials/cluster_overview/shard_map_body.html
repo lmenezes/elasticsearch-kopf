@@ -39,7 +39,14 @@
 				</span>
 				<span ng-show="node.data">
 					<span class="cluster-map-node-detail">docs: {{node.docs}}</span>
-					<span class="cluster-map-node-detail">size: {{node.size}}</span>
+					<span class="cluster-map-node-detail">size: {{node.size}}
+                                          <div class="progress node-progress" title="FS Usage: {{node.fs_used}} out of {{node.fs_total}}">
+                                          <div ng-show="{{node.fs_used_percent}} <= 75" class="progress-bar" role="progressbar" aria-valuenow="{{node.fs_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.fs_used_percent}}%;">
+                                                  </div>
+                                          <div ng-show="{{node.fs_used_percent}} > 75" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{node.fs_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.fs_used_percent}}%;">
+                                                  </div>
+                                          </div>
+                                  </span>
 				</span>
 			</div>
 			<div class="col-lg-6">
