@@ -1013,6 +1013,11 @@ function Node(node_id, node_info, node_stats) {
 	this.heap_committed = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes'));
 	this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
 	this.heap_max = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_max_in_bytes'));
+	var total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
+	var free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
+	this.disk_total = readablizeBytes(total_in_bytes);
+	this.disk_free = readablizeBytes(free_in_bytes);
+	this.disk_used_percent =  Math.round(100 * ((total_in_bytes - free_in_bytes) / total_in_bytes));
 	
 	// FIXME: 0.90/1.0 check. HEap max and heap_percent are not available on 0.90.0
 	if (!isDefined(this.heap_used_percent)) {

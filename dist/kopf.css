@@ -231,6 +231,7 @@ a.cluster-map-header-cluster-action {
 	display: block;
 	font-size: 13px;
 	font-weight: 500;
+	line-height: 15px;
 }
 
 a.cluster-map-header-index-name:hover {
@@ -358,7 +359,41 @@ a.cluster-map-node-action {
 .node-progress {
 	height: 6px;
 	margin-bottom: 0px;
-	margin-top: 4px;
+	margin-top: 2px;
+	border-radius: 0px;
+}
+.node-progress-container {
+	padding-left: 0px;
+	padding-right: 0px;	
+}
+.node-progress-left {
+	padding-right: 6px;
+	padding-left: 0px;
+}
+.node-progress-center {
+	padding-left: 3px;
+	padding-right: 3px;
+}
+.node-progress-right {
+	padding-left: 6px;
+	padding-right: 0px;
+}
+.progress-title-top {
+	font-size: 8px;
+	font-weight: 300;
+	text-align: center;
+	padding-top: 3px;
+	padding-bottom: 0px;
+	line-height: 5px;
+	margin-top: 0px;
+}
+.progress-title-left {
+	font-size: 8px;
+	font-weight: 300;
+	text-align: right;
+	padding-bottom: 0px;
+	line-height: 8px;
+	margin-top: 0px;
 }
 .json-content {
 	font-size: 10px;
