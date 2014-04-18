@@ -168,7 +168,8 @@ a.setting-info:hover {
 	text-align: right;
 }
 .cluster-health-content {
-	font-family: inherit;
+	font-family: monospace;
+	white-space: pre;
 }
 
 .cluster-health-form-group {
