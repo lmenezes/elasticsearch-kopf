@@ -107,6 +107,10 @@ a.setting-info:hover {
 	line-height: 18px;
 	padding-left: 5px;
 }
+
+.action-buttons {
+	text-align: right;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
@@ -119,9 +123,9 @@ a.setting-info:hover {
 }
 
 .aliases-alias-cell {
-	width: 250px;
-	max-width: 250px;
-	min-width: 250px;
+	width: 200px;
+	max-width: 200px;
+	min-width: 200px;
 }
 .aliases-new-alias-input {
 	overflow: hidden;
@@ -129,19 +133,6 @@ a.setting-info:hover {
 .aliases-new-alias-input > a {
 	text-decoration: none;
 	color: inherit;
-}
-
-.aliases-save-changes {
-	text-align: right;
-}
-
-.aliases-remove-new-alias-action {
-	float: right;
-	padding-top: 8px;
-	padding-left: 5px;
-}
-.alias-remove-index {
-	float: right;
 }
 .analysis-token {
 	border-radius: 1px 1px 1px 1px;

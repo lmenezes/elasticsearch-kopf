@@ -107,3 +107,7 @@ a.setting-info:hover {
 	line-height: 18px;
 	padding-left: 5px;
 }
+
+.action-buttons {
+	text-align: right;
+}
