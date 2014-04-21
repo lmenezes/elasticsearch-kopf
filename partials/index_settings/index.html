@@ -59,7 +59,7 @@
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">fail_on_merge_failure</label>
-			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="should fail when index settings merge isn't successful" data-original-title="fail_on_merge_failure" title="">
 				<i class="icon-info-sign"></i>
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.fail_on_merge_failure']" placeholder="">
@@ -86,7 +86,7 @@
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">compound_on_flush</label>
-			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="new segments (create by indexing, not by merging) should be written in compound format. Boolean setting, defaults to true" data-original-title="compound_on_flush" title="">
 				<i class="icon-info-sign"></i>
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.compound_on_flush']" placeholder="">
@@ -122,7 +122,7 @@
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">compound_format</label>
-			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="" data-original-title="" title="">
+			<a href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="Use the compound file. The compound format reduces the number of open file handles when using file based storage, but is less performant. Boolean setting, defaults to false." data-original-title="compound_format" title="">
 				<i class="icon-info-sign"></i>
 			</a>
 			<input type="text" class="form-control input-sm" ng-model="service.index.editable_settings['index.compound_format']" placeholder="">
