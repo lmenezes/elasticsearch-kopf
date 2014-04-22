@@ -16,10 +16,16 @@
 	font-size: 11px;
 	margin-top: 20px;
 }
-.rest-response {
-	padding: 5px;
-}
 .request-client-request-body-options {
 	overflow: hidden;
 	display: block;
+}
+.history-icon {
+	float: right;
+	padding-left: 10px;
+	font-size: 22px;
+}
+
+.history-icon > a:hover {
+	text-decoration: none;
 }
