@@ -26,8 +26,8 @@ describe('WarmupController', function(){
 
     it('Initial values are correct', function(){
         expect(this.scope.index).toEqual(null);
-        expect(this.scope.warmer_id).toEqual("");
-        expect(this.scope.warmers).toEqual({});
+        expect(this.scope.pagination.warmer_id).toEqual("");
+        expect(this.scope.pagination.getPage()).toEqual({});
         expect(this.scope.indices).toEqual([]);
         expect(this.scope.editor).toEqual(undefined);
         expect(this.scope.new_warmer_id).toEqual("");
@@ -51,7 +51,7 @@ describe('WarmupController', function(){
     });
 
     it('Returns total number of warmers', function() {
-        this.scope.warmers = { 'a': 'b', 'c': 'd'}
+        this.scope.pagination.setResults({ 'a': 'b', 'c': 'd'});
         expect(this.scope.totalWarmers()).toEqual(2);
     });
 
@@ -108,7 +108,7 @@ describe('WarmupController', function(){
 
     it('Loads index warmers for index and specific type', function() {
         this.scope.index = { 'name': "index_name" };
-        this.scope.warmer_id = "warmer_id";
+        this.scope.pagination.warmer_id = "warmer_id";
         this.scope.client.getIndexWarmers = function(){};
         spyOn(this.scope.client, "getIndexWarmers").andReturn(true);
         this.scope.loadIndexWarmers();

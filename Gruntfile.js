@@ -83,6 +83,7 @@ module.exports = function(grunt) {
 					// MODELS
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',
+					'src/kopf/models/warmers_pagination.js',
 					// UTIL
 					'src/kopf/util.js'
 				],

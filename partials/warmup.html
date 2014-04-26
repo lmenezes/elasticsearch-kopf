@@ -74,7 +74,7 @@
 									</div>
 									<div class="form-group col-md-6">
 										<label class="form-label">warmer id</label>
-										<input ng-model="warmer_id" class="form-control input-sm" placeholder="warmer id(accepts wildcards. e.g.: warm*)">
+										<input ng-model="pagination.warmer_id" class="form-control input-sm" placeholder="warmer id(accepts wildcards. e.g.: warm*)">
 									</div>
 									<div class="col-xs-12 action-buttons">
 										<button type="submit" class="btn btn-primary input-sm pull-right" ng-click="loadIndexWarmers()">
@@ -83,9 +83,17 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-lg-12 content-panel">
+									<div class="col-lg-12">
 										<div class="pagination-block">
-											displaying {{totalWarmers()}} registered warmers
+											<span ng-switch on="pagination.hasPreviousPage()">
+												<i class="icon-double-angle-left normal-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+												<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+											</span>
+											{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
+											<span ng-switch on="pagination.hasNextPage()">
+												<i class="icon-double-angle-right normal-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+												<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+											</span>
 										</div>
 									</div>
 								</div>
@@ -97,7 +105,7 @@
 												<td>type</td>
 												<td>source</td>
 											</tr>
-											<tr ng-repeat="(id, body) in warmers">
+											<tr ng-repeat="(id, body) in pagination.getPage()">
 												<td>{{id}}</td>
 												<td>{{body.types}}</td>
 												<td class="table-actions">{{body.source}}

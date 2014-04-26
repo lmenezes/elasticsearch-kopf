@@ -1,9 +1,8 @@
 function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.indices = [];
-	$scope.warmers = {};
 	$scope.index = null;
-	$scope.warmer_id = "";
+	$scope.pagination = new WarmersPagination(1, []);
 	
 	// holds data for new warmer. maybe create a model for that
 	$scope.new_warmer_id = '';
@@ -23,7 +22,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	};
 
 	$scope.totalWarmers=function() {
-		return Object.keys($scope.warmers).length;
+		return $scope.pagination.total();
 	};
 	
 	$scope.loadIndices=function() {
@@ -78,13 +77,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 	$scope.loadIndexWarmers=function() {
 		if (isDefined($scope.index)) {
-			$scope.client.getIndexWarmers($scope.index.name, $scope.warmer_id,
+			$scope.client.getIndexWarmers($scope.index.name, $scope.pagination.warmer_id,
 				function(response) {
 					$scope.updateModel(function() {
 						if (isDefined(response[$scope.index.name])) {
-							$scope.warmers = response[$scope.index.name].warmers;
+							$scope.pagination.setResults(response[$scope.index.name].warmers);
 						} else {
-							$scope.warmers = {};
+							$scope.pagination.setResults([]);
 						}
 					});
 				},
@@ -95,7 +94,7 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 				}
 			);
 		} else {
-			$scope.warmers = {};
+			$scope.pagination.setResults([]);
 		}
 	};
 	
