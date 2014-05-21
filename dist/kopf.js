@@ -2356,11 +2356,14 @@ function RestController($scope, $location, $timeout, AlertService, AceEditorServ
 		$scope.request.body = $scope.editor.format();
 		$('#rest-client-response').html('');
 		if (notEmpty($scope.request.url)) {
-			// TODO: deal with basic auth here
+			var a = document.createElement('a');
+			a.href = $scope.request.url;
+			var username = a.username || null;
+			var password = a.password || null;
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
 				AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 			}
-			$scope.client.executeRequest($scope.request.method,$scope.request.url,null,null,$scope.request.body,
+			$scope.client.executeRequest($scope.request.method,$scope.request.url,username,password,$scope.request.body,
 				function(response) {
 					var content = response;
 					try {
