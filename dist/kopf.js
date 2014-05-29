@@ -206,12 +206,7 @@ function Cluster(state,status,nodes,settings) {
 		if (isDefined(settings.persistent) && isDefined(settings.persistent.disable_allocation)) {
 			this.disableAllocation = settings.persistent.disable_allocation;
 		}
-		// FIXME: 0.90/1.0 check
-		if (isDefined(settings.transient) && isDefined(settings.transient['cluster.routing.allocation.disable_allocation'])) {
-			this.disableAllocation = settings.transient['cluster.routing.allocation.disable_allocation'];
-		} else {
-			this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
-		}
+		this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
 		this.settings = settings;
 		this.master_node = state.master_node;
 		var num_nodes = 0;
@@ -381,10 +376,6 @@ function ElasticClient(connection) {
 		throw error.statusText;
 	});
 
-	this.is1=function() {
-		return (this.version.substring(0, 2) == "1.");
-	};
-
 	this.createIndex=function(name, settings, callback_success, callback_error) {
 		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);
 	};
@@ -516,29 +507,17 @@ function ElasticClient(connection) {
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		// FIXME: 0.90/1.0 check
-		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
-		if (this.is1()) {
-			path = "/" + index + "/.percolator/_search";	
-		} 
+		var path = "/" + index + "/.percolator/_search";
 		this.executeElasticRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		// FIXME: 0.90/1.0 check
-		var path = "/_percolator/" + index + "/" + id;
-		if (this.is1()) {
-			path = "/" + index + "/.percolator/" + id;
-		}
+		var path = "/" + index + "/.percolator/" + id;
 		this.executeElasticRequest('DELETE', path, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		// FIXME: 0.90/1.0 check
-		var path = "/_percolator/" + index + "/" + id;
-		if (this.is1()) {
-			path = "/" + index + "/.percolator/" + id;
-		}
+		var path = "/" + index + "/.percolator/" + id;
 		this.executeElasticRequest('PUT', path, body, callback_success, callback_error);
 	};
 	
@@ -797,13 +776,11 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
 	
 	this.settings = index_metadata.settings;
-	// FIXME: 0.90/1.0 check
 	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
 
-	// FIXME: 0.90/1.0 check
 	this.num_of_shards = getProperty(index_metadata.settings, 'index.number_of_shards');
 	this.num_of_replicas = parseInt(getProperty(index_metadata.settings, 'index.number_of_replicas'));
 	this.state = index_metadata.state;
@@ -866,7 +843,6 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	};
 	
 	this.getAnalyzers=function() {
-		// FIXME: 0.90/1.0 check
 		var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
 		if (analyzers.length === 0) {
 			Object.keys(this.settings).forEach(function(setting) {
@@ -1008,32 +984,13 @@ function Node(node_id, node_info, node_stats) {
 	this.current_master = false;
 	this.stats = node_stats;
 	
-	// FIXME: 0.90/1.0 check
 	this.heap_used = readablizeBytes(getProperty(this.stats,'jvm.mem.heap_used_in_bytes'));
 	this.heap_committed = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes'));
 	this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
 	this.heap_max = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_max_in_bytes'));
 	
-	var total_in_bytes = 0;
-	var free_in_bytes = 0;
-	
-	// FIXME: 0.90/1.0 check. HEap max and heap_percent are not available on 0.90.0
-	if (!isDefined(this.heap_used_percent)) {
-		var heap_used = getProperty(this.stats,'jvm.mem.heap_used_in_bytes');
-		var heap_committed = getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes');
-		this.heap_used_percent = Math.round(100 * (heap_used / heap_committed));
-		this.heap_max = this.heap_committed;
-		
-		// FIXME: 0.90/1.0 check. fs.total is not available on early 0.90
-		var devices = getProperty(this.stats, 'fs.data');
-		devices.forEach(function(device) {
-			total_in_bytes += getProperty(device, 'total_in_bytes');
-			free_in_bytes += getProperty(device, 'free_in_bytes');
-		});
-	} else {
-		total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
-		free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
-	}
+	var total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
+	var free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
 	
 	this.disk_total = readablizeBytes(total_in_bytes);
 	this.disk_free = readablizeBytes(free_in_bytes);
@@ -2465,7 +2422,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			function() {
 				$scope.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
-						var refreshIndex = $scope.client.is1() ? query.index : '_percolator';
+						var refreshIndex = query.index;
 						$scope.client.refreshIndex(refreshIndex,
 							function(response) {
 								$scope.updateModel(function() {
@@ -2508,7 +2465,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 		}
 		$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
 			function(response) {
-				var refreshIndex = $scope.client.is1() ? $scope.new_query.index : '_percolator';
+				var refreshIndex = $scope.new_query.index;
 				$scope.client.refreshIndex(refreshIndex,
 					function(response) {
 						$scope.updateModel(function() {
@@ -2572,12 +2529,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 }
 
 function PercolateQuery(query_info) {
-	// FIXME: 0.90/1.0 check
-	if (query_info._index == '_percolator') {
-		this.index = query_info._type;
-	} else {
-		this.index = query_info._index;
-	}
+	this.index = query_info._index;
 	this.id = query_info._id;
 	this.source = query_info._source;
 	

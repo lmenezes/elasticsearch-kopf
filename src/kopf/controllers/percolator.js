@@ -71,7 +71,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 			function() {
 				$scope.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
-						var refreshIndex = $scope.client.is1() ? query.index : '_percolator';
+						var refreshIndex = query.index;
 						$scope.client.refreshIndex(refreshIndex,
 							function(response) {
 								$scope.updateModel(function() {
@@ -114,7 +114,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 		}
 		$scope.client.createPercolatorQuery($scope.new_query.index, $scope.new_query.id, $scope.new_query.source,
 			function(response) {
-				var refreshIndex = $scope.client.is1() ? $scope.new_query.index : '_percolator';
+				var refreshIndex = $scope.new_query.index;
 				$scope.client.refreshIndex(refreshIndex,
 					function(response) {
 						$scope.updateModel(function() {
@@ -178,12 +178,7 @@ function PercolatorController($scope, $location, $timeout, ConfirmDialogService,
 }
 
 function PercolateQuery(query_info) {
-	// FIXME: 0.90/1.0 check
-	if (query_info._index == '_percolator') {
-		this.index = query_info._type;
-	} else {
-		this.index = query_info._index;
-	}
+	this.index = query_info._index;
 	this.id = query_info._id;
 	this.source = query_info._source;
 	
