@@ -14,32 +14,13 @@ function Node(node_id, node_info, node_stats) {
 	this.current_master = false;
 	this.stats = node_stats;
 	
-	// FIXME: 0.90/1.0 check
 	this.heap_used = readablizeBytes(getProperty(this.stats,'jvm.mem.heap_used_in_bytes'));
 	this.heap_committed = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes'));
 	this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
 	this.heap_max = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_max_in_bytes'));
 	
-	var total_in_bytes = 0;
-	var free_in_bytes = 0;
-	
-	// FIXME: 0.90/1.0 check. HEap max and heap_percent are not available on 0.90.0
-	if (!isDefined(this.heap_used_percent)) {
-		var heap_used = getProperty(this.stats,'jvm.mem.heap_used_in_bytes');
-		var heap_committed = getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes');
-		this.heap_used_percent = Math.round(100 * (heap_used / heap_committed));
-		this.heap_max = this.heap_committed;
-		
-		// FIXME: 0.90/1.0 check. fs.total is not available on early 0.90
-		var devices = getProperty(this.stats, 'fs.data');
-		devices.forEach(function(device) {
-			total_in_bytes += getProperty(device, 'total_in_bytes');
-			free_in_bytes += getProperty(device, 'free_in_bytes');
-		});
-	} else {
-		total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
-		free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
-	}
+	var total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
+	var free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
 	
 	this.disk_total = readablizeBytes(total_in_bytes);
 	this.disk_free = readablizeBytes(free_in_bytes);

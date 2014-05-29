@@ -8,13 +8,11 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
 	
 	this.settings = index_metadata.settings;
-	// FIXME: 0.90/1.0 check
 	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
 	this.mappings = index_metadata.mappings;
 	this.metadata.settings = this.settings;
 	this.metadata.mappings = this.mappings;
 
-	// FIXME: 0.90/1.0 check
 	this.num_of_shards = getProperty(index_metadata.settings, 'index.number_of_shards');
 	this.num_of_replicas = parseInt(getProperty(index_metadata.settings, 'index.number_of_replicas'));
 	this.state = index_metadata.state;
@@ -77,7 +75,6 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	};
 	
 	this.getAnalyzers=function() {
-		// FIXME: 0.90/1.0 check
 		var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
 		if (analyzers.length === 0) {
 			Object.keys(this.settings).forEach(function(setting) {
