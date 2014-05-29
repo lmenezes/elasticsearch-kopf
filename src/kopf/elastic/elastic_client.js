@@ -37,10 +37,6 @@ function ElasticClient(connection) {
 		throw error.statusText;
 	});
 
-	this.is1=function() {
-		return (this.version.substring(0, 2) == "1.");
-	};
-
 	this.createIndex=function(name, settings, callback_success, callback_error) {
 		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);
 	};
@@ -172,29 +168,17 @@ function ElasticClient(connection) {
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
-		// FIXME: 0.90/1.0 check
-		var path = isDefined(index) ? "/_percolator/" + index + "/_search" : "/_percolator/_search";
-		if (this.is1()) {
-			path = "/" + index + "/.percolator/_search";	
-		} 
+		var path = "/" + index + "/.percolator/_search";
 		this.executeElasticRequest('POST', path , body,callback_success, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
-		// FIXME: 0.90/1.0 check
-		var path = "/_percolator/" + index + "/" + id;
-		if (this.is1()) {
-			path = "/" + index + "/.percolator/" + id;
-		}
+		var path = "/" + index + "/.percolator/" + id;
 		this.executeElasticRequest('DELETE', path, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		// FIXME: 0.90/1.0 check
-		var path = "/_percolator/" + index + "/" + id;
-		if (this.is1()) {
-			path = "/" + index + "/.percolator/" + id;
-		}
+		var path = "/" + index + "/.percolator/" + id;
 		this.executeElasticRequest('PUT', path, body, callback_success, callback_error);
 	};
 	
