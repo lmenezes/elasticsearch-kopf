@@ -75,6 +75,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/repository.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
+					'src/kopf/controllers/benchmark.js',
 					// SERVICES
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',
@@ -147,6 +148,7 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/percolator.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
+					'src/kopf/controllers/benchmark.js',
 					// SERVICES
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',

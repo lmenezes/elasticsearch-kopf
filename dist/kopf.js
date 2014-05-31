@@ -2929,6 +2929,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	};
 	
 }
+function BenchmarkController($scope, $location, $timeout) {
+
+    $scope.$on('loadBenchmarkEvent', function() {
+
+    });
+
+}
 var Alert=function(message, response, level, _class, icon) {
 	var current_date = new Date();
 	this.message = message;
