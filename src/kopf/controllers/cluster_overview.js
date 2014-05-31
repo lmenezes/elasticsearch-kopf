@@ -296,28 +296,33 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 			var query = $scope.pagination.query;
 			var state = $scope.pagination.state;
 			var hide_special = $scope.pagination.hide_special;
-			$scope.pagination.cached_result = $.map(indices,function(i) {
-				if (hide_special && i.isSpecial()) {
-					return null;
-				}
-				
-				if (notEmpty(query)) {
-					if (i.name.toLowerCase().indexOf(query.trim().toLowerCase()) == -1) {
+			try {
+				var reg = new RegExp(query.trim(), "i");
+				$scope.pagination.cached_result = $.map(indices,function(i) {
+					if (hide_special && i.isSpecial()) {
 						return null;
-					} 
-				}
-				
-				if (state.length > 0) {
-					if (state == "unhealthy") {
-						if (!i.unhealthy) {
-							return null;							
-						}
-					} else if ((state == "open" || state == "close") && state != i.state) {
-						return null;						
 					}
-				} 
-				return i;
-			});
+					
+					if (notEmpty(query)) {
+						if (!reg.test(i.name)) {
+							return null;
+						}
+					}
+					
+					if (state.length > 0) {
+						if (state == "unhealthy") {
+							if (!i.unhealthy) {
+								return null;
+							}
+						} else if ((state == "open" || state == "close") && state != i.state) {
+							return null;
+						}
+					}
+					return i;
+				});
+			} catch (error) {
+				$scope.pagination.cached_result = [];
+			}
 			$scope.previous_pagination = $scope.pagination.clone();
 			$scope.pagination.cluster_timestamp = $scope.cluster.created_at;
 		}
