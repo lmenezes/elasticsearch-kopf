@@ -1,4 +1,103 @@
 <div ng-controller="BenchmarkController" ng-show="hasConnection()">
 	<div class="row">
+		<div class="col-md-6 content-panel">
+			<div class="panel-group" id="#runBenchmarkAccordion">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#runBenchmarkAccordion" href="#runBenchmark">run benchmark</a>
+						</h4>
+					</div>
+					<div id="runBenchmark" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-xs-6">
+									<div class="form-group">
+										<label class="form-label">benchmark name</label>
+										<input type="text" class="form-control input-sm" placeholder="unique name for this benchmark" ng-model="bench.name">
+									</div>
+								</div>
+								<div class="col-xs-6">
+									<div class="form-group">
+										<label class="form-label">percentiles</label>
+										<input type="text" class="form-control input-sm" ng-model="bench.percentiles">
+									</div>
+								</div>
+							</div>
+							<!-- competitors -->
+							<div class="row">
+								<div class="col-xs-12">
+									competitors <i class="icon-plus-sign" ng-click="addCompetitor()"></i>
+								</div>
+							</div>
+							<div ng-repeat="competitor in bench.competitors">
+								<div class="row" >
+									<div class="col-xs-6">
+										<div class="form-group">
+											<label class="form-label">name</label>
+											<input type="text" class="form-control input-sm" placeholder="competitor name" ng-model="competitor.name">
+										</div>
+									</div>
+									<div class="col-xs-6">
+										<div class="form-group">
+											<label class="form-label">search type</label>
+											<select ng-model="competitor.search_type" class="form-control input-sm" ng-options="t as t for t in ['search_then_fetch','dfs_search_then_fetch', 'count']">
+											</select>
+										</div>
+									</div>
+								</div>
+								<!-- indices and types -->
+								<!-- div class="row">
+									<div class="col-xs-6">
+										<label class="form-label">indices (default to all)</label>
+										<select multiple="multiple" ng-model="competitor.indices" ng-options="i.name as i.name for i in indices" class="form-control input-sm-twoxheight">
+											<option value="">defaults to all</option>
+										</select>
+									</div>
+									<div class="col-xs-6">
+										<label class="form-label">types (defaults to all)</label>
+										<select multiple="multiple" ng-model="competitor.types" ng-options="t as t for t in types" class="form-control input-sm-twoxheight">
+											<option value="">defaults to all</option>
+										</select>
+									</div>
+								</div -->
+								<!-- requests -->
+								<div class="row">
+									<div class="col-xs-12">
+										<label class="form-label">requests</label>
+										<textarea class="form-control input-sm" rows="5" ng-model="competitor.requests"></textarea>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12 content-panel action-buttons">
+										<button type="submit" class="btn btn-primary input-sm" ng-click="runBenchmark()">
+											<i class="icon-bolt"></i> run
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 content-panel">
+			<div class="panel-group" id="#benchmarkResultAccordion">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#benchmarkResultAccordion" href="#benchmarkResult">benchmark {{bench.name}} results</a>
+						</h4>
+					</div>
+					<div id="benchmarkResult" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-xs-12">
+									<div id="benchmark-result" style="min-height: 614px"></div>
+								</div>
+							</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

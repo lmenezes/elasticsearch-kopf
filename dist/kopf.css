@@ -111,6 +111,9 @@ a.setting-info:hover {
 .action-buttons {
 	text-align: right;
 }
+textarea {
+    resize: none;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;

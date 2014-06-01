@@ -210,6 +210,10 @@ function ElasticClient(connection) {
 	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
 		this.executeElasticRequest('PUT', "/_snapshot/" + repository + "/" +snapshot, body, callback_success, callback_error );
 	};
+	
+	this.executeBenchmark=function(body, callback_success, callback_error){
+		this.executeElasticRequest('PUT', "/_bench", body, callback_success, callback_error );
+	};
 
 	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;

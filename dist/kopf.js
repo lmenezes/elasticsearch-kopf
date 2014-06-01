@@ -549,6 +549,10 @@ function ElasticClient(connection) {
 	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
 		this.executeElasticRequest('PUT', "/_snapshot/" + repository + "/" +snapshot, body, callback_success, callback_error );
 	};
+	
+	this.executeBenchmark=function(body, callback_success, callback_error){
+		this.executeElasticRequest('PUT', "/_bench", body, callback_success, callback_error );
+	};
 
 	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
 		var url = this.host + path;
@@ -2936,10 +2940,33 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 }
 function BenchmarkController($scope, $location, $timeout) {
 
-    $scope.$on('loadBenchmarkEvent', function() {
+	$scope.bench = new Benchmark();
+	$scope.competitor = new Competitor();
+	$scope.indices = [];
+	$scope.types = [];
 
-    });
-
+	$scope.$on('loadBenchmarkEvent', function() {
+		if (isDefined($scope.cluster)) {
+			$scope.indices = $scope.cluster.indices || [];
+		}
+	});
+	
+	$scope.addCompetitor=function() {
+		this.bench.addCompetitor(new Competitor());
+	};
+	
+	$scope.runBenchmark=function() {
+		$scope.client.executeBenchmark($scope.bench.toJson(), 
+			function(response) {
+				$scope.result = JSONTree.create(response);
+				$('#benchmark-result').html($scope.result);
+			},
+			function(error) {
+				console.log(error);
+			}
+		);
+	};
+	
 }
 var Alert=function(message, response, level, _class, icon) {
 	var current_date = new Date();
@@ -3214,6 +3241,66 @@ function WarmersPagination(page, results) {
 		}
 		return this.cached_results;
 	};
+}
+function Benchmark() {
+	this.name = '';
+	this.num_executor = 1;
+	this.percentiles = '[10, 25, 50, 75, 90, 99]';
+	// can be overriden by competitors
+	this.iterations = '';
+	this.concurrency = '';
+	this.multiplier = '';
+	this.warmup = true;
+	this.num_slowest = '';
+	this.requests = "";
+	this.competitors = [ new Competitor() ];
+	
+	this.addCompetitor=function(competitor) {
+		this.competitors.push(competitor);
+	};
+	
+	this.toJson=function() {
+		var body = {};
+		body.name = this.name;
+		if (notEmpty(this.num_executor)) {
+			body.num_executor_nodes = this.num_executor;
+		}
+		if (notEmpty(this.percentiles)) {
+			body.percentiles = JSON.parse(this.percentiles);
+		}
+		if (this.competitors.length > 0) {
+			body.competitors = this.competitors.map(function(c) { return c.toJson(); });
+		}
+		return JSON.stringify(body, null, 4);
+	};
+	
+}
+
+function Competitor() {
+	this.name = '';
+
+	// override benchmark options
+	this.iterations = '';
+	this.concurrency = '';
+	this.multiplier = '';
+	this.num_slowest = '';
+	this.warmup = true;
+	this.requests = [];
+	
+	// defined only by competitor
+	this.search_type = 'search_then_fetch';
+	this.indices = '[]';
+	this.types = '[]';
+	
+	this.toJson=function() {
+		var body = {};
+		body.name = this.name;
+		if (notEmpty(this.requests)) {
+			body.requests = JSON.parse(this.requests);
+		}
+		return body;
+	};
+	
 }
 function readablizeBytes(bytes) {
 	if (bytes > 0) {
