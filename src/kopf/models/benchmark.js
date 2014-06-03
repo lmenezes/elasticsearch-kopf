@@ -9,7 +9,7 @@ function Benchmark() {
 	this.warmup = true;
 	this.num_slowest = '';
 	this.requests = "";
-	this.competitors = [ new Competitor() ];
+	this.competitors = [ ];
 	
 	this.addCompetitor=function(competitor) {
 		this.competitors.push(competitor);

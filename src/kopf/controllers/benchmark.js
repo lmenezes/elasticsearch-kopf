@@ -12,10 +12,12 @@ function BenchmarkController($scope, $location, $timeout) {
 	});
 	
 	$scope.addCompetitor=function() {
-		this.bench.addCompetitor(new Competitor());
+		this.bench.addCompetitor($scope.competitor);
+		$scope.competitor = new Competitor();
 	};
 	
 	$scope.runBenchmark=function() {
+		console.log($scope.bench.toJson());
 		$scope.client.executeBenchmark($scope.bench.toJson(), 
 			function(response) {
 				$scope.result = JSONTree.create(response);

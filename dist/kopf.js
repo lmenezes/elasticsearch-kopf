@@ -2952,10 +2952,12 @@ function BenchmarkController($scope, $location, $timeout) {
 	});
 	
 	$scope.addCompetitor=function() {
-		this.bench.addCompetitor(new Competitor());
+		this.bench.addCompetitor($scope.competitor);
+		$scope.competitor = new Competitor();
 	};
 	
 	$scope.runBenchmark=function() {
+		console.log($scope.bench.toJson());
 		$scope.client.executeBenchmark($scope.bench.toJson(), 
 			function(response) {
 				$scope.result = JSONTree.create(response);
@@ -3253,7 +3255,7 @@ function Benchmark() {
 	this.warmup = true;
 	this.num_slowest = '';
 	this.requests = "";
-	this.competitors = [ new Competitor() ];
+	this.competitors = [ ];
 	
 	this.addCompetitor=function(competitor) {
 		this.competitors.push(competitor);
