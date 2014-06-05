@@ -113,6 +113,9 @@
 											<td>
 												search type
 											</td>
+											<td>
+												&nbsp;
+											</td>
 										</tr>
 										<tr ng-repeat="competitor in bench.competitors">
 											<td>
@@ -120,6 +123,9 @@
 											</td>
 											<td>
 												<span class="">{{competitor.search_type}}</span>
+											</td>
+											<td>
+												<i class="icon-minus-sign" ng-click="removeCompetitor($index)"></i>
 											</td>
 										</tr>
 									</table>

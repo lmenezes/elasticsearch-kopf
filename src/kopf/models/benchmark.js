@@ -27,6 +27,18 @@ function Benchmark() {
 		if (this.competitors.length > 0) {
 			body.competitors = this.competitors.map(function(c) { return c.toJson(); });
 		}
+		if (notEmpty(this.iterations)) {
+			body.iterations = this.iterations;
+		}
+		if (notEmpty(this.concurrency)) {
+			body.concurrency = this.concurrency;
+		}
+		if (notEmpty(this.multiplier)) {
+			body.multiplier = this.multiplier;
+		}
+		if (notEmpty(this.num_slowest)) {
+			body.num_slowest = this.num_slowest;
+		}
 		return JSON.stringify(body, null, 4);
 	};
 	
@@ -53,6 +65,18 @@ function Competitor() {
 		body.name = this.name;
 		if (notEmpty(this.requests)) {
 			body.requests = JSON.parse(this.requests);
+		}
+		if (notEmpty(this.iterations)) {
+			body.iterations = this.iterations;
+		}
+		if (notEmpty(this.concurrency)) {
+			body.concurrency = this.concurrency;
+		}
+		if (notEmpty(this.multiplier)) {
+			body.multiplier = this.multiplier;
+		}
+		if (notEmpty(this.num_slowest)) {
+			body.num_slowest = this.num_slowest;
 		}
 		return body;
 	};

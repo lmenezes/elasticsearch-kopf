@@ -2942,7 +2942,6 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 }
 function BenchmarkController($scope, $location, $timeout) {
-
 	$scope.bench = new Benchmark();
 	$scope.competitor = new Competitor();
 	$scope.indices = [];
@@ -2957,6 +2956,10 @@ function BenchmarkController($scope, $location, $timeout) {
 	$scope.addCompetitor=function() {
 		this.bench.addCompetitor($scope.competitor);
 		$scope.competitor = new Competitor();
+	};
+	
+	$scope.removeCompetitor=function(index) {
+		console.log($scope.bench.competitors[index]);
 	};
 	
 	$scope.runBenchmark=function() {
@@ -3276,6 +3279,18 @@ function Benchmark() {
 		if (this.competitors.length > 0) {
 			body.competitors = this.competitors.map(function(c) { return c.toJson(); });
 		}
+		if (notEmpty(this.iterations)) {
+			body.iterations = this.iterations;
+		}
+		if (notEmpty(this.concurrency)) {
+			body.concurrency = this.concurrency;
+		}
+		if (notEmpty(this.multiplier)) {
+			body.multiplier = this.multiplier;
+		}
+		if (notEmpty(this.num_slowest)) {
+			body.num_slowest = this.num_slowest;
+		}
 		return JSON.stringify(body, null, 4);
 	};
 	
@@ -3302,6 +3317,18 @@ function Competitor() {
 		body.name = this.name;
 		if (notEmpty(this.requests)) {
 			body.requests = JSON.parse(this.requests);
+		}
+		if (notEmpty(this.iterations)) {
+			body.iterations = this.iterations;
+		}
+		if (notEmpty(this.concurrency)) {
+			body.concurrency = this.concurrency;
+		}
+		if (notEmpty(this.multiplier)) {
+			body.multiplier = this.multiplier;
+		}
+		if (notEmpty(this.num_slowest)) {
+			body.num_slowest = this.num_slowest;
 		}
 		return body;
 	};

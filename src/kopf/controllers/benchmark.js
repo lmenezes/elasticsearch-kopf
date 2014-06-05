@@ -1,5 +1,4 @@
 function BenchmarkController($scope, $location, $timeout) {
-
 	$scope.bench = new Benchmark();
 	$scope.competitor = new Competitor();
 	$scope.indices = [];
@@ -14,6 +13,10 @@ function BenchmarkController($scope, $location, $timeout) {
 	$scope.addCompetitor=function() {
 		this.bench.addCompetitor($scope.competitor);
 		$scope.competitor = new Competitor();
+	};
+	
+	$scope.removeCompetitor=function(index) {
+		console.log($scope.bench.competitors[index]);
 	};
 	
 	$scope.runBenchmark=function() {
