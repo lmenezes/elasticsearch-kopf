@@ -1,4 +1,4 @@
-function BenchmarkController($scope, $location, $timeout) {
+function BenchmarkController($scope, $location, $timeout, AlertService) {
 	$scope.bench = new Benchmark();
 	$scope.competitor = new Competitor();
 	$scope.indices = [];
@@ -11,23 +11,33 @@ function BenchmarkController($scope, $location, $timeout) {
 	});
 	
 	$scope.addCompetitor=function() {
-		this.bench.addCompetitor($scope.competitor);
-		$scope.competitor = new Competitor();
+		if (notEmpty($scope.competitor.name)) {
+			this.bench.addCompetitor($scope.competitor);
+			$scope.competitor = new Competitor();	
+		} else {
+			AlertService.error("Competitor needs a name");
+		}
 	};
 	
 	$scope.removeCompetitor=function(index) {
-		console.log($scope.bench.competitors[index]);
+		$scope.bench.competitors.splice(index, 1);
 	};
 	
 	$scope.runBenchmark=function() {
-		console.log($scope.bench.toJson());
+		$('#benchmark-result').html('');
 		$scope.client.executeBenchmark($scope.bench.toJson(), 
 			function(response) {
 				$scope.result = JSONTree.create(response);
 				$('#benchmark-result').html($scope.result);
 			},
 			function(error) {
-				console.log(error);
+				$scope.updateModel(function() {
+					if (error.status == 503) {
+						AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+					} else {
+						AlertService.error(error.responseJSON.error);
+					}
+				});
 			}
 		);
 	};

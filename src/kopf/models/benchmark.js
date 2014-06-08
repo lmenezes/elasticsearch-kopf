@@ -2,13 +2,6 @@ function Benchmark() {
 	this.name = '';
 	this.num_executor = 1;
 	this.percentiles = '[10, 25, 50, 75, 90, 99]';
-	// can be overriden by competitors
-	this.iterations = '';
-	this.concurrency = '';
-	this.multiplier = '';
-	this.warmup = true;
-	this.num_slowest = '';
-	this.requests = "";
 	this.competitors = [ ];
 	
 	this.addCompetitor=function(competitor) {
@@ -56,9 +49,18 @@ function Competitor() {
 	this.requests = [];
 	
 	// defined only by competitor
-	this.search_type = 'search_then_fetch';
-	this.indices = '[]';
-	this.types = '[]';
+	this.search_type = 'query_then_fetch';
+	this.indices = '';
+	this.types = '';
+	
+	// cache
+	this.filter_cache = false;
+	this.field_data = false;
+	this.recycler_cache = false;
+	this.id_cache = false;
+	
+	this.cache_fields = '';
+	this.cache_keys = '';
 	
 	this.toJson=function() {
 		var body = {};
@@ -78,6 +80,27 @@ function Competitor() {
 		if (notEmpty(this.num_slowest)) {
 			body.num_slowest = this.num_slowest;
 		}
+		if (notEmpty(this.indices)) {
+			body.indices = this.indices;
+		}
+		if (notEmpty(this.types)) {
+			body.types = this.types;
+		}
+
+		body.search_type = this.search_type;
+
+		body.clear_caches = {};
+		body.clear_caches.filter = this.filter_cache;
+		body.clear_caches.field_data = this.field_date;
+		body.clear_caches.id = this.id_cache;
+		body.clear_caches.recycler = this.recycler_cache;
+		if (notEmpty(this.cache_fields)) {
+			body.clear_caches.fields = this.cache_fields;
+		}
+		if (notEmpty(this.cache_keys)) {
+			body.clear_caches.filter_keys = this.cache_keys;
+		}
+		
 		return body;
 	};
 	

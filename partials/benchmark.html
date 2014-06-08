@@ -27,7 +27,7 @@
 							<!-- competitors -->
 							<div class="row">
 								<div class="col-xs-12">
-									competitors
+									<label class="form-label">benchmark competitors</label>
 								</div>
 							</div>
 							<div class="row">
@@ -42,32 +42,20 @@
 										<div class="col-xs-12">
 											<div class="form-group">
 												<label class="form-label">search type</label>
-												<select ng-model="competitor.search_type" class="form-control input-sm" ng-options="t as t for t in ['search_then_fetch','dfs_search_then_fetch', 'count']">
+												<select ng-model="competitor.search_type" class="form-control input-sm" ng-options="t as t for t in ['query_then_fetch','dfs_query_then_fetch', 'count']">
 												</select>
 											</div>
 										</div>
-										<div class="col-xs-6">
+										<div class="col-xs-12">
 											<div class="form-group">
-												<label class="form-label">iterations</label>
-												<input type="text" class="form-control input-sm" placeholder="defaults to 5" ng-model="competitor.iterations">
+												<label class="form-label">indices</label>
+												<input type="text" class="form-control input-sm" placeholder="[ 'index1', 'index2' ]" ng-model="competitor.indices">
 											</div>
 										</div>
-										<div class="col-xs-6">
+										<div class="col-xs-12">
 											<div class="form-group">
-												<label class="form-label">multiplier</label>
-												<input type="text" class="form-control input-sm" placeholder="defaults to 1000" ng-model="competitor.multiplier">
-											</div>
-										</div>
-										<div class="col-xs-6">
-											<div class="form-group">
-												<label class="form-label">concurrency</label>
-												<input type="text" class="form-control input-sm" placeholder="defaults to 5" ng-model="competitor.concurrency">
-											</div>
-										</div>
-										<div class="col-xs-6">
-											<div class="form-group">
-												<label class="form-label">num slowest</label>
-												<input type="text" class="form-control input-sm" placeholder="defaults to 1" ng-model="competitor.num_slowest">
+												<label class="form-label">types</label>
+												<input type="text" class="form-control input-sm" placeholder="[ 'type1', 'type2' ]" ng-model="competitor.types">
 											</div>
 										</div>
 									</div>
@@ -81,21 +69,72 @@
 									</div>
 								</div>
 							</div>
-							<!-- indices and types -->
-							<!-- div class="row">
-								<div class="col-xs-6">
-									<label class="form-label">indices (default to all)</label>
-									<select multiple="multiple" ng-model="competitor.indices" ng-options="i.name as i.name for i in indices" class="form-control input-sm-twoxheight">
-										<option value="">defaults to all</option>
-									</select>
+							<div class="row">
+								<div class="col-xs-12">
+									<div class="panel-group" id="#competitorDetailsAccordion">
+										<a data-toggle="collapse" data-parent="#competitorDetailsAccordion" href="#competitorDetails">more options <i class="icon-expand-alt"></i></a>
+										<div id="competitorDetails" class="panel-collapse collapse">
+											<div class="panel-body">
+												<div class="row">
+													<div class="col-xs-3">
+														<div class="form-group">
+															<label class="form-label">iterations</label>
+															<input type="text" class="form-control input-sm" placeholder="defaults to 5" ng-model="competitor.iterations">
+														</div>
+													</div>
+													<div class="col-xs-3">
+														<div class="form-group">
+															<label class="form-label">multiplier</label>
+															<input type="text" class="form-control input-sm" placeholder="defaults to 1000" ng-model="competitor.multiplier">
+														</div>
+													</div>
+													<div class="col-xs-3">
+														<div class="form-group">
+															<label class="form-label">concurrency</label>
+															<input type="text" class="form-control input-sm" placeholder="defaults to 5" ng-model="competitor.concurrency">
+														</div>
+													</div>
+													<div class="col-xs-3">
+														<div class="form-group">
+															<label class="form-label">num slowest</label>
+															<input type="text" class="form-control input-sm" placeholder="defaults to 1" ng-model="competitor.num_slowest">
+														</div>
+													</div>
+												</div>
+												<div class="row">
+													<div class="col-xs-12">
+														<label class="form-label">clear caches</label>
+													</div>
+													<div class="form-group col-xs-3">
+														<input type="checkbox" ng-model="competitor.filter_cache"> clear filter cache
+													</div>
+													<div class="form-group col-xs-3">
+														<input type="checkbox" ng-model="competitor.field_data"> clear field data
+													</div>
+													<div class="form-group col-xs-3">
+														<input type="checkbox" ng-model="competitor.id_cache"> clear id cache
+													</div>
+													<div class="form-group col-xs-3">
+														<input type="checkbox" ng-model="competitor.recycler_cache"> clear recycler cache
+													</div>
+													<div class="col-xs-6">
+														<div class="form-group">
+															<label class="form-label">fields to clear</label>
+															<input type="text" class="form-control input-sm" placeholder="array of fields to clear" ng-model="competitor.cache_fields">
+														</div>
+													</div>
+													<div class="col-xs-6">
+														<div class="form-group">
+															<label class="form-label">filter keys to clear</label>
+															<input type="text" class="form-control input-sm" placeholder="array of filter keys to clear" ng-model="competitor.cache_keys">
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
-								<div class="col-xs-6">
-									<label class="form-label">types (defaults to all)</label>
-									<select multiple="multiple" ng-model="competitor.types" ng-options="t as t for t in types" class="form-control input-sm-twoxheight">
-										<option value="">defaults to all</option>
-									</select>
-								</div>
-							</div -->
+							</div>
 							<div class="row">
 								<div class="col-xs-12 content-panel action-buttons">
 									<button type="submit" class="btn btn-primary input-sm" ng-click="addCompetitor()">
@@ -113,19 +152,16 @@
 											<td>
 												search type
 											</td>
-											<td>
-												&nbsp;
-											</td>
 										</tr>
 										<tr ng-repeat="competitor in bench.competitors">
 											<td>
-												<span class="">{{competitor.name}}</span>
+												<span class="">
+													{{competitor.name}} 
+													<i class="icon-remove danger-action normal-action" ng-click="removeCompetitor($index)"></i>
+												</span>
 											</td>
 											<td>
 												<span class="">{{competitor.search_type}}</span>
-											</td>
-											<td>
-												<i class="icon-minus-sign" ng-click="removeCompetitor($index)"></i>
 											</td>
 										</tr>
 									</table>
@@ -158,6 +194,8 @@
 									<div id="benchmark-result" style="min-height: 614px"></div>
 								</div>
 							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
