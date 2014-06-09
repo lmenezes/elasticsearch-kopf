@@ -2966,23 +2966,33 @@ function BenchmarkController($scope, $location, $timeout, AlertService) {
 		$scope.bench.competitors.splice(index, 1);
 	};
 	
+	$scope.editCompetitor=function(index) {
+		var edit = $scope.bench.competitors.splice(index, 1);
+		$scope.competitor = edit[0];
+	};
+	
 	$scope.runBenchmark=function() {
 		$('#benchmark-result').html('');
-		$scope.client.executeBenchmark($scope.bench.toJson(), 
-			function(response) {
-				$scope.result = JSONTree.create(response);
-				$('#benchmark-result').html($scope.result);
-			},
-			function(error) {
-				$scope.updateModel(function() {
-					if (error.status == 503) {
-						AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
-					} else {
-						AlertService.error(error.responseJSON.error);
-					}
-				});
-			}
-		);
+		try {
+			var json = $scope.bench.toJson();
+			$scope.client.executeBenchmark(json, 
+				function(response) {
+					$scope.result = JSONTree.create(response);
+					$('#benchmark-result').html($scope.result);
+				},
+				function(error) {
+					$scope.updateModel(function() {
+						if (error.status == 503) {
+							AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+						} else {
+							AlertService.error(error.responseJSON.error);
+						}
+					});
+				}
+			);
+		} catch (error) {
+			AlertService.error(error);
+		}
 	};
 	
 }
@@ -3331,36 +3341,52 @@ function Competitor() {
 			body.requests = JSON.parse(this.requests);
 		}
 		if (notEmpty(this.iterations)) {
-			body.iterations = this.iterations;
+			if (isNumber(this.iterations)) {
+				body.iterations = parseInt(this.iterations);
+			} else {
+				throw "Iterations must be a valid number";
+			}
 		}
 		if (notEmpty(this.concurrency)) {
-			body.concurrency = this.concurrency;
+			if (isNumber(this.concurrency)) {
+				body.concurrency = parseInt(this.concurrency);
+			} else {
+				throw "Concurrency must be a valid number";
+			}
 		}
 		if (notEmpty(this.multiplier)) {
-			body.multiplier = this.multiplier;
+			if (isNumber(this.multiplier)) {
+				body.multiplier = parseInt(this.multiplier);
+			} else {
+				throw "Multiplier must be a valid number";
+			}
 		}
 		if (notEmpty(this.num_slowest)) {
-			body.num_slowest = this.num_slowest;
+			if (isNumber(this.num_slowest)) {
+				body.num_slowest = parseInt(this.num_slowest);
+			} else {
+				throw "Num slowest must be a valid number";
+			}
 		}
 		if (notEmpty(this.indices)) {
-			body.indices = this.indices;
+			body.indices = this.indices.split(",").map(function(index) { return index.trim(); });
 		}
 		if (notEmpty(this.types)) {
-			body.types = this.types;
+			body.types = this.types.split(",").map(function(type) { return type.trim(); });
 		}
 
 		body.search_type = this.search_type;
 
 		body.clear_caches = {};
 		body.clear_caches.filter = this.filter_cache;
-		body.clear_caches.field_data = this.field_date;
+		body.clear_caches.field_data = this.field_data;
 		body.clear_caches.id = this.id_cache;
 		body.clear_caches.recycler = this.recycler_cache;
 		if (notEmpty(this.cache_fields)) {
-			body.clear_caches.fields = this.cache_fields;
+			body.clear_caches.fields = this.cache_fields.split(",").map(function(field) { return field.trim(); });
 		}
 		if (notEmpty(this.cache_keys)) {
-			body.clear_caches.filter_keys = this.cache_keys;
+			body.clear_caches.filter_keys = this.cache_keys.split(",").map(function(key) { return key.trim(); });
 		}
 		
 		return body;
@@ -3403,6 +3429,11 @@ function isDefined(value) {
 // string.trim().length is grater than 0
 function notEmpty(value) {
 	return isDefined(value) && value.toString().trim().length > 0;
+}
+
+function isNumber(value) {
+	var exp = /\d+/;
+	return exp.test(value);
 }
 
 // Returns the given date as a String formatted as hh:MM:ss

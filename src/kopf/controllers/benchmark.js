@@ -23,23 +23,33 @@ function BenchmarkController($scope, $location, $timeout, AlertService) {
 		$scope.bench.competitors.splice(index, 1);
 	};
 	
+	$scope.editCompetitor=function(index) {
+		var edit = $scope.bench.competitors.splice(index, 1);
+		$scope.competitor = edit[0];
+	};
+	
 	$scope.runBenchmark=function() {
 		$('#benchmark-result').html('');
-		$scope.client.executeBenchmark($scope.bench.toJson(), 
-			function(response) {
-				$scope.result = JSONTree.create(response);
-				$('#benchmark-result').html($scope.result);
-			},
-			function(error) {
-				$scope.updateModel(function() {
-					if (error.status == 503) {
-						AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
-					} else {
-						AlertService.error(error.responseJSON.error);
-					}
-				});
-			}
-		);
+		try {
+			var json = $scope.bench.toJson();
+			$scope.client.executeBenchmark(json, 
+				function(response) {
+					$scope.result = JSONTree.create(response);
+					$('#benchmark-result').html($scope.result);
+				},
+				function(error) {
+					$scope.updateModel(function() {
+						if (error.status == 503) {
+							AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+						} else {
+							AlertService.error(error.responseJSON.error);
+						}
+					});
+				}
+			);
+		} catch (error) {
+			AlertService.error(error);
+		}
 	};
 	
 }
