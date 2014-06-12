@@ -84,6 +84,7 @@ test("cluster creating", function() {
 		var nonMatchingNodes = cluster.getNodes(node.name + "a", true, true, true);
 		ok(nonMatchingNodes.length < matchingNodes.length, "Should find at least one less node with that name");
 		ok(node.transport_address.length > 0, "Checking node transport address");	
+		ok(node.host.length > 0, "Checking node host name");	
 	});
 	equal(master_nodes, 1, "There should be exactly one master node");
 });
