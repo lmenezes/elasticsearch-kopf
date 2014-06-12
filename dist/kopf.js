@@ -969,12 +969,13 @@ function EditableIndexSettings(settings) {
 	});
 }
 function Node(node_id, node_info, node_stats) {
-	this.id = node_id;	
+	this.id = node_id;
 	this.name = node_info.name;
 	this.metadata = {};
 	this.metadata.info = node_info;
 	this.metadata.stats = node_stats;
 	this.transport_address = node_info.transport_address;
+	this.host = node_stats.host;
 	var master = node_info.attributes.master === 'false' ? false : true;
 	var data = node_info.attributes.data === 'false' ? false : true;
 	var client = node_info.attributes.client === 'true' ? true : false;
@@ -983,24 +984,24 @@ function Node(node_id, node_info, node_stats) {
 	this.client = client || !master && !data;
 	this.current_master = false;
 	this.stats = node_stats;
-	
+
 	this.heap_used = readablizeBytes(getProperty(this.stats,'jvm.mem.heap_used_in_bytes'));
 	this.heap_committed = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_committed_in_bytes'));
 	this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
 	this.heap_max = readablizeBytes(getProperty(this.stats, 'jvm.mem.heap_max_in_bytes'));
-	
+
 	var total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
 	var free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
-	
+
 	this.disk_total = readablizeBytes(total_in_bytes);
 	this.disk_free = readablizeBytes(free_in_bytes);
 	this.disk_used_percent =  Math.round(100 * ((total_in_bytes - free_in_bytes) / total_in_bytes));
-	
+
 	this.cpu_user = getProperty(this.stats, 'os.cpu.user');
 	this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
 	this.docs = getProperty(this.stats, 'indices.docs.count');
 	this.size = readablizeBytes(getProperty(this.stats, 'indices.store.size_in_bytes'));
-	
+
 	this.setCurrentMaster=function() {
 		this.current_master = true;
 	};
@@ -1018,7 +1019,7 @@ function Node(node_id, node_info, node_stats) {
 		if (this.data && !other.data) return -1; // data node comes first
 		return this.name.localeCompare(other.name); // if all the same, lex. sort
 	};
-	
+
 	this.matches=function(name, data, master, client) {
 		if (notEmpty(name)) {
 			if (this.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
@@ -1028,6 +1029,7 @@ function Node(node_id, node_info, node_stats) {
 		return (data && this.data || master && this.master || client && this.client);
 	};
 }
+
 function Shard(shard_routing, shard_info) {
 	this.info = isDefined(shard_info) ? shard_info : shard_routing;
 	this.primary = shard_routing.primary;
