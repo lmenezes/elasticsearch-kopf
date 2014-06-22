@@ -183,7 +183,13 @@ function ElasticClient(connection) {
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
-		this.executeElasticRequest('GET', "/_snapshot/_all", {}, callback_success, callback_error);
+		var parse_repositories = function(response) {
+			var repositories = Object.keys(response).map(function(repository) {
+				return new Repository(repository, response[repository]);
+			});
+			callback_success(repositories);
+		};
+		this.executeElasticRequest('GET', "/_snapshot/_all", {}, parse_repositories, callback_error);
 	};
 
 	this.createRepository=function(repository, body, callback_success, callback_error) {
@@ -196,7 +202,11 @@ function ElasticClient(connection) {
 
 	this.getSnapshots=function(repository, callback_success, callback_error){
 		var path = "/_snapshot/" + repository + "/_all";
-		this.executeElasticRequest('GET', path, {}, callback_success, callback_error);
+		var parseSnapshots = function(response) {
+			var snapshots = response.snapshots.map(function(snapshot) { return new Snapshot(snapshot); } );
+			callback_success(snapshots);
+		};
+		this.executeElasticRequest('GET', path, {}, parseSnapshots, callback_error);
 	};
 
 	this.deleteSnapshot=function(repository, snapshot, callback_success, callback_error){
