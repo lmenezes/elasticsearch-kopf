@@ -1,39 +1,43 @@
 function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
-
-	$scope.dialog_service = ConfirmDialogService;
+	// registered repositories
 	$scope.repositories = [];
-	$scope.repositories_names = [];
 	$scope.snapshots = [];
 	$scope.indices = [];
+	
+	$scope.snapshot = null;
+	$scope.snapshot_repository = '';
+
 	$scope.restorable_indices = [];
 	$scope.new_repo = {};
 	$scope.new_snap = {};
 	$scope.restore_snap = {};
 	$scope.editor = undefined;
-
+	
 	$scope.$on('loadRepositoryEvent', function() {
-		$scope.reload();
 		$scope.initEditor();
+		$scope.snapshot = null; // clear 'active' snapshot
+		$scope.reload();
 	});
 	
 	$scope.initEditor=function() {
-		if (!angular.isDefined($scope.editor)) {
+		if (!isDefined($scope.editor)) {
 			$scope.editor = AceEditorService.init('repository-settings-editor');
 		}
 	};
 
-	$scope.loadIndices=function() {
-		if (angular.isDefined($scope.cluster)) {
-			$scope.indices = $scope.cluster.indices || [];
+	$scope.reload=function(){
+		$scope.loadIndices();
+		$scope.loadRepositories();
+		if (notEmpty($scope.snapshot_repository)) {
+			$scope.fetchSnapshots($scope.snapshot_repository);
 		}
 	};
-
-	$scope.reload=function(){
-		$scope.loadRepositories().then(function() {
-			$scope.allSnapshots($scope.repositories)
-		});
-		$scope.loadIndices();
-	};
+	
+	$scope.loadIndices=function() {
+		if (isDefined($scope.cluster)) {
+			$scope.indices = $scope.cluster.indices || [];
+		}
+	}
 
 	$scope.optionalParam=function(body, object, paramname){
 		if(angular.isDefined(object[paramname])) {
@@ -42,13 +46,13 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		return body;
 	};
 
-	$scope.deleteRepository=function(name, value){
-		$scope.dialog_service.open(
-			"are you sure you want to delete repository " + name + "?",
-			value,
+	$scope.deleteRepository=function(repository){
+		ConfirmDialogService.open(
+			"are you sure you want to delete repository " + repository.name + "?",
+			repository.settings,
 			"Delete",
 			function() {
-				$scope.client.deleteRepository(name,
+				$scope.client.deleteRepository(repository.name,
 					function(response) {
 						AlertService.success("Repository successfully deleted", response);
 						$scope.reload();
@@ -63,7 +67,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		);
 	};
 
-	$scope.restoreSnapshot=function(){
+	$scope.restoreSnapshot=function() {
 		var body = {}
 		// dont add to body if not present, these are optional, all indices included by default
 		if (angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0) {
@@ -79,7 +83,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		$scope.optionalParam(body, $scope.restore_snap, "rename_replacement");
 		$scope.optionalParam(body, $scope.restore_snap, "rename_pattern");
 
-		$scope.client.restoreSnapshot($scope.restore_snap.snapshot.repository, $scope.restore_snap.snapshot.snapshot, JSON.stringify(body),
+		$scope.client.restoreSnapshot($scope.snapshot_repository, $scope.snapshot.name, JSON.stringify(body),
 			function(response) {
 				AlertService.success("Snapshot Restored Started");
 				$scope.reload();
@@ -113,48 +117,31 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		}
 	};
 
-	$scope._parseRepositories=function(response, deferred){
-		$scope.updateModel(function() {
-			$scope.repositories = response;
-			$scope.repositories_names = [];
-			$.each($scope.repositories, function(key, value){
-				$scope.repositories_names.push({"name":key, "value":key});
-			});
-		});
-		deferred.resolve(true);
-	};
-
 	$scope.loadRepositories=function() {
-		var deferred = $q.defer();
-		try {
-			$scope.client.getRepositories(
-				function(response) {
-					$scope._parseRepositories(response, deferred)
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while reading repositories", error);
-					});
-					deferred.reject(true);
-				}
-			)
-		} catch (error) {
-			AlertService.error("Failed to load repositories");
-			deferred.reject(false);
-		}
-		return deferred.promise
+		$scope.client.getRepositories(
+			function(response) {
+				$scope.updateModel(function() {
+					$scope.repositories = response;
+				});
+			},
+			function(error) {
+				$scope.updateModel(function() {
+					AlertService.error("Error while reading repositories", error);
+				});
+			}
+		);
 	};
 
 	$scope.createSnapshot=function(){
 		var body = {}
 
 		// name and repo required
-		if (!angular.isDefined($scope.new_snap.repository)) {
+		if (!isDefined($scope.new_snap.repository)) {
 			AlertService.warn("Repository is required");
 			return
 		}
 
-		if (!angular.isDefined($scope.new_snap.name)) {
+		if (!isDefined($scope.new_snap.name)) {
 			AlertService.warn("Snapshot name is required");
 			return
 		}
@@ -172,7 +159,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		
 		$scope.optionalParam(body, $scope.new_snap, "ignore_unavailable");
 
-		$scope.client.createSnapshot($scope.new_snap.repository, $scope.new_snap.name, JSON.stringify(body),
+		$scope.client.createSnapshot($scope.new_snap.repository.name, $scope.new_snap.name, JSON.stringify(body),
 			function(response) {
 				AlertService.success("Snapshot created");
 				$scope.reload();
@@ -186,8 +173,8 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	};
 
 	$scope.deleteSnapshot=function(snapshot){
-			$scope.dialog_service.open(
-			"are you sure you want to delete snapshot " + snapshot.snapshot + "?",
+			ConfirmDialogService.open(
+			"are you sure you want to delete snapshot " + snapshot.name + "?",
 			snapshot,
 			"Delete",
 			function() {
@@ -208,41 +195,32 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		);
 	};
 
-	$scope.allSnapshots=function(repositories) {
-		var all = [];
-		$.each(repositories, function(repository, value) {
-			$scope.fetchSnapshots(repository).then(function(data) { $.merge(all, data ); } );
-		});
-		$scope.snapshots = all;
-	};
-
-	$scope._parseSnapshots=function(repository, response, deferred) {
-		var arr = response["snapshots"];
-		// add the repository name to each snapshot object
-		if (arr && arr.constructor==Array && arr.length!==0) {
-			$.each(arr, function(index, value) { value["repository"] = repository; } );
-		}
-		deferred.resolve(response["snapshots"]);
-	};
-
 	$scope.fetchSnapshots=function(repository) {
-		var deferred = $q.defer();
-		try {
-			$scope.client.getSnapshots(repository,
-				function(response) {
-					$scope._parseSnapshots(repository, response, deferred);
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while fetching snapshots", error);
-					});
-					deferred.resolve([]);
-				}
-			)
-		} catch (error) {
-			AlertService.error("Failed to load snapshots");
-			deferred.resolve([]);
-		}
-		return deferred.promise;
+		$scope.client.getSnapshots(repository,
+			function(response) {
+				$scope.updateModel(function() {
+					$scope.snapshots = response;
+				});
+			},
+			function(error) {
+				$scope.updateModel(function() {
+					$scope.snapshots = [];
+					AlertService.error("Error while fetching snapshots", error);
+				});
+			}
+		);
 	};
+
+	$scope.selectSnapshot=function(snapshot) {
+		$scope.snapshot = snapshot;
+	}
+	
+	$scope.unselectSnapshot=function() {
+		$scope.snapshot = null;
+	}
+	
+	$scope.selectRepository=function(repository) {
+		$scope.snapshot_repository = repository;
+		$scope.fetchSnapshots(repository);
+	}
 }

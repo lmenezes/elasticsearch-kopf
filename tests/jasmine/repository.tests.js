@@ -29,25 +29,29 @@ describe('RepositoryController', function(){
 
     //TESTS
     it('init : values are set', function(){
-        expect(this.scope.dialog_service).not.toBe(null);
         expect(this.scope.repositories).toEqual([]);
-        expect(this.scope.repositories_names).toEqual([]);
         expect(this.scope.snapshots).toEqual([]);
         expect(this.scope.indices).toEqual([]);
+        expect(this.scope.snapshot).toEqual(null)
+        expect(this.scope.snapshot_repository).toEqual('');;
+        expect(this.scope.restorable_indices).toEqual([]);
         expect(this.scope.new_repo).toEqual({});
-        expect(this.scope.editor).toEqual(undefined);
         expect(this.scope.new_snap).toEqual({});
+        expect(this.scope.restore_snap).toEqual({});
+        expect(this.scope.editor).toEqual(undefined);
     });
 
-    it('on : makes calls reload and initEditor', function() {
+    it('on : makes calls reload, initEditor and sets snapshot to null', function() {
         spyOn(this.scope, 'reload').andReturn(true);
         spyOn(this.scope, 'initEditor').andCallThrough();
         spyOn(this.AceEditorService, 'init').andReturn("fakeaceeditor");
+        this.scope.snapshot = "not_null";
         this.scope.$emit("loadRepositoryEvent");
         expect(this.scope.reload).toHaveBeenCalled();
         expect(this.scope.initEditor).toHaveBeenCalled();
         expect(this.AceEditorService.init).toHaveBeenCalledWith('repository-settings-editor');
         expect(this.scope.editor).toEqual("fakeaceeditor");
+        expect(this.scope.snapshot).toEqual(null);
     });
 
     it('loadIndices : assigns a value to indices from cluster.indices', function() {
@@ -57,29 +61,26 @@ describe('RepositoryController', function(){
         expect(this.scope.indices).toEqual(["chicken", "kale", "potatoes"]);
     });
 
-    it('reload : calls loadRepositories, allSnapshots, and loadIndices', function() {
-        var deferred = this._q.defer();
-        deferred.resolve(true);
-        spyOn(this.scope, 'loadRepositories').andReturn(deferred.promise);
-        spyOn(this.scope, 'allSnapshots').andReturn(true);
+    it('reload : calls loadRepositories and loadIndices if not snapshot_repository', function() {
+        spyOn(this.scope, 'loadRepositories').andReturn(true);
+        spyOn(this.scope, 'fetchSnapshots').andReturn(true);
         spyOn(this.scope, 'loadIndices').andReturn(true);
         this.scope.reload();
         this._rootScope.$apply();  //force cycle so promise gets resolved
         expect(this.scope.loadRepositories).toHaveBeenCalled();
-        expect(this.scope.allSnapshots).toHaveBeenCalled();
+        expect(this.scope.fetchSnapshots).not.toHaveBeenCalled();
         expect(this.scope.loadIndices).toHaveBeenCalled();
     });
 
-    it('reload : calls loadRepositories and loadIndices (failed promise)', function() {
-        var deferred = this._q.defer();
-        deferred.reject(true);
-        spyOn(this.scope, 'loadRepositories').andReturn(deferred.promise);
-        spyOn(this.scope, 'allSnapshots').andReturn(true);
+    it('reload : calls loadRepositories and loadIndices', function() {
+        spyOn(this.scope, 'loadRepositories').andReturn(true);
+        spyOn(this.scope, 'fetchSnapshots').andReturn(true);
         spyOn(this.scope, 'loadIndices').andReturn(true);
+        this.scope.snapshot_repository = 'whatever';
         this.scope.reload();
         this._rootScope.$apply();  //force cycle so promise gets resolved
         expect(this.scope.loadRepositories).toHaveBeenCalled();
-        expect(this.scope.allSnapshots).not.toHaveBeenCalled();
+        expect(this.scope.fetchSnapshots).toHaveBeenCalled();
         expect(this.scope.loadIndices).toHaveBeenCalled();
     });
 
@@ -102,6 +103,8 @@ describe('RepositoryController', function(){
 
     it('restoreSnapshot : calls client.restorSnapshot : missing optionals', function () {
         this.scope.client.restoreSnapshot = function(){};
+        this.scope.snapshot_repository = 'my_repo';
+        this.scope.snapshot = { "name":"my_snap" };
         this.scope.restore_snap = {
                                     "snapshot": {
                                                 "snapshot":"my_snap",
@@ -121,6 +124,8 @@ describe('RepositoryController', function(){
 
     it('restoreSnapshot : calls client.restorSnapshot : all params', function () {
         this.scope.client.restoreSnapshot = function(){};
+        this.scope.snapshot_repository = 'my_repo';
+        this.scope.snapshot = { "name":"my_snap" };
         this.scope.restore_snap = {
                                     "indices":["idx-20140107","idx-20140108"],
                                     "ignore_unavailable": false,
@@ -182,35 +187,6 @@ describe('RepositoryController', function(){
         expect(this.scope.client.createRepository).not.toHaveBeenCalled();
     });
 
-    it('_parseRepositories : calls updateModel and deferred.resolve', function() {
-        var fakedeferred = {resolve : function(){}}
-        this.scope.updateModel = function(){};
-        spyOn(this.scope, "updateModel");
-        spyOn(fakedeferred, "resolve");
-        this.scope._parseRepositories("chicken", fakedeferred);
-        expect(this.scope.updateModel).toHaveBeenCalled();
-        expect(fakedeferred.resolve).toHaveBeenCalled();
-    });
-
-    it('_parseRepositories : sets repository names for dropdown', function() {
-        var fakedeferred = {resolve : function(){}}
-
-        // fake version of updateModel, to test logic in the function we will pass it
-        this.scope.updateModel=function(action) {
-            action();
-        };
-
-        var repositories = {"repo1":{"r1k1":"r1v1"}}
-        spyOn(this.scope, "updateModel").andCallThrough();
-        spyOn(fakedeferred, "resolve");
-
-        this.scope._parseRepositories(repositories, fakedeferred);
-        expect(this.scope.updateModel).toHaveBeenCalled();
-        expect(fakedeferred.resolve).toHaveBeenCalled();
-        expect(this.scope.repositories_names).toEqual([{"name":"repo1", "value":"repo1"}]);
-        expect(this.scope.repositories).toEqual(repositories);
-    });
-
     it('loadRepositories : calls client.getRepositories', function() {
         this.scope.client.getRepositories = function(){};
         spyOn(this.scope.client, "getRepositories").andReturn(true);
@@ -240,7 +216,7 @@ describe('RepositoryController', function(){
     it('createSnapshot : calls client.createSnapshot', function() {
         this.scope.client.createSnapshot = function(){};
         spyOn(this.scope.client, "createSnapshot").andReturn(true);
-        this.scope.new_snap = {"repository":"my_repo",
+        this.scope.new_snap = {"repository": new Repository("my_repo", {}),
                                 "name":"my_snap"
                             };
 
@@ -255,7 +231,7 @@ describe('RepositoryController', function(){
     it('createSnapshot : calls client.createSnapshot - sets optional', function() {
         this.scope.client.createSnapshot = function(){};
         spyOn(this.scope.client, "createSnapshot").andReturn(true);
-        this.scope.new_snap = {"repository":"my_repo",
+        this.scope.new_snap = {"repository": new Repository("my_repo", {}),
                                 "name":"my_snap",
                                 "indices":["one","two"],
                                 "include_global_state":"true",
@@ -282,68 +258,6 @@ describe('RepositoryController', function(){
         expect(this.ConfirmDialogService.open).toHaveBeenCalled();
     });
 
-    it('allSnapshots : creates list of all snapshots', function() {
-        var repositories = {
-                            "repo_1": {"fake_key":"fake_value"}
-                        };
-
-        var snapshots = [{"snapshot": "my_snapshot_1"}, {"snapshot": "my_snapshot_2"}];
-        var deferred = this._q.defer();
-        
-        deferred.resolve(snapshots);
-        
-        spyOn(this.scope, 'loadRepositories').andReturn();
-        
-        this.scope.snapshots = [{"snapshot":"existing"}];
-        spyOn(this.scope, "fetchSnapshots").andReturn(deferred.promise);
-        this.scope.allSnapshots(repositories);
-        this._rootScope.$apply();
-        expect(this.scope.snapshots).toEqual([{"snapshot": "my_snapshot_1"},
-                                            {"snapshot": "my_snapshot_2"}]);
-    });
-
-    it('allSnapshots : creates list of all snapshots - fail', function() {
-        var repositories = {
-                            "repo_1": {"fake_key":"fake_value"}
-                        };
-        var deferred = this._q.defer();
-        deferred.reject(true);
-        
-        spyOn(this.scope, 'loadRepositories').andReturn();
-        
-        this.scope.snapshots = [{"snapshot":"existing"}];
-        spyOn(this.scope, "fetchSnapshots").andReturn(deferred.promise);
-        this.scope.allSnapshots(repositories);
-        this._rootScope.$apply();
-        expect(this.scope.snapshots).toEqual([]);
-    });
-
-    it('_parseSnapshots : adds repo name to each snapshot', function() {
-        var fakedeferred = {resolve : function(){} };
-        var response = {
-                        "snapshots":[{"s1":{"name":"tylerdyrden"}}]
-        };
-
-        var expected = [{"s1":{"name":"tylerdyrden"}, "repository":"chicken"}];
-        spyOn(fakedeferred, "resolve");
-
-        this.scope._parseSnapshots("chicken", response, fakedeferred);
-        expect(fakedeferred.resolve).toHaveBeenCalledWith(expected);
-    });
-
-    it('_parseSnapshots : adds nothing if snapshots not array', function() {
-        var fakedeferred = {resolve : function(){} };
-        var response = {
-                        "snapshots":{"s1":{"name":"tylerdyrden"}}
-        };
-
-        var expected = {"s1":{"name":"tylerdyrden"}};
-        spyOn(fakedeferred, "resolve");
-
-        this.scope._parseSnapshots("chicken", response, fakedeferred);
-        expect(fakedeferred.resolve).toHaveBeenCalledWith(expected);
-    });
-
     it('fetchSnapshots : calls getSnapshots', function() {
         this.scope.client.getSnapshots = function(){};
         spyOn(this.scope.client, "getSnapshots").andReturn(true);
@@ -352,7 +266,6 @@ describe('RepositoryController', function(){
             "chicken",
             jasmine.any(Function),
             jasmine.any(Function));
-
     });
 
 });
