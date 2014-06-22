@@ -58,6 +58,8 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/node.js',
 					'src/kopf/elastic/shard.js',
 					'src/kopf/elastic/token.js',
+					'src/kopf/elastic/repository.js',
+					'src/kopf/elastic/snapshot.js',
 					// CONTROLLERS
 					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
@@ -131,6 +133,8 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/node.js',
 					'src/kopf/elastic/shard.js',
 					'src/kopf/elastic/token.js',
+					'src/kopf/elastic/repository.js',
+					'src/kopf/elastic/snapshot.js',
 					// CONTROLLERS
 					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
