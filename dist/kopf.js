@@ -2575,39 +2575,36 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	$scope.restore_snap = {};
 	$scope.editor = undefined;
 
-    $scope.$on('loadRepositoryEvent', function() {
+	$scope.$on('loadRepositoryEvent', function() {
 		$scope.reload();
 		$scope.initEditor();
-    });
+	});
 	
-	$scope.initEditor=function(){
-		if(!angular.isDefined($scope.editor)){
+	$scope.initEditor=function() {
+		if (!angular.isDefined($scope.editor)) {
 			$scope.editor = AceEditorService.init('repository-settings-editor');
 		}
 	};
 
 	$scope.loadIndices=function() {
-		if( angular.isDefined($scope.cluster) )
-		{
+		if (angular.isDefined($scope.cluster)) {
 			$scope.indices = $scope.cluster.indices || [];
 		}
 	};
 
-    $scope.reload=function(){
-		$scope.loadRepositories().then(
-							function() {
-								$scope.allSnapshots($scope.repositories)
-							});
+	$scope.reload=function(){
+		$scope.loadRepositories().then(function() {
+			$scope.allSnapshots($scope.repositories)
+		});
 		$scope.loadIndices();
-    };
+	};
 
-    $scope.optionalParam=function(body, object, paramname){
-		if(angular.isDefined(object[paramname]))
-		{
+	$scope.optionalParam=function(body, object, paramname){
+		if(angular.isDefined(object[paramname])) {
 			body[paramname] = object[paramname];
 		}
 		return body;
-    };
+	};
 
 	$scope.deleteRepository=function(name, value){
 		$scope.dialog_service.open(
@@ -2631,17 +2628,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	};
 
 	$scope.restoreSnapshot=function(){
-
 		var body = {}
 		// dont add to body if not present, these are optional, all indices included by default
-		if(angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0)
-		{
+		if (angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0) {
 			body["indices"] = $scope.restore_snap.indices.join(",");
 		}
 
-		if(angular.isDefined($scope.restore_snap.include_global_state))
-		{
-			//TODO : when es fixes bug [https://github.com/elasticsearch/elasticsearch/issues/4949], this extra "true/false" -> true/false handling will go away
+		if (angular.isDefined($scope.restore_snap.include_global_state)) {
+			//TODO : when fixed [https://github.com/elasticsearch/elasticsearch/issues/4949], this extra "true/false" -> true/false handling will go away
 			body["include_global_state"] = ($scope.restore_snap.include_global_state == 'true');
 		}
 
@@ -2664,12 +2658,11 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 
 	$scope.createRepository=function(){
 		$scope.new_repo.settings = $scope.editor.format();
-		if ($scope.editor.error === null){
+		if ($scope.editor.error === null) {
 			var body = {
 				type: $scope.new_repo.type,
 				settings: JSON.parse($scope.new_repo.settings)
 			}
-
 			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
 				function(response) {
 					AlertService.success("Repository created");
@@ -2720,21 +2713,18 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		var body = {}
 
 		// name and repo required
-		if(!angular.isDefined($scope.new_snap.repository))
-		{
+		if (!angular.isDefined($scope.new_snap.repository)) {
 			AlertService.warn("Repository is required");
 			return
 		}
 
-		if(!angular.isDefined($scope.new_snap.name))
-		{
+		if (!angular.isDefined($scope.new_snap.name)) {
 			AlertService.warn("Snapshot name is required");
 			return
 		}
 
 		// dont add to body if not present, these are optional, all indices included by default
-		if(angular.isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0)
-		{
+		if (angular.isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0) {
 			body["indices"] = $scope.new_snap.indices.join(",");
 		}
 
@@ -2784,24 +2774,17 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 
 	$scope.allSnapshots=function(repositories) {
 		var all = [];
-		$.each( repositories, function( repository, value ){
-			$scope.fetchSnapshots(repository).then(
-					function(data){
-						$.merge(all, data );
-					});
+		$.each(repositories, function(repository, value) {
+			$scope.fetchSnapshots(repository).then(function(data) { $.merge(all, data ); } );
 		});
 		$scope.snapshots = all;
 	};
 
 	$scope._parseSnapshots=function(repository, response, deferred) {
 		var arr = response["snapshots"];
-
 		// add the repository name to each snapshot object
-		//
-		if(arr && arr.constructor==Array && arr.length!==0){
-			$.each(arr, function(index, value){
-				value["repository"] = repository;
-			});
+		if (arr && arr.constructor==Array && arr.length!==0) {
+			$.each(arr, function(index, value) { value["repository"] = repository; } );
 		}
 		deferred.resolve(response["snapshots"]);
 	};
@@ -2826,7 +2809,6 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		}
 		return deferred.promise;
 	};
-
 }
 
 function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogService) {
