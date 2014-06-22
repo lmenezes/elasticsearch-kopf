@@ -16,7 +16,7 @@
 					</div>
 					<div class="form-group col-sm-6">
 						<label class="form-label">repository</label>
-						<select class="form-control input-sm" ng-model="new_snap.repository" ng-options="r.name as r.value for r in repositories_names">
+						<select class="form-control input-sm" ng-model="new_snap.repository" ng-options="r as r.name for r in repositories">
 							<option value="">select repository</option>
 						</select>
 					</div>
