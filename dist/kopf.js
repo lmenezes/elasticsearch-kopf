@@ -2762,8 +2762,8 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 			"Delete",
 			function() {
 				$scope.client.deleteSnapshot(
-					snapshot.repository,
-					snapshot.snapshot,
+					$scope.snapshot_repository,
+					snapshot.name,
 					function(response) {
 						AlertService.success("Snapshot successfully deleted", response);
 						$scope.reload();
