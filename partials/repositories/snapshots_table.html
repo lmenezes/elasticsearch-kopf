@@ -31,10 +31,10 @@
 							<tr ng-repeat="s in snapshots">
 								<td>
 									{{s.name}}
-									<a data-toggle="modal" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false">
+									<a data-toggle="modal" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false" tooltip="delete snapshot">
 										<i class="icon-remove remove-icon" ng-click="deleteSnapshot(s)"></i>
 									</a>
-									<i class="icon-resize-full normal-action" ng-click="selectSnapshot(s)"></i>
+									<i class="icon-download-alt details-icon normal-action" ng-click="selectSnapshot(s)" tooltip="restore snapshot"></i>
 								</td>
 								<td>{{s.state}}</td>
 								<td>{{s.indices}}</td>
