@@ -129,9 +129,12 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/aliases.js',
 					'src/kopf/elastic/cluster_changes.js',
 					'src/kopf/elastic/cluster_health.js',
+					'src/kopf/elastic/cluster_settings.js',
 					'src/kopf/elastic/cluster.js',
 					'src/kopf/elastic/elastic_client.js',
+					'src/kopf/elastic/es_connection.js',
 					'src/kopf/elastic/index.js',
+					'src/kopf/elastic/editable_index_settings.js',
 					'src/kopf/elastic/node.js',
 					'src/kopf/elastic/shard.js',
 					'src/kopf/elastic/token.js',
@@ -151,16 +154,19 @@ module.exports = function(grunt) {
 					'src/kopf/controllers/navbar.js',
 					'src/kopf/controllers/rest.js',
 					'src/kopf/controllers/percolator.js',
+					'src/kopf/controllers/repository.js',
 					'src/kopf/controllers/confirm_dialog.js',
 					'src/kopf/controllers/warmup.js',
 					'src/kopf/controllers/benchmark.js',
 					// SERVICES
 					'src/kopf/services/alerts.js',
 					'src/kopf/services/settings.js',
+					'src/kopf/services/aceeditor.js',
+					'src/kopf/services/theme.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',
-					'src/kopf/models/searchable_list.js',
+					'src/kopf/models/warmers_pagination.js',
 					'src/kopf/models/benchmark.js',
 					// UTIL
 					'src/kopf/util.js'
