@@ -37,7 +37,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		if (isDefined($scope.cluster)) {
 			$scope.indices = $scope.cluster.indices || [];
 		}
-	}
+	};
 
 	$scope.optionalParam=function(body, object, paramname){
 		if(angular.isDefined(object[paramname])) {
@@ -68,15 +68,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	};
 
 	$scope.restoreSnapshot=function() {
-		var body = {}
+		var body = {};
 		// dont add to body if not present, these are optional, all indices included by default
 		if (angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0) {
-			body["indices"] = $scope.restore_snap.indices.join(",");
+			body.indices = $scope.restore_snap.indices.join(",");
 		}
 
 		if (angular.isDefined($scope.restore_snap.include_global_state)) {
-			//TODO : when fixed [https://github.com/elasticsearch/elasticsearch/issues/4949], this extra "true/false" -> true/false handling will go away
-			body["include_global_state"] = ($scope.restore_snap.include_global_state == 'true');
+			body.include_global_state = $scope.restore_snap.include_global_state;
 		}
 
 		$scope.optionalParam(body, $scope.restore_snap, "ignore_unavailable");
@@ -99,10 +98,8 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	$scope.createRepository=function(){
 		$scope.new_repo.settings = $scope.editor.format();
 		if ($scope.editor.error === null) {
-			var body = {
-				type: $scope.new_repo.type,
-				settings: JSON.parse($scope.new_repo.settings)
-			}
+			var settings = JSON.parse($scope.new_repo.settings);
+			var body = { type: $scope.new_repo.type, settings: settings };
 			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
 				function(response) {
 					AlertService.success("Repository created");
@@ -126,6 +123,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 			},
 			function(error) {
 				$scope.updateModel(function() {
+					$scope.repositories = [];
 					AlertService.error("Error while reading repositories", error);
 				});
 			}
@@ -133,28 +131,26 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	};
 
 	$scope.createSnapshot=function(){
-		var body = {}
+		var body = {};
 
 		// name and repo required
 		if (!isDefined($scope.new_snap.repository)) {
 			AlertService.warn("Repository is required");
-			return
+			return;
 		}
 
 		if (!isDefined($scope.new_snap.name)) {
 			AlertService.warn("Snapshot name is required");
-			return
+			return;
 		}
 
 		// dont add to body if not present, these are optional, all indices included by default
-		if (angular.isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0) {
-			body["indices"] = $scope.new_snap.indices.join(",");
+		if (isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0) {
+			body.indices = $scope.new_snap.indices.join(",");
 		}
 
-		if(angular.isDefined($scope.new_snap.include_global_state))
-		{
-			//TODO : when es fixes bug [https://github.com/elasticsearch/elasticsearch/issues/4949], this extra "true/false" -> true/false handling will go away
-			body["include_global_state"] = ($scope.new_snap.include_global_state == 'true');
+		if(isDefined($scope.new_snap.include_global_state)) {
+			body.include_global_state = $scope.new_snap.include_global_state;
 		}
 		
 		$scope.optionalParam(body, $scope.new_snap, "ignore_unavailable");
@@ -172,7 +168,7 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		);
 	};
 
-	$scope.deleteSnapshot=function(snapshot){
+	$scope.deleteSnapshot=function(snapshot) {
 			ConfirmDialogService.open(
 			"are you sure you want to delete snapshot " + snapshot.name + "?",
 			snapshot,
@@ -213,14 +209,14 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 
 	$scope.selectSnapshot=function(snapshot) {
 		$scope.snapshot = snapshot;
-	}
+	};
 	
 	$scope.unselectSnapshot=function() {
 		$scope.snapshot = null;
-	}
+	};
 	
 	$scope.selectRepository=function(repository) {
 		$scope.snapshot_repository = repository;
 		$scope.fetchSnapshots(repository);
-	}
+	};
 }
