@@ -18,7 +18,7 @@
 						</div>
 						<div class="col-lg-3 col-sm-3 cluster-overview-filter cluster-map-node-types">
 			    	  <label class="cluster-map-node-type">
-			    	    <input type="checkbox" ng-model="pagination.hide_special"> <i class="icon-asterisk node-type-icon"> </i> hide special ({{cluster.special_indices}})
+			    	    <input type="checkbox" ng-model="pagination.hide_special"> <i class="fa fa-asterisk node-type-icon"> </i> hide special ({{cluster.special_indices}})
 			    	  </label>
 						</div>
 					</div>
@@ -32,17 +32,17 @@
 							<div class="row">
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-						    	    <input type="checkbox" ng-model="pagination.master"> <i class="icon-star-empty node-type-icon"> </i> master
+						    	    <input type="checkbox" ng-model="pagination.master"> <i class="fa fa-star-o node-type-icon"> </i> master
 						    	  </label>
 								</div>
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-										<input type="checkbox" ng-model="pagination.data"> <i class="icon-hdd node-type-icon"> </i> data
+										<input type="checkbox" ng-model="pagination.data"> <i class="fa fa-hdd-o node-type-icon"> </i> data
 									</label>
 								</div>
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-						    	    <input type="checkbox" ng-model="pagination.client"> <i class="icon-search node-type-icon"> </i> client
+						    	    <input type="checkbox" ng-model="pagination.client"> <i class="fa fa-search node-type-icon"> </i> client
 						    	  </label>
 								</div>
 							</div>
@@ -59,13 +59,13 @@
 		<div class="col-xs-6" style="text-align: right;">
 			<div class="cluster-map-pagination">
 				<span ng-switch on="hasPreviousPage()">
-					<i class="icon-double-angle-left normal-action" ng-click="previousPage()" ng-switch-when="true"></i>
-					<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+					<i class="fa fa-angle-double-left normal-action" ng-click="previousPage()" ng-switch-when="true"></i>
+					<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 				</span>
 				{{firstResult()}}-{{lastResult()}} of {{total()}}
 				<span ng-switch on="hasNextPage()">
-					<i class="icon-double-angle-right normal-action" ng-click="nextPage()" ng-switch-when="true"></i>
-					<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+					<i class="fa fa-angle-double-right normal-action" ng-click="nextPage()" ng-switch-when="true"></i>
+					<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
 				</span>
 			</div>
 		</div>
