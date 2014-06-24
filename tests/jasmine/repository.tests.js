@@ -334,7 +334,7 @@ describe('RepositoryController', function(){
         var snapshots = [ new Snapshot({ "name":"fetched_snapshot"}) ];
         this.scope.client.getSnapshots = function(repo, success, failed){ success(snapshots); };
         this.scope.fetchSnapshots("chicken");
-        expect(this.scope.snapshots).toEqual(snapshots);
+        expect(this.scope.pagination.getPage()).toEqual(snapshots);
     });
 
     it('fetchSnapshots : when failed sets snapshots to [] and calls alert service', function() {
