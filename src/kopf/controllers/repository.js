@@ -4,6 +4,8 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	$scope.snapshots = [];
 	$scope.indices = [];
 	
+	$scope.pagination = new SnapshotPagination(1, []);
+	
 	$scope.snapshot = null;
 	$scope.snapshot_repository = '';
 
@@ -195,12 +197,12 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		$scope.client.getSnapshots(repository,
 			function(response) {
 				$scope.updateModel(function() {
-					$scope.snapshots = response;
+					$scope.pagination.setResults(response);
 				});
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.snapshots = [];
+					$scope.pagination.setResults([]);
 					AlertService.error("Error while fetching snapshots", error);
 				});
 			}

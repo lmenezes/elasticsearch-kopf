@@ -20,6 +20,21 @@
 				</div>
 				<div class="row">
 					<div class="col-lg-12">
+						<div class="pagination-block">
+							<span ng-switch on="pagination.hasPreviousPage()">
+								<i class="icon-double-angle-left normal-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+								<i class="icon-double-angle-left inactive-action" ng-switch-when="false"></i>
+							</span>
+							{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
+							<span ng-switch on="pagination.hasNextPage()">
+								<i class="icon-double-angle-right normal-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+								<i class="icon-double-angle-right inactive-action" ng-switch-when="false"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12">
 						<table class="table table-bordered table-striped table-condensed">
 							<tr class="header-row">
 								<td>name</td>
@@ -28,7 +43,7 @@
 								<td>started</td>
 								<td>finished</td>
 							</tr>
-							<tr ng-repeat="s in snapshots">
+							<tr ng-repeat="s in pagination.getPage()">
 								<td>
 									{{s.name}}
 									<a data-toggle="modal" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false" tooltip="delete snapshot">
