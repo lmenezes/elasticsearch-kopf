@@ -9,20 +9,14 @@ describe('RepositoryController', function(){
         //create an empty scope
         this.scope = $rootScope.$new();
         this.scope.client = {}         //set fake client
-        var $q = $injector.get('$q');
-        this._q = $q
         this._rootScope = $rootScope;
-        var $timeout = $injector.get('$timeout');
-        var $location = $injector.get('$location');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         var AlertService = $injector.get('AlertService');
         this.AlertService = AlertService;
-        var AceEditorService = $injector.get('AceEditorService');
-        this.AceEditorService = AceEditorService;
         this.scope.updateModel=function(body) { body(); };
 
         this.createController = function() {
-            return $controller('RepositoryController', {$scope: this.scope}, $location, $timeout, this.ConfirmDialogService, AlertService, AceEditorService);
+            return $controller('RepositoryController', {$scope: this.scope}, this.ConfirmDialogService, AlertService);
         };
 
         this._controller = this.createController();
@@ -36,22 +30,19 @@ describe('RepositoryController', function(){
         expect(this.scope.snapshot).toEqual(null)
         expect(this.scope.snapshot_repository).toEqual('');;
         expect(this.scope.restorable_indices).toEqual([]);
-        expect(this.scope.new_repo).toEqual({});
+        expect(this.scope.repository_form.name).toEqual('');
+        expect(this.scope.repository_form.settings).toEqual({});
+        expect(this.scope.repository_form.type).toEqual('');
         expect(this.scope.new_snap).toEqual({});
         expect(this.scope.restore_snap).toEqual({});
         expect(this.scope.editor).toEqual(undefined);
     });
 
-    it('on : makes calls reload, initEditor and sets snapshot to null', function() {
+    it('on : makes calls reload and sets snapshot to null', function() {
         spyOn(this.scope, 'reload').andReturn(true);
-        spyOn(this.scope, 'initEditor').andCallThrough();
-        spyOn(this.AceEditorService, 'init').andReturn("fakeaceeditor");
         this.scope.snapshot = "not_null";
         this.scope.$emit("loadRepositoryEvent");
         expect(this.scope.reload).toHaveBeenCalled();
-        expect(this.scope.initEditor).toHaveBeenCalled();
-        expect(this.AceEditorService.init).toHaveBeenCalledWith('repository-settings-editor');
-        expect(this.scope.editor).toEqual("fakeaceeditor");
         expect(this.scope.snapshot).toEqual(null);
     });
 
@@ -192,14 +183,10 @@ describe('RepositoryController', function(){
         spyOn(this.scope.client, "createRepository").andCallThrough();
         spyOn(this.scope, "loadRepositories").andReturn(true);
         spyOn(this.AlertService, "success");
-        this.scope.new_repo = { name:"my_repo", type:"o positive" };
-        this.scope.editor = {
-                            error: null,
-                            format:function(){return "{\"settings_key\":\"settings_value\"}";}
-                            };
-        var expected = {type: "o positive", settings: {"settings_key":"settings_value"}};
+        this.scope.repository_form = new Repository("url_repo", {type:"url", settings: {url:"settings_value"} });
+        var expected = { type: "url", settings: { url: "settings_value"}};
         this.scope.createRepository();
-        expect(this.scope.client.createRepository).toHaveBeenCalledWith("my_repo",
+        expect(this.scope.client.createRepository).toHaveBeenCalledWith("url_repo",
                                                                         JSON.stringify(expected),
                                                                         jasmine.any(Function),
                                                                         jasmine.any(Function));
@@ -212,44 +199,35 @@ describe('RepositoryController', function(){
         this.scope.client.createRepository = function(name, body, success, failure){ failure(); };
         spyOn(this.scope.client, "createRepository").andCallThrough();
         spyOn(this.AlertService, "error");
-        this.scope.new_repo = { name:"my_repo", type:"o positive" };
-        this.scope.editor = {
-                            error: null,
-                            format:function(){return "{\"settings_key\":\"settings_value\"}";}
-                            };
-        var expected = {type: "o positive", settings: {"settings_key":"settings_value"}};
+        this.scope.repository_form = new Repository("fs_repo", { "type":"fs", "settings": { "location": "setting_value"} });
+        var expected = {type: "fs", settings: { location:"setting_value"} };
         this.scope.createRepository();
-        expect(this.scope.client.createRepository).toHaveBeenCalledWith("my_repo",
-                                                                        JSON.stringify(expected),
-                                                                        jasmine.any(Function),
-                                                                        jasmine.any(Function));
+        expect(this.scope.client.createRepository).toHaveBeenCalledWith("fs_repo", JSON.stringify(expected), jasmine.any(Function),jasmine.any(Function));
         expect(this.AlertService.error).toHaveBeenCalled();
     });
 
-    it('createRepository : does NOT call client.createRepository if editor error', function(){
+    it('createRepository : does NOT call client.createRepository if validation error', function(){
         this.scope.client.createRepository = function(){};
+        spyOn(this.AlertService, "error");
         spyOn(this.scope.client, "createRepository").andReturn(true);
-        this.scope.editor = {
-                            error: "yep this is an error",
-                            format:function(){return "{\"settings_key\":\"settings_value\"}";}
-                            };
         this.scope.createRepository();
         expect(this.scope.client.createRepository).not.toHaveBeenCalled();
+        expect(this.AlertService.error).toHaveBeenCalled();
     });
 
     it('loadRepositories : if success calls client.getRepositories and sets repositories', function() {
         var repos = [ new Repository('a', { 'type': 'test', 'settings': {} } ) ];
-        this.scope.client.getRepositories = function(success, failure) { 
-          success(repos); 
+        this.scope.client.getRepositories = function(success, failure) {
+          success(repos);
         };
-        
+
         this.scope.loadRepositories();
         expect(this.scope.repositories).toEqual(repos);
     });
 
     it('loadRepositories : if fails calls Alert service and sets repositories to ][]', function() {
-        this.scope.client.getRepositories = function(success, failure) { 
-          failure("error message"); 
+        this.scope.client.getRepositories = function(success, failure) {
+          failure("error message");
         };
         spyOn(this.AlertService, "error");
         this.scope.loadRepositories();

@@ -1,4 +1,4 @@
-function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
+function RepositoryController($scope, ConfirmDialogService, AlertService) {
 	// registered repositories
 	$scope.repositories = [];
 	$scope.snapshots = [];
@@ -10,22 +10,15 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	$scope.snapshot_repository = '';
 
 	$scope.restorable_indices = [];
-	$scope.new_repo = {};
+	$scope.repository_form = new Repository('', { settings: {}, type: '' });
 	$scope.new_snap = {};
 	$scope.restore_snap = {};
 	$scope.editor = undefined;
 	
 	$scope.$on('loadRepositoryEvent', function() {
-		$scope.initEditor();
 		$scope.snapshot = null; // clear 'active' snapshot
 		$scope.reload();
 	});
-	
-	$scope.initEditor=function() {
-		if (!isDefined($scope.editor)) {
-			$scope.editor = AceEditorService.init('repository-settings-editor');
-		}
-	};
 
 	$scope.reload=function(){
 		$scope.loadIndices();
@@ -97,24 +90,24 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		);
 	};
 
-	$scope.createRepository=function(){
-		$scope.new_repo.settings = $scope.editor.format();
-		if ($scope.editor.error === null) {
-			var settings = JSON.parse($scope.new_repo.settings);
-			var body = { type: $scope.new_repo.type, settings: settings };
-			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
-				function(response) {
-					AlertService.success("Repository created");
-					$scope.loadRepositories();
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while creating repository", error);
-					});
-				}
-			);
-		}
-	};
+    $scope.createRepository=function(){
+        try {
+            $scope.repository_form.validate();
+            $scope.client.createRepository($scope.repository_form.name, $scope.repository_form.asJson(),
+                function(response) {
+                    AlertService.success("Repository created");
+                    $scope.loadRepositories();
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        AlertService.error("Error while creating repository", error);
+                    });
+                }
+            );
+        } catch (error) {
+            AlertService.error(error);
+        }
+    };
 
 	$scope.loadRepositories=function() {
 		$scope.client.getRepositories(

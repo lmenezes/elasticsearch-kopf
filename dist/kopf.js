@@ -1087,6 +1087,64 @@ function Repository(name, info) {
 	this.name = name;
 	this.type = info.type;
 	this.settings = info.settings;
+
+    this.asJson=function() {
+        var json = { type: this.type };
+        if (this.type === 'fs') {
+            var fsSettings = ['location', 'chunk_size', 'max_restore_bytes_per_sec', 'max_snapshot_bytes_per_sec', 'compress'];
+            json.settings = this.getSettings(fsSettings);
+        }
+        if (this.type === 'url') {
+            var urlSettings = ['url'];
+            json.settings = this.getSettings(urlSettings);
+        }
+        if (this.type === 's3') {
+            var s3Settings = ['region', 'bucket', 'base_path', 'access_key', 'secret_key', 'chunk_size', 'max_retries', 'compress', 'server_side_encryption'];
+            json.settings = this.getSettings(s3Settings);
+        }
+        return JSON.stringify(json);
+    };
+
+    this.validate=function() {
+        if (!notEmpty(this.name)) {
+            throw "Repository name is required";
+        }
+        if (!notEmpty(this.type)) {
+            throw "Repository type is required";
+        }
+        if (this.type === 'fs') {
+            var fsRequired = ['location'];
+            this.validateSettings(fsRequired);
+        }
+        if (this.type === 'url') {
+            var urlRequired = ['url'];
+            this.validateSettings(urlRequired);
+        }
+        if (this.type === 's3') {
+            var s3Required = ['bucket'];
+            this.validateSettings(s3Required);
+        }
+    };
+
+    this.validateSettings=function(required) {
+        var repository = this;
+        required.forEach(function(setting) {
+            if (!notEmpty(repository.settings[setting])) {
+                throw(setting + " is required for repositories of type " + repository.type);
+            }
+        });
+    };
+
+    this.getSettings=function(availableSettings) {
+        var settings = {};
+        var currentSettings = this.settings;
+        availableSettings.forEach(function(setting) {
+            if (notEmpty(currentSettings[setting])) {
+                settings[setting] = currentSettings[setting];
+            }
+        });
+        return settings;
+    };
 }
 function Snapshot(info) {
 	this.name = info.snapshot;
@@ -2603,7 +2661,7 @@ function PercolateQuery(query_info) {
 			this.source == other.source);
 	};
 }
-function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
+function RepositoryController($scope, ConfirmDialogService, AlertService) {
 	// registered repositories
 	$scope.repositories = [];
 	$scope.snapshots = [];
@@ -2615,22 +2673,15 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 	$scope.snapshot_repository = '';
 
 	$scope.restorable_indices = [];
-	$scope.new_repo = {};
+	$scope.repository_form = new Repository('', { settings: {}, type: '' });
 	$scope.new_snap = {};
 	$scope.restore_snap = {};
 	$scope.editor = undefined;
 	
 	$scope.$on('loadRepositoryEvent', function() {
-		$scope.initEditor();
 		$scope.snapshot = null; // clear 'active' snapshot
 		$scope.reload();
 	});
-	
-	$scope.initEditor=function() {
-		if (!isDefined($scope.editor)) {
-			$scope.editor = AceEditorService.init('repository-settings-editor');
-		}
-	};
 
 	$scope.reload=function(){
 		$scope.loadIndices();
@@ -2702,24 +2753,24 @@ function RepositoryController($q, $scope, $location, $timeout, ConfirmDialogServ
 		);
 	};
 
-	$scope.createRepository=function(){
-		$scope.new_repo.settings = $scope.editor.format();
-		if ($scope.editor.error === null) {
-			var settings = JSON.parse($scope.new_repo.settings);
-			var body = { type: $scope.new_repo.type, settings: settings };
-			$scope.client.createRepository($scope.new_repo.name, JSON.stringify(body),
-				function(response) {
-					AlertService.success("Repository created");
-					$scope.loadRepositories();
-				},
-				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while creating repository", error);
-					});
-				}
-			);
-		}
-	};
+    $scope.createRepository=function(){
+        try {
+            $scope.repository_form.validate();
+            $scope.client.createRepository($scope.repository_form.name, $scope.repository_form.asJson(),
+                function(response) {
+                    AlertService.success("Repository created");
+                    $scope.loadRepositories();
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        AlertService.error("Error while creating repository", error);
+                    });
+                }
+            );
+        } catch (error) {
+            AlertService.error(error);
+        }
+    };
 
 	$scope.loadRepositories=function() {
 		$scope.client.getRepositories(
