@@ -341,7 +341,7 @@ function ElasticClient(connection) {
 	this.host = connection.host;
 	this.username = connection.username;
 	this.password = connection.password;
-	
+
 	this.createAuthToken=function(username,password) {
 		var auth = null;
 		if (isDefined(username) && isDefined(password)) {
@@ -354,7 +354,7 @@ function ElasticClient(connection) {
 	var fetch_version = $.ajax({
 		type: 'GET',
 		url: connection.host + "/",
-		beforeSend: function(xhr) { 
+		beforeSend: function(xhr) {
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
 			} 
@@ -366,8 +366,13 @@ function ElasticClient(connection) {
 	var client = this;
 	fetch_version.done(function(response) {
 		try {
-			client.version = response.version.number;	
-		} catch (error) {
+			var version = response.version.number;
+            client.version = { 'str': version };
+            var parts = version.split('.');
+            client.version.major = parseInt(parts[0]);
+            client.version.minor = parseInt(parts[1]);
+            client.version.build = parseInt(parts[2]);
+        } catch (error) {
 			throw { message: "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + connection.host + "]?", body: response };
 		}
 	});
@@ -375,6 +380,15 @@ function ElasticClient(connection) {
 	fetch_version.fail(function(error) {
 		throw error.statusText;
 	});
+
+    this.versionCheck=function(version) {
+        var parts = version.split('.');
+        var mjr = parseInt(parts[0]);
+        var mnr = parseInt(parts[1]);
+        var bld = parseInt(parts[2]);
+        var v = this.version;
+        return (v.major > mjr || v.major == mjr && v.minor > mnr || v.major == mjr && v.minor == mnr && v.build >= bld);
+    };
 
 	this.createIndex=function(name, settings, callback_success, callback_error) {
 		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);

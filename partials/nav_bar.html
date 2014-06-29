@@ -94,7 +94,7 @@
 				<li class="" id="repository_option" ng-click="selectTab('loadRepositoryEvent')">
 					<a href="#repository" data-toggle="tab" class=""><i class="fa fa-suitcase"></i> repository</a>
 				</li>
-				<li class="" id="benchmark_option" ng-click="selectTab('loadBenchmarkEvent')">
+				<li class="" id="benchmark_option" ng-click="selectTab('loadBenchmarkEvent')" ng-show="client.versionCheck('1.3.0')">
 					<a href="#benchmark" data-toggle="tab" class=""><i class="fa fa-bar-chart-o"></i> benchmark</a>
 				</li>
 			</ul>
