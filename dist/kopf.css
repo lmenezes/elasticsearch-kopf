@@ -361,17 +361,9 @@ a.cluster-map-node-action {
 	padding-left: 0px;
 	padding-right: 0px;	
 }
-.node-progress-left {
-	padding-right: 6px;
-	padding-left: 0px;
-}
-.node-progress-center {
+.node-progress-bar {
 	padding-left: 3px;
 	padding-right: 3px;
-}
-.node-progress-right {
-	padding-left: 6px;
-	padding-right: 0px;
 }
 .progress-title-top {
 	font-size: 8px;
