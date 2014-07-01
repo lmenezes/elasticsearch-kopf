@@ -404,10 +404,6 @@ function ElasticClient(connection) {
 		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
-	this.getClusterState=function(callback_success, callback_error) {
-		this.executeElasticRequest('GET', "/_cluster/state",{}, callback_success, callback_error);
-	};
-
 	this.shutdownNode=function(node_id, callback_success, callback_error) {
 		this.executeElasticRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
 	};
@@ -483,24 +479,19 @@ function ElasticClient(connection) {
 	};
 
 	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
-		var data = {};
+		var data = { actions: [] };
 		if (add_aliases.length === 0 && remove_aliases.length === 0) {
 			throw "No changes were made: nothing to save";
 		}
-		data.actions = [];
 		remove_aliases.forEach(function(alias) {
 			data.actions.push({'remove':alias.info()});
 		});
 		add_aliases.forEach(function(alias) {
 			data.actions.push({'add':alias.info()});
 		});
-		this.executeElasticRequest('POST', "/_aliases",JSON.stringify(data, undefined, ""), callback_success, callback_error);
+		this.executeElasticRequest('POST', "/_aliases",JSON.stringify(data), callback_success, callback_error);
 	};
 
-	this.getNodesStats=function(callback_success, callback_error) {
-		this.executeElasticRequest('GET', "/_nodes/stats?all=true",{},callback_success, callback_error);
-	};
-	
 	this.getIndexWarmers=function(index, warmer, callback_success, callback_error) {
 		var path = "/" + index + "/_warmer/" + warmer.trim();
 		this.executeElasticRequest('GET', path ,{},callback_success, callback_error);
@@ -620,7 +611,7 @@ function ElasticClient(connection) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
 					}
-				},
+				}
 			})).then(
 				function(cluster_health) {
 					callback_success(new ClusterHealth(cluster_health));
