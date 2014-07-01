@@ -17,6 +17,14 @@ function Repository(name, info) {
             var s3Settings = ['region', 'bucket', 'base_path', 'access_key', 'secret_key', 'chunk_size', 'max_retries', 'compress', 'server_side_encryption'];
             json.settings = this.getSettings(s3Settings);
         }
+        if (this.type === 'hdfs') {
+            var hdfsSettings = ['uri', 'path', 'load_defaults', 'conf_location', 'concurrent_streams', 'compress', 'chunk_size'];
+            json.settings = this.getSettings(hdfsSettings);
+        }
+        if (this.type === 'azure') {
+            var azureSettings = ['container', 'base_path', 'concurrent_streams', 'chunk_size', 'compress'];
+            json.settings = this.getSettings(azureSettings);
+        }
         return JSON.stringify(json);
     };
 
@@ -38,6 +46,10 @@ function Repository(name, info) {
         if (this.type === 's3') {
             var s3Required = ['bucket'];
             this.validateSettings(s3Required);
+        }
+        if (this.type === 'hdfs') {
+            var hdfsRequired = ['path'];
+            this.validateSettings(hdfsRequired);
         }
     };
 
