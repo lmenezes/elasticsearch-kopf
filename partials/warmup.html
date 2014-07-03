@@ -16,17 +16,17 @@
 								<div class="row">
 									<div class="form-group col-md-4">
 										<label class="form-label">index</label>
-										<select class="form-control input-sm" ng-model="new_index" ng-options="i.name for i in indices" ng-change="loadIndexWarmers()">
+										<select class="form-control input-sm" ng-model="warmer.index" ng-options="i.name as i.name for i in indices" ng-change="loadIndexWarmers()">
 											<option value="">select target index</option>
 										</select>
 									</div>
 									<div class="form-group col-md-4">
 										<label class="form-label">types</label>
-										<input ng-model="new_types" class="form-control input-sm" placeholder="types(e.g.: type_1,type2)">
+										<input ng-model="warmer.types" class="form-control input-sm" placeholder="types(e.g.: type_1,type2)">
 									</div>
 									<div class="form-group col-md-4">
 										<label class="form-label">warmer id</label>
-										<input ng-model="new_warmer_id" class="form-control input-sm" placeholder="warmer id">
+										<input ng-model="warmer.id" class="form-control input-sm" placeholder="warmer id">
 									</div>
 								</div>
 								<div class="row">
@@ -68,7 +68,7 @@
 								<div class="row">
 									<div class="form-group col-md-6">
 										<label class="form-label">index</label>
-										<select class="form-control input-sm" ng-model="index" ng-options="i.name for i in indices" ng-change="loadIndexWarmers()">
+										<select class="form-control input-sm" ng-model="index" ng-options="i.name as i.name for i in indices" ng-change="loadIndexWarmers()">
 											<option value="">load warmers for selected index</option>
 										</select>
 									</div>
@@ -105,17 +105,17 @@
 												<td>type</td>
 												<td>source</td>
 											</tr>
-											<tr ng-repeat="(id, body) in pagination.getPage()">
-												<td>{{id}}</td>
-												<td>{{body.types}}</td>
-												<td class="table-actions">{{body.source}}
+											<tr ng-repeat="warmer in pagination.getPage()">
+                                                <td>{{warmer.id}}</td>
+												<td>{{warmer.types}}</td>
+												<td class="table-actions">{{warmer.source}}
 													<a data-toggle="modal" href="#confirm_dialog" 
 													class="remove-icon" data-backdrop="static">
-														<i class="fa fa-times remove-icon" title="remove query" ng-click="deleteWarmupQuery(id, body.source)"></i>
+														<i class="fa fa-times remove-icon" title="remove query" ng-click="deleteWarmupQuery(warmer)"></i>
 													</a>
 													<a data-toggle="modal" href="#" 
 													class="details-icon" data-backdrop="static">
-														<i class="fa fa-eye details-icon" title="view details" ng-click="displayInfo('warmup query ' + id,body.source)"></i>
+														<i class="fa fa-eye details-icon" title="view details" ng-click="displayInfo('warmup query ' + warmer.id,warmer.source)"></i>
 													</a>
 												</td>
 											</tr>

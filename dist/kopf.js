@@ -494,21 +494,32 @@ function ElasticClient(connection) {
 
 	this.getIndexWarmers=function(index, warmer, callback_success, callback_error) {
 		var path = "/" + index + "/_warmer/" + warmer.trim();
-		this.executeElasticRequest('GET', path ,{},callback_success, callback_error);
+        var parseWarmers = function(response) {
+            var warmers = [];
+            Object.keys(response).forEach(function(i) {
+                var index = i;
+                var index_warmers = response[index].warmers;
+                Object.keys(index_warmers).forEach(function(warmer_id) {
+                    warmers.push(new Warmer(warmer_id, index, index_warmers[warmer_id]));
+                });
+            });
+            callback_success(warmers);
+        };
+		this.executeElasticRequest('GET', path ,{}, parseWarmers, callback_error);
 	};
 	
-	this.deleteWarmupQuery=function(index, warmer, callback_success, callback_error) {
-		var path = "/" + index + "/_warmer/" + warmer;
+	this.deleteWarmupQuery=function(warmer, callback_success, callback_error) {
+		var path = "/" + warmer.index + "/_warmer/" + warmer.id;
 		this.executeElasticRequest('DELETE', path, {},callback_success, callback_error);
 	};
 	
-	this.registerWarmupQuery=function(index, types, warmer_id, source, callback_success, callback_error) {
-		var path = "/" + index + "/";
-		if (notEmpty(types)) {
-			path += types + "/";
+	this.registerWarmupQuery=function(warmer, callback_success, callback_error) {
+		var path = "/" + warmer.index + "/";
+		if (notEmpty(warmer.types)) {
+			path += warmer.types + "/";
 		}
-		path += "/_warmer/" + warmer_id.trim();
-		this.executeElasticRequest('PUT', path ,source,callback_success, callback_error);
+		path += "/_warmer/" + warmer.id.trim();
+		this.executeElasticRequest('PUT', path ,warmer.source, callback_success, callback_error);
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
@@ -1160,6 +1171,12 @@ function Snapshot(info) {
 	this.duration_in_millis = info.duration_in_millis;
 	this.failures = info.failures;
 	this.shards = info.shards;
+}
+function Warmer(id, index, body) {
+    this.id = id;
+    this.index = index;
+    this.source = body.source;
+    this.types = body.types;
 }
 function Request(url, method, body) {
 	this.timestamp = getTimeString(new Date());
@@ -2902,11 +2919,8 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	$scope.pagination = new WarmersPagination(1, []);
 	
 	// holds data for new warmer. maybe create a model for that
-	$scope.new_warmer_id = '';
-	$scope.new_index = '';
-	$scope.new_source = '';
-	$scope.new_types = '';
-	
+	$scope.warmer = new Warmer('', '', { types: [], source: {} });
+
 	$scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
 		$scope.initEditor();
@@ -2930,7 +2944,8 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		if ($scope.editor.hasContent()) {
 			$scope.editor.format();
 			if (!isDefined($scope.editor.error)) {
-				$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.editor.getValue(),
+                $scope.warmer.source = $scope.editor.getValue();
+				$scope.client.registerWarmupQuery($scope.warmer,
 					function(response) {
 						$scope.updateModel(function() {
 							$scope.loadIndexWarmers();
@@ -2949,13 +2964,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		}
 	};
 	
-	$scope.deleteWarmupQuery=function(warmer_id, source) {
+	$scope.deleteWarmupQuery=function(warmer) {
 		ConfirmDialogService.open(
-			"are you sure you want to delete query " + warmer_id + "?",
-			source,
+			"are you sure you want to delete query " + warmer.id + "?",
+			warmer.source,
 			"Delete",
 			function() {
-				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
+				$scope.client.deleteWarmupQuery(warmer,
 					function(response) {
 						$scope.updateModel(function() {
 							AlertService.success("Warmup query successfully deleted", response);
@@ -2974,18 +2989,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 	$scope.loadIndexWarmers=function() {
 		if (isDefined($scope.index)) {
-			$scope.client.getIndexWarmers($scope.index.name, $scope.pagination.warmer_id,
-				function(response) {
+			$scope.client.getIndexWarmers($scope.index, $scope.pagination.warmer_id,
+				function(warmers) {
 					$scope.updateModel(function() {
-						if (isDefined(response[$scope.index.name])) {
-							$scope.pagination.setResults(response[$scope.index.name].warmers);
-						} else {
-							$scope.pagination.setResults([]);
-						}
+                        $scope.pagination.setResults(warmers);
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
+                        $scope.pagination.setResults([]);
 						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
@@ -3232,11 +3244,10 @@ function WarmersPagination(page, results) {
 	this.results = results;
 	this.warmer_id = "";
 	this.past_warmer_id = null;
-	this.total = 0;
 	this.cached_results = null;
 	
 	this.firstResult=function() {
-		if (Object.keys(this.getResults()).length > 0) {
+		if (this.getResults().length > 0) {
 			return ((this.current_page() - 1) * this.page_size) + 1;
 		} else {
 			return 0;
@@ -3244,15 +3255,15 @@ function WarmersPagination(page, results) {
 	};
 	
 	this.lastResult=function() {
-		if (this.current_page() * this.page_size > Object.keys(this.getResults()).length) {
-			return Object.keys(this.getResults()).length;
+		if (this.current_page() * this.page_size > this.getResults().length) {
+			return this.getResults().length;
 		} else {
 			return this.current_page() * this.page_size;
 		}
 	};
 
 	this.hasNextPage=function() {
-		return this.page_size * this.current_page() < Object.keys(this.getResults()).length;
+		return this.page_size * this.current_page() < this.getResults().length;
 	};
 	
 	this.hasPreviousPage=function() {
@@ -3278,14 +3289,14 @@ function WarmersPagination(page, results) {
 		var count = 1;
 		var first_result = this.firstResult();
 		var last_result = this.lastResult();
-		var page = {};
+		var page = [];
 		var results = this.getResults();
-		Object.keys(results).forEach(function(alias) {
+		results.forEach(function(warmer) {
 			if (count < first_result || count > last_result) {
 				count += 1;
 			} else {
 				count += 1;
-				page[alias] = results[alias];
+				page.push(warmer);
 			}
 		});
 		return page;
@@ -3301,22 +3312,22 @@ function WarmersPagination(page, results) {
 	};
 	
 	this.total=function() {
-		return Object.keys(this.getResults()).length;
+		return this.getResults().length;
 	};
-	
+
 	this.getResults=function() {
-		var matchingResults = {};
+		var matchingResults = [];
 		var filters_changed = this.warmer_id != this.past_warmer_id;
 		if (filters_changed || !isDefined(this.cached_results)) { // if filters changed or no cached, calculate
 			var warmer_id = this.warmer_id;
 			var results = this.results;
-			Object.keys(results).forEach(function(current_warmer_id) {
+			results.forEach(function(warmer) {
 				if (isDefined(warmer_id) && warmer_id.length > 0) {
-					if (current_warmer_id.indexOf(warmer_id) != -1) {
-						matchingResults[current_warmer_id] = results[current_warmer_id];
+					if (warmer.id.indexOf(warmer_id) != -1) {
+						matchingResults.push(warmer);
 					} 
 				} else {
-					matchingResults[current_warmer_id] = results[current_warmer_id];
+					matchingResults.push(warmer);
 				}
 			});
 			this.cached_results = matchingResults;

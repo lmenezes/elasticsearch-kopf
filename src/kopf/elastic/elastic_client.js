@@ -155,21 +155,32 @@ function ElasticClient(connection) {
 
 	this.getIndexWarmers=function(index, warmer, callback_success, callback_error) {
 		var path = "/" + index + "/_warmer/" + warmer.trim();
-		this.executeElasticRequest('GET', path ,{},callback_success, callback_error);
+        var parseWarmers = function(response) {
+            var warmers = [];
+            Object.keys(response).forEach(function(i) {
+                var index = i;
+                var index_warmers = response[index].warmers;
+                Object.keys(index_warmers).forEach(function(warmer_id) {
+                    warmers.push(new Warmer(warmer_id, index, index_warmers[warmer_id]));
+                });
+            });
+            callback_success(warmers);
+        };
+		this.executeElasticRequest('GET', path ,{}, parseWarmers, callback_error);
 	};
 	
-	this.deleteWarmupQuery=function(index, warmer, callback_success, callback_error) {
-		var path = "/" + index + "/_warmer/" + warmer;
+	this.deleteWarmupQuery=function(warmer, callback_success, callback_error) {
+		var path = "/" + warmer.index + "/_warmer/" + warmer.id;
 		this.executeElasticRequest('DELETE', path, {},callback_success, callback_error);
 	};
 	
-	this.registerWarmupQuery=function(index, types, warmer_id, source, callback_success, callback_error) {
-		var path = "/" + index + "/";
-		if (notEmpty(types)) {
-			path += types + "/";
+	this.registerWarmupQuery=function(warmer, callback_success, callback_error) {
+		var path = "/" + warmer.index + "/";
+		if (notEmpty(warmer.types)) {
+			path += warmer.types + "/";
 		}
-		path += "/_warmer/" + warmer_id.trim();
-		this.executeElasticRequest('PUT', path ,source,callback_success, callback_error);
+		path += "/_warmer/" + warmer.id.trim();
+		this.executeElasticRequest('PUT', path ,warmer.source, callback_success, callback_error);
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {

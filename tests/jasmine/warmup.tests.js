@@ -30,10 +30,10 @@ describe('WarmupController', function(){
         expect(this.scope.pagination.getPage()).toEqual({});
         expect(this.scope.indices).toEqual([]);
         expect(this.scope.editor).toEqual(undefined);
-        expect(this.scope.new_warmer_id).toEqual("");
-        expect(this.scope.new_index).toEqual("");
-        expect(this.scope.new_source).toEqual("");
-        expect(this.scope.new_types).toEqual("");		
+        expect(this.scope.warmer.id).toEqual("");
+        expect(this.scope.warmer.index).toEqual("");
+        expect(this.scope.warmer.source).toEqual({});
+        expect(this.scope.warmer.types).toEqual([]);
     });
 
     it('Initializes data when warmup tab is selected', function() {
@@ -51,8 +51,8 @@ describe('WarmupController', function(){
     });
 
     it('Returns total number of warmers', function() {
-        this.scope.pagination.setResults({ 'a': 'b', 'c': 'd'});
-        expect(this.scope.totalWarmers()).toEqual(2);
+        this.scope.pagination.setResults([new Warmer("warmer_id","index", { types: [], source: {}}), new Warmer("warmer_id2","index", { types: [], source: {}})]);
+        expect(this.scope.pagination.total()).toEqual(2);
     });
 
     it('Prevent warmup with empty body to be created', function() {
@@ -85,32 +85,34 @@ describe('WarmupController', function(){
             getValue : function(){return '{ "query": { "match_all": {} } }'; },
             hasContent: function(){return true;}
         };
-        this.scope.new_index = { "name": "index_name"};
-        this.scope.new_types = "type";
-        this.scope.new_warmer_id = "warmer_id";
+        var warmer = new Warmer("warmer_id", "index_name", { types: "type", source: {} });
+        this.scope.warmer = warmer;
         this.scope.editor = editor;
         this.scope.client.registerWarmupQuery = function(){};
         this.scope.updateModel = function(){};
         spyOn(this.scope.client, "registerWarmupQuery").andReturn(true);
         this.scope.createWarmerQuery();
-        expect(this.scope.client.registerWarmupQuery).toHaveBeenCalledWith("index_name", "type", "warmer_id",'{ "query": { "match_all": {} } }', 
+        expect(this.scope.warmer.source).toEqual(editor.getValue());
+        expect(this.scope.client.registerWarmupQuery).toHaveBeenCalledWith(warmer,
                                                                 jasmine.any(Function),
                                                                 jasmine.any(Function));
     });
 
     it('Loads index warmers for index and all types', function() {
-        this.scope.index = { 'name': "index_name" };
+        this.scope.index = "index_name";
         this.scope.client.getIndexWarmers = function(){};
         spyOn(this.scope.client, "getIndexWarmers").andReturn(true);
+        this.scope.warmer = new Warmer('', 'index_name', {});
         this.scope.loadIndexWarmers();
         expect(this.scope.client.getIndexWarmers).toHaveBeenCalledWith("index_name", '', jasmine.any(Function), jasmine.any(Function));
     });
 
     it('Loads index warmers for index and specific type', function() {
-        this.scope.index = { 'name': "index_name" };
+        this.scope.index = "index_name";
         this.scope.pagination.warmer_id = "warmer_id";
         this.scope.client.getIndexWarmers = function(){};
         spyOn(this.scope.client, "getIndexWarmers").andReturn(true);
+        this.scope.warmer = new Warmer('', 'index_name', {});
         this.scope.loadIndexWarmers();
         expect(this.scope.client.getIndexWarmers).toHaveBeenCalledWith("index_name", 'warmer_id', jasmine.any(Function), jasmine.any(Function));
     });
@@ -122,9 +124,8 @@ describe('WarmupController', function(){
         this.scope.updateModel = function(){};
         spyOn(this.scope.client, "deleteWarmupQuery").andReturn(true);
         spyOn(this.ConfirmDialogService, "open").andReturn(true);
-        this.scope.deleteWarmupQuery("warmer_id","source");
-        expect(this.ConfirmDialogService.open).toHaveBeenCalledWith("are you sure you want to delete query warmer_id?", "source","Delete",
-                                                                jasmine.any(Function));
+        this.scope.deleteWarmupQuery(new Warmer("warmer_id","index", { types: [], source: {}}));
+        expect(this.ConfirmDialogService.open).toHaveBeenCalledWith("are you sure you want to delete query warmer_id?", {},"Delete",jasmine.any(Function));
     });
 
 });

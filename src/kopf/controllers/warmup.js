@@ -5,11 +5,8 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	$scope.pagination = new WarmersPagination(1, []);
 	
 	// holds data for new warmer. maybe create a model for that
-	$scope.new_warmer_id = '';
-	$scope.new_index = '';
-	$scope.new_source = '';
-	$scope.new_types = '';
-	
+	$scope.warmer = new Warmer('', '', { types: [], source: {} });
+
 	$scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
 		$scope.initEditor();
@@ -33,7 +30,8 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		if ($scope.editor.hasContent()) {
 			$scope.editor.format();
 			if (!isDefined($scope.editor.error)) {
-				$scope.client.registerWarmupQuery($scope.new_index.name, $scope.new_types, $scope.new_warmer_id, $scope.editor.getValue(),
+                $scope.warmer.source = $scope.editor.getValue();
+				$scope.client.registerWarmupQuery($scope.warmer,
 					function(response) {
 						$scope.updateModel(function() {
 							$scope.loadIndexWarmers();
@@ -52,13 +50,13 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		}
 	};
 	
-	$scope.deleteWarmupQuery=function(warmer_id, source) {
+	$scope.deleteWarmupQuery=function(warmer) {
 		ConfirmDialogService.open(
-			"are you sure you want to delete query " + warmer_id + "?",
-			source,
+			"are you sure you want to delete query " + warmer.id + "?",
+			warmer.source,
 			"Delete",
 			function() {
-				$scope.client.deleteWarmupQuery($scope.index.name, warmer_id,
+				$scope.client.deleteWarmupQuery(warmer,
 					function(response) {
 						$scope.updateModel(function() {
 							AlertService.success("Warmup query successfully deleted", response);
@@ -77,18 +75,15 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 	$scope.loadIndexWarmers=function() {
 		if (isDefined($scope.index)) {
-			$scope.client.getIndexWarmers($scope.index.name, $scope.pagination.warmer_id,
-				function(response) {
+			$scope.client.getIndexWarmers($scope.index, $scope.pagination.warmer_id,
+				function(warmers) {
 					$scope.updateModel(function() {
-						if (isDefined(response[$scope.index.name])) {
-							$scope.pagination.setResults(response[$scope.index.name].warmers);
-						} else {
-							$scope.pagination.setResults([]);
-						}
+                        $scope.pagination.setResults(warmers);
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
+                        $scope.pagination.setResults([]);
 						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}

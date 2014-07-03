@@ -11,9 +11,9 @@ module.exports = function(grunt) {
 					files: ['src/kopf/**/*.*','src/kopf/*.*'],
 					tasks: ['build'],
 					options: {
-					spawn: false,
-				},
-			},
+					spawn: false
+				}
+			}
 		},
 		copy: {
 			main: {
@@ -60,6 +60,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/token.js',
 					'src/kopf/elastic/repository.js',
 					'src/kopf/elastic/snapshot.js',
+                    'src/kopf/elastic/warmer.js',
 					// CONTROLLERS
 					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
@@ -111,7 +112,7 @@ module.exports = function(grunt) {
 					'src/kopf/css/repository.css'
 				],
 				dest: 'dist/kopf.css'
-			},
+			}
 			
 		},
 		connect: {
@@ -141,6 +142,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/token.js',
 					'src/kopf/elastic/repository.js',
 					'src/kopf/elastic/snapshot.js',
+                    'src/kopf/elastic/warmer.js',
 					// CONTROLLERS
 					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
@@ -179,8 +181,8 @@ module.exports = function(grunt) {
 			all: ['tests/all.html']
 		},
 		karma: {
-			unit: { configFile: 'tests/karma.config.js', keepalive: true },
-		},
+			unit: { configFile: 'tests/karma.config.js', keepalive: true }
+		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
