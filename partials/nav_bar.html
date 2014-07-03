@@ -7,7 +7,7 @@
 				<span class="icon-bar"></span>
 			</button>
 			<a class="navbar-brand dropdown-toggle navbar-cluster-status-{{cluster_health.status}}" href="#" data-toggle="dropdown">kopf
-				<i class="fa fa-caret-down navbar-logo-action"></i>
+				<i class="fa fa-fw fa-caret-down navbar-logo-action"></i>
 			</a>
 			<ul class="dropdown-menu form-horizontal navbar-app-settings">
 				<li class="navbar-menu-section">
@@ -63,7 +63,7 @@
 			<ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}}">
 				<li class="active" id="cluster_option" ng-click="selectTab()">
 					<a href="#cluster" data-toggle="tab">
-                        <i class="fa fa-sitemap"></i> cluster
+                        <i class="fa fa-fw fa-sitemap"></i> cluster
                     </a>
 				</li>
 				<li id="index_settings_option" style="display: none;">
@@ -80,37 +80,37 @@
 				</li>
 				<li id="rest_option" ng-click="selectTab()">
 					<a href="#rest" data-toggle="tab">
-                        <i class="fa fa-edit"></i> rest
+                        <i class="fa fa-fw fa-edit"></i> rest
                     </a>
 				</li>
 				<li id="aliases_option" ng-click="selectTab('loadAliasesEvent')">
 					<a href="#aliases" data-toggle="tab">
-                        <i class="fa fa-tags"></i> aliases
+                        <i class="fa fa-fw fa-tags"></i> aliases
                     </a>
 				</li>
 				<li id="analysis_option" ng-click="selectTab('loadAnalysisEvent')">
 					<a href="#analysis" data-toggle="tab">
-                        <i class="fa fa-puzzle-piece"></i> analysis
+                        <i class="fa fa-fw fa-puzzle-piece"></i> analysis
                     </a>
 				</li>
 				<li id="percolator_option" ng-click="selectTab('loadPercolatorEvent')">
 					<a href="#percolator" data-toggle="tab">
-                        <i class="fa fa-bullseye"></i> percolator
+                        <i class="fa fa-fw fa-bell-o"></i> percolator
                     </a>
 				</li>
 				<li id="warmup_option" ng-click="selectTab('loadWarmupEvent')">
 					<a href="#warmup" data-toggle="tab">
-                        <i class="fa fa-fire"></i> warmers
+                        <i class="fa fa-fw fa-fire"></i> warmers
                     </a>
 				</li>
 				<li id="repository_option" ng-click="selectTab('loadRepositoryEvent')">
 					<a href="#repository" data-toggle="tab">
-                        <i class="fa fa-suitcase"></i> repository
+                        <i class="fa fa-fw fa-camera"></i> snapshot
                     </a>
 				</li>
 				<li id="benchmark_option" ng-click="selectTab('loadBenchmarkEvent')" ng-show="client.versionCheck('1.3.0')">
 					<a href="#benchmark" data-toggle="tab">
-                        <i class="fa fa-bar-chart-o"></i> benchmark
+                        <i class="fa fa-fw fa-bar-chart-o"></i> benchmark
                     </a>
 				</li>
 			</ul>
