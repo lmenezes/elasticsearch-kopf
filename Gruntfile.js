@@ -63,7 +63,6 @@ module.exports = function(grunt) {
                     'src/kopf/elastic/warmer.js',
                     'src/kopf/elastic/percolator.js',
 					// CONTROLLERS
-					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
 					'src/kopf/controllers/aliases.js',
 					'src/kopf/controllers/analysis.js',
@@ -90,7 +89,11 @@ module.exports = function(grunt) {
 					'src/kopf/models/gist.js',
 					'src/kopf/models/warmers_pagination.js',
 					'src/kopf/models/snapshots_pagination.js',
+                    'src/kopf/models/aliases_pagination.js',
 					'src/kopf/models/benchmark.js',
+                    'src/kopf/models/request.js',
+                    'src/kopf/models/cluster_navigation.js',
+                    'src/kopf/models/modal_controls.js',
 					// UTIL
 					'src/kopf/util.js'
 				],
@@ -146,7 +149,6 @@ module.exports = function(grunt) {
                     'src/kopf/elastic/warmer.js',
                     'src/kopf/elastic/percolator.js',
 					// CONTROLLERS
-					'src/kopf/controllers.js',
 					'src/kopf/kopf.js',
 					'src/kopf/controllers/aliases.js',
 					'src/kopf/controllers/analysis.js',
@@ -173,7 +175,11 @@ module.exports = function(grunt) {
 					'src/kopf/models/gist.js',
 					'src/kopf/models/warmers_pagination.js',
 					'src/kopf/models/snapshots_pagination.js',
+                    'src/kopf/models/aliases_pagination.js',
 					'src/kopf/models/benchmark.js',
+                    'src/kopf/models/request.js',
+                    'src/kopf/models/cluster_navigation.js',
+                    'src/kopf/models/modal_controls.js',
 					// UTIL
 					'src/kopf/util.js'
 				]
