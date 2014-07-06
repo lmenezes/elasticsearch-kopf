@@ -185,7 +185,12 @@ function ElasticClient(connection) {
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
 		var path = "/" + index + "/.percolator/_search";
-		this.executeElasticRequest('POST', path , body,callback_success, callback_error);
+        var parsePercolators = function(response) {
+            var collection = response.hits.hits.map(function(q) { return new PercolateQuery(q); });
+            var percolators = new PercolatorsPage(body.from, body.size, response.hits.total, collection);
+            callback_success(percolators);
+        };
+        this.executeElasticRequest('POST', path , JSON.stringify(body), parsePercolators, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
@@ -193,9 +198,9 @@ function ElasticClient(connection) {
 		this.executeElasticRequest('DELETE', path, {}, callback_success, callback_error);
 	};
 	
-	this.createPercolatorQuery=function(index, id, body, callback_success, callback_error) {
-		var path = "/" + index + "/.percolator/" + id;
-		this.executeElasticRequest('PUT', path, body, callback_success, callback_error);
+	this.createPercolatorQuery=function(percolator, callback_success, callback_error) {
+		var path = "/" + percolator.index + "/.percolator/" + percolator.id;
+		this.executeElasticRequest('PUT', path, percolator.source, callback_success, callback_error);
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
