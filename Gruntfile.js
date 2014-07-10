@@ -46,7 +46,6 @@ module.exports = function(grunt) {
 			appjs: {
 				src: [
 					'src/kopf/elastic/alias.js',
-					'src/kopf/elastic/aliases.js',
 					'src/kopf/elastic/cluster_changes.js',
 					'src/kopf/elastic/cluster_health.js',
 					'src/kopf/elastic/cluster_settings.js',
@@ -132,7 +131,6 @@ module.exports = function(grunt) {
 			kopf: {
 				src: [
 					'src/kopf/elastic/alias.js',
-					'src/kopf/elastic/aliases.js',
 					'src/kopf/elastic/cluster_changes.js',
 					'src/kopf/elastic/cluster_health.js',
 					'src/kopf/elastic/cluster_settings.js',

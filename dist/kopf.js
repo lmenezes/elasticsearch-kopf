@@ -1,9 +1,44 @@
+function IndexAliases(index, aliases) {
+    this.index = index;
+    this.aliases = aliases;
+
+    this.clone=function() {
+        var cloned = new IndexAliases(this.index, []);
+        cloned.aliases = this.aliases.map(function(alias) { return alias.clone(); });
+        return cloned;
+    };
+}
+
+IndexAliases.diff=function(original, modified) {
+    var differences = [];
+    modified.forEach(function(ia) {
+        var is_new = true;
+        original.forEach(function(orig_ia) {
+            if (ia.index == orig_ia.index) {
+                is_new = false;
+                ia.aliases.forEach(function(alias) {
+                    var original_aliases = orig_ia.aliases.filter(function(original_alias) {
+                        return alias.equals(original_alias);
+                    });
+                    if (original_aliases.length === 0) {
+                        differences.push(alias);
+                    }
+                });
+            }
+        });
+        if (is_new) {
+            ia.aliases.forEach(function(alias) { differences.push(alias); });
+        }
+    });
+    return differences;
+};
+
 function Alias(alias, index, filter, index_routing, search_routing) {
 	this.alias = isDefined(alias) ? alias.toLowerCase() : "";
 	this.index = isDefined(index) ? index.toLowerCase() : "";
-	this.filter = filter;
-	this.index_routing = index_routing;
-	this.search_routing = search_routing;
+	this.filter = isDefined(filter) ? filter : "";
+	this.index_routing = isDefined(index_routing) ? index_routing : "";
+	this.search_routing = isDefined(search_routing) ? search_routing : "";
 
 	this.validate=function() {
 		if (!notEmpty(this.alias)) {
@@ -44,25 +79,11 @@ function Alias(alias, index, filter, index_routing, search_routing) {
 		}
 		return info; 
 	};
-}
-function Aliases(aliases_info) {
-	var indices  = [];
-	var aliases_map = {};
-	Object.keys(aliases_info).forEach(function(index) {
-		indices.push(index); // fills list of available indices
-		var indexAliases = aliases_info[index].aliases;
-		Object.keys(indexAliases).forEach(function(alias) { // group aliases per alias name
-			if (!isDefined(aliases_map[alias])) {
-				aliases_map[alias] = [];
-			}
-			var alias_instance = new Alias(alias, index, indexAliases[alias].filter, indexAliases[alias].index_routing,indexAliases[alias].search_routing);
-			aliases_map[alias].push(alias_instance);
-		});
-	});
-	this.indices = indices.sort(function(a,b) { return a.localeCompare(b); });
-	this.info = aliases_map;
-}
 
+    this.clone=function() {
+        return new Alias(this.alias, this.index, this.filter, this.index_routing, this.search_routing);
+    };
+}
 function ClusterChanges() {
 
 	this.nodeJoins = null;
@@ -453,9 +474,20 @@ function ElasticClient(connection) {
 
 	this.fetchAliases=function(callback_success, callback_error) {
 		var createAliases=function(response) {
-			callback_success(new Aliases(response));
+            var indices = Object.keys(response);
+            var index_aliases = [];
+            indices.forEach(function(index) {
+                if (Object.keys(response[index].aliases).length > 0) {
+                    var aliases = Object.keys(response[index].aliases).map(function(alias) {
+                        var info = response[index].aliases[alias];
+                        return new Alias(alias, index, info.filter, info.index_routing, info.search_routing);
+                    });
+                    index_aliases.push(new IndexAliases(index, aliases));
+                }
+            });
+			callback_success(index_aliases);
 		};
-		this.executeElasticRequest('GET', "/_aliases",{},createAliases, callback_error);
+		this.executeElasticRequest('GET', "/_aliases",{}, createAliases, callback_error);
 	};
 
 	this.analyzeByField=function(index, type, field, text, callback_success, callback_error) {
@@ -480,15 +512,8 @@ function ElasticClient(connection) {
 
 	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
 		var data = { actions: [] };
-		if (add_aliases.length === 0 && remove_aliases.length === 0) {
-			throw "No changes were made: nothing to save";
-		}
-		remove_aliases.forEach(function(alias) {
-			data.actions.push({'remove':alias.info()});
-		});
-		add_aliases.forEach(function(alias) {
-			data.actions.push({'add':alias.info()});
-		});
+		remove_aliases.forEach(function(alias) { data.actions.push({'remove':alias.info()}); });
+		add_aliases.forEach(function(alias) { data.actions.push({'add':alias.info()}); });
 		this.executeElasticRequest('POST', "/_aliases",JSON.stringify(data), callback_success, callback_error);
 	};
 
@@ -1275,11 +1300,11 @@ kopf.factory('ConfirmDialogService', function() {
 	return this;
 });
 
-function AliasesController($scope, $location, $timeout, AlertService, AceEditorService) {
-	$scope.aliases = null;
-	$scope.new_index = {};
+function AliasesController($scope, AlertService, AceEditorService) {
 	$scope.pagination= new AliasesPagination(1, []);
+    $scope.original = [];
 	$scope.editor = undefined;
+    $scope.new_alias = new Alias("", "", "", "", "");
 	
 	$scope.viewDetails=function(alias) {
 		$scope.details = alias;
@@ -1296,20 +1321,23 @@ function AliasesController($scope, $location, $timeout, AlertService, AceEditorS
 		if (!isDefined($scope.editor.error)) {
 			try {
 				$scope.new_alias.validate();
+                var index_name = $scope.new_alias.index;
+                var alias_name = $scope.new_alias.alias;
 				// if alias already exists, check if its already associated with index
-				if (isDefined($scope.aliases.info[$scope.new_alias.alias])) {
-					var aliases = $scope.aliases.info[$scope.new_alias.alias];
-					$.each(aliases,function(i, alias) {
-						if (alias.index === $scope.new_alias.index) {
-							throw "Alias is already associated with this index";
-						}
-					});
-				} else {
-					$scope.aliases.info[$scope.new_alias.alias] = [];
-				}
-				$scope.aliases.info[$scope.new_alias.alias].push($scope.new_alias);
+				var indices = $scope.pagination.results.filter(function(a) { return a.index == index_name; });
+                if (indices.length === 0) {
+                    $scope.pagination.results.push(new IndexAliases(index_name, [ $scope.new_alias ]));
+                } else {
+                    var index_aliases = indices[0];
+                    var aliases = index_aliases.aliases.filter(function(a) { return alias_name == a.alias;  });
+                    if (aliases.length > 0) {
+                        throw "Alias is already associated with this index";
+                    } else {
+                        index_aliases.aliases.push($scope.new_alias);
+                    }
+                }
 				$scope.new_alias = new Alias();
-				$scope.pagination.setResults($scope.aliases.info);
+				$scope.pagination.setResults($scope.pagination.results);
 				AlertService.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
 			} catch (error) {
 				AlertService.error(error ,null);
@@ -1319,93 +1347,67 @@ function AliasesController($scope, $location, $timeout, AlertService, AceEditorS
 		}
 	};
 	
-	$scope.removeAlias=function(alias) {
-		delete $scope.aliases.info[alias];
-		$scope.pagination.setResults($scope.aliases.info);
-		AlertService.success("Alias successfully removed. Note that changes made will only be persisted after saving changes");
+	$scope.removeIndexAliases=function(index) {
+        for (var position = 0; position < $scope.pagination.results.length; position++) {
+            if (index == $scope.pagination.results[position].index) {
+                $scope.pagination.results.splice(position, 1);
+                break;
+            }
+        }
+
+        $scope.pagination.setResults($scope.pagination.results);
+		AlertService.success("All aliases were removed for " + index);
 	};
 	
-	$scope.removeAliasFromIndex=function(index, alias_name) {
-		var aliases = $scope.aliases.info[alias_name];
-		for (var i = 0; i < aliases.length; i++) {
-			if (alias_name === aliases[i].alias && index === aliases[i].index) {
-				$scope.aliases.info[alias_name].splice(i,1);
-				AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
-			}
-		}
+	$scope.removeIndexAlias=function(index, alias) {
+        var index_position = 0;
+        for (; index_position < $scope.pagination.results.length; index_position++) {
+            if (index == $scope.pagination.results[index_position].index) {
+                break;
+            }
+        }
+        var index_aliases = $scope.pagination.results[index_position];
+        for (var alias_position = 0; alias_position < index_aliases.aliases.length; alias_position++) {
+            if (alias == index_aliases.aliases[alias_position].alias) {
+                index_aliases.aliases.splice(alias_position, 1);
+                if (index_aliases.aliases.length === 0) {
+                    $scope.pagination.results.splice(index_position, 1);
+                }
+                break;
+            }
+        }
+        $scope.pagination.setResults($scope.pagination.results); // refreshes view
+        AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 	};
 	
 	$scope.mergeAliases=function() {
-		var deletes = [];
-		var adds = [];
-		Object.keys($scope.aliases.info).forEach(function(alias_name) {
-			var aliases = $scope.aliases.info[alias_name];
-			aliases.forEach(function(alias) {
-				// if alias didnt exist, just add it
-				if (!isDefined($scope.originalAliases.info[alias_name])) {
-					adds.push(alias);
-				} else {
-					var originalAliases = $scope.originalAliases.info[alias_name];
-					var addAlias = true;
-					for (var i = 0; i < originalAliases.length; i++) {
-						if (originalAliases[i].equals(alias)) {
-							addAlias = false;
-							break;
-						}
-					}
-					if (addAlias) {
-						adds.push(alias);
-					}
-				}
-			});
-		});
-		Object.keys($scope.originalAliases.info).forEach(function(alias_name) {
-			var aliases = $scope.originalAliases.info[alias_name];
-			aliases.forEach(function(alias) {
-				if (!isDefined($scope.aliases.info[alias.alias])) {
-					deletes.push(alias);
-				} else {
-					var newAliases = $scope.aliases.info[alias_name];
-					var removeAlias = true;
-					for (var i = 0; i < newAliases.length; i++) {
-						if (alias.index === newAliases[i].index && alias.equals(newAliases[i])) {
-							removeAlias = false;
-							break;
-						}
-					}
-					if (removeAlias) {
-						deletes.push(alias);
-					}
-				}
-			});
-		});
-		$scope.client.updateAliases(adds,deletes,
-			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Aliases were successfully updated",response);
-				});
-				$scope.loadAliases();
-			},
-			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while updating aliases",error);
-				});
-			}
-		);
-	};
-	
-	$scope._parseAliases = function(aliases) {
-		$scope.originalAliases = aliases;
-		$scope.aliases = jQuery.extend(true, {}, $scope.originalAliases);
-		$scope.pagination.setResults($scope.aliases.info);
+		var deletes = IndexAliases.diff($scope.pagination.results, $scope.original);
+		var adds = IndexAliases.diff($scope.original, $scope.pagination.results);
+        if (adds.length === 0 && deletes.length === 0) {
+            AlertService.warn("No changes were made: nothing to save");
+        } else {
+            $scope.client.updateAliases(adds,deletes,
+                function(response) {
+                    $scope.updateModel(function() {
+                        AlertService.success("Aliases were successfully updated",response);
+                    });
+                    $scope.loadAliases();
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        AlertService.error("Error while updating aliases",error);
+                    });
+                }
+            );
+        }
 	};
 
 	$scope.loadAliases=function() {
-		$scope.new_alias = new Alias();
 		$scope.client.fetchAliases(
-			function(aliases) {
+			function(index_aliases) {
 				$scope.updateModel(function() {
-					$scope._parseAliases(aliases);
+                    $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
+					$scope.pagination.setResults(index_aliases);
 				});
 			},
 			function(error) {
@@ -1417,7 +1419,8 @@ function AliasesController($scope, $location, $timeout, AlertService, AceEditorS
 	};
 	
     $scope.$on('loadAliasesEvent', function() {
-		$scope.loadAliases();
+        $scope.indices = $scope.cluster.indices;
+        $scope.loadAliases();
 		$scope.initEditor();
     });
 
@@ -3269,15 +3272,14 @@ function AliasesPagination(page, results) {
     this.page = page;
     this.page_size = 10;
     this.results = results;
-    this.alias_query = "";
-    this.index_query = "";
-    this.past_alias_query = null;
-    this.past_index_query = null;
-    this.total = 0;
+    this.index = "";
+    this.past_index = "";
+    this.alias = "";
+    this.past_alias = "";
     this.cached_results = null;
 
     this.firstResult=function() {
-        if (Object.keys(this.getResults()).length > 0) {
+        if (this.getResults().length > 0) {
             return ((this.current_page() - 1) * this.page_size) + 1;
         } else {
             return 0;
@@ -3285,15 +3287,15 @@ function AliasesPagination(page, results) {
     };
 
     this.lastResult=function() {
-        if (this.current_page() * this.page_size > Object.keys(this.getResults()).length) {
-            return Object.keys(this.getResults()).length;
+        if (this.current_page() * this.page_size > this.getResults().length) {
+            return this.getResults().length;
         } else {
             return this.current_page() * this.page_size;
         }
     };
 
     this.hasNextPage=function() {
-        return this.page_size * this.current_page() < Object.keys(this.getResults()).length;
+        return this.page_size * this.current_page() < this.getResults().length;
     };
 
     this.hasPreviousPage=function() {
@@ -3309,7 +3311,7 @@ function AliasesPagination(page, results) {
     };
 
     this.current_page=function() {
-        if (this.alias_query != this.past_alias_query || this.index_query != this.past_index_query) {
+        if (this.index != this.past_index || this.alias != this.past_alias) {
             this.page = 1;
         }
         return this.page;
@@ -3319,14 +3321,14 @@ function AliasesPagination(page, results) {
         var count = 1;
         var first_result = this.firstResult();
         var last_result = this.lastResult();
-        var page = {};
+        var page = [];
         var results = this.getResults();
-        Object.keys(results).forEach(function(alias) {
+        results.forEach(function(warmer) {
             if (count < first_result || count > last_result) {
                 count += 1;
             } else {
                 count += 1;
-                page[alias] = results[alias];
+                page.push(warmer);
             }
         });
         return page;
@@ -3336,47 +3338,44 @@ function AliasesPagination(page, results) {
         this.results = results;
         // forces recalculation of page
         this.cached_results = null;
+        while (this.total() < this.firstResult()) {
+            this.previousPage();
+        }
     };
 
     this.total=function() {
-        return Object.keys(this.getResults()).length;
+        return this.getResults().length;
     };
 
     this.getResults=function() {
-        var matchingResults = {};
-        var filters_changed = (this.alias_query != this.past_alias_query || this.index_query != this.past_index_query);
+        var matchingResults = [];
+        var filters_changed = this.index != this.past_index || this.alias != this.past_alias;
         if (filters_changed || !isDefined(this.cached_results)) { // if filters changed or no cached, calculate
-            var alias_query = this.alias_query;
-            var index_query = this.index_query;
+            var index = this.index;
+            var alias = this.alias;
             var results = this.results;
-            Object.keys(results).forEach(function(alias_name) {
-                if (isDefined(alias_query) && alias_query.length > 0) {
-                    if (alias_name.indexOf(alias_query) != -1) {
-                        if (isDefined(index_query) && index_query.length > 0) {
-                            results[alias_name].forEach(function(alias) {
-                                if (alias.index.indexOf(index_query) != -1) {
-                                    matchingResults[alias_name] = results[alias_name];
-                                }
-                            });
-                        } else {
-                            matchingResults[alias_name] = results[alias_name];
+            results.forEach(function(index_alias) {
+                var matches = true;
+                if (isDefined(index) && index.length > 0 && index_alias.index.indexOf(index) == -1) {
+                   matches = false;
+                }
+
+                if (matches && isDefined(alias) && alias.length > 0) {
+                    matches = false;
+                    for (var i = 0; i < index_alias.aliases.length; i++) {
+                        if (index_alias.aliases[i].alias.indexOf(alias) != -1) {
+                            matches = true;
+                            break;
                         }
                     }
-                } else {
-                    if (isDefined(index_query) && index_query.length > 0) {
-                        results[alias_name].forEach(function(alias) {
-                            if (alias.index.indexOf(index_query) != -1) {
-                                matchingResults[alias_name] = results[alias_name];
-                            }
-                        });
-                    } else {
-                        matchingResults[alias_name] = results[alias_name];
-                    }
+                }
+                if (matches) {
+                    matchingResults.push(index_alias);
                 }
             });
             this.cached_results = matchingResults;
-            this.past_alias_query = this.alias_query;
-            this.past_index_query = this.index_query;
+            this.past_index = this.index;
+            this.past_alias = this.alias;
         }
         return this.cached_results;
     };

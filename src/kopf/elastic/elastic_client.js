@@ -114,9 +114,20 @@ function ElasticClient(connection) {
 
 	this.fetchAliases=function(callback_success, callback_error) {
 		var createAliases=function(response) {
-			callback_success(new Aliases(response));
+            var indices = Object.keys(response);
+            var index_aliases = [];
+            indices.forEach(function(index) {
+                if (Object.keys(response[index].aliases).length > 0) {
+                    var aliases = Object.keys(response[index].aliases).map(function(alias) {
+                        var info = response[index].aliases[alias];
+                        return new Alias(alias, index, info.filter, info.index_routing, info.search_routing);
+                    });
+                    index_aliases.push(new IndexAliases(index, aliases));
+                }
+            });
+			callback_success(index_aliases);
 		};
-		this.executeElasticRequest('GET', "/_aliases",{},createAliases, callback_error);
+		this.executeElasticRequest('GET', "/_aliases",{}, createAliases, callback_error);
 	};
 
 	this.analyzeByField=function(index, type, field, text, callback_success, callback_error) {
@@ -141,15 +152,8 @@ function ElasticClient(connection) {
 
 	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
 		var data = { actions: [] };
-		if (add_aliases.length === 0 && remove_aliases.length === 0) {
-			throw "No changes were made: nothing to save";
-		}
-		remove_aliases.forEach(function(alias) {
-			data.actions.push({'remove':alias.info()});
-		});
-		add_aliases.forEach(function(alias) {
-			data.actions.push({'add':alias.info()});
-		});
+		remove_aliases.forEach(function(alias) { data.actions.push({'remove':alias.info()}); });
+		add_aliases.forEach(function(alias) { data.actions.push({'add':alias.info()}); });
 		this.executeElasticRequest('POST', "/_aliases",JSON.stringify(data), callback_success, callback_error);
 	};
 
