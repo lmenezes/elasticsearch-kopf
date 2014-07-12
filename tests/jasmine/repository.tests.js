@@ -341,5 +341,25 @@ describe('RepositoryController', function(){
         expect(this.scope.snapshot).toEqual(null);
     });
 
+    it('clears selected repository on snapshot listings if repository is deleted', function() {
+        this.scope.snapshot_repository = "will_be_deleted";
+        var repository = new Repository("will_be_deleted", { "type":"fs", "settings": { "location": "setting_value"} });
+        this.scope.client.deleteRepository =  function(repo, success, failed){ success("") };
+        spyOn(this.scope, "reload").andReturn(true);
+        this.scope.executeDeleteRepository(repository);
+        expect(this.scope.snapshot_repository).toEqual('');
+        expect(this.scope.reload).toHaveBeenCalled();
+    });
+
+    it('doesnt clear selected repository on snapshot listings if another repository is deleted', function() {
+        this.scope.snapshot_repository = "wont_be_deleted";
+        var repository = new Repository("will_be_deleted", { "type":"fs", "settings": { "location": "setting_value"} });
+        this.scope.client.deleteRepository =  function(repo, success, failed){ success("") };
+        spyOn(this.scope, "reload").andReturn(true);
+        this.scope.executeDeleteRepository(repository);
+        expect(this.scope.snapshot_repository).toEqual('wont_be_deleted');
+        expect(this.scope.reload).toHaveBeenCalled();
+    });
+
 
 });

@@ -2549,24 +2549,29 @@ function RepositoryController($scope, ConfirmDialogService, AlertService) {
 		return body;
 	};
 
-	$scope.deleteRepository=function(repository){
+    $scope.executeDeleteRepository = function(repository) {
+        $scope.client.deleteRepository(repository.name,
+            function(response) {
+                AlertService.success("Repository successfully deleted", response);
+                if (notEmpty($scope.snapshot_repository) && $scope.snapshot_repository == repository.name) {
+                    $scope.snapshot_repository = '';
+                }
+                $scope.reload();
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while deleting repositor", error);
+                });
+            }
+        );
+    };
+
+	$scope.deleteRepository=function(repository) {
 		ConfirmDialogService.open(
 			"are you sure you want to delete repository " + repository.name + "?",
 			repository.settings,
 			"Delete",
-			function() {
-				$scope.client.deleteRepository(repository.name,
-					function(response) {
-						AlertService.success("Repository successfully deleted", response);
-						$scope.reload();
-					},
-					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting repositor", error);
-						});
-					}
-				);
-			}
+            function() { $scope.executeDeleteRepository(repository); }
 		);
 	};
 
