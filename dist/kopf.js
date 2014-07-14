@@ -1301,7 +1301,7 @@ kopf.factory('ConfirmDialogService', function() {
 });
 
 function AliasesController($scope, AlertService, AceEditorService) {
-	$scope.pagination= new AliasesPagination(1, []);
+	$scope.paginator = new Paginator(1,10, [], new AliasFilter("",""));
     $scope.original = [];
 	$scope.editor = undefined;
     $scope.new_alias = new Alias("", "", "", "", "");
@@ -1324,9 +1324,9 @@ function AliasesController($scope, AlertService, AceEditorService) {
                 var index_name = $scope.new_alias.index;
                 var alias_name = $scope.new_alias.alias;
 				// if alias already exists, check if its already associated with index
-				var indices = $scope.pagination.results.filter(function(a) { return a.index == index_name; });
+				var indices = $scope.paginator.collection.filter(function(a) { return a.index == index_name; });
                 if (indices.length === 0) {
-                    $scope.pagination.results.push(new IndexAliases(index_name, [ $scope.new_alias ]));
+                    $scope.paginator.collection.push(new IndexAliases(index_name, [ $scope.new_alias ]));
                 } else {
                     var index_aliases = indices[0];
                     var aliases = index_aliases.aliases.filter(function(a) { return alias_name == a.alias;  });
@@ -1337,7 +1337,7 @@ function AliasesController($scope, AlertService, AceEditorService) {
                     }
                 }
 				$scope.new_alias = new Alias();
-				$scope.pagination.setResults($scope.pagination.results);
+				$scope.paginator.refresh();
 				AlertService.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
 			} catch (error) {
 				AlertService.error(error ,null);
@@ -1348,41 +1348,41 @@ function AliasesController($scope, AlertService, AceEditorService) {
 	};
 	
 	$scope.removeIndexAliases=function(index) {
-        for (var position = 0; position < $scope.pagination.results.length; position++) {
-            if (index == $scope.pagination.results[position].index) {
-                $scope.pagination.results.splice(position, 1);
+        for (var position = 0; position < $scope.paginator.collection.length; position++) {
+            if (index == $scope.paginator.collection[position].index) {
+                $scope.paginator.collection.splice(position, 1);
                 break;
             }
         }
 
-        $scope.pagination.setResults($scope.pagination.results);
+        $scope.paginator.refresh();
 		AlertService.success("All aliases were removed for " + index);
 	};
 	
 	$scope.removeIndexAlias=function(index, alias) {
         var index_position = 0;
-        for (; index_position < $scope.pagination.results.length; index_position++) {
-            if (index == $scope.pagination.results[index_position].index) {
+        for (; index_position < $scope.paginator.collection.length; index_position++) {
+            if (index == $scope.paginator.collection[index_position].index) {
                 break;
             }
         }
-        var index_aliases = $scope.pagination.results[index_position];
+        var index_aliases = $scope.paginator.collection[index_position];
         for (var alias_position = 0; alias_position < index_aliases.aliases.length; alias_position++) {
             if (alias == index_aliases.aliases[alias_position].alias) {
                 index_aliases.aliases.splice(alias_position, 1);
                 if (index_aliases.aliases.length === 0) {
-                    $scope.pagination.results.splice(index_position, 1);
+                    $scope.paginator.collection.splice(index_position, 1);
                 }
                 break;
             }
         }
-        $scope.pagination.setResults($scope.pagination.results); // refreshes view
+        $scope.paginator.refresh(); // refreshes view
         AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 	};
 	
 	$scope.mergeAliases=function() {
-		var deletes = IndexAliases.diff($scope.pagination.results, $scope.original);
-		var adds = IndexAliases.diff($scope.original, $scope.pagination.results);
+		var deletes = IndexAliases.diff($scope.paginator.collection, $scope.original);
+		var adds = IndexAliases.diff($scope.original, $scope.paginator.collection);
         if (adds.length === 0 && deletes.length === 0) {
             AlertService.warn("No changes were made: nothing to save");
         } else {
@@ -1390,8 +1390,9 @@ function AliasesController($scope, AlertService, AceEditorService) {
                 function(response) {
                     $scope.updateModel(function() {
                         AlertService.success("Aliases were successfully updated",response);
+                        $scope.loadAliases();
                     });
-                    $scope.loadAliases();
+
                 },
                 function(error) {
                     $scope.updateModel(function() {
@@ -1407,7 +1408,7 @@ function AliasesController($scope, AlertService, AceEditorService) {
 			function(index_aliases) {
 				$scope.updateModel(function() {
                     $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
-					$scope.pagination.setResults(index_aliases);
+					$scope.paginator.setCollection(index_aliases);
 				});
 			},
 			function(error) {
@@ -3268,118 +3269,6 @@ function SnapshotPagination(page, results) {
 		return this.cached_results;
 	};
 }
-function AliasesPagination(page, results) {
-    this.page = page;
-    this.page_size = 10;
-    this.results = results;
-    this.index = "";
-    this.past_index = "";
-    this.alias = "";
-    this.past_alias = "";
-    this.cached_results = null;
-
-    this.firstResult=function() {
-        if (this.getResults().length > 0) {
-            return ((this.current_page() - 1) * this.page_size) + 1;
-        } else {
-            return 0;
-        }
-    };
-
-    this.lastResult=function() {
-        if (this.current_page() * this.page_size > this.getResults().length) {
-            return this.getResults().length;
-        } else {
-            return this.current_page() * this.page_size;
-        }
-    };
-
-    this.hasNextPage=function() {
-        return this.page_size * this.current_page() < this.getResults().length;
-    };
-
-    this.hasPreviousPage=function() {
-        return this.current_page() > 1;
-    };
-
-    this.nextPage=function() {
-        this.page += 1;
-    };
-
-    this.previousPage=function() {
-        this.page -= 1;
-    };
-
-    this.current_page=function() {
-        if (this.index != this.past_index || this.alias != this.past_alias) {
-            this.page = 1;
-        }
-        return this.page;
-    };
-
-    this.getPage=function() {
-        var count = 1;
-        var first_result = this.firstResult();
-        var last_result = this.lastResult();
-        var page = [];
-        var results = this.getResults();
-        results.forEach(function(warmer) {
-            if (count < first_result || count > last_result) {
-                count += 1;
-            } else {
-                count += 1;
-                page.push(warmer);
-            }
-        });
-        return page;
-    };
-
-    this.setResults=function(results) {
-        this.results = results;
-        // forces recalculation of page
-        this.cached_results = null;
-        while (this.total() < this.firstResult()) {
-            this.previousPage();
-        }
-    };
-
-    this.total=function() {
-        return this.getResults().length;
-    };
-
-    this.getResults=function() {
-        var matchingResults = [];
-        var filters_changed = this.index != this.past_index || this.alias != this.past_alias;
-        if (filters_changed || !isDefined(this.cached_results)) { // if filters changed or no cached, calculate
-            var index = this.index;
-            var alias = this.alias;
-            var results = this.results;
-            results.forEach(function(index_alias) {
-                var matches = true;
-                if (isDefined(index) && index.length > 0 && index_alias.index.indexOf(index) == -1) {
-                   matches = false;
-                }
-
-                if (matches && isDefined(alias) && alias.length > 0) {
-                    matches = false;
-                    for (var i = 0; i < index_alias.aliases.length; i++) {
-                        if (index_alias.aliases[i].alias.indexOf(alias) != -1) {
-                            matches = true;
-                            break;
-                        }
-                    }
-                }
-                if (matches) {
-                    matchingResults.push(index_alias);
-                }
-            });
-            this.cached_results = matchingResults;
-            this.past_index = this.index;
-            this.past_alias = this.alias;
-        }
-        return this.cached_results;
-    };
-}
 function Benchmark() {
 	this.name = '';
 	this.num_executor = 1;
@@ -3580,6 +3469,116 @@ function ModalControls() {
     this.active = false;
     this.title = '';
     this.info = '';
+}
+function Paginator(page, page_size, collection, filter) {
+    this.page = page;
+    this.page_size = page_size;
+
+    this.collection = collection;
+    this.filtered_collection = null;
+
+    this.filter = filter;
+    this.previous_filter = null;
+
+
+    this.firstResult=function() {
+        return this.total() > 0 ? ((this.page -1) * this.page_size) + 1 : 0;
+    };
+
+    this.lastResult=function() {
+        return this.page * this.page_size > this.total() ? this.total() : this.page * this.page_size;
+    };
+
+    this.hasNextPage=function() {
+        return this.page_size * this.page < this.total();
+    };
+
+    this.hasPreviousPage=function() {
+        return this.page > 1;
+    };
+
+    this.nextPage=function() {
+        this.page += 1;
+    };
+
+    this.previousPage=function() {
+        this.page -= 1;
+    };
+
+    this.getPage=function() {
+        return this.getResults().slice(this.firstResult() -1, this.lastResult());
+    };
+
+    this.setCollection=function(collection) {
+        this.collection = collection;
+        this.filtered_collection = null; // forces recalculation
+        while (this.total() < this.firstResult()) {
+            this.previousPage();
+        }
+    };
+
+    this.total=function() {
+        return this.getResults().length;
+    };
+
+    this.getResults=function() {
+        var filter_changed = !this.filter.equals(this.previous_filter);
+        if (filter_changed || !isDefined(this.filtered_collection)) {
+            var filter = this.filter;
+            this.previous_filter = this.filter.clone();
+            var collection = this.collection;
+            if (filter.isBlank()) {
+                this.filtered_collection = this.collection;
+            } else {
+                var filtered_collection = [];
+                collection.forEach(function(item) {
+                    if (filter.matches(item)) {
+                        filtered_collection.push(item);
+                    }
+                });
+                this.filtered_collection = filtered_collection;
+            }
+        }
+        return this.filtered_collection;
+    };
+
+    this.refresh=function() {
+        this.setCollection(this.collection);
+    };
+}
+function AliasFilter(index, alias) {
+
+    this.index = index;
+    this.alias = alias;
+
+    this.clone=function() { return new AliasFilter(this.index, this.alias); };
+
+    this.equals=function(other) {
+        return other !== null && this.index == other.index && this.alias == other.alias;
+    };
+
+    this.isBlank=function() { return !notEmpty(this.index) && !notEmpty(this.alias); };
+
+    this.matches=function(index_alias) {
+        if (this.isBlank()) {
+            return true;
+        } else {
+            var matches = true;
+            if (notEmpty(this.index)) {
+                matches = index_alias.index.indexOf(this.index) != -1;
+            }
+            if (matches && notEmpty(this.alias)) {
+                matches = false;
+                var aliases = index_alias.aliases;
+                for (var i = 0; !matches && i < aliases.length; i++) {
+                    var alias = aliases[i];
+                    matches = alias.alias.indexOf(this.alias) != -1;
+                }
+            }
+            return matches;
+        }
+    };
+
 }
 function readablizeBytes(bytes) {
 	if (bytes > 0) {

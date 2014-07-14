@@ -85,24 +85,24 @@
 									<form class="form-inline" role="form">
 										<div class="col-xs-6 form-group">
 											<label class="form-label">alias name</label>
-											<input type="text" ng-model="pagination.alias" class="form-control input-sm" placeholder="filter by alias name">
+											<input type="text" ng-model="paginator.filter.alias" class="form-control input-sm" placeholder="filter by alias name">
 										</div>
 										<div class="col-xs-6 form-group">
 											<label class="form-label">index name</label>
-											<input type="text" ng-model="pagination.index" class="form-control input-sm" placeholder="filter by index name">
+											<input type="text" ng-model="paginator.filter.index" class="form-control input-sm" placeholder="filter by index name">
 										</div>
 									</form>
 								</div>
 								<div class="row">
 									<div class="col-lg-12">
 										<div class="pagination-block">
-											<span ng-switch on="pagination.hasPreviousPage()">
-												<i class="fa fa-angle-double-left normal-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+											<span ng-switch on="paginator.hasPreviousPage()">
+												<i class="fa fa-angle-double-left normal-action" ng-click="paginator.previousPage()" ng-switch-when="true"></i>
 												<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 											</span>
-											{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
-											<span ng-switch on="pagination.hasNextPage()">
-												<i class="fa fa-angle-double-right normal-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+											{{paginator.firstResult()}}-{{paginator.lastResult()}} of {{paginator.total()}}
+											<span ng-switch on="paginator.hasNextPage()">
+												<i class="fa fa-angle-double-right normal-action" ng-click="paginator.nextPage()" ng-switch-when="true"></i>
 												<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
 											</span>
 										</div>
@@ -115,7 +115,7 @@
 												<td class="aliases-alias-cell">index</td>
 												<td>aliases</td>
 											</tr>
-											<tr ng-repeat="index_alias in pagination.getPage()">
+											<tr ng-repeat="index_alias in paginator.getPage()">
 												<td>
 													<i class="fa fa-times remove-icon normal-action" ng-click="removeIndexAliases(index_alias.index)" title="remove all aliases for this index"></i>
 													<span class="aliases-new-alias-input">{{index_alias.index}}</span>
