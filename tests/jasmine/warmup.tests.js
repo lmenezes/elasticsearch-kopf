@@ -26,8 +26,8 @@ describe('WarmupController', function(){
 
     it('Initial values are correct', function(){
         expect(this.scope.index).toEqual(null);
-        expect(this.scope.pagination.warmer_id).toEqual("");
-        expect(this.scope.pagination.getPage()).toEqual({});
+        expect(this.scope.paginator.filter.id).toEqual("");
+        expect(this.scope.paginator.getPage()).toEqual({});
         expect(this.scope.indices).toEqual([]);
         expect(this.scope.editor).toEqual(undefined);
         expect(this.scope.warmer.id).toEqual("");
@@ -51,8 +51,8 @@ describe('WarmupController', function(){
     });
 
     it('Returns total number of warmers', function() {
-        this.scope.pagination.setResults([new Warmer("warmer_id","index", { types: [], source: {}}), new Warmer("warmer_id2","index", { types: [], source: {}})]);
-        expect(this.scope.pagination.total()).toEqual(2);
+        this.scope.paginator.setCollection([new Warmer("warmer_id","index", { types: [], source: {}}), new Warmer("warmer_id2","index", { types: [], source: {}})]);
+        expect(this.scope.paginator.total()).toEqual(2);
     });
 
     it('Prevent warmup with empty body to be created', function() {
@@ -109,12 +109,12 @@ describe('WarmupController', function(){
 
     it('Loads index warmers for index and specific type', function() {
         this.scope.index = "index_name";
-        this.scope.pagination.warmer_id = "warmer_id";
+        this.scope.paginator.filter.id = "warmer_id";
         this.scope.client.getIndexWarmers = function(){};
         spyOn(this.scope.client, "getIndexWarmers").andReturn(true);
         this.scope.warmer = new Warmer('', 'index_name', {});
         this.scope.loadIndexWarmers();
-        expect(this.scope.client.getIndexWarmers).toHaveBeenCalledWith("index_name", 'warmer_id', jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.client.getIndexWarmers).toHaveBeenCalledWith("index_name", '', jasmine.any(Function), jasmine.any(Function));
     });
 
     // TODO: how to make this work with the call that happens once user confirms?

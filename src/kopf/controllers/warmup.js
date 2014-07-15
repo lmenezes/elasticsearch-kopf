@@ -1,10 +1,9 @@
-function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
+function WarmupController($scope, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.index = null;
-	$scope.pagination = new WarmersPagination(1, []);
+	$scope.paginator = new Paginator(1, 10, [], new WarmerFilter(""));
 	
-	// holds data for new warmer. maybe create a model for that
 	$scope.warmer = new Warmer('', '', { types: [], source: {} });
 
 	$scope.$on('loadWarmupEvent', function() {
@@ -18,10 +17,6 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		}
 	};
 
-	$scope.totalWarmers=function() {
-		return $scope.pagination.total();
-	};
-	
 	$scope.loadIndices=function() {
 		$scope.indices = $scope.cluster.indices;
 	};
@@ -75,21 +70,21 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 	$scope.loadIndexWarmers=function() {
 		if (isDefined($scope.index)) {
-			$scope.client.getIndexWarmers($scope.index, $scope.pagination.warmer_id,
+			$scope.client.getIndexWarmers($scope.index, "",
 				function(warmers) {
 					$scope.updateModel(function() {
-                        $scope.pagination.setResults(warmers);
+                        $scope.paginator.setCollection(warmers);
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-                        $scope.pagination.setResults([]);
+                        $scope.paginator.setCollection([]);
 						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
 			);
 		} else {
-			$scope.pagination.setResults([]);
+			$scope.paginator.setCollection([]);
 		}
 	};
 	

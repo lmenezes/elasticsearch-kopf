@@ -69,21 +69,21 @@
 					<div class="col-sm-4">
 					  <div class="form-group">
 					    <label class="form-label">repository</label>
-								<select class="form-control input-sm" ng-model="snapshot_repository" ng-options="r.name as r.name for r in repositories" ng-change="selectRepository(snapshot_repository)">
-								</select>
+                            <select class="form-control input-sm" ng-model="snapshot_repository" ng-options="r.name as r.name for r in repositories" ng-change="selectRepository(snapshot_repository)">
+                            </select>
 					  </div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="pagination-block">
-							<span ng-switch on="pagination.hasPreviousPage()">
-								<i class="fa fa-angle-double-left normal-action" ng-click="pagination.previousPage()" ng-switch-when="true"></i>
+							<span ng-switch on="paginator.hasPreviousPage()">
+								<i class="fa fa-angle-double-left normal-action" ng-click="paginator.previousPage()" ng-switch-when="true"></i>
 								<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 							</span>
-							{{pagination.firstResult()}}-{{pagination.lastResult()}} of {{pagination.total()}}
-							<span ng-switch on="pagination.hasNextPage()">
-								<i class="fa fa-angle-double-right normal-action" ng-click="pagination.nextPage()" ng-switch-when="true"></i>
+							{{paginator.firstResult()}}-{{paginator.lastResult()}} of {{paginator.total()}}
+							<span ng-switch on="paginator.hasNextPage()">
+								<i class="fa fa-angle-double-right normal-action" ng-click="paginator.nextPage()" ng-switch-when="true"></i>
 								<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
 							</span>
 						</div>
@@ -99,7 +99,7 @@
 								<td>started</td>
 								<td>finished</td>
 							</tr>
-							<tr ng-repeat="s in pagination.getPage()">
+							<tr ng-repeat="s in paginator.getPage()">
 								<td>
 									{{s.name}}
 									<a data-toggle="modal" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false" tooltip="delete snapshot">

@@ -2516,7 +2516,7 @@ function RepositoryController($scope, ConfirmDialogService, AlertService) {
 	$scope.snapshots = [];
 	$scope.indices = [];
 	
-	$scope.pagination = new SnapshotPagination(1, []);
+	$scope.paginator = new Paginator(1, 10, [], new SnapshotFilter());
 	
 	$scope.snapshot = null;
 	$scope.snapshot_repository = '';
@@ -2707,12 +2707,12 @@ function RepositoryController($scope, ConfirmDialogService, AlertService) {
 		$scope.client.getSnapshots(repository,
 			function(response) {
 				$scope.updateModel(function() {
-					$scope.pagination.setResults(response);
+					$scope.paginator.setCollection(response);
 				});
 			},
 			function(error) {
 				$scope.updateModel(function() {
-					$scope.pagination.setResults([]);
+					$scope.paginator.setCollection([]);
 					AlertService.error("Error while fetching snapshots", error);
 				});
 			}
@@ -2746,13 +2746,12 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 	};
 	
 }
-function WarmupController($scope, $location, $timeout, ConfirmDialogService, AlertService, AceEditorService) {
+function WarmupController($scope, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.index = null;
-	$scope.pagination = new WarmersPagination(1, []);
+	$scope.paginator = new Paginator(1, 10, [], new WarmerFilter(""));
 	
-	// holds data for new warmer. maybe create a model for that
 	$scope.warmer = new Warmer('', '', { types: [], source: {} });
 
 	$scope.$on('loadWarmupEvent', function() {
@@ -2766,10 +2765,6 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 		}
 	};
 
-	$scope.totalWarmers=function() {
-		return $scope.pagination.total();
-	};
-	
 	$scope.loadIndices=function() {
 		$scope.indices = $scope.cluster.indices;
 	};
@@ -2823,21 +2818,21 @@ function WarmupController($scope, $location, $timeout, ConfirmDialogService, Ale
 	
 	$scope.loadIndexWarmers=function() {
 		if (isDefined($scope.index)) {
-			$scope.client.getIndexWarmers($scope.index, $scope.pagination.warmer_id,
+			$scope.client.getIndexWarmers($scope.index, "",
 				function(warmers) {
 					$scope.updateModel(function() {
-                        $scope.pagination.setResults(warmers);
+                        $scope.paginator.setCollection(warmers);
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
-                        $scope.pagination.setResults([]);
+                        $scope.paginator.setCollection([]);
 						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
 			);
 		} else {
-			$scope.pagination.setResults([]);
+			$scope.paginator.setCollection([]);
 		}
 	};
 	
@@ -3071,203 +3066,6 @@ function Gist(title, url) {
 		return this;
 	};
 
-}
-function WarmersPagination(page, results) {
-	this.page = page;
-	this.page_size = 10;
-	this.results = results;
-	this.warmer_id = "";
-	this.past_warmer_id = null;
-	this.cached_results = null;
-	
-	this.firstResult=function() {
-		if (this.getResults().length > 0) {
-			return ((this.current_page() - 1) * this.page_size) + 1;
-		} else {
-			return 0;
-		}
-	};
-	
-	this.lastResult=function() {
-		if (this.current_page() * this.page_size > this.getResults().length) {
-			return this.getResults().length;
-		} else {
-			return this.current_page() * this.page_size;
-		}
-	};
-
-	this.hasNextPage=function() {
-		return this.page_size * this.current_page() < this.getResults().length;
-	};
-	
-	this.hasPreviousPage=function() {
-		return this.current_page() > 1;
-	};
-	
-	this.nextPage=function() {
-		this.page += 1;
-	};
-	
-	this.previousPage=function() {
-		this.page -= 1;
-	};
-	
-	this.current_page=function() {
-		if (this.warmer_id != this.past_warmer_id) {
-			this.page = 1;
-		}
-		return this.page;
-	};
-	
-	this.getPage=function() {
-		var count = 1;
-		var first_result = this.firstResult();
-		var last_result = this.lastResult();
-		var page = [];
-		var results = this.getResults();
-		results.forEach(function(warmer) {
-			if (count < first_result || count > last_result) {
-				count += 1;
-			} else {
-				count += 1;
-				page.push(warmer);
-			}
-		});
-		return page;
-	};
-	
-	this.setResults=function(results) {
-		this.results = results;
-		// forces recalculation of page
-		this.cached_results = null; 
-		while (this.total() < this.firstResult()) {
-			this.previousPage();
-		}
-	};
-	
-	this.total=function() {
-		return this.getResults().length;
-	};
-
-	this.getResults=function() {
-		var matchingResults = [];
-		var filters_changed = this.warmer_id != this.past_warmer_id;
-		if (filters_changed || !isDefined(this.cached_results)) { // if filters changed or no cached, calculate
-			var warmer_id = this.warmer_id;
-			var results = this.results;
-			results.forEach(function(warmer) {
-				if (isDefined(warmer_id) && warmer_id.length > 0) {
-					if (warmer.id.indexOf(warmer_id) != -1) {
-						matchingResults.push(warmer);
-					} 
-				} else {
-					matchingResults.push(warmer);
-				}
-			});
-			this.cached_results = matchingResults;
-			this.past_warmer_id = this.warmer_id;
-		}
-		return this.cached_results;
-	};
-}
-function SnapshotPagination(page, results) {
-	this.page = page;
-	this.page_size = 10;
-	this.results = results;
-	this.snapshot_name = "";
-	this.past_snapshot_name = null;
-	this.total = 0;
-	this.cached_results = null;
-	
-	this.firstResult=function() {
-		if (Object.keys(this.getResults()).length > 0) {
-			return ((this.current_page() - 1) * this.page_size) + 1;
-		} else {
-			return 0;
-		}
-	};
-	
-	this.lastResult=function() {
-		if (this.current_page() * this.page_size > Object.keys(this.getResults()).length) {
-			return Object.keys(this.getResults()).length;
-		} else {
-			return this.current_page() * this.page_size;
-		}
-	};
-
-	this.hasNextPage=function() {
-		return this.page_size * this.current_page() < Object.keys(this.getResults()).length;
-	};
-	
-	this.hasPreviousPage=function() {
-		return this.current_page() > 1;
-	};
-	
-	this.nextPage=function() {
-		this.page += 1;
-	};
-	
-	this.previousPage=function() {
-		this.page -= 1;
-	};
-	
-	this.current_page=function() {
-		if (this.snapshot_name != this.past_snapshot_name) {
-			this.page = 1;
-		}
-		return this.page;
-	};
-	
-	this.getPage=function() {
-		var count = 1;
-		var first_result = this.firstResult();
-		var last_result = this.lastResult();
-		var page = [];
-		var results = this.getResults();
-		results.forEach(function(snapshot) {
-			if (count < first_result || count > last_result) {
-				count += 1;
-			} else {
-				count += 1;
-				page.push(snapshot);
-			}
-		});
-		return page;
-	};
-	
-	this.setResults=function(results) {
-		this.results = results;
-		// forces recalculation of page
-		this.cached_results = null; 
-		while (this.total() < this.firstResult()) {
-			this.previousPage();
-		}
-	};
-	
-	this.total=function() {
-		return this.getResults().length;
-	};
-	
-	this.getResults=function() {
-		var matchingResults = [];
-		var filters_changed = this.snapshot_name != this.past_snapshot_name;
-		if (filters_changed || !isDefined(this.cached_results)) { // if filters changed or no cached, calculate
-			var snapshot_name = this.snapshot_name;
-			var results = this.results;
-			results.forEach(function(current_snapshot) {
-				if (isDefined(snapshot_name) && snapshot_name.length > 0) {
-					if (current_snapshot.name.indexOf(snapshot_name) != -1) {
-						matchingResults.push(current_snapshot);
-					} 
-				} else {
-					matchingResults.push(current_snapshot);
-				}
-			});
-			this.cached_results = matchingResults;
-			this.past_snapshot_name = this.snapshot_name;
-		}
-		return this.cached_results;
-	};
 }
 function Benchmark() {
 	this.name = '';
@@ -3576,6 +3374,38 @@ function AliasFilter(index, alias) {
                 }
             }
             return matches;
+        }
+    };
+
+}
+function SnapshotFilter() {
+
+    this.clone=function() { return new SnapshotFilter(); };
+
+    this.equals=function(other) { return other !== null; };
+
+    this.isBlank=function() { return true; };
+
+    this.matches=function(snapshot) { return true; };
+
+}
+function WarmerFilter(id) {
+
+    this.id = id;
+
+    this.clone=function() { return new WarmerFilter(this.id); };
+
+    this.equals=function(other) {
+        return other !== null && this.id == other.id;
+    };
+
+    this.isBlank=function() { return !notEmpty(this.id); };
+
+    this.matches=function(warmer) {
+        if (this.isBlank()) {
+            return true;
+        } else {
+            return warmer.id.indexOf(this.id) != -1;
         }
     };
 
