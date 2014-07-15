@@ -94,6 +94,7 @@ module.exports = function(grunt) {
                     'src/kopf/models/alias_filter.js',
                     'src/kopf/models/snapshot_filter.js',
                     'src/kopf/models/warmer_filter.js',
+                    'src/kopf/models/index_filter.js',
 					// UTIL
 					'src/kopf/util.js'
 				],
@@ -180,6 +181,7 @@ module.exports = function(grunt) {
                     'src/kopf/models/alias_filter.js',
                     'src/kopf/models/snapshot_filter.js',
                     'src/kopf/models/warmer_filter.js',
+                    'src/kopf/models/index_filter.js',
 					// UTIL
 					'src/kopf/util.js'
 				]

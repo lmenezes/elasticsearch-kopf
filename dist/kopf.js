@@ -269,7 +269,7 @@ function Cluster(state,status,nodes,settings) {
 		this.successful_shards = status._shards.successful;
 		this.total_size = readablizeBytes(total_size);
 		this.total_size_in_bytes = total_size;
-		this.getNodes=function(name, data, master, client) { 
+		this.getNodes=function(name, data, master, client) {
 			return $.map(this.nodes,function(node) {
 				return node.matches(name, data, master, client) ? node : null;
 			});
@@ -1615,14 +1615,10 @@ function ClusterHealthController($scope,$location,$timeout,$sce, AlertService, C
 	$scope.gist_history = $scope.loadHistory();
 
 }
-function ClusterOverviewController($scope, $location, $timeout, IndexSettingsService, ConfirmDialogService, AlertService, SettingsService) {
-	$scope.settings_service = SettingsService;
-	$scope.idxSettingsSrv = IndexSettingsService;
-	$scope.dialog_service = ConfirmDialogService;
+function ClusterOverviewController($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
 	$scope.pagination = new ClusterNavigation();
-	$scope.previous_pagination = null;
-	
-	
+    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+
 	$scope.getNodes=function() {
 		if (isDefined($scope.cluster)) {
 			return $scope.cluster.getNodes($scope.pagination.node_name, $scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
@@ -1636,7 +1632,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.shutdown_node=function(node_id, node_name) {
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to shutdown node " + node_name + "?",
 			"Shutting down a node will make all data stored in this node inaccessible, unless this data is replicated across other nodes." +
 			"Replicated shards will be promoted to primary if the primary shard is no longer reachable.",
@@ -1660,7 +1656,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 
 	$scope.optimizeIndex=function(index){
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to optimize index " + index + "?",
 			"Optimizing an index is a resource intensive operation and should be done with caution."+
 			"Usually, you will only want to optimize an index when it will no longer receive updates",
@@ -1683,7 +1679,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.deleteIndex=function(index) {
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to delete index " + index + "?",
 			"Deleting an index cannot be undone and all data for this index will be lost",
 			"Delete",
@@ -1703,7 +1699,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.clearCache=function(index) {
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to clear the cache for index " + index + "?",
 			"This will clear all caches for this index.",
 			"Clear",
@@ -1726,7 +1722,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 
 	$scope.refreshIndex=function(index) {
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to refresh index " + index + "?",
 			"Refreshing an index makes all operations performed since the last refresh available for search.",
 			"Refresh",
@@ -1780,7 +1776,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.closeIndex=function(index) {
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to close index " + index + "?",
 			"Closing an index will remove all it's allocated shards from the cluster. " +
 			"Both searches and updates will no longer be accepted for the index." +
@@ -1805,7 +1801,7 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 	};
 	
 	$scope.openIndex=function(index) {
-		$scope.dialog_service.open(
+        ConfirmDialogService.open(
 			"are you sure you want to open index " + index + "?",
 			"Opening an index will trigger the recovery process for the index. " +
 			"This process could take sometime depending on the index size.",
@@ -1833,119 +1829,22 @@ function ClusterOverviewController($scope, $location, $timeout, IndexSettingsSer
 		var indices = $scope.cluster.indices.filter(function(i) {
 			return i.name == index;
 		});
-		$scope.idxSettingsSrv.index = indices[0];
+        IndexSettingsService.index = indices[0];
 		$('#idx_settings_tabs a:first').tab('show');
 		$(".setting-info").popover();		
 	};
-	
-	
-	$scope.firstResult=function() {
-		if ($scope.getResults().length > 0) {
-			return (($scope.current_page() - 1) * $scope.pagination.page_size) + 1;
-		} else {
-			return 0;
-		}
-	};
-	
-	$scope.lastResult=function() {
-		if ($scope.current_page() * $scope.pagination.page_size > $scope.getResults().length) {
-			return $scope.getResults().length;
-		} else {
-			return $scope.current_page() * $scope.pagination.page_size;
-		}
+
+	$scope.index=function(index) {
+        if (isDefined($scope.cluster) && ($scope.index_paginator.filter.timestamp === 0 ||
+            $scope.index_paginator.filter.timestamp != $scope.cluster.created_at)) {
+            $scope.index_paginator.setCollection($scope.cluster.indices);
+            var page = $scope.index_paginator.getPage();
+            return isDefined(page[index]) ? page[index] : null;
+        } else {
+            return null;
+        }
 	};
 
-	$scope.hasNextPage=function() {
-		return $scope.pagination.page_size * $scope.current_page() < $scope.getResults().length;
-	};
-	
-	$scope.hasPreviousPage=function() {
-		return $scope.current_page() > 1;
-	};
-	
-	$scope.nextPage=function() {
-		$scope.pagination.page += 1;
-	};
-	
-	$scope.previousPage=function() {
-		$scope.pagination.page -= 1;
-	};
-	
-	$scope.total=function() {
-		return $scope.getResults().length;
-	};
-	
-	$scope.current_page=function() {
-		if ($scope.pagination.query != $scope.pagination.previous_query) {
-			$scope.pagination.previous_query = $scope.pagination.query;
-			$scope.pagination.page = 1;
-		}
-		return $scope.pagination.page;
-	};
-	
-	$scope.getPage=function() {
-		var count = 1;
-		var first_result = $scope.firstResult();
-		var last_result = $scope.lastResult();
-		var page = $.map($scope.getResults(),function(i) {
-			if (count < first_result || count > last_result) {
-				count += 1;
-				return null;
-			}
-			count += 1;
-			return i;
-		});
-		return page;
-	};
-	
-	$scope.index=function(index) {
-		var page = $scope.getPage();
-		if (isDefined(page[index])) {
-			return page[index];
-		} else {
-			return null;
-		}
-	};
-	
-	$scope.getResults=function() {
-		if ($scope.cluster !== null && ($scope.pagination.cluster_timestamp === null || $scope.pagination.cluster_timestamp != $scope.cluster.created_at|| !$scope.pagination.equals($scope.previous_pagination))) {
-			var indices = isDefined($scope.cluster) ? $scope.cluster.indices : [];
-			var query = $scope.pagination.query;
-			var state = $scope.pagination.state;
-			var hide_special = $scope.pagination.hide_special;
-			try {
-				var reg = new RegExp(query.trim(), "i");
-				$scope.pagination.cached_result = $.map(indices,function(i) {
-					if (hide_special && i.isSpecial()) {
-						return null;
-					}
-					
-					if (notEmpty(query)) {
-						if (!reg.test(i.name)) {
-							return null;
-						}
-					}
-					
-					if (state.length > 0) {
-						if (state == "unhealthy") {
-							if (!i.unhealthy) {
-								return null;
-							}
-						} else if ((state == "open" || state == "close") && state != i.state) {
-							return null;
-						}
-					}
-					return i;
-				});
-			} catch (error) {
-				$scope.pagination.cached_result = [];
-			}
-			$scope.previous_pagination = $scope.pagination.clone();
-			$scope.pagination.cluster_timestamp = $scope.cluster.created_at;
-		}
-		return $scope.pagination.cached_result;
-	};
-	
 }
 function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 
@@ -3406,6 +3305,53 @@ function WarmerFilter(id) {
             return true;
         } else {
             return warmer.id.indexOf(this.id) != -1;
+        }
+    };
+
+}
+function IndexFilter(name, state, hide_special, timestamp) {
+    this.name = name;
+    this.state = state;
+    this.hide_special = hide_special;
+    this.timestamp = timestamp;
+
+    this.clone=function() {
+        return new IndexFilter(this.name, this.state, this.hide_special, this.timestamp);
+    };
+
+    this.equals=function(other) {
+        return (
+            other !== null &&
+            this.name == other.name &&
+            this.state == other.state &&
+            this.hide_special === other.hide_special &&
+            this.timestamp == other.timestamp
+        );
+    };
+
+    this.isBlank=function() {
+        return !notEmpty(this.name) && !notEmpty(this.state) && !notEmpty(this.hide_special);
+    };
+
+    this.matches=function(index) {
+        if (this.isBlank()) {
+            return true;
+        } else {
+            var matches = true;
+            if (notEmpty(this.name) && index.name.indexOf(this.name) == -1) {
+                matches = false;
+            }
+            if (matches && notEmpty(this.state)) {
+                if (this.state == "unhealthy" && !index.unhealthy) {
+                        matches = false;
+                } else if ((this.state == "open" || this.state == "close") && this.state != index.state) {
+                    matches = false;
+                }
+            }
+            if (matches && this.hide_special) {
+                matches = !index.isSpecial();
+            }
+            return matches;
         }
     };
 
