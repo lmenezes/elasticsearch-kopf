@@ -110,7 +110,11 @@
 			</div>
 		</div>
 	</td>
-	<td ng-repeat="position in [0,1,2,3,4]" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 1" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 2" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 3" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
+	<td ng-init="position = 4" ng-include src="'partials/cluster_overview/index_body.html'" ng-class="{'box': index(position).closed()}"></td>
 </tr>
 <!-- Unassigned shards -->
 <tr>
@@ -120,5 +124,9 @@
 			<span>unassigned shards</span>
 		</div>
 	</td>
-	<td ng-repeat="position in [0,1,2,3,4]" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 0" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 1" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 2" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 3" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
+	<td ng-init="position = 4" ng-include src="'partials/cluster_overview/index_unassigned.html'" class="shards box"></td>
 </tr>

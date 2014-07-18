@@ -26,5 +26,9 @@
 		</div>
 	</th>
 	<!-- indices -->
-	<th class="index-cell box" ng-repeat="position in [0,1,2,3,4]" ng-include src="'partials/cluster_overview/index_header.html'"></th>
+	<th class="index-cell box" ng-init="position = 0" ng-include src="'partials/cluster_overview/index_header.html'"></th>
+	<th class="index-cell box" ng-init="position = 1" ng-include src="'partials/cluster_overview/index_header.html'"></th>
+	<th class="index-cell box" ng-init="position = 2" ng-include src="'partials/cluster_overview/index_header.html'"></th>
+	<th class="index-cell box" ng-init="position = 3" ng-include src="'partials/cluster_overview/index_header.html'"></th>
+	<th class="index-cell box" ng-init="position = 4" ng-include src="'partials/cluster_overview/index_header.html'"></th>
 </tr>
