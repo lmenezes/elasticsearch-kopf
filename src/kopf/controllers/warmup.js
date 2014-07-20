@@ -1,4 +1,4 @@
-function WarmupController($scope, ConfirmDialogService, AlertService, AceEditorService) {
+kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', function($scope, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.index = null;
@@ -88,4 +88,4 @@ function WarmupController($scope, ConfirmDialogService, AlertService, AceEditorS
 		}
 	};
 	
-}
+}]);

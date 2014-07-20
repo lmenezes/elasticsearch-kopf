@@ -1,4 +1,4 @@
-function ClusterHealthController($scope,$location,$timeout,$sce, AlertService, ConfirmDialogService) {
+kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '$sce', 'AlertService', 'ConfirmDialogService', function($scope,$location,$timeout,$sce, AlertService, ConfirmDialogService) {
 	$scope.shared_url = '';
 	$scope.results = null;
 	
@@ -127,4 +127,4 @@ function ClusterHealthController($scope,$location,$timeout,$sce, AlertService, C
 	
 	$scope.gist_history = $scope.loadHistory();
 
-}
+}]);

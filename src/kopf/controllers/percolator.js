@@ -1,4 +1,4 @@
-function PercolatorController($scope, ConfirmDialogService, AlertService, AceEditorService) {
+kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', function($scope, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.pagination = new PercolatorsPage(0, 0, 0, []);
 
@@ -152,4 +152,4 @@ function PercolatorController($scope, ConfirmDialogService, AlertService, AceEdi
 		}
 	};
 	
-}
+}]);

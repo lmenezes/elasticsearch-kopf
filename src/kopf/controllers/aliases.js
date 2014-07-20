@@ -1,4 +1,4 @@
-function AliasesController($scope, AlertService, AceEditorService) {
+kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', function($scope, AlertService, AceEditorService) {
 	$scope.paginator = new Paginator(1,10, [], new AliasFilter("",""));
     $scope.original = [];
 	$scope.editor = undefined;
@@ -122,5 +122,4 @@ function AliasesController($scope, AlertService, AceEditorService) {
         $scope.loadAliases();
 		$scope.initEditor();
     });
-
-}
+}]);

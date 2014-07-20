@@ -1,4 +1,4 @@
-function CreateIndexController($scope, $location, $timeout, AlertService) {
+kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
@@ -62,4 +62,4 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 		$scope.name = '';
 		$scope.replicas = '';
 	};
-}
+}]);

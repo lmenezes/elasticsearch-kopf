@@ -1,4 +1,4 @@
-function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
+kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "1.3.0-SNAPSHOT";
 	$scope.username = null;
@@ -166,4 +166,4 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$scope.$apply(action);
 	};
 
-}
+}]);

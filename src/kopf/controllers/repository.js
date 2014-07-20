@@ -1,4 +1,4 @@
-function RepositoryController($scope, ConfirmDialogService, AlertService) {
+kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'AlertService', function($scope, ConfirmDialogService, AlertService) {
 	// registered repositories
 	$scope.repositories = [];
 	$scope.snapshots = [];
@@ -219,4 +219,4 @@ function RepositoryController($scope, ConfirmDialogService, AlertService) {
 		$scope.snapshot_repository = repository;
 		$scope.fetchSnapshots(repository);
 	};
-}
+}]);

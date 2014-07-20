@@ -1,4 +1,4 @@
-function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
+kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', 'IndexSettingsService', 'AlertService', function($scope, $location, $timeout, IndexSettingsService, AlertService) {
 	$scope.service = IndexSettingsService;
 
 	$scope.save=function() {
@@ -24,4 +24,4 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 			}
 		);
 	};
- }
+ }]);

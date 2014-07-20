@@ -1,4 +1,4 @@
-function BenchmarkController($scope, $location, $timeout, AlertService) {
+kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
 	$scope.bench = new Benchmark();
 	$scope.competitor = new Competitor();
 	$scope.indices = [];
@@ -52,4 +52,4 @@ function BenchmarkController($scope, $location, $timeout, AlertService) {
 		}
 	};
 	
-}
+}]);

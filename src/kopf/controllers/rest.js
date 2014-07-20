@@ -1,5 +1,5 @@
-function RestController($scope, $location, $timeout, AlertService, AceEditorService) {
-	
+kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', function($scope, $location, $timeout, AlertService, AceEditorService) {
+
 	$scope.request = new Request($scope.connection.host + "/_search","GET","{}");
 	$scope.validation_error = null;
 
@@ -93,4 +93,4 @@ function RestController($scope, $location, $timeout, AlertService, AceEditorServ
 			);
 		}
 	};
-}
+}]);

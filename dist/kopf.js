@@ -1300,7 +1300,7 @@ kopf.factory('ConfirmDialogService', function() {
 	return this;
 });
 
-function AliasesController($scope, AlertService, AceEditorService) {
+kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', function($scope, AlertService, AceEditorService) {
 	$scope.paginator = new Paginator(1,10, [], new AliasFilter("",""));
     $scope.original = [];
 	$scope.editor = undefined;
@@ -1424,9 +1424,10 @@ function AliasesController($scope, AlertService, AceEditorService) {
         $scope.loadAliases();
 		$scope.initEditor();
     });
+}]);
 
-}
-function AnalysisController($scope, $location, $timeout, AlertService) {
+kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
+
 	$scope.indices = null;
 
 	// by index
@@ -1484,8 +1485,8 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		$scope.indices = $scope.cluster.open_indices();
 	});
 	
-}
-function ClusterHealthController($scope,$location,$timeout,$sce, AlertService, ConfirmDialogService) {
+}]);
+kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '$sce', 'AlertService', 'ConfirmDialogService', function($scope,$location,$timeout,$sce, AlertService, ConfirmDialogService) {
 	$scope.shared_url = '';
 	$scope.results = null;
 	
@@ -1614,8 +1615,8 @@ function ClusterHealthController($scope,$location,$timeout,$sce, AlertService, C
 	
 	$scope.gist_history = $scope.loadHistory();
 
-}
-function ClusterOverviewController($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
+}]);
+kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
 	$scope.pagination = new ClusterNavigation();
     $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
 
@@ -1849,9 +1850,8 @@ function ClusterOverviewController($scope, IndexSettingsService, ConfirmDialogSe
         return page;
 	};
 
-}
-function ClusterSettingsController($scope, $location, $timeout, AlertService) {
-
+}]);
+kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
 	$scope.$on('loadClusterSettingsEvent', function() {
 		$('#cluster_settings_option a').tab('show');
 		$('#cluster_settings_tabs a:first').tab('show');
@@ -1861,7 +1861,7 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 	});
 
 	$scope.save=function() {
-		var response = $scope.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ""),
+		$scope.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ""),
 			function(response) {
 				$scope.updateModel(function() {
 					AlertService.success("Cluster settings were successfully updated",response);
@@ -1875,8 +1875,8 @@ function ClusterSettingsController($scope, $location, $timeout, AlertService) {
 			}
 		);
 	};
-}
-function CreateIndexController($scope, $location, $timeout, AlertService) {
+}]);
+kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
@@ -1940,8 +1940,8 @@ function CreateIndexController($scope, $location, $timeout, AlertService) {
 		$scope.name = '';
 		$scope.replicas = '';
 	};
-}
-function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
+}]);
+kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "1.3.0-SNAPSHOT";
 	$scope.username = null;
@@ -2109,8 +2109,9 @@ function GlobalController($scope, $location, $timeout, $sce, ConfirmDialogServic
 		$scope.$apply(action);
 	};
 
-}
-function IndexSettingsController($scope, $location, $timeout, IndexSettingsService, AlertService) {
+}]);
+
+kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', 'IndexSettingsService', 'AlertService', function($scope, $location, $timeout, IndexSettingsService, AlertService) {
 	$scope.service = IndexSettingsService;
 
 	$scope.save=function() {
@@ -2136,8 +2137,8 @@ function IndexSettingsController($scope, $location, $timeout, IndexSettingsServi
 			}
 		);
 	};
- }
-function NavbarController($scope, $location, $timeout, AlertService, SettingsService, ThemeService) {
+ }]);
+kopf.controller('NavbarController', ['$scope', '$location', '$timeout', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, AlertService, SettingsService, ThemeService) {
 	$scope.settings_service = SettingsService;
 	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
 	$scope.theme = ThemeService.getTheme();
@@ -2159,10 +2160,10 @@ function NavbarController($scope, $location, $timeout, AlertService, SettingsSer
 		ThemeService.setTheme($scope.theme);
 	};
 
-}
+}]);
 
-function RestController($scope, $location, $timeout, AlertService, AceEditorService) {
-	
+kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', function($scope, $location, $timeout, AlertService, AceEditorService) {
+
 	$scope.request = new Request($scope.connection.host + "/_search","GET","{}");
 	$scope.validation_error = null;
 
@@ -2256,8 +2257,8 @@ function RestController($scope, $location, $timeout, AlertService, AceEditorServ
 			);
 		}
 	};
-}
-function PercolatorController($scope, ConfirmDialogService, AlertService, AceEditorService) {
+}]);
+kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', function($scope, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.pagination = new PercolatorsPage(0, 0, 0, []);
 
@@ -2411,9 +2412,9 @@ function PercolatorController($scope, ConfirmDialogService, AlertService, AceEdi
 		}
 	};
 	
-}
+}]);
 
-function RepositoryController($scope, ConfirmDialogService, AlertService) {
+kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'AlertService', function($scope, ConfirmDialogService, AlertService) {
 	// registered repositories
 	$scope.repositories = [];
 	$scope.snapshots = [];
@@ -2634,9 +2635,9 @@ function RepositoryController($scope, ConfirmDialogService, AlertService) {
 		$scope.snapshot_repository = repository;
 		$scope.fetchSnapshots(repository);
 	};
-}
+}]);
 
-function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogService) {
+kopf.controller('ConfirmDialogController', ['$scope', '$location', '$timeout', 'ConfirmDialogService', function($scope, $location, $timeout, ConfirmDialogService) {
 
 	$scope.dialog_service = ConfirmDialogService;
 	
@@ -2648,8 +2649,8 @@ function ConfirmDialogController($scope, $location, $timeout, ConfirmDialogServi
 		$scope.dialog_service.confirm();
 	};
 	
-}
-function WarmupController($scope, ConfirmDialogService, AlertService, AceEditorService) {
+}]);
+kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', function($scope, ConfirmDialogService, AlertService, AceEditorService) {
 	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.index = null;
@@ -2739,8 +2740,8 @@ function WarmupController($scope, ConfirmDialogService, AlertService, AceEditorS
 		}
 	};
 	
-}
-function BenchmarkController($scope, $location, $timeout, AlertService) {
+}]);
+kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
 	$scope.bench = new Benchmark();
 	$scope.competitor = new Competitor();
 	$scope.indices = [];
@@ -2794,7 +2795,7 @@ function BenchmarkController($scope, $location, $timeout, AlertService) {
 		}
 	};
 	
-}
+}]);
 var Alert=function(message, response, level, _class, icon) {
 	var current_date = new Date();
 	this.message = message;

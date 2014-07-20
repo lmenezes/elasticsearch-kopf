@@ -1,4 +1,5 @@
-function AnalysisController($scope, $location, $timeout, AlertService) {
+kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
+
 	$scope.indices = null;
 
 	// by index
@@ -56,4 +57,4 @@ function AnalysisController($scope, $location, $timeout, AlertService) {
 		$scope.indices = $scope.cluster.open_indices();
 	});
 	
-}
+}]);

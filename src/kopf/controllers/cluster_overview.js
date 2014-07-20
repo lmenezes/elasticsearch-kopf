@@ -1,4 +1,4 @@
-function ClusterOverviewController($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
+kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
 	$scope.pagination = new ClusterNavigation();
     $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
 
@@ -232,4 +232,4 @@ function ClusterOverviewController($scope, IndexSettingsService, ConfirmDialogSe
         return page;
 	};
 
-}
+}]);
