@@ -1834,15 +1834,19 @@ function ClusterOverviewController($scope, IndexSettingsService, ConfirmDialogSe
 		$(".setting-info").popover();		
 	};
 
-	$scope.index=function(index) {
+	$scope.getPage=function() {
+        var page;
+        // updates collection when cluster info has been updated
         if (isDefined($scope.cluster) && ($scope.index_paginator.filter.timestamp === 0 ||
             $scope.index_paginator.filter.timestamp != $scope.cluster.created_at)) {
             $scope.index_paginator.setCollection($scope.cluster.indices);
-            var page = $scope.index_paginator.getPage();
-            return isDefined(page[index]) ? page[index] : null;
-        } else {
-            return null;
+            $scope.index_paginator.filter.timestamp = $scope.cluster.created_at;
         }
+        page = $scope.index_paginator.getPage();
+        while (page.length < $scope.index_paginator.page_size) {
+            page.push(null);
+        }
+        return page;
 	};
 
 }
