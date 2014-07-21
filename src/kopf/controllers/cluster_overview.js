@@ -1,11 +1,15 @@
 kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
-	$scope.pagination = new ClusterNavigation();
     $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+    $scope.node_paginator = new Paginator(1, 10000, [], new NodeFilter("", true, true, true, 0));
 
 	$scope.getNodes=function() {
-		if (isDefined($scope.cluster)) {
-			return $scope.cluster.getNodes($scope.pagination.node_name, $scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
-		}
+        // updates collection when cluster info has been updated
+        if (isDefined($scope.cluster) && ($scope.node_paginator.filter.timestamp === 0 ||
+            $scope.node_paginator.filter.timestamp != $scope.cluster.created_at)) {
+            $scope.node_paginator.setCollection($scope.cluster.nodes);
+            $scope.node_paginator.filter.timestamp = $scope.cluster.created_at;
+        }
+        return $scope.node_paginator.getPage();
 	};
 	
 	$scope.closeModal=function(forced_refresh){
@@ -226,6 +230,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
             $scope.index_paginator.filter.timestamp = $scope.cluster.created_at;
         }
         page = $scope.index_paginator.getPage();
+        // fills array up to page size, so empty columns will be displayed
         while (page.length < $scope.index_paginator.page_size) {
             page.push(null);
         }

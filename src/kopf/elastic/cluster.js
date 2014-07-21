@@ -47,12 +47,6 @@ function Cluster(state,status,nodes,settings) {
 		this.successful_shards = status._shards.successful;
 		this.total_size = readablizeBytes(total_size);
 		this.total_size_in_bytes = total_size;
-		this.getNodes=function(name, data, master, client) {
-			return $.map(this.nodes,function(node) {
-				return node.matches(name, data, master, client) ? node : null;
-			});
-		};
-		
 		this.changes = null;
 
 		this.computeChanges=function(old_cluster) {

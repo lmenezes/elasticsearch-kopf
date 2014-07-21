@@ -36,7 +36,7 @@ test("cluster creating", function() {
 		ok(index.name.length > 0, "Checking index name: [" + index.name + "]");
 		ok(number_pattern.test(index.num_of_shards), "Checking number of shards: [" + index.num_of_shards + "]");
 		ok(number_pattern.test(index.num_of_replicas), "Checking number of replicas: [" + index.num_of_replicas + "]");
-		var node_ids = cluster.getNodes('', true, true, true).map(function(node) { return node.id; });
+		var node_ids = cluster.nodes.map(function(node) { return node.id; });
 		node_ids.forEach(function(node_id) {
 			if (index.shards[node_id] !== undefined) {
 				index.shards[node_id].forEach(function(shard) {
@@ -57,7 +57,7 @@ test("cluster creating", function() {
 	});
 
 	// check nodes
-	var nodes = cluster.getNodes('', true, true, true);
+	var nodes = cluster.nodes;
 	equal(nodes.length, 2, "Unfiltered node list");
 	var master_nodes = 0;
 	nodes.forEach(function(node) {
@@ -77,14 +77,6 @@ test("cluster creating", function() {
 			master_nodes += 1;
 			equal(master_node, node.id, "Checking current master");
 		}
-		// should find at least current node
-		var matchingNodes = cluster.getNodes(node.name, true, true, true);
-		ok(matchingNodes.length >= 1, "Should find at least node with that name: [" + matchingNodes.length + "]");
-		// should not find at least the current node
-		var nonMatchingNodes = cluster.getNodes(node.name + "a", true, true, true);
-		ok(nonMatchingNodes.length < matchingNodes.length, "Should find at least one less node with that name");
-		ok(node.transport_address.length > 0, "Checking node transport address");	
-		ok(node.host.length > 0, "Checking node host name");	
 	});
 	equal(master_nodes, 1, "There should be exactly one master node");
 });

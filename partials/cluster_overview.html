@@ -26,23 +26,23 @@
 				<div class="col-lg-6">
 					<div class="row">
 						<div class="col-lg-6 col-sm-6 cluster-overview-filter">
-							<input type="text" ng-model="pagination.node_name" class="form-control input-sm" placeholder="filter nodes by name">
+							<input type="text" ng-model="node_paginator.filter.name" class="form-control input-sm" placeholder="filter nodes by name">
 						</div>
 						<div class="col-lg-6 col-sm-6 cluster-map-node-types cluster-overview-filter">
 							<div class="row">
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-						    	    <input type="checkbox" ng-model="pagination.master"> <i class="fa fa-star-o node-type-icon"> </i> master
+						    	    <input type="checkbox" ng-model="node_paginator.filter.master"> <i class="fa fa-star-o node-type-icon"> </i> master
 						    	  </label>
 								</div>
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-										<input type="checkbox" ng-model="pagination.data"> <i class="fa fa-hdd-o node-type-icon"> </i> data
+										<input type="checkbox" ng-model="node_paginator.filter.data"> <i class="fa fa-hdd-o node-type-icon"> </i> data
 									</label>
 								</div>
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-						    	    <input type="checkbox" ng-model="pagination.client"> <i class="fa fa-search node-type-icon"> </i> client
+						    	    <input type="checkbox" ng-model="node_paginator.filter.client"> <i class="fa fa-search node-type-icon"> </i> client
 						    	  </label>
 								</div>
 							</div>

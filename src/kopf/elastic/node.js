@@ -49,13 +49,4 @@ function Node(node_id, node_info, node_stats) {
 		if (this.data && !other.data) return -1; // data node comes first
 		return this.name.localeCompare(other.name); // if all the same, lex. sort
 	};
-
-	this.matches=function(name, data, master, client) {
-		if (notEmpty(name)) {
-			if (this.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
-				return false;
-			}
-		}
-		return (data && this.data || master && this.master || client && this.client);
-	};
 }

@@ -269,12 +269,6 @@ function Cluster(state,status,nodes,settings) {
 		this.successful_shards = status._shards.successful;
 		this.total_size = readablizeBytes(total_size);
 		this.total_size_in_bytes = total_size;
-		this.getNodes=function(name, data, master, client) {
-			return $.map(this.nodes,function(node) {
-				return node.matches(name, data, master, client) ? node : null;
-			});
-		};
-		
 		this.changes = null;
 
 		this.computeChanges=function(old_cluster) {
@@ -1079,15 +1073,6 @@ function Node(node_id, node_info, node_stats) {
 		if (this.data && !other.data) return -1; // data node comes first
 		return this.name.localeCompare(other.name); // if all the same, lex. sort
 	};
-
-	this.matches=function(name, data, master, client) {
-		if (notEmpty(name)) {
-			if (this.name.toLowerCase().indexOf(name.trim().toLowerCase()) == -1) {
-				return false;
-			}
-		}
-		return (data && this.data || master && this.master || client && this.client);
-	};
 }
 
 function Shard(shard_routing, shard_info) {
@@ -1617,13 +1602,17 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 
 }]);
 kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
-	$scope.pagination = new ClusterNavigation();
     $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+    $scope.node_paginator = new Paginator(1, 10000, [], new NodeFilter("", true, true, true, 0));
 
 	$scope.getNodes=function() {
-		if (isDefined($scope.cluster)) {
-			return $scope.cluster.getNodes($scope.pagination.node_name, $scope.pagination.data,$scope.pagination.master,$scope.pagination.client);	
-		}
+        // updates collection when cluster info has been updated
+        if (isDefined($scope.cluster) && ($scope.node_paginator.filter.timestamp === 0 ||
+            $scope.node_paginator.filter.timestamp != $scope.cluster.created_at)) {
+            $scope.node_paginator.setCollection($scope.cluster.nodes);
+            $scope.node_paginator.filter.timestamp = $scope.cluster.created_at;
+        }
+        return $scope.node_paginator.getPage();
 	};
 	
 	$scope.closeModal=function(forced_refresh){
@@ -1844,6 +1833,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
             $scope.index_paginator.filter.timestamp = $scope.cluster.created_at;
         }
         page = $scope.index_paginator.getPage();
+        // fills array up to page size, so empty columns will be displayed
         while (page.length < $scope.index_paginator.page_size) {
             page.push(null);
         }
@@ -3357,6 +3347,45 @@ function IndexFilter(name, state, hide_special, timestamp) {
                 matches = !index.isSpecial();
             }
             return matches;
+        }
+    };
+
+}
+function NodeFilter(name, data, master, client, timestamp) {
+    this.name = name;
+    this.data = data;
+    this.master = master;
+    this.client = client;
+    this.timestamp = timestamp;
+
+    this.clone=function() {
+        return new NodeFilter(this.name, this.data, this.master, this.client);
+    };
+
+    this.equals=function(other) {
+        return (
+            other !== null &&
+            this.name == other.name &&
+            this.data == other.data &&
+            this.master == other.master &&
+            this.client == other.client &&
+            this.timestamp == other.timestamp
+            );
+    };
+
+    this.isBlank=function() {
+        return !notEmpty(this.name) && (this.data && this.master && this.client);
+    };
+
+    this.matches=function(node) {
+        if (this.isBlank()) {
+            return true;
+        } else {
+            var matches = true;
+            if (notEmpty(this.name) && node.name.toLowerCase().indexOf(this.name.toLowerCase()) == -1) {
+                return false;
+            }
+            return (data && this.data || master && this.master || client && this.client);
         }
     };
 
