@@ -1290,8 +1290,15 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     $scope.original = [];
 	$scope.editor = undefined;
     $scope.new_alias = new Alias("", "", "", "", "");
-	
-	$scope.viewDetails=function(alias) {
+
+    $scope.aliases = [];
+
+    $scope.$watch('paginator', function(filter, previous) {
+        $scope.paginator.refresh();
+        $scope.aliases = $scope.paginator.getPage();
+    }, true);
+
+    $scope.viewDetails=function(alias) {
 		$scope.details = alias;
 	};
 
@@ -1309,9 +1316,10 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
                 var index_name = $scope.new_alias.index;
                 var alias_name = $scope.new_alias.alias;
 				// if alias already exists, check if its already associated with index
-				var indices = $scope.paginator.collection.filter(function(a) { return a.index == index_name; });
+                var collection = $scope.paginator.getCollection();
+				var indices = collection.filter(function(a) { return a.index == index_name; });
                 if (indices.length === 0) {
-                    $scope.paginator.collection.push(new IndexAliases(index_name, [ $scope.new_alias ]));
+                    collection.push(new IndexAliases(index_name, [ $scope.new_alias ]));
                 } else {
                     var index_aliases = indices[0];
                     var aliases = index_aliases.aliases.filter(function(a) { return alias_name == a.alias;  });
@@ -1333,9 +1341,9 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	};
 	
 	$scope.removeIndexAliases=function(index) {
-        for (var position = 0; position < $scope.paginator.collection.length; position++) {
-            if (index == $scope.paginator.collection[position].index) {
-                $scope.paginator.collection.splice(position, 1);
+        for (var position = 0; position < $scope.paginator.getCollection().length; position++) {
+            if (index == $scope.paginator.getCollection()[position].index) {
+                $scope.paginator.getCollection().splice(position, 1);
                 break;
             }
         }
@@ -1346,17 +1354,17 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	
 	$scope.removeIndexAlias=function(index, alias) {
         var index_position = 0;
-        for (; index_position < $scope.paginator.collection.length; index_position++) {
-            if (index == $scope.paginator.collection[index_position].index) {
+        for (; index_position < $scope.paginator.getCollection().length; index_position++) {
+            if (index == $scope.paginator.getCollection()[index_position].index) {
                 break;
             }
         }
-        var index_aliases = $scope.paginator.collection[index_position];
+        var index_aliases = $scope.paginator.getCollection()[index_position];
         for (var alias_position = 0; alias_position < index_aliases.aliases.length; alias_position++) {
             if (alias == index_aliases.aliases[alias_position].alias) {
                 index_aliases.aliases.splice(alias_position, 1);
                 if (index_aliases.aliases.length === 0) {
-                    $scope.paginator.collection.splice(index_position, 1);
+                    $scope.paginator.getCollection().splice(index_position, 1);
                 }
                 break;
             }
@@ -1366,8 +1374,8 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	};
 	
 	$scope.mergeAliases=function() {
-		var deletes = IndexAliases.diff($scope.paginator.collection, $scope.original);
-		var adds = IndexAliases.diff($scope.original, $scope.paginator.collection);
+		var deletes = IndexAliases.diff($scope.paginator.getCollection(), $scope.original);
+		var adds = IndexAliases.diff($scope.original, $scope.paginator.getCollection());
         if (adds.length === 0 && deletes.length === 0) {
             AlertService.warn("No changes were made: nothing to save");
         } else {
@@ -1394,6 +1402,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 				$scope.updateModel(function() {
                     $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
 					$scope.paginator.setCollection(index_aliases);
+                    $scope.aliases = $scope.paginator.getPage();
 				});
 			},
 			function(error) {
@@ -1602,19 +1611,42 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 
 }]);
 kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
-    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
-    $scope.node_paginator = new Paginator(1, 10000, [], new NodeFilter("", true, true, true, 0));
 
-	$scope.getNodes=function() {
-        // updates collection when cluster info has been updated
-        if (isDefined($scope.cluster) && ($scope.node_paginator.filter.timestamp === 0 ||
-            $scope.node_paginator.filter.timestamp != $scope.cluster.created_at)) {
-            $scope.node_paginator.setCollection($scope.cluster.nodes);
-            $scope.node_paginator.filter.timestamp = $scope.cluster.created_at;
+    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+
+    $scope.node_filter = new NodeFilter("", true, true, true, 0);
+
+    $scope.indices = [];
+    $scope.nodes = [];
+
+    $scope.$watch('cluster', function(cluster, previous) {
+        if (isDefined(cluster)) {
+            $scope.index_paginator.setCollection(cluster.indices);
+            $scope.indices = $scope.index_paginator.getPage();
+            $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+        } else {
+            $scope.indices = [];
+            $scope.nodes = [];
         }
-        return $scope.node_paginator.getPage();
-	};
-	
+    });
+
+    $scope.$watch('index_paginator', function(filter, previous) {
+        if (isDefined($scope.cluster)) {
+            $scope.index_paginator.setCollection($scope.cluster.indices);
+            $scope.indices = $scope.index_paginator.getPage();
+        } else {
+            $scope.indices = [];
+        }
+    }, true);
+
+    $scope.$watch('node_filter', function(filter, previous) {
+        if (isDefined($scope.cluster)) {
+            $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+        } else {
+            $scope.nodes = [];
+        }
+    }, true);
+
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
 			$scope.refreshClusterState();
@@ -1822,22 +1854,6 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
         IndexSettingsService.index = indices[0];
 		$('#idx_settings_tabs a:first').tab('show');
 		$(".setting-info").popover();		
-	};
-
-	$scope.getPage=function() {
-        var page;
-        // updates collection when cluster info has been updated
-        if (isDefined($scope.cluster) && ($scope.index_paginator.filter.timestamp === 0 ||
-            $scope.index_paginator.filter.timestamp != $scope.cluster.created_at)) {
-            $scope.index_paginator.setCollection($scope.cluster.indices);
-            $scope.index_paginator.filter.timestamp = $scope.cluster.created_at;
-        }
-        page = $scope.index_paginator.getPage();
-        // fills array up to page size, so empty columns will be displayed
-        while (page.length < $scope.index_paginator.page_size) {
-            page.push(null);
-        }
-        return page;
 	};
 
 }]);
@@ -2407,10 +2423,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'AlertService', function($scope, ConfirmDialogService, AlertService) {
 	// registered repositories
 	$scope.repositories = [];
-	$scope.snapshots = [];
 	$scope.indices = [];
 	
 	$scope.paginator = new Paginator(1, 10, [], new SnapshotFilter());
+    $scope.snapshots = [];
 	
 	$scope.snapshot = null;
 	$scope.snapshot_repository = '';
@@ -2420,6 +2436,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.new_snap = {};
 	$scope.restore_snap = {};
 	$scope.editor = undefined;
+
+    $scope.$watch('paginator', function(filter, previous) {
+        $scope.paginator.refresh();
+        $scope.snapshots = $scope.paginator.getPage();
+    }, true);
 	
 	$scope.$on('loadRepositoryEvent', function() {
 		$scope.snapshot = null; // clear 'active' snapshot
@@ -2648,6 +2669,13 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 	
 	$scope.warmer = new Warmer('', '', { types: [], source: {} });
 
+    $scope.warmers = [];
+
+    $scope.$watch('paginator', function(filter, previous) {
+        $scope.paginator.refresh();
+        $scope.warmers = $scope.paginator.getPage();
+    }, true);
+
 	$scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
 		$scope.initEditor();
@@ -2716,17 +2744,20 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 				function(warmers) {
 					$scope.updateModel(function() {
                         $scope.paginator.setCollection(warmers);
+                        $scope.warmers = $scope.paginator.getPage();
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
                         $scope.paginator.setCollection([]);
+                        $scope.warmers = $scope.paginator.getPage();
 						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
 			);
 		} else {
 			$scope.paginator.setCollection([]);
+            $scope.warmers = $scope.paginator.getPage();
 		}
 	};
 	
@@ -3166,23 +3197,22 @@ function Paginator(page, page_size, collection, filter) {
     this.page = page;
     this.page_size = page_size;
 
-    this.collection = collection;
-    this.filtered_collection = null;
+    this.$collection = isDefined(collection) ? collection : [];
 
     this.filter = filter;
-    this.previous_filter = null;
 
+    this.$total = this.$collection.length;
 
     this.firstResult=function() {
-        return this.total() > 0 ? ((this.page -1) * this.page_size) + 1 : 0;
+        return this.$total > 0 ? ((this.page -1) * this.page_size) + 1 : 0;
     };
 
     this.lastResult=function() {
-        return this.page * this.page_size > this.total() ? this.total() : this.page * this.page_size;
+        return this.page * this.page_size > this.$total ? this.$total : this.page * this.page_size;
     };
 
     this.hasNextPage=function() {
-        return this.page_size * this.page < this.total();
+        return this.page_size * this.page < this.$total;
     };
 
     this.hasPreviousPage=function() {
@@ -3198,45 +3228,51 @@ function Paginator(page, page_size, collection, filter) {
     };
 
     this.getPage=function() {
-        return this.getResults().slice(this.firstResult() -1, this.lastResult());
+        var page = this.$filtered_collection.slice(this.firstResult() -1, this.lastResult());
+        while (page.length < this.page_size) {
+            page.push(null);
+        }
+        return page;
     };
 
     this.setCollection=function(collection) {
-        this.collection = collection;
-        this.filtered_collection = null; // forces recalculation
-        while (this.total() < this.firstResult()) {
-            this.previousPage();
-        }
+        this.$collection = collection;
+        this.refresh();
     };
 
-    this.total=function() {
-        return this.getResults().length;
+    this.getTotal=function() {
+        return this.$total;
     };
 
     this.getResults=function() {
-        var filter_changed = !this.filter.equals(this.previous_filter);
-        if (filter_changed || !isDefined(this.filtered_collection)) {
-            var filter = this.filter;
-            this.previous_filter = this.filter.clone();
-            var collection = this.collection;
-            if (filter.isBlank()) {
-                this.filtered_collection = this.collection;
-            } else {
-                var filtered_collection = [];
-                collection.forEach(function(item) {
-                    if (filter.matches(item)) {
-                        filtered_collection.push(item);
-                    }
-                });
-                this.filtered_collection = filtered_collection;
-            }
+        var filter = this.filter;
+        var collection = this.$collection;
+        if (filter.isBlank()) {
+            return collection;
+        } else {
+            var filtered_collection = [];
+            collection.forEach(function(item) {
+                if (filter.matches(item)) {
+                    filtered_collection.push(item);
+                }
+            });
+            return filtered_collection;
         }
-        return this.filtered_collection;
+    };
+
+
+    this.getCollection=function() {
+        return this.$collection;
     };
 
     this.refresh=function() {
-        this.setCollection(this.collection);
+        this.$filtered_collection = this.getResults();
+        this.$total = this.$filtered_collection.length;
+        while (this.$total < this.firstResult()) {
+          this.previousPage();
+        }
     };
+
 }
 function AliasFilter(index, alias) {
 

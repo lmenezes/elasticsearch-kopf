@@ -23,7 +23,7 @@ describe('AliasesController', function(){
 
     //TESTS
     it('init : values are set', function(){
-        expect(this.scope.paginator.collection).toEqual([]);
+        expect(this.scope.paginator.getCollection()).toEqual([]);
         expect(this.scope.paginator.page).toEqual(1);
         expect(this.scope.paginator.filter.index).toEqual("");
         expect(this.scope.paginator.filter.alias).toEqual("");
@@ -60,8 +60,7 @@ describe('AliasesController', function(){
     });
 
     it('addAlias : new alias : gets added to aliases map, calls pagination', function () {
-        this.scope.paginator = { collection: [] };
-        this.scope.paginator.refresh = function() {};
+        this.scope.paginator = new Paginator(1, 10, [], new AliasFilter("",""));
         var fake_editor = {            error : undefined,
             format : function(){return {'filter':'fromeditor'}; }
         };
@@ -71,16 +70,15 @@ describe('AliasesController', function(){
         spyOn(this.scope.paginator, "refresh");
         this.scope.addAlias();
         expect(this.scope.paginator.refresh).toHaveBeenCalled();
-        expect(this.scope.paginator.collection.length).toEqual(1);
-        expect(this.scope.paginator.collection[0].index).toEqual("myindex");
-        expect(this.scope.paginator.collection[0].aliases.length).toEqual(1);
-        expect(this.scope.paginator.collection[0].aliases[0]).toEqual(fake_alias);
+        expect(this.scope.paginator.getCollection().length).toEqual(1);
+        expect(this.scope.paginator.getCollection()[0].index).toEqual("myindex");
+        expect(this.scope.paginator.getCollection()[0].aliases.length).toEqual(1);
+        expect(this.scope.paginator.getCollection()[0].aliases[0]).toEqual(fake_alias);
     });
 
     it('addAlias : existing alias throws alert, does not change state, does not call pagination', function () {
         var added = new Alias("myalias", "myindex");
-        this.scope.paginator = { collection: [ new IndexAliases("myindex", [ added ] ) ] };
-        this.scope.paginator = { refresh: function(){} };
+        this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ added ] ) ], new AliasFilter("",""));
         var fake_editor = {
             error : undefined,
             format : function(){return {'filter':'fromeditor'}; }
@@ -92,35 +90,32 @@ describe('AliasesController', function(){
         spyOn(this.AlertService, "error");
         this.scope.addAlias();
         expect(this.AlertService.error).toHaveBeenCalled();
-        expect(this.scope.paginator.refresh).not.toHaveBeenCalled(  );
+        expect(this.scope.paginator.refresh).not.toHaveBeenCalled();
     });
 
     it('removeAlias : changes alias list, calls pagination setresults with new info', function () {
-        this.scope.paginator = { collection: [ new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] ) ] };
-        this.scope.paginator.refresh = function() {};
+        this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] ) ], new AliasFilter("",""));
         spyOn(this.scope.paginator, "refresh");
         this.scope.removeIndexAliases("myindex");
         expect(this.scope.paginator.refresh).toHaveBeenCalledWith();
-        expect(this.scope.paginator.collection).toEqual([]);
+        expect(this.scope.paginator.getCollection()).toEqual([]);
     });
 
     it('removeAliasFromIndex : ', function () {
-        this.scope.paginator = { collection: [ new IndexAliases("myindex", [ new Alias("myalias", "myindex"), new Alias("myalias2", "myindex") ] ) ] };
-        this.scope.paginator.refresh = function() {};
+        this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ new Alias("myalias", "myindex"), new Alias("myalias2", "myindex") ] ) ], new AliasFilter("",""));
         spyOn(this.scope.paginator, "refresh");
         spyOn(this.AlertService, "success");
         this.scope.removeIndexAlias('myindex', 'myalias');
         expect(this.AlertService.success).toHaveBeenCalled();
-        expect(this.scope.paginator.collection.length).toEqual(1);
-        expect(this.scope.paginator.collection[0].aliases.length).toEqual(1);
+        expect(this.scope.paginator.getCollection().length).toEqual(1);
+        expect(this.scope.paginator.getCollection()[0].aliases.length).toEqual(1);
 
     });
 
     it('mergeAliases : displays warn if no changes were made', function () {
         this.scope.client.updateAliases = function(){};
         this.scope.original = [new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] )];
-        this.scope.paginator = { collection: [ new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] ) ] };
-        this.scope.paginator.refresh = function() {};
+        this.scope.paginator = new Paginator(1, 10, [new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] )], new AliasFilter("",""));
         spyOn(this.AlertService, "warn");
         this.scope.mergeAliases();
         expect(this.AlertService.warn).toHaveBeenCalled()
@@ -129,8 +124,7 @@ describe('AliasesController', function(){
     it('mergeAliases : calls client updateAliases', function () {
         this.scope.client.updateAliases = function(){};
         this.scope.original = [];
-        this.scope.paginator = { collection: [ new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] ) ] };
-        this.scope.paginator.setCollection = function() {};
+        this.scope.paginator = new Paginator(1, 10, [new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] )], new AliasFilter("",""));
         spyOn(this.scope.paginator, "setCollection");
         spyOn(this.scope.client, "updateAliases");
         this.scope.mergeAliases();
@@ -141,8 +135,7 @@ describe('AliasesController', function(){
         this.scope.client.updateAliases = function(){};
         this.scope.original = [];
         var added = new Alias("myalias", "myindex");
-        this.scope.paginator = { collection: [ new IndexAliases("myindex", [ added ] ) ] };
-        this.scope.paginator.setCollection = function() {};
+        this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ added ] ) ], new AliasFilter("",""));
         spyOn(this.scope.paginator, "setCollection");
         spyOn(this.scope.client, "updateAliases");
         this.scope.mergeAliases();
@@ -153,8 +146,7 @@ describe('AliasesController', function(){
         this.scope.client.updateAliases = function(){};
         var removed = new Alias("myalias", "myindex");
         this.scope.original = [ new IndexAliases("myindex", [ removed ] ) ];
-        this.scope.paginator = { collection: [ ] };
-        this.scope.paginator.setCollection = function() {};
+        this.scope.paginator = new Paginator(1, 10, [], new AliasFilter("",""));
         spyOn(this.scope.paginator, "setCollection");
         spyOn(this.scope.client, "updateAliases");
         this.scope.mergeAliases();
@@ -166,7 +158,7 @@ describe('AliasesController', function(){
             success([ new IndexAliases("index_name", [ new Alias("alias_name", "index_name")])]);
         }
         this.scope.loadAliases();
-        expect(this.scope.paginator.collection.length).toEqual(1);
+        expect(this.scope.paginator.getCollection().length).toEqual(1);
         expect(this.scope.original.length).toEqual(1);
     });
 

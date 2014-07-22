@@ -84,7 +84,7 @@
 												<i class="fa fa-angle-double-left normal-action" ng-click="paginator.previousPage()" ng-switch-when="true"></i>
 												<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 											</span>
-											{{paginator.firstResult()}}-{{paginator.lastResult()}} of {{paginator.total()}}
+											{{paginator.firstResult()}}-{{paginator.lastResult()}} of {{paginator.getTotal()}}
 											<span ng-switch on="paginator.hasNextPage()">
 												<i class="fa fa-angle-double-right normal-action" ng-click="paginator.nextPage()" ng-switch-when="true"></i>
 												<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
@@ -100,7 +100,7 @@
 												<td>type</td>
 												<td>source</td>
 											</tr>
-											<tr ng-repeat="warmer in paginator.getPage()">
+											<tr ng-repeat="warmer in warmers track by $index">
                                                 <td>{{warmer.id}}</td>
 												<td>{{warmer.types}}</td>
 												<td class="table-actions">{{warmer.source}}

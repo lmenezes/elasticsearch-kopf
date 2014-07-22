@@ -27,7 +27,7 @@ describe('WarmupController', function(){
     it('Initial values are correct', function(){
         expect(this.scope.index).toEqual(null);
         expect(this.scope.paginator.filter.id).toEqual("");
-        expect(this.scope.paginator.getPage()).toEqual({});
+        expect(this.scope.paginator.getCollection()).toEqual([]);
         expect(this.scope.indices).toEqual([]);
         expect(this.scope.editor).toEqual(undefined);
         expect(this.scope.warmer.id).toEqual("");
@@ -52,7 +52,7 @@ describe('WarmupController', function(){
 
     it('Returns total number of warmers', function() {
         this.scope.paginator.setCollection([new Warmer("warmer_id","index", { types: [], source: {}}), new Warmer("warmer_id2","index", { types: [], source: {}})]);
-        expect(this.scope.paginator.total()).toEqual(2);
+        expect(this.scope.paginator.getTotal()).toEqual(2);
     });
 
     it('Prevent warmup with empty body to be created', function() {

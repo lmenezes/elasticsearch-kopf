@@ -1,10 +1,10 @@
 kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'AlertService', function($scope, ConfirmDialogService, AlertService) {
 	// registered repositories
 	$scope.repositories = [];
-	$scope.snapshots = [];
 	$scope.indices = [];
 	
 	$scope.paginator = new Paginator(1, 10, [], new SnapshotFilter());
+    $scope.snapshots = [];
 	
 	$scope.snapshot = null;
 	$scope.snapshot_repository = '';
@@ -14,6 +14,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.new_snap = {};
 	$scope.restore_snap = {};
 	$scope.editor = undefined;
+
+    $scope.$watch('paginator', function(filter, previous) {
+        $scope.paginator.refresh();
+        $scope.snapshots = $scope.paginator.getPage();
+    }, true);
 	
 	$scope.$on('loadRepositoryEvent', function() {
 		$scope.snapshot = null; // clear 'active' snapshot

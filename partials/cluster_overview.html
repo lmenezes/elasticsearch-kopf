@@ -26,23 +26,23 @@
 				<div class="col-lg-6">
 					<div class="row">
 						<div class="col-lg-6 col-sm-6 cluster-overview-filter">
-							<input type="text" ng-model="node_paginator.filter.name" class="form-control input-sm" placeholder="filter nodes by name">
+							<input type="text" ng-model="node_filter.name" class="form-control input-sm" placeholder="filter nodes by name">
 						</div>
 						<div class="col-lg-6 col-sm-6 cluster-map-node-types cluster-overview-filter">
 							<div class="row">
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-						    	    <input type="checkbox" ng-model="node_paginator.filter.master"> <i class="fa fa-star-o node-type-icon"> </i> master
+						    	    <input type="checkbox" ng-model="node_filter.master"> <i class="fa fa-star-o node-type-icon"> </i> master
 						    	  </label>
 								</div>
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-										<input type="checkbox" ng-model="node_paginator.filter.data"> <i class="fa fa-hdd-o node-type-icon"> </i> data
+										<input type="checkbox" ng-model="node_filter.data"> <i class="fa fa-hdd-o node-type-icon"> </i> data
 									</label>
 								</div>
 								<div class="col-xs-4">
 						    	  <label class="cluster-map-node-type">
-						    	    <input type="checkbox" ng-model="node_paginator.filter.client"> <i class="fa fa-search node-type-icon"> </i> client
+						    	    <input type="checkbox" ng-model="node_filter.client"> <i class="fa fa-search node-type-icon"> </i> client
 						    	  </label>
 								</div>
 							</div>
@@ -62,7 +62,7 @@
 					<i class="fa fa-angle-double-left normal-action" ng-click="index_paginator.previousPage()" ng-switch-when="true"></i>
 					<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 				</span>
-				{{index_paginator.firstResult()}}-{{index_paginator.lastResult()}} of {{index_paginator.total()}}
+				{{index_paginator.firstResult()}}-{{index_paginator.lastResult()}} of {{index_paginator.getTotal()}}
 				<span ng-switch on="index_paginator.hasNextPage()">
 					<i class="fa fa-angle-double-right normal-action" ng-click="index_paginator.nextPage()" ng-switch-when="true"></i>
 					<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
@@ -100,95 +100,12 @@
                     </div>
                 </th>
                 <!-- indices -->
-                <th class="index-cell box" ng-repeat="idx in getPage() track by $index">
-                    <!-- index name -->
-                    <span ng-show="idx != null">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="dropdown">
-                                    <a data-toggle="dropdown" href="#" class="cluster-map-header-index-name">
-                                        <i class="fa fa-fw fa-caret-down pull-right"></i>
-                                        <span ng-class="{'closed-index': idx.closed()}" class="cluster-map-header-index-name">{{idx.name}} </span>
-                                    </a>
-                                    <ul class="dropdown-menu index-dropdown" role="menu">
-                                        <li role="presentation">
-                                            <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="displayInfo('settings for index ' + idx.name,idx.settings)">
-                                                <i class="fa fa-fw fa-info-circle index-menu-icon"></i> show settings
-                                            </a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="displayInfo('mappings for index ' + idx.name,idx.mappings)">
-                                                <i class="fa fa-fw fa-code index-menu-icon"></i> show mappings
-                                            </a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a ng-show="idx.open()" data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="closeIndex(idx.name)">
-                                                <i class="fa fa-fw fa-folder-open index-menu-icon"></i> close index
-                                            </a>
-                                            <a data-toggle="modal" ng-show="idx.closed()" href="#confirm_dialog" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="openIndex(idx.name)">
-                                                <i class="fa fa-fw fa-folder index-menu-icon" title="open index"></i>  open index
-                                            </a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="optimizeIndex(idx.name)">
-                                                <i class="fa fa-fw fa-wrench index-menu-icon"></i> optimize index
-                                            </a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="refresh index" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="refreshIndex(idx.name)">
-                                                <i class="fa fa-fw fa-refresh index-menu-icon"></i> refresh index
-                                            </a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" role="menuitem" tabindex="-1" data-backdrop="static" data-keyboard="fa fa-fwlse" ng-click="clearCache(idx.name)">
-                                                <i class="fa fa-fw fa-circle-o index-menu-icon"></i> clear cache
-                                            </a>
-                                        </li>
-                                        <li role="presentation">
-                                            <a href="#" ng-click="loadIndexSettings(idx.name)" class="cluster-map-header-index-action" role="menuitem" tabindex="-1">
-                                                <i class="fa fa-fw fa-cog index-menu-icon"></i> edit settings
-                                            </a>
-                                        </li>
-                                        <li role="presentation" class="divider"></li>
-                                        <li role="presentation">
-                                            <a data-toggle="modal" href="#confirm_dialog" class="cluster-map-header-index-action" title="delete index" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="deleteIndex(idx.name)">
-                                                <i class="fa fa-fw fa-trash-o danger-action index-menu-icon"></i> delete index
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="cluster-map-header-index-alias" ng-class="{'closed-index': idx.closed()}">
-                                    <span title="{{idx.num_of_shards}} shards and {{idx.num_of_replicas}} replicas">shards: {{idx.num_of_shards}} * {{idx.num_of_replicas + 1}} |</span>
-                                    <span title="{{idx.num_docs}} docs, {{idx.max_doc}} max docs, {{idx.deleted_docs}} deleted docs">docs: {{idx.num_docs}} |</span>
-                                    <span title="size: {{idx.size_in_bytes}}, total size: {{idx.total_size_in_bytes}}">size: {{idx.size_in_bytes}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- index info -->
-                        <div ng-show="idx.aliases.length <= 5" class="row" ng-repeat="alias in idx.visibleAliases()">
-                            <div class="col-lg-12">
-                                <div class="cluster-map-header-index-alias" ng-class="{'closed-index': idx.closed()}">
-                                    <i class="fa fa-fw fa-tag"></i> {{alias}}
-                                </div>
-                            </div>
-                        </div>
-                        <div ng-show="idx.aliases.length > 5" class="row">
-                            <div class="col-lg-12">
-                                <div class="cluster-map-header-index-alias" ng-class="{'closed-index': idx.closed()}">
-                                    <i class="fa fa-fw fa-tags"></i> {{idx.aliases.length}} total aliases
-                                </div>
-                            </div>
-                        </div>
-                    </span>
+                <th ng-repeat="index in indices track by $index" class="index-cell box" ng-include="'partials/cluster_overview/index_header.html'">
                 </th>
             </tr>
 		</thead>
 		<tbody>
-            <tr ng-repeat="node in getNodes()">
+            <tr ng-repeat="node in nodes track by $index">
                 <td class="box">
                     <div class="row">
                         <div class="col-lg-12 cluster-map-header-index-name">
@@ -300,13 +217,7 @@
                         </div>
                     </div>
                 </td>
-                <td ng-repeat="idx in getPage() track by $index" ng-class="{'box': idx.closed()}">
-                    <div class="cluster-map-shards">
-	                    <span id="{{shard.id}}" ng-switch on="shard.primary" class="normal-action" ng-click="displayInfo('shard info',shard.info)" ng-repeat="shard in idx.shards[node.id]">
-		                    <span ng-switch-when="true" class="shard shard-primary" ng-class="{STARTED:'shard-started', INITIALIZING:'shard-initializing', 'RELOCATED':'shard-relocated', 	'RECOVERING':'shard-recovering','CLOSED':'shard-closed'}[shard.state]">{{shard.shard}}</span>
-		                    <span ng-switch-default class="shard" ng-class="{STARTED:'shard-started', INITIALIZING:'shard-initializing', 'RELOCATED':'shard-relocated', 	'RECOVERING':'shard-recovering','CLOSED':'shard-closed'}[shard.state]">{{shard.shard}}</span>
-	                    </span>
-                    </div>
+                <td ng-repeat="index in indices track by $index" ng-class="{'box': index.closed()}" ng-include="'partials/cluster_overview/index_body.html'">
                 </td>
             </tr>
             <!-- Unassigned shards -->
@@ -317,12 +228,7 @@
                         <span>unassigned shards</span>
                     </div>
                 </td>
-                <td ng-repeat="idx in getPage() track by $index" class="shards box">
-                    <div class="cluster-map-shards" ng-show="idx != null">
-	                    <span ng-repeat="shard in idx.unassigned">
-		                    <span class="shard shard-unallocated">{{shard.shard}}</span>
-	                    </span>
-                    </div>
+                <td class="shards box" ng-repeat="index in indices track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">
                 </td>
             </tr>
 		</tbody>

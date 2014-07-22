@@ -1,17 +1,40 @@
 kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
-    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
-    $scope.node_paginator = new Paginator(1, 10000, [], new NodeFilter("", true, true, true, 0));
 
-	$scope.getNodes=function() {
-        // updates collection when cluster info has been updated
-        if (isDefined($scope.cluster) && ($scope.node_paginator.filter.timestamp === 0 ||
-            $scope.node_paginator.filter.timestamp != $scope.cluster.created_at)) {
-            $scope.node_paginator.setCollection($scope.cluster.nodes);
-            $scope.node_paginator.filter.timestamp = $scope.cluster.created_at;
+    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+
+    $scope.node_filter = new NodeFilter("", true, true, true, 0);
+
+    $scope.indices = [];
+    $scope.nodes = [];
+
+    $scope.$watch('cluster', function(cluster, previous) {
+        if (isDefined(cluster)) {
+            $scope.index_paginator.setCollection(cluster.indices);
+            $scope.indices = $scope.index_paginator.getPage();
+            $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+        } else {
+            $scope.indices = [];
+            $scope.nodes = [];
         }
-        return $scope.node_paginator.getPage();
-	};
-	
+    });
+
+    $scope.$watch('index_paginator', function(filter, previous) {
+        if (isDefined($scope.cluster)) {
+            $scope.index_paginator.setCollection($scope.cluster.indices);
+            $scope.indices = $scope.index_paginator.getPage();
+        } else {
+            $scope.indices = [];
+        }
+    }, true);
+
+    $scope.$watch('node_filter', function(filter, previous) {
+        if (isDefined($scope.cluster)) {
+            $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+        } else {
+            $scope.nodes = [];
+        }
+    }, true);
+
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
 			$scope.refreshClusterState();
@@ -219,22 +242,6 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
         IndexSettingsService.index = indices[0];
 		$('#idx_settings_tabs a:first').tab('show');
 		$(".setting-info").popover();		
-	};
-
-	$scope.getPage=function() {
-        var page;
-        // updates collection when cluster info has been updated
-        if (isDefined($scope.cluster) && ($scope.index_paginator.filter.timestamp === 0 ||
-            $scope.index_paginator.filter.timestamp != $scope.cluster.created_at)) {
-            $scope.index_paginator.setCollection($scope.cluster.indices);
-            $scope.index_paginator.filter.timestamp = $scope.cluster.created_at;
-        }
-        page = $scope.index_paginator.getPage();
-        // fills array up to page size, so empty columns will be displayed
-        while (page.length < $scope.index_paginator.page_size) {
-            page.push(null);
-        }
-        return page;
 	};
 
 }]);

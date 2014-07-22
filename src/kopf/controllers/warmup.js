@@ -6,6 +6,13 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 	
 	$scope.warmer = new Warmer('', '', { types: [], source: {} });
 
+    $scope.warmers = [];
+
+    $scope.$watch('paginator', function(filter, previous) {
+        $scope.paginator.refresh();
+        $scope.warmers = $scope.paginator.getPage();
+    }, true);
+
 	$scope.$on('loadWarmupEvent', function() {
 		$scope.loadIndices();
 		$scope.initEditor();
@@ -74,17 +81,20 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 				function(warmers) {
 					$scope.updateModel(function() {
                         $scope.paginator.setCollection(warmers);
+                        $scope.warmers = $scope.paginator.getPage();
 					});
 				},
 				function(error) {
 					$scope.updateModel(function() {
                         $scope.paginator.setCollection([]);
+                        $scope.warmers = $scope.paginator.getPage();
 						AlertService.error("Error while fetching warmup queries", error);
 					});
 				}
 			);
 		} else {
 			$scope.paginator.setCollection([]);
+            $scope.warmers = $scope.paginator.getPage();
 		}
 	};
 	
