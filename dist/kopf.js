@@ -3369,8 +3369,14 @@ function IndexFilter(name, state, hide_special, timestamp) {
             return true;
         } else {
             var matches = true;
-            if (notEmpty(this.name) && index.name.indexOf(this.name) == -1) {
-                matches = false;
+            if (notEmpty(this.name)) {
+                try {
+                    var reg = new RegExp(this.name.trim(), "i");
+                    matches = reg.test(index.name);
+                }
+                catch (err) { // if not valid regexp, still try normal matching
+                    matches = index.name.indexOf(this.name.toLowerCase()) != -1;
+                }
             }
             if (matches && notEmpty(this.state)) {
                 if (this.state == "unhealthy" && !index.unhealthy) {
