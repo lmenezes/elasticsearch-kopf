@@ -2922,7 +2922,7 @@ kopf.factory('AceEditorService', function() {
 });
 kopf.factory('ThemeService', function() {
 	
-	this.theme = "default";
+	this.theme = "dark";
 	
 	this.setTheme=function(theme) {
 		this.theme = theme;

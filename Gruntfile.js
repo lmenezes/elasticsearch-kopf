@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 					{expand: true, flatten: true, src: ['src/lib/ace/worker-json.js'], dest: './'},
 					{expand: true, flatten: true, src: ['src/kopf/theme-kopf.js'], dest: './'},
 					{expand: true, flatten: true, src: ['src/kopf/css/dark_style.css'], dest: './dist/'},
-					{expand: true, flatten: true, src: ['src/kopf/css/default_style.css'], dest: './dist/'}
+					{expand: true, flatten: true, src: ['src/kopf/css/light_style.css'], dest: './dist/'}
 				]
 			}
 		},
