@@ -1,5 +1,6 @@
 kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', function($scope, AlertService, AceEditorService) {
 	$scope.paginator = new Paginator(1,10, [], new AliasFilter("",""));
+    $scope.page = $scope.paginator.getPage();
     $scope.original = [];
 	$scope.editor = undefined;
     $scope.new_alias = new Alias("", "", "", "", "");
@@ -7,8 +8,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     $scope.aliases = [];
 
     $scope.$watch('paginator', function(filter, previous) {
-        $scope.paginator.refresh();
-        $scope.aliases = $scope.paginator.getPage();
+        $scope.page = $scope.paginator.getPage();
     }, true);
 
     $scope.viewDetails=function(alias) {
@@ -43,7 +43,8 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
                     }
                 }
 				$scope.new_alias = new Alias();
-				$scope.paginator.refresh();
+				$scope.paginator.setCollection(collection);
+                $scope.page = $scope.paginator.getPage();
 				AlertService.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
 			} catch (error) {
 				AlertService.error(error ,null);
@@ -54,41 +55,45 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	};
 	
 	$scope.removeIndexAliases=function(index) {
-        for (var position = 0; position < $scope.paginator.getCollection().length; position++) {
-            if (index == $scope.paginator.getCollection()[position].index) {
-                $scope.paginator.getCollection().splice(position, 1);
+        var collection = $scope.paginator.getCollection();
+        for (var position = 0; position < collection.length; position++) {
+            if (index == collection[position].index) {
+                collection.splice(position, 1);
                 break;
             }
         }
-
-        $scope.paginator.refresh();
+        $scope.paginator.setCollection(collection);
+        $scope.page = $scope.paginator.getPage();
 		AlertService.success("All aliases were removed for " + index);
 	};
 	
 	$scope.removeIndexAlias=function(index, alias) {
         var index_position = 0;
-        for (; index_position < $scope.paginator.getCollection().length; index_position++) {
-            if (index == $scope.paginator.getCollection()[index_position].index) {
+        var collection = $scope.paginator.getCollection();
+        for (; index_position < collection.length; index_position++) {
+            if (index == collection[index_position].index) {
                 break;
             }
         }
-        var index_aliases = $scope.paginator.getCollection()[index_position];
+        var index_aliases = collection[index_position];
         for (var alias_position = 0; alias_position < index_aliases.aliases.length; alias_position++) {
             if (alias == index_aliases.aliases[alias_position].alias) {
                 index_aliases.aliases.splice(alias_position, 1);
                 if (index_aliases.aliases.length === 0) {
-                    $scope.paginator.getCollection().splice(index_position, 1);
+                    collection.splice(index_position, 1);
                 }
                 break;
             }
         }
-        $scope.paginator.refresh(); // refreshes view
+        $scope.paginator.setCollection(collection);
+        $scope.page = $scope.paginator.getPage();
         AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
 	};
 	
 	$scope.mergeAliases=function() {
-		var deletes = IndexAliases.diff($scope.paginator.getCollection(), $scope.original);
-		var adds = IndexAliases.diff($scope.original, $scope.paginator.getCollection());
+		var collection = $scope.paginator.getCollection();
+        var deletes = IndexAliases.diff(collection, $scope.original);
+		var adds = IndexAliases.diff($scope.original, collection);
         if (adds.length === 0 && deletes.length === 0) {
             AlertService.warn("No changes were made: nothing to save");
         } else {
@@ -115,7 +120,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 				$scope.updateModel(function() {
                     $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
 					$scope.paginator.setCollection(index_aliases);
-                    $scope.aliases = $scope.paginator.getPage();
+                    $scope.page = $scope.paginator.getPage();
 				});
 			},
 			function(error) {

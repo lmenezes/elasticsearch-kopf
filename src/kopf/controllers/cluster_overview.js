@@ -2,6 +2,8 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 
     $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
 
+    $scope.page = $scope.index_paginator.getPage();
+
     $scope.node_filter = new NodeFilter("", true, true, true, 0);
 
     $scope.indices = [];
@@ -10,10 +12,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.$watch('cluster', function(cluster, previous) {
         if (isDefined(cluster)) {
             $scope.index_paginator.setCollection(cluster.indices);
-            $scope.indices = $scope.index_paginator.getPage();
+            $scope.page = $scope.index_paginator.getPage();
             $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
         } else {
-            $scope.indices = [];
+            $scope.index_paginator.setCollection([]);
+            $scope.page = $scope.index_paginator.getPage();
             $scope.nodes = [];
         }
     });
@@ -21,7 +24,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.$watch('index_paginator', function(filter, previous) {
         if (isDefined($scope.cluster)) {
             $scope.index_paginator.setCollection($scope.cluster.indices);
-            $scope.indices = $scope.index_paginator.getPage();
+            $scope.page = $scope.index_paginator.getPage();
         } else {
             $scope.indices = [];
         }

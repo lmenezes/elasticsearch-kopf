@@ -52,7 +52,7 @@ describe('WarmupController', function(){
 
     it('Returns total number of warmers', function() {
         this.scope.paginator.setCollection([new Warmer("warmer_id","index", { types: [], source: {}}), new Warmer("warmer_id2","index", { types: [], source: {}})]);
-        expect(this.scope.paginator.getTotal()).toEqual(2);
+        expect(this.scope.paginator.getPage().total).toEqual(2);
     });
 
     it('Prevent warmup with empty body to be created', function() {

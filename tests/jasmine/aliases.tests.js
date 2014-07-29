@@ -67,9 +67,9 @@ describe('AliasesController', function(){
         var fake_alias = new Alias('myalias', 'myindex', { 'filter' : 'fromeditor' });
         this.scope.editor = fake_editor;
         this.scope.new_alias = fake_alias;
-        spyOn(this.scope.paginator, "refresh");
+        spyOn(this.scope.paginator, "getPage");
         this.scope.addAlias();
-        expect(this.scope.paginator.refresh).toHaveBeenCalled();
+        expect(this.scope.paginator.getPage).toHaveBeenCalled();
         expect(this.scope.paginator.getCollection().length).toEqual(1);
         expect(this.scope.paginator.getCollection()[0].index).toEqual("myindex");
         expect(this.scope.paginator.getCollection()[0].aliases.length).toEqual(1);
@@ -86,24 +86,24 @@ describe('AliasesController', function(){
         var fake_alias = new Alias('myalias', 'myindex', { 'filter' : 'fromeditor' });
         this.scope.editor = fake_editor;
         this.scope.new_alias = fake_alias;
-        spyOn(this.scope.paginator, "refresh");
+        spyOn(this.scope.paginator, "getPage");
         spyOn(this.AlertService, "error");
         this.scope.addAlias();
         expect(this.AlertService.error).toHaveBeenCalled();
-        expect(this.scope.paginator.refresh).not.toHaveBeenCalled();
+        expect(this.scope.paginator.getPage).not.toHaveBeenCalled();
     });
 
     it('removeAlias : changes alias list, calls pagination setresults with new info', function () {
         this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] ) ], new AliasFilter("",""));
-        spyOn(this.scope.paginator, "refresh");
+        spyOn(this.scope.paginator, "getPage");
         this.scope.removeIndexAliases("myindex");
-        expect(this.scope.paginator.refresh).toHaveBeenCalledWith();
+        expect(this.scope.paginator.getPage).toHaveBeenCalledWith();
         expect(this.scope.paginator.getCollection()).toEqual([]);
     });
 
     it('removeAliasFromIndex : ', function () {
         this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ new Alias("myalias", "myindex"), new Alias("myalias2", "myindex") ] ) ], new AliasFilter("",""));
-        spyOn(this.scope.paginator, "refresh");
+        spyOn(this.scope.paginator, "getPage");
         spyOn(this.AlertService, "success");
         this.scope.removeIndexAlias('myindex', 'myalias');
         expect(this.AlertService.success).toHaveBeenCalled();

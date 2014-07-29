@@ -58,12 +58,12 @@
 		</div>
 		<div class="col-xs-6" style="text-align: right;">
 			<div class="cluster-map-pagination">
-				<span ng-switch on="index_paginator.hasPreviousPage()">
+				<span ng-switch on="page.previous">
 					<i class="fa fa-angle-double-left normal-action" ng-click="index_paginator.previousPage()" ng-switch-when="true"></i>
 					<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 				</span>
-				{{index_paginator.firstResult()}}-{{index_paginator.lastResult()}} of {{index_paginator.getTotal()}}
-				<span ng-switch on="index_paginator.hasNextPage()">
+				{{page.first}}-{{page.last}} of {{page.total}}
+				<span ng-switch on="page.next">
 					<i class="fa fa-angle-double-right normal-action" ng-click="index_paginator.nextPage()" ng-switch-when="true"></i>
 					<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
 				</span>
@@ -100,7 +100,7 @@
                     </div>
                 </th>
                 <!-- indices -->
-                <th ng-repeat="index in indices track by $index" class="index-cell box" ng-include="'partials/cluster_overview/index_header.html'">
+                <th ng-repeat="index in page.elements track by $index" class="index-cell box" ng-include="'partials/cluster_overview/index_header.html'">
                 </th>
             </tr>
 		</thead>
@@ -217,7 +217,7 @@
                         </div>
                     </div>
                 </td>
-                <td ng-repeat="index in indices track by $index" ng-class="{'box': index.closed()}" ng-include="'partials/cluster_overview/index_body.html'">
+                <td ng-repeat="index in page.elements track by $index" ng-class="{'box': index.closed()}" ng-include="'partials/cluster_overview/index_body.html'">
                 </td>
             </tr>
             <!-- Unassigned shards -->
@@ -228,7 +228,7 @@
                         <span>unassigned shards</span>
                     </div>
                 </td>
-                <td class="shards box" ng-repeat="index in indices track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">
+                <td class="shards box" ng-repeat="index in page.elements track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">
                 </td>
             </tr>
 		</tbody>

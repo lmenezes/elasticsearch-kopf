@@ -4,6 +4,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.indices = [];
 	
 	$scope.paginator = new Paginator(1, 10, [], new SnapshotFilter());
+    $scope.page = $scope.paginator.getPage();
     $scope.snapshots = [];
 	
 	$scope.snapshot = null;
@@ -16,8 +17,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.editor = undefined;
 
     $scope.$watch('paginator', function(filter, previous) {
-        $scope.paginator.refresh();
-        $scope.snapshots = $scope.paginator.getPage();
+        $scope.page = $scope.paginator.getPage();
     }, true);
 	
 	$scope.$on('loadRepositoryEvent', function() {
@@ -201,11 +201,13 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 			function(response) {
 				$scope.updateModel(function() {
 					$scope.paginator.setCollection(response);
+                    $scope.page = $scope.paginator.getPage();
 				});
 			},
 			function(error) {
 				$scope.updateModel(function() {
 					$scope.paginator.setCollection([]);
+                    $scope.page = $scope.paginator.getPage();
 					AlertService.error("Error while fetching snapshots", error);
 				});
 			}

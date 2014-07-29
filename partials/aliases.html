@@ -96,12 +96,12 @@
 								<div class="row">
 									<div class="col-lg-12">
 										<div class="pagination-block">
-											<span ng-switch on="paginator.hasPreviousPage()">
+											<span ng-switch on="page.previous">
 												<i class="fa fa-angle-double-left normal-action" ng-click="paginator.previousPage()" ng-switch-when="true"></i>
 												<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
 											</span>
-											{{paginator.firstResult()}}-{{paginator.lastResult()}} of {{paginator.getTotal()}}
-											<span ng-switch on="paginator.hasNextPage()">
+											{{page.first}}-{{page.last}} of {{page.total}}
+											<span ng-switch on="page.next">
 												<i class="fa fa-angle-double-right normal-action" ng-click="paginator.nextPage()" ng-switch-when="true"></i>
 												<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
 											</span>
@@ -115,7 +115,7 @@
 												<td class="aliases-alias-cell">index</td>
 												<td>aliases</td>
 											</tr>
-											<tr ng-repeat="index_alias in aliases track by $index" ng-show="index_alias != null">
+											<tr ng-repeat="index_alias in page.elements track by $index" ng-show="index_alias != null">
 												<td>
 													<i class="fa fa-times remove-icon normal-action" ng-click="removeIndexAliases(index_alias.index)" title="remove all aliases for this index"></i>
 													<span class="aliases-new-alias-input">{{index_alias.index}}</span>
