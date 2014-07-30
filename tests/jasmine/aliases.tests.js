@@ -22,7 +22,7 @@ describe('AliasesController', function(){
     }));
 
     //TESTS
-    it('init : values are set', function(){
+    it('init : values are set', function() {
         expect(this.scope.paginator.getCollection()).toEqual([]);
         expect(this.scope.paginator.page).toEqual(1);
         expect(this.scope.paginator.filter.index).toEqual("");

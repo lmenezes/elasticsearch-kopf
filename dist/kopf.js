@@ -1623,37 +1623,42 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 
     $scope.node_filter = new NodeFilter("", true, true, true, 0);
 
-    $scope.indices = [];
     $scope.nodes = [];
 
     $scope.$watch('cluster', function(cluster, previous) {
         if (isDefined(cluster)) {
-            $scope.index_paginator.setCollection(cluster.indices);
-            $scope.page = $scope.index_paginator.getPage();
-            $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+            $scope.setIndices(cluster.indices);
+            $scope.setNodes($scope.cluster.nodes);
         } else {
-            $scope.index_paginator.setCollection([]);
-            $scope.page = $scope.index_paginator.getPage();
-            $scope.nodes = [];
+            $scope.setIndices([]);
+            $scope.setNodes([]);
         }
     });
 
     $scope.$watch('index_paginator', function(filter, previous) {
         if (isDefined($scope.cluster)) {
-            $scope.index_paginator.setCollection($scope.cluster.indices);
-            $scope.page = $scope.index_paginator.getPage();
+            $scope.setIndices($scope.cluster.indices);
         } else {
-            $scope.indices = [];
+            $scope.setIndices([]); // could it even happen?
         }
     }, true);
 
     $scope.$watch('node_filter', function(filter, previous) {
         if (isDefined($scope.cluster)) {
-            $scope.nodes = $scope.cluster.nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+            $scope.setNodes($scope.cluster.nodes);
         } else {
-            $scope.nodes = [];
+            $scope.setNodes([]);
         }
     }, true);
+
+    $scope.setNodes=function(nodes) {
+        $scope.nodes = nodes.filter(function(node) { return $scope.node_filter.matches(node); });
+    };
+
+    $scope.setIndices=function(indices) {
+        $scope.index_paginator.setCollection(indices);
+        $scope.page = $scope.index_paginator.getPage();
+    };
 
 	$scope.closeModal=function(forced_refresh){
 		if (forced_refresh) {
