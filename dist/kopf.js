@@ -884,10 +884,7 @@ function Index(index_name,index_info, index_metadata, index_status) {
 
 	this.unhealthy = unhealthy || unassigned.length > 0;
 	this.unassigned = unassigned;
-	
-	this.settingsAsString=function() {
-		return prettyPrintObject(this.metadata);
-	};
+
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
 	};
@@ -913,58 +910,47 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	};
 	
 	function isAnalyzable(type) {
-		var non_analyzable_types = ['integer', 'long', 'float', 'double', 'multi_field'];
-		return non_analyzable_types.indexOf(type) == -1;
+        return ['float', 'double', 'byte', 'short', 'integer', 'long', 'nested', 'object'].indexOf(type) == -1;
 	}
 	
 	this.getFields=function(type) {
+        var fields = [];
 		if (isDefined(this.mappings[type])) {
-			var fields = this.mappings[type].properties;
-			var validFields = [];
-			Object.keys(fields).forEach(function(field) {
-				// multi fields
-				if (isDefined(fields[field].fields)) {
-					var full_path = fields[field].path != 'just_name';
-					var multi_fields = fields[field].fields;
-					Object.keys(multi_fields).forEach(function(multi_field) {
-						if (isAnalyzable(multi_fields[multi_field].type)) {
-							if (field != multi_field && full_path) {
-								validFields.push(field + "." + multi_field);		
-							} else {
-								validFields.push(multi_field);	
-							}
-						}
-					});
-				}
-				// normal fields
-				if (isAnalyzable(fields[field].type)) {
-					validFields.push(field);
-				}
-			});
-			return validFields.sort(function(a, b) { return a.localeCompare(b); });
-		} else {
-			return [];
+			fields = this.getProperties("", this.mappings[type].properties);
 		}
+        return fields.sort(function(a, b) { return a.localeCompare(b); });
 	};
+
+    this.getProperties=function(parent, fields) {
+        var prefix = parent !== "" ? parent + "." : "";
+        var validFields = [];
+        for (var field in fields) {
+            // multi field
+            if (isDefined(fields[field].fields)) {
+                var multiPrefix = fields[field].path != 'just_name' ? prefix + field : prefix;
+                var multiProps = this.getProperties(multiPrefix, fields[field].fields);
+                validFields = validFields.concat(multiProps);
+            }
+            // nested and object types
+            if (fields[field].type == 'nested' || fields[field].type == 'object' || !isDefined(fields[field].type)) {
+                var nestedProperties = this.getProperties(prefix + field,fields[field].properties);
+                validFields = validFields.concat(nestedProperties);
+            }
+            // normal fields
+            if (isDefined(fields[field].type) && isAnalyzable(fields[field].type)) {
+                validFields.push(prefix + field);
+            }
+        }
+        return validFields;
+    };
 	
-	this.isSpecial=function() {
-		return (
-			this.name.indexOf(".") === 0 ||
-			this.name.indexOf("_") === 0
-		);
-	};
+	this.isSpecial=function() { return (this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0); };
 	
-	this.equals=function(index) {
-		return index !== null && index.name == this.name;
-	};
+	this.equals=function(index) { return index !== null && index.name == this.name; };
 	
-	this.closed=function() {
-		return this.state === "close";
-	};
+	this.closed=function() { return this.state === "close";	};
 	
-	this.open=function() {
-		return this.state === "open";
-	};
+	this.open=function() { return this.state === "open"; };
 }
 function EditableIndexSettings(settings) {
 	// FIXME: 0.90/1.0 check

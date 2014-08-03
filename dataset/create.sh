@@ -2,16 +2,16 @@
 curl -s -XDELETE http://localhost:9200/_all >> /dev/null
 
 curl -s -XPOST http://localhost:9200/foobar -d '{"index":{"number_of_shards":2,"number_of_replicas":0,"analysis":{"analyzer":{"index_inc_search":{"tokenizer":"whitespace","filter":["lowercase"]}}}}}' >> /dev/null 
-curl -s -XPUT http://localhost:9200/foobar/bar/_mapping -d '{"bar":{"properties":{"id":{"type":"long"},"content":{"type":"string","fields":{"content.raw":{"type":"string"}}}}}}' >> /dev/null
-curl -s -XPUT http://localhost:9200/foobar/baz/_mapping -d '{"baz":{"properties":{"id":{"type":"long"},"content":{"path":"just_name","type":"string","fields":{"content.raw":{"type":"string"}}}}}}' >> /dev/null
+curl -s -XPUT http://localhost:9200/foobar/bar/_mapping -d '{"bar":{"properties":{"id":{"type":"long"},"content":{"type":"string","fields":{"raw":{"type":"string"}}}, "nesty": { "type": "nested", "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}, "objecty": { "type": "object", "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}}}}' >> /dev/null
+curl -s -XPUT http://localhost:9200/foobar/baz/_mapping -d '{"baz":{"properties":{"id":{"type":"long"},"content":{"path":"just_name","type":"string","fields":{"raw":{"type":"string"}}}, "objecty": { "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}}}}}' >> /dev/null
 
 curl -s -XPOST http://localhost:9200/foobaz -d '{"index":{"number_of_shards":1,"number_of_replicas":2,"analysis":{"analyzer":{"index_inc_search":{"tokenizer":"whitespace","filter":["lowercase"]}}}}}' >> /dev/null
-curl -s -XPUT http://localhost:9200/foobaz/bar/_mapping -d '{"bar":{"properties":{"id":{"type":"long"},"content":{"type":"string","fields":{"content.raw":{"type":"string"}}}}}}' >> /dev/null
-curl -s -XPUT http://localhost:9200/foobaz/baz/_mapping -d '{"baz":{"properties":{"id":{"type":"long"},"content":{"path":"just_name","type":"string","fields":{"content.raw":{"type":"string"}}}}}}' >> /dev/null
+curl -s -XPUT http://localhost:9200/foobaz/bar/_mapping -d '{"bar":{"properties":{"id":{"type":"long"},"content":{"type":"string","fields":{"raw":{"type":"string"}}}, "nesty": { "type": "nested", "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}, "objecty": { "type": "object", "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}}}}' >> /dev/null
+curl -s -XPUT http://localhost:9200/foobaz/baz/_mapping -d '{"baz":{"properties":{"id":{"type":"long"},"content":{"path":"just_name","type":"string","fields":{"raw":{"type":"string"}}}, "objecty": { "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}}}}}' >> /dev/null
 
 curl -s -XPOST http://localhost:9200/qux -d '{"index":{"number_of_shards":1,"number_of_replicas":2,"analysis":{"analyzer":{"index_inc_search":{"tokenizer":"whitespace","filter":["lowercase"]}}}}}' >> /dev/null
-curl -s -XPUT http://localhost:9200/qux/baz/_mapping -d '{"baz":{"properties":{"id":{"type":"long"},"content":{"path":"just_name","type":"string","fields":{"content.raw":{"type":"string"}}}}}}' >> /dev/null
-curl -s -XPUT http://localhost:9200/qux/bar/_mapping -d '{"bar":{"properties":{"id":{"type":"long"},"content":{"type":"string","fields":{"content.raw":{"type":"string"}}}}}}' >> /dev/null
+curl -s -XPUT http://localhost:9200/qux/baz/_mapping -d '{"baz":{"properties":{"id":{"type":"long"},"content":{"path":"just_name","type":"string","fields":{"raw":{"type":"string"}}}, "objecty": { "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}}}}}' >> /dev/null
+curl -s -XPUT http://localhost:9200/qux/bar/_mapping -d '{"bar":{"properties":{"id":{"type":"long"},"content":{"type":"string","fields":{"raw":{"type":"string"}}}, "nesty": { "type": "nested", "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}, "objecty": { "type": "object", "properties": { "id": { "type": "integer" }, "name": { "type": "string"}}}}}}' >> /dev/null
 curl -s -XPOST http://localhost:9200/qux/_close >> /dev/null
 
 curl -s -XPUT http://localhost:9200/foobar/bar/1 -d '{"id":1, "content":"foobar bar 1"}' >> /dev/null
