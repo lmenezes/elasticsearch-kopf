@@ -28,11 +28,8 @@ function NodeFilter(name, data, master, client, timestamp) {
         if (this.isBlank()) {
             return true;
         } else {
-            var matches = true;
-            if (notEmpty(this.name) && node.name.toLowerCase().indexOf(this.name.toLowerCase()) == -1) {
-                return false;
-            }
-            return (data && this.data || master && this.master || client && this.client);
+            var matches = notEmpty(this.name) ? node.name.toLowerCase().indexOf(this.name.toLowerCase()) != -1 : true;
+            return matches && (node.data && this.data || node.master && this.master || node.client && this.client);
         }
     };
 
