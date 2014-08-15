@@ -56,12 +56,12 @@ function ElasticClient(connection) {
 	};
 
 	this.enableShardAllocation=function(callback_success, callback_error) {
-		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":false }};
+		var new_settings = { "transient":{ "cluster.routing.allocation": { "enable": 'all', "disable_allocation": false } } };
 		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
 	this.disableShardAllocation=function(callback_success, callback_error) {
-		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":true }};
+		var new_settings = { "transient":{ "cluster.routing.allocation": { "enable": 'none', "disable_allocation": true } } };
 		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 

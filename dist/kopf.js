@@ -223,11 +223,17 @@ function ClusterSettings(settings) {
 function Cluster(state,status,nodes,settings) {
 	this.created_at = new Date().getTime();
 	if (isDefined(state) && isDefined(status) && isDefined(nodes) && isDefined(settings)) {
-		this.disableAllocation = false;
-		if (isDefined(settings.persistent) && isDefined(settings.persistent.disable_allocation)) {
-			this.disableAllocation = settings.persistent.disable_allocation;
-		}
-		this.disableAllocation = getProperty(settings,'transient.cluster.routing.allocation.disable_allocation', "false");
+        this.disableAllocation = "false";
+        var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
+        var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
+        if (transientAllocation !== "") {
+            this.disableAllocation = transientAllocation == "all" ? "false" : "true";
+        } else {
+            if (persistentAllocation != "all") {
+                this.disableAllocation = "true";
+            }
+        }
+
 		this.settings = settings;
 		this.master_node = state.master_node;
 		var num_nodes = 0;
@@ -410,12 +416,12 @@ function ElasticClient(connection) {
 	};
 
 	this.enableShardAllocation=function(callback_success, callback_error) {
-		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":false }};
+		var new_settings = { "transient":{ "cluster.routing.allocation": { "enable": 'all', "disable_allocation": false } } };
 		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
 	this.disableShardAllocation=function(callback_success, callback_error) {
-		var new_settings = {"transient":{ "cluster.routing.allocation.disable_allocation":true }};
+		var new_settings = { "transient":{ "cluster.routing.allocation": { "enable": 'none', "disable_allocation": true } } };
 		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
