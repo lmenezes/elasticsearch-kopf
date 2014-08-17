@@ -3383,7 +3383,17 @@ function IndexFilter(name, state, hide_special, timestamp) {
             return true;
         } else {
             var matches = true;
-            if (notEmpty(this.name)) {
+            if (this.hide_special) {
+                matches = !index.isSpecial();
+            }
+            if (matches && notEmpty(this.state)) {
+                if (this.state == "unhealthy" && !index.unhealthy) {
+                    matches = false;
+                } else if ((this.state == "open" || this.state == "close") && this.state != index.state) {
+                    matches = false;
+                }
+            }
+            if (matches && notEmpty(this.name)) {
                 try {
                     var reg = new RegExp(this.name.trim(), "i");
                     matches = reg.test(index.name);
@@ -3391,16 +3401,6 @@ function IndexFilter(name, state, hide_special, timestamp) {
                 catch (err) { // if not valid regexp, still try normal matching
                     matches = index.name.indexOf(this.name.toLowerCase()) != -1;
                 }
-            }
-            if (matches && notEmpty(this.state)) {
-                if (this.state == "unhealthy" && !index.unhealthy) {
-                        matches = false;
-                } else if ((this.state == "open" || this.state == "close") && this.state != index.state) {
-                    matches = false;
-                }
-            }
-            if (matches && this.hide_special) {
-                matches = !index.isSpecial();
             }
             return matches;
         }
