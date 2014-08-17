@@ -337,16 +337,11 @@ function Cluster(state,status,nodes,settings) {
 					}
 				});
 			}
-
-			console.log(this.num_docs);
-            console.log(old_cluster.num_docs);
             var docDelta = this.num_docs - old_cluster.num_docs;
 			// var docRate = docDelta / ((this.created_at - old_cluster.created_at) / 1000);
 			changes.setDocDelta(docDelta);
-
 			var dataDelta = this.total_size_in_bytes - old_cluster.total_size_in_bytes;
 			changes.setDataDelta(dataDelta);
-
 		}
 		this.changes = changes;
 	};
