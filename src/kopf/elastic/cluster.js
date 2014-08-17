@@ -43,7 +43,7 @@ function Cluster(state,status,nodes,settings) {
 				num_docs += index.num_docs;
 				return index;
 			}
-		).sort(function(a,b) { return a.compare(b); });
+		);
 		this.special_indices = special_indices;
 		this.num_docs = num_docs;
 		this.unassigned_shards = unassigned_shards;
