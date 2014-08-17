@@ -222,141 +222,145 @@ function ClusterSettings(settings) {
 }
 function Cluster(state,status,nodes,settings) {
 	this.created_at = new Date().getTime();
-	if (isDefined(state) && isDefined(status) && isDefined(nodes) && isDefined(settings)) {
-        this.disableAllocation = "false";
-        var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
-        var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
-        if (transientAllocation !== "") {
-            this.disableAllocation = transientAllocation == "all" ? "false" : "true";
-        } else {
-            if (persistentAllocation != "all") {
-                this.disableAllocation = "true";
-            }
+
+    this.disableAllocation = "false";
+    var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
+    var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
+    if (transientAllocation !== "") {
+        this.disableAllocation = transientAllocation == "all" ? "false" : "true";
+    } else {
+        if (persistentAllocation != "all") {
+            this.disableAllocation = "true";
         }
+    }
 
-		this.settings = settings;
-		this.master_node = state.master_node;
-		var num_nodes = 0;
-		this.nodes = Object.keys(state.nodes).map(function(x) { 
-			var node = new Node(x,state.nodes[x],nodes.nodes[x]);
-			num_nodes += 1;
-			if (node.id === state.master_node) {
-				node.setCurrentMaster();
-			}
-			return node;
-		}).sort(function(a,b) { return a.compare(b); });
-		this.number_of_nodes = num_nodes;
-		var iMetadata = state.metadata.indices;
-		var iRoutingTable = state.routing_table.indices;
-		var iStatus = status.indices;
-		var count = 0;
-		var unassigned_shards = 0;
-		var total_size = 0;
-		var num_docs = 0;
-		var special_indices = 0;
-		this.indices = Object.keys(iMetadata).map(
-			function(x) { 
-				var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
-				if (index.isSpecial()) {
-					special_indices++;
-				}
-				unassigned_shards += index.unassigned.length;
-				total_size += parseInt(index.total_size);
-				num_docs += index.num_docs;
-				return index;
-			}
-		);
-		this.special_indices = special_indices;
-		this.num_docs = num_docs;
-		this.unassigned_shards = unassigned_shards;
-		this.total_indices = this.indices.length;
-		this.shards = status._shards.total;
-		this.failed_shards = status._shards.failed;
-		this.successful_shards = status._shards.successful;
-		this.total_size = readablizeBytes(total_size);
-		this.total_size_in_bytes = total_size;
-		this.changes = null;
+	this.settings = settings;
+	this.master_node = state.master_node;
+	var num_nodes = 0;
+    var total_size = 0;
+    var num_docs = 0;
 
-		this.computeChanges=function(old_cluster) {
-			var nodes = this.nodes;
-			var indices = this.indices;
-			var changes = new ClusterChanges();
-			if (isDefined(old_cluster)) {
-				// checks for node differences
-				old_cluster.nodes.forEach(function(node) {
-					for (var i = 0; i < nodes.length; i++) {
-						if (nodes[i].equals(node)) {
-							node = null;
-							break;
-						}
-					}
-					if (isDefined(node)) {
-						changes.addLeavingNode(node);
-					}
-				});
-				
-				if (old_cluster.nodes.length != nodes.length || !changes.hasJoins()) {
-						nodes.forEach(function(node) {
-							for (var i = 0; i < old_cluster.nodes.length; i++) {
-								if (old_cluster.nodes[i].equals(node)) {
-									node = null;
-									break;
-								}
-							}	
-						if (isDefined(node)) {
-							changes.addJoiningNode(node);	
-						}
-					});
-				}
-			
-				// checks for indices differences
-				old_cluster.indices.forEach(function(index) {
-					for (var i = 0; i < indices.length; i++) {
-						if (indices[i].equals(index)) {
-							index = null;
-							break;
-						}
-					}
-					if (isDefined(index)) {
-						changes.addDeletedIndex(index);
-					}
-				});
-				
-				if (old_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
-						indices.forEach(function(index) {
-							for (var i = 0; i < old_cluster.indices.length; i++) {
-								if (old_cluster.indices[i].equals(index)) {
-									index = null;
-									break;
-								}
-							}	
-						if (isDefined(index)) {
-							changes.addCreatedIndex(index);	
-						}
-					});
-				}
-				
-				var docDelta = this.num_docs - old_cluster.num_docs;
-				// var docRate = docDelta / ((this.created_at - old_cluster.created_at) / 1000);
-				changes.setDocDelta(docDelta);
-				
-				var dataDelta = this.total_size_in_bytes - old_cluster.total_size_in_bytes;
-				changes.setDataDelta(dataDelta);
-			
+	this.nodes = Object.keys(state.nodes).map(function(x) {
+		var node = new Node(x,state.nodes[x],nodes.nodes[x]);
+        total_size += parseInt(node.size_in_bytes);
+        num_docs += node.docs;
+		num_nodes += 1;
+		if (node.id === state.master_node) {
+			node.setCurrentMaster();
+		}
+		return node;
+	}).sort(function(a,b) { return a.compare(b); });
+	this.number_of_nodes = num_nodes;
+	var iMetadata = state.metadata.indices;
+	var iRoutingTable = state.routing_table.indices;
+	var iStatus = status.indices;
+	var count = 0;
+
+	var special_indices = 0;
+	this.indices = Object.keys(iMetadata).map(
+		function(x) {
+			var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+			if (index.special) {
+				special_indices++;
 			}
-			this.changes = changes;
-		};
-		
-		this.open_indices=function() {
-			return $.map(this.indices, function(index) {
-				if (index.state == 'open') {
-					return index;
-				} else {
-					return null;
+			return index;
+		}
+	);
+	this.special_indices = special_indices;
+	this.num_docs = num_docs;
+	this.total_indices = this.indices.length;
+
+    this.shards = status._shards.total;
+	this.failed_shards = status._shards.failed;
+	this.successful_shards = status._shards.successful;
+    this.unassigned_shards = state.routing_nodes.unassigned.length;
+
+    this.total_size = readablizeBytes(total_size);
+	this.total_size_in_bytes = total_size;
+	this.changes = null;
+
+	this.computeChanges=function(old_cluster) {
+		var nodes = this.nodes;
+		var indices = this.indices;
+		var changes = new ClusterChanges();
+		if (isDefined(old_cluster)) {
+			// checks for node differences
+			old_cluster.nodes.forEach(function(node) {
+				for (var i = 0; i < nodes.length; i++) {
+					if (nodes[i].equals(node)) {
+						node = null;
+						break;
+					}
+				}
+				if (isDefined(node)) {
+					changes.addLeavingNode(node);
 				}
 			});
-		};
-	}
+
+			if (old_cluster.nodes.length != nodes.length || !changes.hasJoins()) {
+					nodes.forEach(function(node) {
+						for (var i = 0; i < old_cluster.nodes.length; i++) {
+							if (old_cluster.nodes[i].equals(node)) {
+								node = null;
+								break;
+							}
+						}
+					if (isDefined(node)) {
+						changes.addJoiningNode(node);
+					}
+				});
+			}
+
+			// checks for indices differences
+			old_cluster.indices.forEach(function(index) {
+				for (var i = 0; i < indices.length; i++) {
+					if (indices[i].equals(index)) {
+						index = null;
+						break;
+					}
+				}
+				if (isDefined(index)) {
+					changes.addDeletedIndex(index);
+				}
+			});
+
+			if (old_cluster.indices.length != indices.length || !changes.hasCreatedIndices()) {
+					indices.forEach(function(index) {
+						for (var i = 0; i < old_cluster.indices.length; i++) {
+							if (old_cluster.indices[i].equals(index)) {
+								index = null;
+								break;
+							}
+						}
+					if (isDefined(index)) {
+						changes.addCreatedIndex(index);
+					}
+				});
+			}
+
+			console.log(this.num_docs);
+            console.log(old_cluster.num_docs);
+            var docDelta = this.num_docs - old_cluster.num_docs;
+			// var docRate = docDelta / ((this.created_at - old_cluster.created_at) / 1000);
+			changes.setDocDelta(docDelta);
+
+			var dataDelta = this.total_size_in_bytes - old_cluster.total_size_in_bytes;
+			changes.setDataDelta(dataDelta);
+
+		}
+		this.changes = changes;
+	};
+
+	this.open_indices=function() {
+		return $.map(this.indices, function(index) {
+			if (index.state == 'open') {
+				return index;
+			} else {
+				return null;
+			}
+		});
+	};
+
 }
 function ElasticClient(connection) {
 	this.host = connection.host;
@@ -828,8 +832,7 @@ function ESConnection(url) {
 }
 function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;
-	var index_shards = {};
-	this.shards = index_shards;
+	this.shards = null;
 	this.metadata = {};
 	this.aliases = getProperty(index_metadata,'aliases', []);
 
@@ -858,38 +861,49 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	// adds shard information
 	
 	var unhealthy = false;
-	
-	if (isDefined(index_info)) {
-		$.map(index_info.shards, function(shards, shard_num) {
-			$.map(shards, function(shard_routing, shard_copy) {
-				if (shard_routing.node === null) {
-					unassigned.push(new UnassignedShard(shard_routing));	
-				} else {
-					if (!isDefined(index_shards[shard_routing.node])) {
-						index_shards[shard_routing.node] = [];
-					}
-					var shard_status = null;
-					if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
-						index_status.shards[shard_routing.shard].forEach(function(status) {
-							if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
-								shard_status = status;
-							}
-						});
-					}
-					var new_shard = new Shard(shard_routing, shard_status);
-					
-					if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
-						unhealthy = true;
-					}
-					
-					index_shards[shard_routing.node].push(new_shard);				
-				}
-			});
-		});
-	}
+
+    this.getShards=function(node_id) {
+        if (isDefined(index_info)) {
+            if (this.shards === null) {
+                var index_shards = {};
+                $.map(index_info.shards, function(shards, shard_num) {
+                    $.map(shards, function(shard_routing, shard_copy) {
+                        if (shard_routing.node === null) {
+                            unassigned.push(new UnassignedShard(shard_routing));
+                        } else {
+                            if (!isDefined(index_shards[shard_routing.node])) {
+                                index_shards[shard_routing.node] = [];
+                            }
+                            var shard_status = null;
+                            if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
+                                index_status.shards[shard_routing.shard].forEach(function(status) {
+                                    if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
+                                        shard_status = status;
+                                    }
+                                });
+                            }
+                            var new_shard = new Shard(shard_routing, shard_status);
+
+                            if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
+                                unhealthy = true;
+                            }
+
+                            index_shards[shard_routing.node].push(new_shard);
+                        }
+                    });
+                });
+                this.shards = index_shards;
+            }
+        } else {
+            this.shards = {};
+        }
+        return this.shards[node_id];
+    };
 
 	this.unhealthy = unhealthy || unassigned.length > 0;
 	this.unassigned = unassigned;
+
+    this.special = this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0;
 
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
@@ -949,8 +963,6 @@ function Index(index_name,index_info, index_metadata, index_status) {
         }
         return validFields;
     };
-	
-	this.isSpecial=function() { return (this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0); };
 	
 	this.equals=function(index) { return index !== null && index.name == this.name; };
 	
@@ -1046,7 +1058,8 @@ function Node(node_id, node_info, node_stats) {
 	this.cpu_user = getProperty(this.stats, 'os.cpu.user');
 	this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
 	this.docs = getProperty(this.stats, 'indices.docs.count');
-	this.size = readablizeBytes(getProperty(this.stats, 'indices.store.size_in_bytes'));
+    this.size_in_bytes = getProperty(this.stats, 'indices.store.size_in_bytes');
+    this.size = readablizeBytes(this.size_in_bytes);
 
 	this.setCurrentMaster=function() {
 		this.current_master = true;
@@ -3384,7 +3397,7 @@ function IndexFilter(name, state, hide_special, timestamp) {
         } else {
             var matches = true;
             if (this.hide_special) {
-                matches = !index.isSpecial();
+                matches = !index.special;
             }
             if (matches && notEmpty(this.state)) {
                 if (this.state == "unhealthy" && !index.unhealthy) {

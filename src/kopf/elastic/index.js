@@ -1,7 +1,6 @@
 function Index(index_name,index_info, index_metadata, index_status) {
 	this.name = index_name;
-	var index_shards = {};
-	this.shards = index_shards;
+	this.shards = null;
 	this.metadata = {};
 	this.aliases = getProperty(index_metadata,'aliases', []);
 
@@ -30,38 +29,49 @@ function Index(index_name,index_info, index_metadata, index_status) {
 	// adds shard information
 	
 	var unhealthy = false;
-	
-	if (isDefined(index_info)) {
-		$.map(index_info.shards, function(shards, shard_num) {
-			$.map(shards, function(shard_routing, shard_copy) {
-				if (shard_routing.node === null) {
-					unassigned.push(new UnassignedShard(shard_routing));	
-				} else {
-					if (!isDefined(index_shards[shard_routing.node])) {
-						index_shards[shard_routing.node] = [];
-					}
-					var shard_status = null;
-					if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
-						index_status.shards[shard_routing.shard].forEach(function(status) {
-							if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
-								shard_status = status;
-							}
-						});
-					}
-					var new_shard = new Shard(shard_routing, shard_status);
-					
-					if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
-						unhealthy = true;
-					}
-					
-					index_shards[shard_routing.node].push(new_shard);				
-				}
-			});
-		});
-	}
+
+    this.getShards=function(node_id) {
+        if (isDefined(index_info)) {
+            if (this.shards === null) {
+                var index_shards = {};
+                $.map(index_info.shards, function(shards, shard_num) {
+                    $.map(shards, function(shard_routing, shard_copy) {
+                        if (shard_routing.node === null) {
+                            unassigned.push(new UnassignedShard(shard_routing));
+                        } else {
+                            if (!isDefined(index_shards[shard_routing.node])) {
+                                index_shards[shard_routing.node] = [];
+                            }
+                            var shard_status = null;
+                            if (isDefined(index_status) && isDefined(index_status.shards[shard_routing.shard])) {
+                                index_status.shards[shard_routing.shard].forEach(function(status) {
+                                    if (status.routing.node == shard_routing.node && status.routing.shard == shard_routing.shard) {
+                                        shard_status = status;
+                                    }
+                                });
+                            }
+                            var new_shard = new Shard(shard_routing, shard_status);
+
+                            if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
+                                unhealthy = true;
+                            }
+
+                            index_shards[shard_routing.node].push(new_shard);
+                        }
+                    });
+                });
+                this.shards = index_shards;
+            }
+        } else {
+            this.shards = {};
+        }
+        return this.shards[node_id];
+    };
 
 	this.unhealthy = unhealthy || unassigned.length > 0;
 	this.unassigned = unassigned;
+
+    this.special = this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0;
 
 	this.compare=function(b) { // TODO: take into account index properties?
 		return this.name.localeCompare(b.name);
@@ -121,8 +131,6 @@ function Index(index_name,index_info, index_metadata, index_status) {
         }
         return validFields;
     };
-	
-	this.isSpecial=function() { return (this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0); };
 	
 	this.equals=function(index) { return index !== null && index.name == this.name; };
 	

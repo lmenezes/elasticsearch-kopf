@@ -28,7 +28,7 @@ function IndexFilter(name, state, hide_special, timestamp) {
         } else {
             var matches = true;
             if (this.hide_special) {
-                matches = !index.isSpecial();
+                matches = !index.special;
             }
             if (matches && notEmpty(this.state)) {
                 if (this.state == "unhealthy" && !index.unhealthy) {
