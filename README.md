@@ -21,8 +21,8 @@ Installation
 Run locally:
 
     git clone git://github.com/lmenezes/elasticsearch-kopf.git
-    git checkout {version}
     cd elasticsearch-kopf
+    git checkout {version}
     open index.html
     
 ps: local execution doesn't work with Chrome(and maybe other browsers). See more [here](http://docs.angularjs.org/api/ng.directive:ngInclude).
