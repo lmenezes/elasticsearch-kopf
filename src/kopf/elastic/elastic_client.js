@@ -101,6 +101,11 @@ function ElasticClient(connection) {
 		this.executeElasticRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
 	};
 
+    this.getIndexMetadata=function(name, callback_success, callback_error) {
+        var transformed = function(response) { callback_success(new IndexMetadata(name, response.metadata.indices[name])); };
+        this.executeElasticRequest('GET', "/_cluster/state/metadata/" + name, {}, transformed, callback_error);
+    };
+
 	this.getNodes=function(callback_success, callback_error) {
 		var nodes = [];
 		var createNodes = function(response) {
@@ -309,7 +314,7 @@ function ElasticClient(connection) {
 		$.when(
 			$.ajax({ 
 				type: 'GET', 
-				url: host+"/_cluster/state", 
+				url: host+"/_cluster/state/master_node,nodes,routing_table,blocks/",
 				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
@@ -350,10 +355,21 @@ function ElasticClient(connection) {
 						xhr.setRequestHeader("Authorization", auth);
 					} 
 				}
-			})
+			}),
+            $.ajax({
+                type: 'GET',
+                url: host+"/_aliases",
+                dataType: 'json',
+                data: {},
+                beforeSend: function(xhr) {
+                    if (isDefined(auth)) {
+                        xhr.setRequestHeader("Authorization", auth);
+                    }
+                }
+            })
 		).then(
-			function(cluster_state,nodes_stats,cluster_status,settings) {
-				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+			function(cluster_state,nodes_stats,cluster_status,settings,aliases) {
+				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0],aliases[0]));
 			},
 			function(error) {
 				callback_error(error);

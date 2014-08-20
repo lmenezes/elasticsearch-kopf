@@ -220,7 +220,7 @@ function ClusterSettings(settings) {
 		});		
 	});
 }
-function Cluster(state,status,nodes,settings) {
+function Cluster(state,status,nodes,settings, aliases) {
 	this.created_at = new Date().getTime();
 
     this.disableAllocation = "false";
@@ -251,21 +251,25 @@ function Cluster(state,status,nodes,settings) {
 		return node;
 	}).sort(function(a,b) { return a.compare(b); });
 	this.number_of_nodes = num_nodes;
-	var iMetadata = state.metadata.indices;
 	var iRoutingTable = state.routing_table.indices;
 	var iStatus = status.indices;
-	var count = 0;
 
 	var special_indices = 0;
-	this.indices = Object.keys(iMetadata).map(
+	this.indices = Object.keys(iRoutingTable).map(
 		function(x) {
-			var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+			var index = new Index(x, state, iRoutingTable[x], iStatus[x], aliases[x]);
 			if (index.special) {
 				special_indices++;
 			}
 			return index;
 		}
 	);
+    if (isDefined(state.blocks.indices)) {
+        var indices = this.indices;
+        Object.keys(state.blocks.indices).forEach(function(index) {
+            indices.push(new Index(index));
+        });
+    }
 	this.special_indices = special_indices;
 	this.num_docs = num_docs;
 	this.total_indices = this.indices.length;
@@ -459,6 +463,11 @@ function ElasticClient(connection) {
 	this.updateClusterSettings=function(settings, callback_success, callback_error) {
 		this.executeElasticRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
 	};
+
+    this.getIndexMetadata=function(name, callback_success, callback_error) {
+        var transformed = function(response) { callback_success(new IndexMetadata(name, response.metadata.indices[name])); };
+        this.executeElasticRequest('GET', "/_cluster/state/metadata/" + name, {}, transformed, callback_error);
+    };
 
 	this.getNodes=function(callback_success, callback_error) {
 		var nodes = [];
@@ -668,7 +677,7 @@ function ElasticClient(connection) {
 		$.when(
 			$.ajax({ 
 				type: 'GET', 
-				url: host+"/_cluster/state", 
+				url: host+"/_cluster/state/master_node,nodes,routing_table,blocks/",
 				dataType: 'json', 
 				data: {},
 				beforeSend: function(xhr) { 
@@ -709,10 +718,21 @@ function ElasticClient(connection) {
 						xhr.setRequestHeader("Authorization", auth);
 					} 
 				}
-			})
+			}),
+            $.ajax({
+                type: 'GET',
+                url: host+"/_aliases",
+                dataType: 'json',
+                data: {},
+                beforeSend: function(xhr) {
+                    if (isDefined(auth)) {
+                        xhr.setRequestHeader("Authorization", auth);
+                    }
+                }
+            })
 		).then(
-			function(cluster_state,nodes_stats,cluster_status,settings) {
-				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0]));
+			function(cluster_state,nodes_stats,cluster_status,settings,aliases) {
+				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0],aliases[0]));
 			},
 			function(error) {
 				callback_error(error);
@@ -825,29 +845,38 @@ function ESConnection(url) {
 		}		
 	}
 }
-function Index(index_name,index_info, index_metadata, index_status) {
+function Index(index_name, cluster_state, index_info, index_status, aliases) {
 	this.name = index_name;
 	this.shards = null;
 	this.metadata = {};
-	this.aliases = getProperty(index_metadata,'aliases', []);
+	this.state = "close";
+    this.num_of_shards = 0;
+    this.num_of_replicas = 0;
+    this.aliases = [];
+    if (isDefined(aliases)) {
+        var index_aliases = aliases.aliases;
+        if (isDefined(index_aliases) && index_aliases.length > 0) {
+            this.aliases = Object.keys(aliases.aliases);
+        }
+    }
 
-	this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
-	
-	this.settings = index_metadata.settings;
-	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
-	this.mappings = index_metadata.mappings;
-	this.metadata.settings = this.settings;
-	this.metadata.mappings = this.mappings;
+    this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
 
-	this.num_of_shards = getProperty(index_metadata.settings, 'index.number_of_shards');
-	this.num_of_replicas = parseInt(getProperty(index_metadata.settings, 'index.number_of_replicas'));
-	this.state = index_metadata.state;
-	
-	this.num_docs = getProperty(index_status, 'docs.num_docs', 0);
+    if (isDefined(cluster_state)) {
+        var routing = getProperty(cluster_state, "routing_table.indices");
+        this.state = "open";
+        if (isDefined(routing)) {
+            var shards = Object.keys(cluster_state.routing_table.indices[index_name].shards);
+            this.num_of_shards = shards.length;
+            var shardMap = cluster_state.routing_table.indices[index_name].shards;
+            this.num_of_replicas = shardMap[0].length - 1;
+        }
+    }
+    this.num_docs = getProperty(index_status, 'docs.num_docs', 0);
 	this.max_doc = getProperty(index_status, 'docs.max_doc', 0);
 	this.deleted_docs = getProperty(index_status, 'docs.deleted_docs', 0);
 	this.size = getProperty(index_status, 'index.primary_size_in_bytes', 0);
-	this.total_size = getProperty(index_status, 'index.size_in_bytes', 0);	
+	this.total_size = getProperty(index_status, 'index.size_in_bytes', 0);
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	
@@ -904,67 +933,14 @@ function Index(index_name,index_info, index_metadata, index_status) {
 		return this.name.localeCompare(b.name);
 	};
 	
-	this.getTypes=function() {
-		return Object.keys(this.mappings).sort(function(a, b) { return a.localeCompare(b); });
-	};
-	
-	this.getAnalyzers=function() {
-		var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
-		if (analyzers.length === 0) {
-			Object.keys(this.settings).forEach(function(setting) {
-				if (setting.indexOf('index.analysis.analyzer') === 0) {
-					var analyzer = setting.substring('index.analysis.analyzer.'.length);
-					analyzer = analyzer.substring(0,analyzer.indexOf("."));
-					if ($.inArray(analyzer, analyzers) == -1) {
-						analyzers.push(analyzer);
-					}
-				}
-			});			
-		}
-		return analyzers.sort(function(a, b) { return a.localeCompare(b); });
-	};
-	
-	function isAnalyzable(type) {
-        return ['float', 'double', 'byte', 'short', 'integer', 'long', 'nested', 'object'].indexOf(type) == -1;
-	}
-	
-	this.getFields=function(type) {
-        var fields = [];
-		if (isDefined(this.mappings[type])) {
-			fields = this.getProperties("", this.mappings[type].properties);
-		}
-        return fields.sort(function(a, b) { return a.localeCompare(b); });
-	};
-
-    this.getProperties=function(parent, fields) {
-        var prefix = parent !== "" ? parent + "." : "";
-        var validFields = [];
-        for (var field in fields) {
-            // multi field
-            if (isDefined(fields[field].fields)) {
-                var multiPrefix = fields[field].path != 'just_name' ? prefix + field : prefix;
-                var multiProps = this.getProperties(multiPrefix, fields[field].fields);
-                validFields = validFields.concat(multiProps);
-            }
-            // nested and object types
-            if (fields[field].type == 'nested' || fields[field].type == 'object' || !isDefined(fields[field].type)) {
-                var nestedProperties = this.getProperties(prefix + field,fields[field].properties);
-                validFields = validFields.concat(nestedProperties);
-            }
-            // normal fields
-            if (isDefined(fields[field].type) && isAnalyzable(fields[field].type)) {
-                validFields.push(prefix + field);
-            }
-        }
-        return validFields;
-    };
-	
 	this.equals=function(index) { return index !== null && index.name == this.name; };
 	
 	this.closed=function() { return this.state === "close";	};
 	
 	this.open=function() { return this.state === "open"; };
 }
+
+
 function EditableIndexSettings(settings) {
 	// FIXME: 0.90/1.0 check
 	this.valid_settings = [
@@ -1253,10 +1229,77 @@ function PercolatorsPage(from, size, total, percolators) {
         return total;
     };
 }
+function IndexMetadata(index, metadata) {
+    this.index = index;
+    this.mappings = metadata.mappings;
+    this.settings = metadata.settings;
+
+    this.getTypes=function() {
+        return Object.keys(this.mappings).sort(function(a, b) { return a.localeCompare(b); });
+    };
+
+    this.getAnalyzers=function() {
+        var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
+        if (analyzers.length === 0) {
+            Object.keys(this.settings).forEach(function(setting) {
+                if (setting.indexOf('index.analysis.analyzer') === 0) {
+                    var analyzer = setting.substring('index.analysis.analyzer.'.length);
+                    analyzer = analyzer.substring(0,analyzer.indexOf("."));
+                    if ($.inArray(analyzer, analyzers) == -1) {
+                        analyzers.push(analyzer);
+                    }
+                }
+            });
+        }
+        return analyzers.sort(function(a, b) { return a.localeCompare(b); });
+    };
+
+    function isAnalyzable(type) {
+        return ['float', 'double', 'byte', 'short', 'integer', 'long', 'nested', 'object'].indexOf(type) == -1;
+    }
+
+    this.getFields=function(type) {
+        var fields = [];
+        if (isDefined(this.mappings[type])) {
+            fields = this.getProperties("", this.mappings[type].properties);
+        }
+        return fields.sort(function(a, b) { return a.localeCompare(b); });
+    };
+
+    this.getProperties=function(parent, fields) {
+        var prefix = parent !== "" ? parent + "." : "";
+        var validFields = [];
+        for (var field in fields) {
+            // multi field
+            if (isDefined(fields[field].fields)) {
+                var multiPrefix = fields[field].path != 'just_name' ? prefix + field : prefix;
+                var multiProps = this.getProperties(multiPrefix, fields[field].fields);
+                validFields = validFields.concat(multiProps);
+            }
+            // nested and object types
+            if (fields[field].type == 'nested' || fields[field].type == 'object' || !isDefined(fields[field].type)) {
+                var nestedProperties = this.getProperties(prefix + field,fields[field].properties);
+                validFields = validFields.concat(nestedProperties);
+            }
+            // normal fields
+            if (isDefined(fields[field].type) && isAnalyzable(fields[field].type)) {
+                validFields.push(prefix + field);
+            }
+        }
+        return validFields;
+    };
+}
 var kopf = angular.module('kopf', []);
 
 kopf.factory('IndexSettingsService', function() {
-	return {index: null};
+
+    this.loadSettings=function(index, settings) {
+        this.index = index;
+        this.settings = settings;
+        this.editable_settings = new EditableIndexSettings(settings);
+    };
+
+    return this;
 });
 
 // manages behavior of confirmation dialog
@@ -1431,6 +1474,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 
 	// by index
 	$scope.field_index = null;
+    $scope.field_index_metadata = null;
 	$scope.field_type = '';
 	$scope.field_field = '';
 	$scope.field_text = '';
@@ -1438,10 +1482,59 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 	
 	// By analyzer
 	$scope.analyzer_index = '';
+    $scope.analyzer_index_metadata = null;
 	$scope.analyzer_analyzer = '';
 	$scope.analyzer_text = '';
 	$scope.analyzer_tokens = [];
-	
+
+    $scope.$watch('field_index', function(current, previous) {
+        $scope.loadIndexTypes(current.name);
+    });
+
+    $scope.loadIndexTypes=function(index) {
+        $scope.field_type = '';
+        $scope.field_field = '';
+        if (notEmpty(index)) {
+            $scope.client.getIndexMetadata(index,
+                function(metadata) {
+                    $scope.updateModel(function() {
+                        $scope.field_index_metadata = metadata;
+                    });
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        $scope.field_index = '';
+                        AlertService.error("Error while loading index metadata", error);
+                    });
+                }
+            );
+        }
+    };
+
+    $scope.$watch('analyzer_index', function(current, previous) {
+        $scope.loadIndexAnalyzers(current.name);
+    });
+
+    $scope.loadIndexAnalyzers=function(index) {
+        $scope.analyzer_analyzer = '';
+        if (notEmpty(index)) {
+            $scope.client.getIndexMetadata(index,
+                function(metadata) {
+                    $scope.updateModel(function() {
+                        $scope.analyzer_index_metadata = metadata;
+                    });
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        $scope.analyzer_index = '';
+                        AlertService.error("Error while loading index metadata", error);
+                    });
+                }
+            );
+        }
+    };
+
+
 	$scope.analyzeByField=function() {
 		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
 			$scope.field_tokens = null;
@@ -1875,13 +1968,51 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	
 	$scope.loadIndexSettings=function(index) {
 		$('#index_settings_option a').tab('show');
-		var indices = $scope.cluster.indices.filter(function(i) {
-			return i.name == index;
-		});
-        IndexSettingsService.index = indices[0];
-		$('#idx_settings_tabs a:first').tab('show');
-		$(".setting-info").popover();		
+        $scope.client.getIndexMetadata(index,
+            function(metadata) {
+                $scope.updateModel(function() {
+                    IndexSettingsService.loadSettings(index, metadata.settings);
+                    $('#idx_settings_tabs a:first').tab('show');
+                    $(".setting-info").popover();
+                });
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while loading index settings", error);
+                });
+            }
+        );
 	};
+
+    $scope.showIndexSettings=function(index) {
+        $scope.client.getIndexMetadata(index,
+            function(metadata) {
+                $scope.updateModel(function() {
+                    $scope.displayInfo('settings for index ' + index, metadata.settings);
+                });
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while loading index settings", error);
+                });
+            }
+        );
+    };
+
+    $scope.showIndexMappings=function(index) {
+        $scope.client.getIndexMetadata(index,
+            function(metadata) {
+                $scope.updateModel(function() {
+                    $scope.displayInfo('mappings for index ' + index, metadata.mappings);
+                });
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while loading index mappings", error);
+                });
+            }
+        );
+    };
 
 }]);
 kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
@@ -2148,15 +2279,17 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 	$scope.service = IndexSettingsService;
 
 	$scope.save=function() {
-		var index = $scope.service.index;
+        var index = $scope.service.index;
+		var settings = $scope.service.settings;
 		var new_settings = {};
+        var editable_settings = $scope.service.editable_settings;
 		// TODO: could move that to editable_index_settings model
-		index.editable_settings.valid_settings.forEach(function(setting) {
-			if (notEmpty(index.editable_settings[setting])) {
-				new_settings[setting] = index.editable_settings[setting];
+		editable_settings.valid_settings.forEach(function(setting) {
+			if (notEmpty(editable_settings[setting])) {
+				new_settings[setting] = editable_settings[setting];
 			}
 		});
-		$scope.client.updateIndexSettings(index.name, JSON.stringify(new_settings, undefined, ""),
+		$scope.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
 			function(response) {
 				$scope.updateModel(function() {
 					AlertService.success("Index settings were successfully updated", response);

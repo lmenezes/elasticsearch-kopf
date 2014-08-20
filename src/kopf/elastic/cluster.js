@@ -1,4 +1,4 @@
-function Cluster(state,status,nodes,settings) {
+function Cluster(state,status,nodes,settings, aliases) {
 	this.created_at = new Date().getTime();
 
     this.disableAllocation = "false";
@@ -29,21 +29,25 @@ function Cluster(state,status,nodes,settings) {
 		return node;
 	}).sort(function(a,b) { return a.compare(b); });
 	this.number_of_nodes = num_nodes;
-	var iMetadata = state.metadata.indices;
 	var iRoutingTable = state.routing_table.indices;
 	var iStatus = status.indices;
-	var count = 0;
 
 	var special_indices = 0;
-	this.indices = Object.keys(iMetadata).map(
+	this.indices = Object.keys(iRoutingTable).map(
 		function(x) {
-			var index = new Index(x,iRoutingTable[x], iMetadata[x], iStatus[x]);
+			var index = new Index(x, state, iRoutingTable[x], iStatus[x], aliases[x]);
 			if (index.special) {
 				special_indices++;
 			}
 			return index;
 		}
 	);
+    if (isDefined(state.blocks.indices)) {
+        var indices = this.indices;
+        Object.keys(state.blocks.indices).forEach(function(index) {
+            indices.push(new Index(index));
+        });
+    }
 	this.special_indices = special_indices;
 	this.num_docs = num_docs;
 	this.total_indices = this.indices.length;

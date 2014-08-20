@@ -61,6 +61,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/snapshot.js',
                     'src/kopf/elastic/warmer.js',
                     'src/kopf/elastic/percolator.js',
+                    'src/kopf/elastic/index_metadata.js',
 					// CONTROLLERS
 					'src/kopf/kopf.js',
 					'src/kopf/controllers/aliases.js',
@@ -149,6 +150,7 @@ module.exports = function(grunt) {
 					'src/kopf/elastic/snapshot.js',
                     'src/kopf/elastic/warmer.js',
                     'src/kopf/elastic/percolator.js',
+                    'src/kopf/elastic/index_metadata.js',
 					// CONTROLLERS
 					'src/kopf/kopf.js',
 					'src/kopf/controllers/aliases.js',

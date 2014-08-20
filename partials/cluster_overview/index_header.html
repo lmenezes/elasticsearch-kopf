@@ -8,12 +8,12 @@
                 </a>
                 <ul class="dropdown-menu index-dropdown" role="menu">
                     <li role="presentation">
-                        <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="displayInfo('settings for index ' + index.name,index.settings)">
+                        <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="showIndexSettings(index.name)">
                             <i class="fa fa-fw fa-info-circle index-menu-icon"></i> show settings
                         </a>
                     </li>
                     <li role="presentation">
-                        <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="displayInfo('mappings for index ' + index.name,index.mappings)">
+                        <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="showIndexMappings(index.name)">
                             <i class="fa fa-fw fa-code index-menu-icon"></i> show mappings
                         </a>
                     </li>

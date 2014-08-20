@@ -16,7 +16,7 @@ describe('AnalysisController', function(){
         this.createController = function() {
             return $controller('AnalysisController', {$scope: this.scope}, $location, $timeout, this.AlertService);
         };
-
+        this.scope.updateModel=function(body) { body(); };
         this._controller = this.createController();
     }));
 
@@ -103,5 +103,28 @@ describe('AnalysisController', function(){
         expect(this.scope.client.analyzeByAnalyzer).toHaveBeenCalledWith('a', 'analyzer', 'blah blah', jasmine.any(Function), jasmine.any(Function));
     });
 
+    it('load index metadata whenever an index is selected on analysis by field', function() {
+        this.scope.field_index = new Index('heyhey');
+        this.scope.client.getIndexMetadata = function(name, success, failure){ success(new IndexMetadata(name, {mappings: { wat: "wat"}})); };
+        spyOn(this.scope.client, "getIndexMetadata").andCallThrough();
+        this.scope.field_index = new Index('heyhey');
+        spyOn(this.scope, "loadIndexTypes").andCallThrough();
+        this.scope.$digest();
+        expect(this.scope.loadIndexTypes).toHaveBeenCalledWith("heyhey");
+        expect(this.scope.client.getIndexMetadata).toHaveBeenCalledWith("heyhey",jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.field_index_metadata.mappings).toEqual({ wat: "wat"});
+    });
+
+    it('load index metadata whenever an index is selected on analysis by analyzer', function() {
+        this.scope.client.getIndexMetadata = function(name, success, failure){ success(new IndexMetadata(name, {mappings: { wat: "wat"}})); };
+        spyOn(this.scope.client, "getIndexMetadata").andCallThrough();
+        this.scope.field_index = new Index('heyhey');
+        this.scope.analyzer_index = new Index('heyhey');
+        spyOn(this.scope, "loadIndexAnalyzers").andCallThrough();
+        this.scope.$digest();
+        expect(this.scope.loadIndexAnalyzers).toHaveBeenCalledWith("heyhey");
+        expect(this.scope.client.getIndexMetadata).toHaveBeenCalledWith("heyhey",jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.analyzer_index_metadata.mappings).toEqual({ wat: "wat"});
+    });
 
 });

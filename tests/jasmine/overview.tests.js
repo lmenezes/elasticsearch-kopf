@@ -380,4 +380,56 @@ describe('ClusterOverviewController', function(){
         expect(this.AlertService.error).toHaveBeenCalled();
     });
 
+    // show index settings
+    it('show index settings', function(){
+        this.scope.client.getIndexMetadata=function(index, success, failed) { return success(new IndexMetadata(index, {settings:{}})); };
+        this.scope.displayInfo=function(header, body) {};
+        spyOn(this.scope, "updateModel").andCallThrough();
+        spyOn(this.scope.client, "getIndexMetadata").andCallThrough();
+        spyOn(this.scope, "displayInfo").andReturn();
+        this.scope.showIndexSettings("index_name");
+        expect(this.scope.client.getIndexMetadata).toHaveBeenCalledWith("index_name", jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.updateModel).toHaveBeenCalled();
+        expect(this.scope.displayInfo).toHaveBeenCalledWith("settings for index index_name", {});
+    });
+
+    it('fail loading index settings', function(){
+        this.scope.client.getIndexMetadata=function(index, success, failed) { return failed("buu"); };
+        this.scope.displayInfo=function(header, body) {};
+        spyOn(this.scope, "updateModel").andCallThrough();
+        spyOn(this.scope.client, "getIndexMetadata").andCallThrough();
+        spyOn(this.AlertService, "error").andReturn();
+        this.scope.showIndexSettings("index_name");
+        expect(this.scope.client.getIndexMetadata).toHaveBeenCalledWith("index_name", jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.updateModel).toHaveBeenCalled();
+        expect(this.AlertService.error).toHaveBeenCalledWith("Error while loading index settings", "buu");
+    });
+
+    // show index mappings
+    it('show index mappings', function(){
+        this.scope.client.getIndexMetadata=function(index, success, failed) { return success(new IndexMetadata(index, {mappings:{}})); };
+        this.scope.displayInfo=function(header, body) {};
+        spyOn(this.scope, "updateModel").andCallThrough();
+        spyOn(this.scope.client, "getIndexMetadata").andCallThrough();
+        spyOn(this.scope, "displayInfo").andReturn();
+        this.scope.showIndexMappings("index_name");
+        expect(this.scope.client.getIndexMetadata).toHaveBeenCalledWith("index_name", jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.updateModel).toHaveBeenCalled();
+        expect(this.scope.displayInfo).toHaveBeenCalledWith("mappings for index index_name", {});
+    });
+
+    it('show index mappings', function(){
+        this.scope.client.getIndexMetadata=function(index, success, failed) { return failed("buuuu"); };
+        this.scope.displayInfo=function(header, body) {};
+        spyOn(this.scope, "updateModel").andCallThrough();
+        spyOn(this.scope.client, "getIndexMetadata").andCallThrough();
+        spyOn(this.AlertService, "error").andReturn();
+        this.scope.showIndexMappings("index_name");
+        expect(this.scope.client.getIndexMetadata).toHaveBeenCalledWith("index_name", jasmine.any(Function), jasmine.any(Function));
+        expect(this.scope.updateModel).toHaveBeenCalled();
+        expect(this.AlertService.error).toHaveBeenCalledWith("Error while loading index mappings", "buuuu");
+    });
+
+
+
 });

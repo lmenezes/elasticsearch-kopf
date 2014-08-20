@@ -4,6 +4,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 
 	// by index
 	$scope.field_index = null;
+    $scope.field_index_metadata = null;
 	$scope.field_type = '';
 	$scope.field_field = '';
 	$scope.field_text = '';
@@ -11,10 +12,59 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 	
 	// By analyzer
 	$scope.analyzer_index = '';
+    $scope.analyzer_index_metadata = null;
 	$scope.analyzer_analyzer = '';
 	$scope.analyzer_text = '';
 	$scope.analyzer_tokens = [];
-	
+
+    $scope.$watch('field_index', function(current, previous) {
+        $scope.loadIndexTypes(current.name);
+    });
+
+    $scope.loadIndexTypes=function(index) {
+        $scope.field_type = '';
+        $scope.field_field = '';
+        if (notEmpty(index)) {
+            $scope.client.getIndexMetadata(index,
+                function(metadata) {
+                    $scope.updateModel(function() {
+                        $scope.field_index_metadata = metadata;
+                    });
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        $scope.field_index = '';
+                        AlertService.error("Error while loading index metadata", error);
+                    });
+                }
+            );
+        }
+    };
+
+    $scope.$watch('analyzer_index', function(current, previous) {
+        $scope.loadIndexAnalyzers(current.name);
+    });
+
+    $scope.loadIndexAnalyzers=function(index) {
+        $scope.analyzer_analyzer = '';
+        if (notEmpty(index)) {
+            $scope.client.getIndexMetadata(index,
+                function(metadata) {
+                    $scope.updateModel(function() {
+                        $scope.analyzer_index_metadata = metadata;
+                    });
+                },
+                function(error) {
+                    $scope.updateModel(function() {
+                        $scope.analyzer_index = '';
+                        AlertService.error("Error while loading index metadata", error);
+                    });
+                }
+            );
+        }
+    };
+
+
 	$scope.analyzeByField=function() {
 		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
 			$scope.field_tokens = null;

@@ -1,26 +1,35 @@
-function Index(index_name,index_info, index_metadata, index_status) {
+function Index(index_name, cluster_state, index_info, index_status, aliases) {
 	this.name = index_name;
 	this.shards = null;
 	this.metadata = {};
-	this.aliases = getProperty(index_metadata,'aliases', []);
+	this.state = "close";
+    this.num_of_shards = 0;
+    this.num_of_replicas = 0;
+    this.aliases = [];
+    if (isDefined(aliases)) {
+        var index_aliases = aliases.aliases;
+        if (isDefined(index_aliases) && index_aliases.length > 0) {
+            this.aliases = Object.keys(aliases.aliases);
+        }
+    }
 
-	this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
-	
-	this.settings = index_metadata.settings;
-	this.editable_settings = new EditableIndexSettings(index_metadata.settings);
-	this.mappings = index_metadata.mappings;
-	this.metadata.settings = this.settings;
-	this.metadata.mappings = this.mappings;
+    this.visibleAliases=function() { return this.aliases.length > 5 ? this.aliases.slice(0,5) : this.aliases; };
 
-	this.num_of_shards = getProperty(index_metadata.settings, 'index.number_of_shards');
-	this.num_of_replicas = parseInt(getProperty(index_metadata.settings, 'index.number_of_replicas'));
-	this.state = index_metadata.state;
-	
-	this.num_docs = getProperty(index_status, 'docs.num_docs', 0);
+    if (isDefined(cluster_state)) {
+        var routing = getProperty(cluster_state, "routing_table.indices");
+        this.state = "open";
+        if (isDefined(routing)) {
+            var shards = Object.keys(cluster_state.routing_table.indices[index_name].shards);
+            this.num_of_shards = shards.length;
+            var shardMap = cluster_state.routing_table.indices[index_name].shards;
+            this.num_of_replicas = shardMap[0].length - 1;
+        }
+    }
+    this.num_docs = getProperty(index_status, 'docs.num_docs', 0);
 	this.max_doc = getProperty(index_status, 'docs.max_doc', 0);
 	this.deleted_docs = getProperty(index_status, 'docs.deleted_docs', 0);
 	this.size = getProperty(index_status, 'index.primary_size_in_bytes', 0);
-	this.total_size = getProperty(index_status, 'index.size_in_bytes', 0);	
+	this.total_size = getProperty(index_status, 'index.size_in_bytes', 0);
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	
@@ -77,64 +86,10 @@ function Index(index_name,index_info, index_metadata, index_status) {
 		return this.name.localeCompare(b.name);
 	};
 	
-	this.getTypes=function() {
-		return Object.keys(this.mappings).sort(function(a, b) { return a.localeCompare(b); });
-	};
-	
-	this.getAnalyzers=function() {
-		var analyzers = Object.keys(getProperty(this.settings,'index.analysis.analyzer', {}));
-		if (analyzers.length === 0) {
-			Object.keys(this.settings).forEach(function(setting) {
-				if (setting.indexOf('index.analysis.analyzer') === 0) {
-					var analyzer = setting.substring('index.analysis.analyzer.'.length);
-					analyzer = analyzer.substring(0,analyzer.indexOf("."));
-					if ($.inArray(analyzer, analyzers) == -1) {
-						analyzers.push(analyzer);
-					}
-				}
-			});			
-		}
-		return analyzers.sort(function(a, b) { return a.localeCompare(b); });
-	};
-	
-	function isAnalyzable(type) {
-        return ['float', 'double', 'byte', 'short', 'integer', 'long', 'nested', 'object'].indexOf(type) == -1;
-	}
-	
-	this.getFields=function(type) {
-        var fields = [];
-		if (isDefined(this.mappings[type])) {
-			fields = this.getProperties("", this.mappings[type].properties);
-		}
-        return fields.sort(function(a, b) { return a.localeCompare(b); });
-	};
-
-    this.getProperties=function(parent, fields) {
-        var prefix = parent !== "" ? parent + "." : "";
-        var validFields = [];
-        for (var field in fields) {
-            // multi field
-            if (isDefined(fields[field].fields)) {
-                var multiPrefix = fields[field].path != 'just_name' ? prefix + field : prefix;
-                var multiProps = this.getProperties(multiPrefix, fields[field].fields);
-                validFields = validFields.concat(multiProps);
-            }
-            // nested and object types
-            if (fields[field].type == 'nested' || fields[field].type == 'object' || !isDefined(fields[field].type)) {
-                var nestedProperties = this.getProperties(prefix + field,fields[field].properties);
-                validFields = validFields.concat(nestedProperties);
-            }
-            // normal fields
-            if (isDefined(fields[field].type) && isAnalyzable(fields[field].type)) {
-                validFields.push(prefix + field);
-            }
-        }
-        return validFields;
-    };
-	
 	this.equals=function(index) { return index !== null && index.name == this.name; };
 	
 	this.closed=function() { return this.state === "close";	};
 	
 	this.open=function() { return this.state === "open"; };
 }
+

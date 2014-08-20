@@ -48,16 +48,16 @@ test("Use regexp as plain string if regexp doesnt compile", function() {
 
 test("Filter out closed index", function() {
     var filter = new IndexFilter("", "close", true, 0);
-    var index = new Index('', null, {state: 'close'}, {});
-    var index2 = new Index('', null, {state: 'open'}, {});
+    var index = new Index('');
+    var index2 = new Index('', {}, {}, {});
     ok(filter.matches(index), "Matches if index is closed");
     ok(!filter.matches(index2), "doesnt matches if index is open");
 })
 
 test("Filter out open index", function() {
     var filter = new IndexFilter("", "open", true, 0);
-    var index = new Index('', null, {state: 'close'}, {});
-    var index2 = new Index('', null, {state: 'open'}, {});
+    var index = new Index('');
+    var index2 = new Index('', {}, {}, {}, {});
     ok(!filter.matches(index), "Doesnt matches if index is closed");
     ok(filter.matches(index2), "Matches if index is open");
 })

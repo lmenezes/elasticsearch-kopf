@@ -258,12 +258,50 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	
 	$scope.loadIndexSettings=function(index) {
 		$('#index_settings_option a').tab('show');
-		var indices = $scope.cluster.indices.filter(function(i) {
-			return i.name == index;
-		});
-        IndexSettingsService.index = indices[0];
-		$('#idx_settings_tabs a:first').tab('show');
-		$(".setting-info").popover();		
+        $scope.client.getIndexMetadata(index,
+            function(metadata) {
+                $scope.updateModel(function() {
+                    IndexSettingsService.loadSettings(index, metadata.settings);
+                    $('#idx_settings_tabs a:first').tab('show');
+                    $(".setting-info").popover();
+                });
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while loading index settings", error);
+                });
+            }
+        );
 	};
+
+    $scope.showIndexSettings=function(index) {
+        $scope.client.getIndexMetadata(index,
+            function(metadata) {
+                $scope.updateModel(function() {
+                    $scope.displayInfo('settings for index ' + index, metadata.settings);
+                });
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while loading index settings", error);
+                });
+            }
+        );
+    };
+
+    $scope.showIndexMappings=function(index) {
+        $scope.client.getIndexMetadata(index,
+            function(metadata) {
+                $scope.updateModel(function() {
+                    $scope.displayInfo('mappings for index ' + index, metadata.mappings);
+                });
+            },
+            function(error) {
+                $scope.updateModel(function() {
+                    AlertService.error("Error while loading index mappings", error);
+                });
+            }
+        );
+    };
 
 }]);
