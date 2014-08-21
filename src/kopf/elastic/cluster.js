@@ -48,7 +48,9 @@ function Cluster(state,status,nodes,settings, aliases) {
             indices.push(new Index(index));
         });
     }
-	this.special_indices = special_indices;
+    this.indices = this.indices.sort(function(a,b) { return a.compare(b); });
+
+    this.special_indices = special_indices;
 	this.num_docs = num_docs;
 	this.total_indices = this.indices.length;
 
