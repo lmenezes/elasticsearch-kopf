@@ -1490,7 +1490,9 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 	$scope.analyzer_tokens = [];
 
     $scope.$watch('field_index', function(current, previous) {
-        $scope.loadIndexTypes(current.name);
+        if (isDefined(current)) {
+            $scope.loadIndexTypes(current.name);
+        }
     });
 
     $scope.loadIndexTypes=function(index) {
@@ -1514,7 +1516,9 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
     };
 
     $scope.$watch('analyzer_index', function(current, previous) {
-        $scope.loadIndexAnalyzers(current.name);
+        if (isDefined(current)) {
+            $scope.loadIndexAnalyzers(current.name);
+        }
     });
 
     $scope.loadIndexAnalyzers=function(index) {
