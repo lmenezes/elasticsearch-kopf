@@ -14,15 +14,11 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 		});
 		$scope.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Index settings were successfully updated", response);
-				});
+                AlertService.success("Index settings were successfully updated", response);
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while updating index settings", error);
-				});
+                AlertService.error("Error while updating index settings", error);
 			}
 		);
 	};

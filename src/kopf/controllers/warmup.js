@@ -35,15 +35,11 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
                 $scope.warmer.source = $scope.editor.getValue();
 				$scope.client.registerWarmupQuery($scope.warmer,
 					function(response) {
-						$scope.updateModel(function() {
-							$scope.loadIndexWarmers();
-							AlertService.success("Warmup query successfully registered", response);
-						});
+                        $scope.loadIndexWarmers();
+                        AlertService.success("Warmup query successfully registered", response);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Request did not return a valid JSON", error);
-						});
+                        AlertService.error("Request did not return a valid JSON", error);
 					}
 				);
 			}
@@ -60,15 +56,11 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 			function() {
 				$scope.client.deleteWarmupQuery(warmer,
 					function(response) {
-						$scope.updateModel(function() {
-							AlertService.success("Warmup query successfully deleted", response);
-							$scope.loadIndexWarmers();
-						});
+                        AlertService.success("Warmup query successfully deleted", response);
+                        $scope.loadIndexWarmers();
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting warmup query", error);
-						});
+                        AlertService.error("Error while deleting warmup query", error);
 					}
 				);
 			}
@@ -79,17 +71,13 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 		if (isDefined($scope.index)) {
 			$scope.client.getIndexWarmers($scope.index, "",
 				function(warmers) {
-					$scope.updateModel(function() {
-                        $scope.paginator.setCollection(warmers);
-                        $scope.page = $scope.paginator.getPage();
-					});
+                    $scope.paginator.setCollection(warmers);
+                    $scope.page = $scope.paginator.getPage();
 				},
 				function(error) {
-					$scope.updateModel(function() {
-                        $scope.paginator.setCollection([]);
-                        $scope.page = $scope.paginator.getPage();
-						AlertService.error("Error while fetching warmup queries", error);
-					});
+                    $scope.paginator.setCollection([]);
+                    $scope.page = $scope.paginator.getPage();
+                    AlertService.error("Error while fetching warmup queries", error);
 				}
 			);
 		} else {

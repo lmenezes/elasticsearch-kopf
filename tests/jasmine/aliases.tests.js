@@ -12,9 +12,7 @@ describe('AliasesController', function(){
         var $timeout = $injector.get('$timeout');
         var $location = $injector.get('$location');
         this.AlertService = $injector.get('AlertService');
-        this.scope.updateModel=function(body) { body(); };
-
-        this.createController = function() {
+       this.createController = function() {
             return $controller('AliasesController', {$scope: this.scope}, $location, $timeout, this.AlertService);
         };
 

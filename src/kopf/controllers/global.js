@@ -1,4 +1,4 @@
-kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
+kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, $http, $q, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "1.3.0-SNAPSHOT";
 	$scope.username = null;
@@ -37,7 +37,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 
 		$scope.connection = new ESConnection(url);
 		$scope.setConnected(false);
 		try {
-			$scope.client = new ElasticClient($scope.connection);
+			$scope.client = new ElasticClient($scope.connection, $http, $q);
 			$scope.home_screen();
 		} catch (error) {
 			$scope.client = null;
@@ -97,33 +97,25 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 
 			$timeout(function() { 
 				$scope.client.getClusterDetail(
 					function(cluster) {
-						$scope.updateModel(function() { 
 							cluster.computeChanges($scope.cluster);
 							$scope.cluster = cluster;
 							$scope.alertClusterChanges();
-						});
 					},
 					function(error) {
-						$scope.updateModel(function() { 
 							AlertService.error("Error while retrieving cluster information", error);
 							$scope.cluster = null; 
-						});
 					}
 				);
 			
 				$scope.client.getClusterHealth( 
 					function(cluster) {
-						$scope.updateModel(function() { 
-							$scope.cluster_health = cluster;
-							$scope.setConnected(true);
-						});
+                        $scope.cluster_health = cluster;
+                        $scope.setConnected(true);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							$scope.cluster_health = null;
-							$scope.setConnected(false);
-							AlertService.error("Error connecting to [" + $scope.host + "]",error);						
-						});
+                        $scope.cluster_health = null;
+                        $scope.setConnected(false);
+                        AlertService.error("Error connecting to [" + $scope.host + "]",error);
 					}
 				);
 			}, 100);			

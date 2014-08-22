@@ -10,15 +10,11 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
 	$scope.save=function() {
 		$scope.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ""),
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Cluster settings were successfully updated",response);
-				});
+                AlertService.success("Cluster settings were successfully updated",response);
 				$scope.refreshClusterState();
 			}, 
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while updating cluster settings",error);
-				});
+                AlertService.error("Error while updating cluster settings",error);
 			}
 		);
 	};

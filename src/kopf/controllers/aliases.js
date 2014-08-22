@@ -99,16 +99,11 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         } else {
             $scope.client.updateAliases(adds,deletes,
                 function(response) {
-                    $scope.updateModel(function() {
-                        AlertService.success("Aliases were successfully updated",response);
-                        $scope.loadAliases();
-                    });
-
+                    AlertService.success("Aliases were successfully updated",response);
+                    $scope.loadAliases();
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        AlertService.error("Error while updating aliases",error);
-                    });
+                    AlertService.error("Error while updating aliases",error);
                 }
             );
         }
@@ -117,16 +112,12 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	$scope.loadAliases=function() {
 		$scope.client.fetchAliases(
 			function(index_aliases) {
-				$scope.updateModel(function() {
-                    $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
-					$scope.paginator.setCollection(index_aliases);
-                    $scope.page = $scope.paginator.getPage();
-				});
+                $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
+                $scope.paginator.setCollection(index_aliases);
+                $scope.page = $scope.paginator.getPage();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while fetching aliases",error);
-				});
+                AlertService.error("Error while fetching aliases",error);
 			}
 		);
 	};

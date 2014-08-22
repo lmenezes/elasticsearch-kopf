@@ -46,9 +46,7 @@ kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'Al
 				function(response) {
 					$scope.refreshClusterState();
 				}, function(error) { 
-					$scope.updateModel(function() {
-						AlertService.error("Error while creating index", error);
-					});
+                    AlertService.error("Error while creating index", error);
 				}
 			);
 		}

@@ -29,15 +29,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         if (notEmpty(index)) {
             $scope.client.getIndexMetadata(index,
                 function(metadata) {
-                    $scope.updateModel(function() {
-                        $scope.field_index_metadata = metadata;
-                    });
+                    $scope.field_index_metadata = metadata;
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        $scope.field_index = '';
-                        AlertService.error("Error while loading index metadata", error);
-                    });
+                    $scope.field_index = '';
+                    AlertService.error("Error while loading index metadata", error);
                 }
             );
         }
@@ -54,15 +50,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         if (notEmpty(index)) {
             $scope.client.getIndexMetadata(index,
                 function(metadata) {
-                    $scope.updateModel(function() {
-                        $scope.analyzer_index_metadata = metadata;
-                    });
+                    $scope.analyzer_index_metadata = metadata;
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        $scope.analyzer_index = '';
-                        AlertService.error("Error while loading index metadata", error);
-                    });
+                    $scope.analyzer_index = '';
+                    AlertService.error("Error while loading index metadata", error);
                 }
             );
         }
@@ -74,15 +66,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 			$scope.field_tokens = null;
 			$scope.client.analyzeByField($scope.field_index.name,$scope.field_type,$scope.field_field,$scope.field_text, 
 				function(response) {
-					$scope.updateModel(function() {
-						$scope.field_tokens = response;
-					});
+                    $scope.field_tokens = response;
 				},
 				function(error) {
-					$scope.updateModel(function() {
-						$scope.field_tokens = null;
-						AlertService.error("Error while analyzing text", error);
-					});
+                    $scope.field_tokens = null;
+                    AlertService.error("Error while analyzing text", error);
 				}
 			);
 		}
@@ -93,15 +81,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 			$scope.analyzer_tokens = null;
 			$scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
-					$scope.updateModel(function() {
-						$scope.analyzer_tokens = response;
-					});
+					$scope.analyzer_tokens = response;
 				},
 				function(error) {
-					$scope.updateModel(function() {
-						$scope.analyzer_tokens = null;
-						AlertService.error("Error while analyzing text", error);
-					});
+                    $scope.analyzer_tokens = null;
+                    AlertService.error("Error while analyzing text", error);
 				}
 			);
 		}

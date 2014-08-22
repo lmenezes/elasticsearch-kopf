@@ -363,20 +363,17 @@ function Cluster(state,status,nodes,settings, aliases) {
 	};
 
 }
-function ElasticClient(connection) {
+function ElasticClient(connection, http_service, q) {
 	this.host = connection.host;
 	this.username = connection.username;
 	this.password = connection.password;
 
 	this.createAuthToken=function(username,password) {
-		var auth = null;
-		if (isDefined(username) && isDefined(password)) {
-			auth = "Basic " + window.btoa(username + ":" + password);
-		}
-		return auth;
+		var hasAuth = isDefined(username) && isDefined(password);
+        return hasAuth ? "Basic " + window.btoa(username + ":" + password) : null;
 	};
 	
-	var auth = this.createAuthToken(connection.username, connection.password);
+	var auth = this.createAuthToken(this.username, this.password);
 	var fetch_version = $.ajax({
 		type: 'GET',
 		url: connection.host + "/",
@@ -385,7 +382,6 @@ function ElasticClient(connection) {
 				xhr.setRequestHeader("Authorization", auth);
 			} 
 		},
-		data: {},
 		async: false
 	});
 	
@@ -417,70 +413,59 @@ function ElasticClient(connection) {
     };
 
 	this.createIndex=function(name, settings, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/" + name, settings, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/" + name, settings, callback_success, callback_error);
 	};
 
 	this.enableShardAllocation=function(callback_success, callback_error) {
 		var new_settings = { "transient":{ "cluster.routing.allocation": { "enable": 'all', "disable_allocation": false } } };
-		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+		this.executeClusterRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
 	this.disableShardAllocation=function(callback_success, callback_error) {
 		var new_settings = { "transient":{ "cluster.routing.allocation": { "enable": 'none', "disable_allocation": true } } };
-		this.executeElasticRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+		this.executeClusterRequest('PUT', "/_cluster/settings",JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
 	};
 
 	this.shutdownNode=function(node_id, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
 	};
 
 	this.openIndex=function(index, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
 	};
 
 	this.optimizeIndex=function(index, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
 	};
 
 	this.clearCache=function(index, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
 	};
 
 	this.closeIndex=function(index, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
+        this.executeClusterRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
 	};
 
 	this.refreshIndex=function(index, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
 	};
 
 	this.deleteIndex=function(name, callback_success, callback_error) {
-		this.executeElasticRequest('DELETE', "/" + name, {}, callback_success, callback_error);
+		this.executeClusterRequest('DELETE', "/" + name, {}, callback_success, callback_error);
 	};
 
 	this.updateIndexSettings=function(name, settings, callback_success, callback_error) {
-		this.executeElasticRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
+		this.executeClusterRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
 	};
 
 	this.updateClusterSettings=function(settings, callback_success, callback_error) {
-		this.executeElasticRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
+		this.executeClusterRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
 	};
 
     this.getIndexMetadata=function(name, callback_success, callback_error) {
         var transformed = function(response) { callback_success(new IndexMetadata(name, response.metadata.indices[name])); };
-        this.executeElasticRequest('GET', "/_cluster/state/metadata/" + name, {}, transformed, callback_error);
+        this.executeClusterRequest('GET', "/_cluster/state/metadata/" + name, {}, transformed, callback_error);
     };
-
-	this.getNodes=function(callback_success, callback_error) {
-		var nodes = [];
-		var createNodes = function(response) {
-			Object.keys(response.response.nodes).forEach(function(node_id) {
-				nodes.push(new Node(node_id,response.response.nodes[node_id]));
-			});
-			callback_success(nodes);
-		};
-		this.executeElasticRequest('GET', "/_cluster/state", {}, createNodes, callback_error);
-	};
 
 	this.fetchAliases=function(callback_success, callback_error) {
 		var createAliases=function(response) {
@@ -497,7 +482,7 @@ function ElasticClient(connection) {
             });
 			callback_success(index_aliases);
 		};
-		this.executeElasticRequest('GET', "/_aliases",{}, createAliases, callback_error);
+		this.executeClusterRequest('GET', "/_aliases",{}, createAliases, callback_error);
 	};
 
 	this.analyzeByField=function(index, type, field, text, callback_success, callback_error) {
@@ -507,7 +492,7 @@ function ElasticClient(connection) {
 			});
 			callback_success(tokens);
 		};
-		this.executeElasticRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
+		this.executeClusterRequest('GET', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
 	};
 
 	this.analyzeByAnalyzer=function(index, analyzer, text, callback_success, callback_error) {
@@ -517,14 +502,14 @@ function ElasticClient(connection) {
 			});
 			callback_success(tokens);
 		};
-		this.executeElasticRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
+		this.executeClusterRequest('GET', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
 	};
 
 	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
 		var data = { actions: [] };
 		remove_aliases.forEach(function(alias) { data.actions.push({'remove':alias.info()}); });
 		add_aliases.forEach(function(alias) { data.actions.push({'add':alias.info()}); });
-		this.executeElasticRequest('POST', "/_aliases",JSON.stringify(data), callback_success, callback_error);
+		this.executeClusterRequest('POST', "/_aliases",JSON.stringify(data), callback_success, callback_error);
 	};
 
 	this.getIndexWarmers=function(index, warmer, callback_success, callback_error) {
@@ -540,12 +525,12 @@ function ElasticClient(connection) {
             });
             callback_success(warmers);
         };
-		this.executeElasticRequest('GET', path ,{}, parseWarmers, callback_error);
+		this.executeClusterRequest('GET', path ,{}, parseWarmers, callback_error);
 	};
 	
 	this.deleteWarmupQuery=function(warmer, callback_success, callback_error) {
 		var path = "/" + warmer.index + "/_warmer/" + warmer.id;
-		this.executeElasticRequest('DELETE', path, {},callback_success, callback_error);
+		this.executeClusterRequest('DELETE', path, {},callback_success, callback_error);
 	};
 	
 	this.registerWarmupQuery=function(warmer, callback_success, callback_error) {
@@ -554,7 +539,7 @@ function ElasticClient(connection) {
 			path += warmer.types + "/";
 		}
 		path += "/_warmer/" + warmer.id.trim();
-		this.executeElasticRequest('PUT', path ,warmer.source, callback_success, callback_error);
+		this.executeClusterRequest('PUT', path ,warmer.source, callback_success, callback_error);
 	};
 	
 	this.fetchPercolateQueries=function(index, body, callback_success, callback_error) {
@@ -564,17 +549,17 @@ function ElasticClient(connection) {
             var percolators = new PercolatorsPage(body.from, body.size, response.hits.total, collection);
             callback_success(percolators);
         };
-        this.executeElasticRequest('POST', path , JSON.stringify(body), parsePercolators, callback_error);
+        this.executeClusterRequest('POST', path , JSON.stringify(body), parsePercolators, callback_error);
 	};
 	
 	this.deletePercolatorQuery=function(index, id, callback_success, callback_error) {
 		var path = "/" + index + "/.percolator/" + id;
-		this.executeElasticRequest('DELETE', path, {}, callback_success, callback_error);
+		this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
 	};
 	
 	this.createPercolatorQuery=function(percolator, callback_success, callback_error) {
 		var path = "/" + percolator.index + "/.percolator/" + percolator.id;
-		this.executeElasticRequest('PUT', path, percolator.source, callback_success, callback_error);
+		this.executeClusterRequest('PUT', path, percolator.source, callback_success, callback_error);
 	};
 	
 	this.getRepositories=function(callback_success, callback_error) {
@@ -584,15 +569,15 @@ function ElasticClient(connection) {
 			});
 			callback_success(repositories);
 		};
-		this.executeElasticRequest('GET', "/_snapshot/_all", {}, parse_repositories, callback_error);
+		this.executeClusterRequest('GET', "/_snapshot/_all", {}, parse_repositories, callback_error);
 	};
 
 	this.createRepository=function(repository, body, callback_success, callback_error) {
-		this.executeElasticRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error);
 	};
 
 	this.deleteRepository=function(repository, callback_success, callback_error) {
-		this.executeElasticRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error);
+		this.executeClusterRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error);
 	};
 
 	this.getSnapshots=function(repository, callback_success, callback_error){
@@ -601,57 +586,55 @@ function ElasticClient(connection) {
 			var snapshots = response.snapshots.map(function(snapshot) { return new Snapshot(snapshot); } );
 			callback_success(snapshots);
 		};
-		this.executeElasticRequest('GET', path, {}, parseSnapshots, callback_error);
+		this.executeClusterRequest('GET', path, {}, parseSnapshots, callback_error);
 	};
 
 	this.deleteSnapshot=function(repository, snapshot, callback_success, callback_error){
-		this.executeElasticRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
+		this.executeClusterRequest('DELETE', "/_snapshot/" + repository + "/" +snapshot, {}, callback_success, callback_error);
 	};
 
 	this.restoreSnapshot=function(repository, snapshot, body, callback_success, callback_error){
-		this.executeElasticRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", body, callback_success, callback_error);
+		this.executeClusterRequest('POST', "/_snapshot/" + repository + "/" +snapshot + "/_restore", body, callback_success, callback_error);
 	};
 
 	this.createSnapshot=function(repository, snapshot, body, callback_success, callback_error){
-		this.executeElasticRequest('PUT', "/_snapshot/" + repository + "/" +snapshot, body, callback_success, callback_error );
+		this.executeClusterRequest('PUT', "/_snapshot/" + repository + "/" +snapshot, body, callback_success, callback_error );
 	};
 	
 	this.executeBenchmark=function(body, callback_success, callback_error){
-		this.executeElasticRequest('PUT', "/_bench", body, callback_success, callback_error );
+		this.executeClusterRequest('PUT', "/_bench", body, callback_success, callback_error );
 	};
 
-	this.executeElasticRequest=function(method, path, data, callback_success, callback_error) {
-		var url = this.host + path;
-		this.executeRequest(method,url,this.username,this.password, data, callback_success, callback_error);
-	};
+    this.executeClusterRequest=function(method, path, data, callback_success, callback_error) {
+        var params = {
+            method: method,
+            url: this.host + path,
+            data: data,
+            withCredentials: auth !== null,
+            headers: { Authorization: auth}
+        };
+        http_service(params).
+            success(function(data, status, headers, config) { callback_success(data); }).
+            error(function(data, status, headers, config) { callback_error(data); });
+    };
 	
 	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {
-		var auth = this.createAuthToken(username,password);
-		$.when(
-			$.ajax({
-				type: method,
-				url: url,
-				beforeSend: function(xhr) {
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					}
-				},
-				data: data
-		})).then(
-			function(r) {
-				callback_success(r);
-			},
-			function(error) {
-				callback_error(error);
-			}
-		);
+        var params = {
+            method: method,
+            url: url,
+            data: data,
+            withCredentials: auth !== null,
+            headers: { Authorization: auth}
+        };
+        http_service(params).
+            success(function(data, status, headers, config) { callback_success(data); }).
+            error(function(data, status, headers, config) { callback_error(data, status); });
 	};
 
 	/** ####### END OF REFACTORED AREA ####### **/
 
 	this.getClusterHealth=function(callback_success, callback_error) {
 		var url = this.host + "/_cluster/health";
-		var auth = this.createAuthToken(this.username,this.password);
 		$.when(
 			$.ajax({
 				type: 'GET',
@@ -675,71 +658,21 @@ function ElasticClient(connection) {
 
 	this.getClusterDetail=function(callback_success, callback_error) {
 		var host = this.host;
-		var auth = this.createAuthToken(this.username,this.password);
-		$.when(
-			$.ajax({ 
-				type: 'GET', 
-				url: host+"/_cluster/state/master_node,nodes,routing_table,blocks/",
-				dataType: 'json', 
-				data: {},
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-			$.ajax({
-				type: 'GET',
-				url: host+"/_nodes/stats?all=true", 
-				dataType: 'json', 
-				data: {}, 
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-			$.ajax({
-				type: 'GET',
-				url: host+"/_status", 
-				dataType: 'json', 
-				data: {}, 
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					}
-				}
-			}),
-			$.ajax({
-				type: 'GET',
-				url: host+"/_cluster/settings", 
-				dataType: 'json', 
-				data: {}, 
-				beforeSend: function(xhr) { 
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					} 
-				}
-			}),
-            $.ajax({
-                type: 'GET',
-                url: host+"/_aliases",
-                dataType: 'json',
-                data: {},
-                beforeSend: function(xhr) {
-                    if (isDefined(auth)) {
-                        xhr.setRequestHeader("Authorization", auth);
-                    }
-                }
-            })
-		).then(
-			function(cluster_state,nodes_stats,cluster_status,settings,aliases) {
-				callback_success(new Cluster(cluster_state[0],cluster_status[0],nodes_stats[0],settings[0],aliases[0]));
-			},
-			function(error) {
-				callback_error(error);
-			}
-		);
+		var auth = this.auth;
+        var params = { withCredentials: auth !== null, headers: { Authorization: auth } };
+        q.all([
+            http_service.get(host+"/_cluster/state/master_node,nodes,routing_table,blocks/", params),
+            http_service.get(host+"/_status", params),
+            http_service.get(host+"/_nodes/stats?all=true", params),
+            http_service.get(host+"/_cluster/settings", params),
+            http_service.get(host+"/_aliases", params)
+        ]).then(function(responses) {
+                callback_success(new Cluster(responses[0].data,responses[1].data,responses[2].data,responses[3].data,responses[4].data));
+            },
+            function(error) {
+                callback_error(error);
+            }
+        );
 	};
 
 	this.getClusterDiagnosis=function(health, state, stats, hotthreads, callback_success,callback_error) {
@@ -1431,16 +1364,11 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         } else {
             $scope.client.updateAliases(adds,deletes,
                 function(response) {
-                    $scope.updateModel(function() {
-                        AlertService.success("Aliases were successfully updated",response);
-                        $scope.loadAliases();
-                    });
-
+                    AlertService.success("Aliases were successfully updated",response);
+                    $scope.loadAliases();
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        AlertService.error("Error while updating aliases",error);
-                    });
+                    AlertService.error("Error while updating aliases",error);
                 }
             );
         }
@@ -1449,16 +1377,12 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	$scope.loadAliases=function() {
 		$scope.client.fetchAliases(
 			function(index_aliases) {
-				$scope.updateModel(function() {
-                    $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
-					$scope.paginator.setCollection(index_aliases);
-                    $scope.page = $scope.paginator.getPage();
-				});
+                $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
+                $scope.paginator.setCollection(index_aliases);
+                $scope.page = $scope.paginator.getPage();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while fetching aliases",error);
-				});
+                AlertService.error("Error while fetching aliases",error);
 			}
 		);
 	};
@@ -1501,15 +1425,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         if (notEmpty(index)) {
             $scope.client.getIndexMetadata(index,
                 function(metadata) {
-                    $scope.updateModel(function() {
-                        $scope.field_index_metadata = metadata;
-                    });
+                    $scope.field_index_metadata = metadata;
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        $scope.field_index = '';
-                        AlertService.error("Error while loading index metadata", error);
-                    });
+                    $scope.field_index = '';
+                    AlertService.error("Error while loading index metadata", error);
                 }
             );
         }
@@ -1526,15 +1446,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         if (notEmpty(index)) {
             $scope.client.getIndexMetadata(index,
                 function(metadata) {
-                    $scope.updateModel(function() {
-                        $scope.analyzer_index_metadata = metadata;
-                    });
+                    $scope.analyzer_index_metadata = metadata;
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        $scope.analyzer_index = '';
-                        AlertService.error("Error while loading index metadata", error);
-                    });
+                    $scope.analyzer_index = '';
+                    AlertService.error("Error while loading index metadata", error);
                 }
             );
         }
@@ -1546,15 +1462,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 			$scope.field_tokens = null;
 			$scope.client.analyzeByField($scope.field_index.name,$scope.field_type,$scope.field_field,$scope.field_text, 
 				function(response) {
-					$scope.updateModel(function() {
-						$scope.field_tokens = response;
-					});
+                    $scope.field_tokens = response;
 				},
 				function(error) {
-					$scope.updateModel(function() {
-						$scope.field_tokens = null;
-						AlertService.error("Error while analyzing text", error);
-					});
+                    $scope.field_tokens = null;
+                    AlertService.error("Error while analyzing text", error);
 				}
 			);
 		}
@@ -1565,15 +1477,11 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 			$scope.analyzer_tokens = null;
 			$scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
-					$scope.updateModel(function() {
-						$scope.analyzer_tokens = response;
-					});
+					$scope.analyzer_tokens = response;
 				},
 				function(error) {
-					$scope.updateModel(function() {
-						$scope.analyzer_tokens = null;
-						AlertService.error("Error while analyzing text", error);
-					});
+                    $scope.analyzer_tokens = null;
+                    AlertService.error("Error while analyzing text", error);
 				}
 			);
 		}
@@ -1768,15 +1676,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.shutdownNode=function(node_id) {
         $scope.client.shutdownNode(node_id,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Node [" + node_id + "] successfully shutdown", response);
-                });
+                AlertService.success("Node [" + node_id + "] successfully shutdown", response);
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while shutting down node",error);
-                });
+                AlertService.error("Error while shutting down node",error);
             }
         );
     };
@@ -1794,14 +1698,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.optimizeIndex=function(index) {
         $scope.client.optimizeIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully optimized", response);
-                });
+                AlertService.success("Index was successfully optimized", response);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while optimizing index", error);
-                });
+                AlertService.error("Error while optimizing index", error);
             }
         );
     };
@@ -1822,9 +1722,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while deleting index", error);
-                });
+                AlertService.error("Error while deleting index", error);
             }
         );
     };
@@ -1841,15 +1739,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.clearCache=function(index) {
         $scope.client.clearCache(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index cache was successfully cleared", response);
-                });
+                AlertService.success("Index cache was successfully cleared", response);
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while clearing index cache", error);
-                });
+                AlertService.error("Error while clearing index cache", error);
             }
         );
     };
@@ -1866,14 +1760,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.refreshIndex=function(index) {
         $scope.client.refreshIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully refreshed", response);
-                });
+                AlertService.success("Index was successfully refreshed", response);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while refreshing index", error);
-                });
+                AlertService.error("Error while refreshing index", error);
             }
         );
     };
@@ -1890,15 +1780,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.enableAllocation=function() {
 		$scope.client.enableShardAllocation(
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Shard allocation was successfully enabled", response);
-				});
+                AlertService.success("Shard allocation was successfully enabled", response);
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while enabling shard allocation", error);	
-				});
+                AlertService.error("Error while enabling shard allocation", error);
 			}
 		);
 	};
@@ -1906,15 +1792,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.disableAllocation=function() {
 		$scope.client.disableShardAllocation(
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Shard allocation was successfully disabled", response);
-				});
+                AlertService.success("Shard allocation was successfully disabled", response);
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while disabling shard allocation", error);	
-				});
+                AlertService.error("Error while disabling shard allocation", error);
 			}
 		);
 	};
@@ -1922,16 +1804,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.closeIndex=function(index) {
         $scope.client.closeIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully closed", response);
-                });
+                AlertService.success("Index was successfully closed", response);
                 $scope.refreshClusterState();
             },
-            function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while closing index", error);
-                });
-            }
+            function(error) { AlertService.error("Error while closing index", error); }
         );
     };
 
@@ -1949,15 +1825,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.openIndex=function(index) {
         $scope.client.openIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully opened", response);
-                });
+                AlertService.success("Index was successfully opened", response);
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while opening index", error);
-                });
+                AlertService.error("Error while opening index", error);
             }
         );
     };
@@ -1976,16 +1848,12 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 		$('#index_settings_option a').tab('show');
         $scope.client.getIndexMetadata(index,
             function(metadata) {
-                $scope.updateModel(function() {
-                    IndexSettingsService.loadSettings(index, metadata.settings);
-                    $('#idx_settings_tabs a:first').tab('show');
-                    $(".setting-info").popover();
-                });
+                IndexSettingsService.loadSettings(index, metadata.settings);
+                $('#idx_settings_tabs a:first').tab('show');
+                $(".setting-info").popover();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while loading index settings", error);
-                });
+                AlertService.error("Error while loading index settings", error);
             }
         );
 	};
@@ -1993,14 +1861,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.showIndexSettings=function(index) {
         $scope.client.getIndexMetadata(index,
             function(metadata) {
-                $scope.updateModel(function() {
-                    $scope.displayInfo('settings for index ' + index, metadata.settings);
-                });
+                $scope.displayInfo('settings for index ' + index, metadata.settings);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while loading index settings", error);
-                });
+                AlertService.error("Error while loading index settings", error);
             }
         );
     };
@@ -2008,14 +1872,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.showIndexMappings=function(index) {
         $scope.client.getIndexMetadata(index,
             function(metadata) {
-                $scope.updateModel(function() {
-                    $scope.displayInfo('mappings for index ' + index, metadata.mappings);
-                });
+                $scope.displayInfo('mappings for index ' + index, metadata.mappings);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while loading index mappings", error);
-                });
+                AlertService.error("Error while loading index mappings", error);
             }
         );
     };
@@ -2033,15 +1893,11 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
 	$scope.save=function() {
 		$scope.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ""),
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Cluster settings were successfully updated",response);
-				});
+                AlertService.success("Cluster settings were successfully updated",response);
 				$scope.refreshClusterState();
 			}, 
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while updating cluster settings",error);
-				});
+                AlertService.error("Error while updating cluster settings",error);
 			}
 		);
 	};
@@ -2094,9 +1950,7 @@ kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'Al
 				function(response) {
 					$scope.refreshClusterState();
 				}, function(error) { 
-					$scope.updateModel(function() {
-						AlertService.error("Error while creating index", error);
-					});
+                    AlertService.error("Error while creating index", error);
 				}
 			);
 		}
@@ -2111,7 +1965,7 @@ kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'Al
 		$scope.replicas = '';
 	};
 }]);
-kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
+kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, $http, $q, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService) {
 	$scope.dialog = ConfirmDialogService;
 	$scope.version = "1.3.0-SNAPSHOT";
 	$scope.username = null;
@@ -2150,7 +2004,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 
 		$scope.connection = new ESConnection(url);
 		$scope.setConnected(false);
 		try {
-			$scope.client = new ElasticClient($scope.connection);
+			$scope.client = new ElasticClient($scope.connection, $http, $q);
 			$scope.home_screen();
 		} catch (error) {
 			$scope.client = null;
@@ -2210,33 +2064,25 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$sce', 
 			$timeout(function() { 
 				$scope.client.getClusterDetail(
 					function(cluster) {
-						$scope.updateModel(function() { 
 							cluster.computeChanges($scope.cluster);
 							$scope.cluster = cluster;
 							$scope.alertClusterChanges();
-						});
 					},
 					function(error) {
-						$scope.updateModel(function() { 
 							AlertService.error("Error while retrieving cluster information", error);
 							$scope.cluster = null; 
-						});
 					}
 				);
 			
 				$scope.client.getClusterHealth( 
 					function(cluster) {
-						$scope.updateModel(function() { 
-							$scope.cluster_health = cluster;
-							$scope.setConnected(true);
-						});
+                        $scope.cluster_health = cluster;
+                        $scope.setConnected(true);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							$scope.cluster_health = null;
-							$scope.setConnected(false);
-							AlertService.error("Error connecting to [" + $scope.host + "]",error);						
-						});
+                        $scope.cluster_health = null;
+                        $scope.setConnected(false);
+                        AlertService.error("Error connecting to [" + $scope.host + "]",error);
 					}
 				);
 			}, 100);			
@@ -2297,15 +2143,11 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 		});
 		$scope.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Index settings were successfully updated", response);
-				});
+                AlertService.success("Index settings were successfully updated", response);
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while updating index settings", error);
-				});
+                AlertService.error("Error while updating index settings", error);
 			}
 		);
 	};
@@ -2407,23 +2249,18 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
 						// nothing to do
 					}
 					$('#rest-client-response').html(content);
-					$scope.updateModel(function() {
-						$scope.addToHistory(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-					});
-
+					$scope.addToHistory(new Request($scope.request.url,$scope.request.method,$scope.request.body));
 				},
-				function(error) {
-					$scope.updateModel(function() {
-						if (error.status !== 0) {
-							AlertService.error("Request was not successful: " + error.statusText);
-						} else {
-							AlertService.error($scope.request.url + " is unreachable");
-						}
-					});
-					try {
-						$('#rest-client-response').html(JSONTree.create(JSON.parse(error.responseText)));
-					} catch (invalid_json) {
-						$('#rest-client-response').html(error.responseText);
+				function(error, status) {
+					if (status !== 0) {
+						AlertService.error("Request was not successful");
+                        try {
+                            $('#rest-client-response').html(JSONTree.create(error));
+                        } catch (invalid_json) {
+                            $('#rest-client-response').html(error);
+                        }
+					} else {
+						AlertService.error($scope.request.url + " is unreachable");
 					}
 				}
 			);
@@ -2487,22 +2324,16 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 						var refreshIndex = query.index;
 						$scope.client.refreshIndex(refreshIndex,
 							function(response) {
-								$scope.updateModel(function() {
-									AlertService.success("Query successfully deleted", response);
-									$scope.loadPercolatorQueries();
-								});
+                                AlertService.success("Query successfully deleted", response);
+                                $scope.loadPercolatorQueries();
 							},
 							function(error) {
-								$scope.updateModel(function() {
-									AlertService.error("Error while reloading queries", error);
-								});
+                                AlertService.error("Error while reloading queries", error);
 							}
 						);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting query", error);
-						});
+                        AlertService.error("Error while deleting query", error);
 					}
 				);
 			}
@@ -2530,23 +2361,17 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 				var refreshIndex = $scope.new_query.index;
 				$scope.client.refreshIndex(refreshIndex,
 					function(response) {
-						$scope.updateModel(function() {
-							AlertService.success("Percolator Query successfully created", response);
-							$scope.index = $scope.new_query.index;
-							$scope.loadPercolatorQueries(0);
-						});
+                        AlertService.success("Percolator Query successfully created", response);
+                        $scope.index = $scope.new_query.index;
+                        $scope.loadPercolatorQueries(0);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.success("Error while reloading queries", error);
-						});
+                        AlertService.success("Error while reloading queries", error);
 					}
 				);
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while creating percolator query", error);
-				});
+                AlertService.error("Error while creating percolator query", error);
 			}
 		);
 	};
@@ -2569,14 +2394,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 			}
 			$scope.client.fetchPercolateQueries($scope.index, body,
 				function(percolators) {
-					$scope.updateModel(function() {
-						$scope.pagination = percolators;
-					});
+                    $scope.pagination = percolators;
 				},
 				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while reading loading percolate queries", error);
-					});
+                    AlertService.error("Error while reading loading percolate queries", error);
 				}
 			);
 		} catch (error) {
@@ -2644,9 +2465,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
                 $scope.reload();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while deleting repositor", error);
-                });
+                AlertService.error("Error while deleting repositor", error);
             }
         );
     };
@@ -2681,9 +2500,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 				$scope.reload();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while started restore of snapshot", error);
-				});
+                AlertService.error("Error while started restore of snapshot", error);
 			}
 		);
 	};
@@ -2697,9 +2514,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
                     $scope.loadRepositories();
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        AlertService.error("Error while creating repository", error);
-                    });
+                    AlertService.error("Error while creating repository", error);
                 }
             );
         } catch (error) {
@@ -2710,15 +2525,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.loadRepositories=function() {
 		$scope.client.getRepositories(
 			function(response) {
-				$scope.updateModel(function() {
-					$scope.repositories = response;
-				});
+                $scope.repositories = response;
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					$scope.repositories = [];
-					AlertService.error("Error while reading repositories", error);
-				});
+                $scope.repositories = [];
+                AlertService.error("Error while reading repositories", error);
 			}
 		);
 	};
@@ -2754,9 +2565,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 				$scope.reload();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while creating snapshot", error);
-				});
+                AlertService.error("Error while creating snapshot", error);
 			}
 		);
 	};
@@ -2775,9 +2584,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 						$scope.reload();
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting snapshot", error);
-						});
+                        AlertService.error("Error while deleting snapshot", error);
 					}
 				);
 			}
@@ -2787,17 +2594,13 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.fetchSnapshots=function(repository) {
 		$scope.client.getSnapshots(repository,
 			function(response) {
-				$scope.updateModel(function() {
-					$scope.paginator.setCollection(response);
-                    $scope.page = $scope.paginator.getPage();
-				});
+                $scope.paginator.setCollection(response);
+                $scope.page = $scope.paginator.getPage();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					$scope.paginator.setCollection([]);
-                    $scope.page = $scope.paginator.getPage();
-					AlertService.error("Error while fetching snapshots", error);
-				});
+                $scope.paginator.setCollection([]);
+                $scope.page = $scope.paginator.getPage();
+                AlertService.error("Error while fetching snapshots", error);
 			}
 		);
 	};
@@ -2866,15 +2669,11 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
                 $scope.warmer.source = $scope.editor.getValue();
 				$scope.client.registerWarmupQuery($scope.warmer,
 					function(response) {
-						$scope.updateModel(function() {
-							$scope.loadIndexWarmers();
-							AlertService.success("Warmup query successfully registered", response);
-						});
+                        $scope.loadIndexWarmers();
+                        AlertService.success("Warmup query successfully registered", response);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Request did not return a valid JSON", error);
-						});
+                        AlertService.error("Request did not return a valid JSON", error);
 					}
 				);
 			}
@@ -2891,15 +2690,11 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 			function() {
 				$scope.client.deleteWarmupQuery(warmer,
 					function(response) {
-						$scope.updateModel(function() {
-							AlertService.success("Warmup query successfully deleted", response);
-							$scope.loadIndexWarmers();
-						});
+                        AlertService.success("Warmup query successfully deleted", response);
+                        $scope.loadIndexWarmers();
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting warmup query", error);
-						});
+                        AlertService.error("Error while deleting warmup query", error);
 					}
 				);
 			}
@@ -2910,17 +2705,13 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 		if (isDefined($scope.index)) {
 			$scope.client.getIndexWarmers($scope.index, "",
 				function(warmers) {
-					$scope.updateModel(function() {
-                        $scope.paginator.setCollection(warmers);
-                        $scope.page = $scope.paginator.getPage();
-					});
+                    $scope.paginator.setCollection(warmers);
+                    $scope.page = $scope.paginator.getPage();
 				},
 				function(error) {
-					$scope.updateModel(function() {
-                        $scope.paginator.setCollection([]);
-                        $scope.page = $scope.paginator.getPage();
-						AlertService.error("Error while fetching warmup queries", error);
-					});
+                    $scope.paginator.setCollection([]);
+                    $scope.page = $scope.paginator.getPage();
+                    AlertService.error("Error while fetching warmup queries", error);
 				}
 			);
 		} else {
@@ -2969,14 +2760,12 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
 					$scope.result = JSONTree.create(response);
 					$('#benchmark-result').html($scope.result);
 				},
-				function(error) {
-					$scope.updateModel(function() {
-						if (error.status == 503) {
-							AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
-						} else {
-							AlertService.error(error.responseJSON.error);
-						}
-					});
+				function(error, status) {
+                    if (status == 503) {
+                        AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+                    } else {
+                        AlertService.error(error.error);
+                    }
 				}
 			);
 		} catch (error) {

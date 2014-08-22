@@ -13,7 +13,6 @@ describe('RepositoryController', function(){
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         var AlertService = $injector.get('AlertService');
         this.AlertService = AlertService;
-        this.scope.updateModel=function(body) { body(); };
 
         this.createController = function() {
             return $controller('RepositoryController', {$scope: this.scope}, this.ConfirmDialogService, AlertService);

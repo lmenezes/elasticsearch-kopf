@@ -16,7 +16,6 @@ describe('AnalysisController', function(){
         this.createController = function() {
             return $controller('AnalysisController', {$scope: this.scope}, $location, $timeout, this.AlertService);
         };
-        this.scope.updateModel=function(body) { body(); };
         this._controller = this.createController();
     }));
 
@@ -27,7 +26,6 @@ describe('AnalysisController', function(){
         expect(this.scope.field_type).toEqual('');
         expect(this.scope.field_text).toEqual('');
         expect(this.scope.field_tokens).toEqual([]);
-
         expect(this.scope.analyzer_index).toEqual('');
         expect(this.scope.analyzer_analyzer).toEqual('');
         expect(this.scope.analyzer_text).toEqual('');

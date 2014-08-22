@@ -89,7 +89,6 @@ describe('WarmupController', function(){
         this.scope.warmer = warmer;
         this.scope.editor = editor;
         this.scope.client.registerWarmupQuery = function(){};
-        this.scope.updateModel = function(){};
         spyOn(this.scope.client, "registerWarmupQuery").andReturn(true);
         this.scope.createWarmerQuery();
         expect(this.scope.warmer.source).toEqual(editor.getValue());
@@ -121,7 +120,6 @@ describe('WarmupController', function(){
     it('Deletes an existing Warmup query', function() {
         this.scope.index = { 'name': "index_name" };
         this.scope.client.deleteWarmupQuery = function(){};
-        this.scope.updateModel = function(){};
         spyOn(this.scope.client, "deleteWarmupQuery").andReturn(true);
         spyOn(this.ConfirmDialogService, "open").andReturn(true);
         this.scope.deleteWarmupQuery(new Warmer("warmer_id","index", { types: [], source: {}}));

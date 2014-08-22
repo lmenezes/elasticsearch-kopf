@@ -56,9 +56,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
                 $scope.reload();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while deleting repositor", error);
-                });
+                AlertService.error("Error while deleting repositor", error);
             }
         );
     };
@@ -93,9 +91,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 				$scope.reload();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while started restore of snapshot", error);
-				});
+                AlertService.error("Error while started restore of snapshot", error);
 			}
 		);
 	};
@@ -109,9 +105,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
                     $scope.loadRepositories();
                 },
                 function(error) {
-                    $scope.updateModel(function() {
-                        AlertService.error("Error while creating repository", error);
-                    });
+                    AlertService.error("Error while creating repository", error);
                 }
             );
         } catch (error) {
@@ -122,15 +116,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.loadRepositories=function() {
 		$scope.client.getRepositories(
 			function(response) {
-				$scope.updateModel(function() {
-					$scope.repositories = response;
-				});
+                $scope.repositories = response;
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					$scope.repositories = [];
-					AlertService.error("Error while reading repositories", error);
-				});
+                $scope.repositories = [];
+                AlertService.error("Error while reading repositories", error);
 			}
 		);
 	};
@@ -166,9 +156,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 				$scope.reload();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while creating snapshot", error);
-				});
+                AlertService.error("Error while creating snapshot", error);
 			}
 		);
 	};
@@ -187,9 +175,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 						$scope.reload();
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting snapshot", error);
-						});
+                        AlertService.error("Error while deleting snapshot", error);
 					}
 				);
 			}
@@ -199,17 +185,13 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 	$scope.fetchSnapshots=function(repository) {
 		$scope.client.getSnapshots(repository,
 			function(response) {
-				$scope.updateModel(function() {
-					$scope.paginator.setCollection(response);
-                    $scope.page = $scope.paginator.getPage();
-				});
+                $scope.paginator.setCollection(response);
+                $scope.page = $scope.paginator.getPage();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					$scope.paginator.setCollection([]);
-                    $scope.page = $scope.paginator.getPage();
-					AlertService.error("Error while fetching snapshots", error);
-				});
+                $scope.paginator.setCollection([]);
+                $scope.page = $scope.paginator.getPage();
+                AlertService.error("Error while fetching snapshots", error);
 			}
 		);
 	};

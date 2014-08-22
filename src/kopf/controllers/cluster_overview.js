@@ -52,15 +52,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.shutdownNode=function(node_id) {
         $scope.client.shutdownNode(node_id,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Node [" + node_id + "] successfully shutdown", response);
-                });
+                AlertService.success("Node [" + node_id + "] successfully shutdown", response);
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while shutting down node",error);
-                });
+                AlertService.error("Error while shutting down node",error);
             }
         );
     };
@@ -78,14 +74,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.optimizeIndex=function(index) {
         $scope.client.optimizeIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully optimized", response);
-                });
+                AlertService.success("Index was successfully optimized", response);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while optimizing index", error);
-                });
+                AlertService.error("Error while optimizing index", error);
             }
         );
     };
@@ -106,9 +98,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while deleting index", error);
-                });
+                AlertService.error("Error while deleting index", error);
             }
         );
     };
@@ -125,15 +115,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.clearCache=function(index) {
         $scope.client.clearCache(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index cache was successfully cleared", response);
-                });
+                AlertService.success("Index cache was successfully cleared", response);
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while clearing index cache", error);
-                });
+                AlertService.error("Error while clearing index cache", error);
             }
         );
     };
@@ -150,14 +136,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.refreshIndex=function(index) {
         $scope.client.refreshIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully refreshed", response);
-                });
+                AlertService.success("Index was successfully refreshed", response);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while refreshing index", error);
-                });
+                AlertService.error("Error while refreshing index", error);
             }
         );
     };
@@ -174,15 +156,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.enableAllocation=function() {
 		$scope.client.enableShardAllocation(
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Shard allocation was successfully enabled", response);
-				});
+                AlertService.success("Shard allocation was successfully enabled", response);
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while enabling shard allocation", error);	
-				});
+                AlertService.error("Error while enabling shard allocation", error);
 			}
 		);
 	};
@@ -190,15 +168,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.disableAllocation=function() {
 		$scope.client.disableShardAllocation(
 			function(response) {
-				$scope.updateModel(function() {
-					AlertService.success("Shard allocation was successfully disabled", response);
-				});
+                AlertService.success("Shard allocation was successfully disabled", response);
 				$scope.refreshClusterState();
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while disabling shard allocation", error);	
-				});
+                AlertService.error("Error while disabling shard allocation", error);
 			}
 		);
 	};
@@ -206,16 +180,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	$scope.closeIndex=function(index) {
         $scope.client.closeIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully closed", response);
-                });
+                AlertService.success("Index was successfully closed", response);
                 $scope.refreshClusterState();
             },
-            function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while closing index", error);
-                });
-            }
+            function(error) { AlertService.error("Error while closing index", error); }
         );
     };
 
@@ -233,15 +201,11 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.openIndex=function(index) {
         $scope.client.openIndex(index,
             function(response) {
-                $scope.updateModel(function() {
-                    AlertService.success("Index was successfully opened", response);
-                });
+                AlertService.success("Index was successfully opened", response);
                 $scope.refreshClusterState();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while opening index", error);
-                });
+                AlertService.error("Error while opening index", error);
             }
         );
     };
@@ -260,16 +224,12 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 		$('#index_settings_option a').tab('show');
         $scope.client.getIndexMetadata(index,
             function(metadata) {
-                $scope.updateModel(function() {
-                    IndexSettingsService.loadSettings(index, metadata.settings);
-                    $('#idx_settings_tabs a:first').tab('show');
-                    $(".setting-info").popover();
-                });
+                IndexSettingsService.loadSettings(index, metadata.settings);
+                $('#idx_settings_tabs a:first').tab('show');
+                $(".setting-info").popover();
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while loading index settings", error);
-                });
+                AlertService.error("Error while loading index settings", error);
             }
         );
 	};
@@ -277,14 +237,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.showIndexSettings=function(index) {
         $scope.client.getIndexMetadata(index,
             function(metadata) {
-                $scope.updateModel(function() {
-                    $scope.displayInfo('settings for index ' + index, metadata.settings);
-                });
+                $scope.displayInfo('settings for index ' + index, metadata.settings);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while loading index settings", error);
-                });
+                AlertService.error("Error while loading index settings", error);
             }
         );
     };
@@ -292,14 +248,10 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     $scope.showIndexMappings=function(index) {
         $scope.client.getIndexMetadata(index,
             function(metadata) {
-                $scope.updateModel(function() {
-                    $scope.displayInfo('mappings for index ' + index, metadata.mappings);
-                });
+                $scope.displayInfo('mappings for index ' + index, metadata.mappings);
             },
             function(error) {
-                $scope.updateModel(function() {
-                    AlertService.error("Error while loading index mappings", error);
-                });
+                AlertService.error("Error while loading index mappings", error);
             }
         );
     };

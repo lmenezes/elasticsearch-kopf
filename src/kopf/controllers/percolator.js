@@ -55,22 +55,16 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 						var refreshIndex = query.index;
 						$scope.client.refreshIndex(refreshIndex,
 							function(response) {
-								$scope.updateModel(function() {
-									AlertService.success("Query successfully deleted", response);
-									$scope.loadPercolatorQueries();
-								});
+                                AlertService.success("Query successfully deleted", response);
+                                $scope.loadPercolatorQueries();
 							},
 							function(error) {
-								$scope.updateModel(function() {
-									AlertService.error("Error while reloading queries", error);
-								});
+                                AlertService.error("Error while reloading queries", error);
 							}
 						);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.error("Error while deleting query", error);
-						});
+                        AlertService.error("Error while deleting query", error);
 					}
 				);
 			}
@@ -98,23 +92,17 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 				var refreshIndex = $scope.new_query.index;
 				$scope.client.refreshIndex(refreshIndex,
 					function(response) {
-						$scope.updateModel(function() {
-							AlertService.success("Percolator Query successfully created", response);
-							$scope.index = $scope.new_query.index;
-							$scope.loadPercolatorQueries(0);
-						});
+                        AlertService.success("Percolator Query successfully created", response);
+                        $scope.index = $scope.new_query.index;
+                        $scope.loadPercolatorQueries(0);
 					},
 					function(error) {
-						$scope.updateModel(function() {
-							AlertService.success("Error while reloading queries", error);
-						});
+                        AlertService.success("Error while reloading queries", error);
 					}
 				);
 			},
 			function(error) {
-				$scope.updateModel(function() {
-					AlertService.error("Error while creating percolator query", error);
-				});
+                AlertService.error("Error while creating percolator query", error);
 			}
 		);
 	};
@@ -137,14 +125,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 			}
 			$scope.client.fetchPercolateQueries($scope.index, body,
 				function(percolators) {
-					$scope.updateModel(function() {
-						$scope.pagination = percolators;
-					});
+                    $scope.pagination = percolators;
 				},
 				function(error) {
-					$scope.updateModel(function() {
-						AlertService.error("Error while reading loading percolate queries", error);
-					});
+                    AlertService.error("Error while reading loading percolate queries", error);
 				}
 			);
 		} catch (error) {

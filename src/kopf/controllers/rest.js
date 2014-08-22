@@ -71,23 +71,18 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
 						// nothing to do
 					}
 					$('#rest-client-response').html(content);
-					$scope.updateModel(function() {
-						$scope.addToHistory(new Request($scope.request.url,$scope.request.method,$scope.request.body));
-					});
-
+					$scope.addToHistory(new Request($scope.request.url,$scope.request.method,$scope.request.body));
 				},
-				function(error) {
-					$scope.updateModel(function() {
-						if (error.status !== 0) {
-							AlertService.error("Request was not successful: " + error.statusText);
-						} else {
-							AlertService.error($scope.request.url + " is unreachable");
-						}
-					});
-					try {
-						$('#rest-client-response').html(JSONTree.create(JSON.parse(error.responseText)));
-					} catch (invalid_json) {
-						$('#rest-client-response').html(error.responseText);
+				function(error, status) {
+					if (status !== 0) {
+						AlertService.error("Request was not successful");
+                        try {
+                            $('#rest-client-response').html(JSONTree.create(error));
+                        } catch (invalid_json) {
+                            $('#rest-client-response').html(error);
+                        }
+					} else {
+						AlertService.error($scope.request.url + " is unreachable");
 					}
 				}
 			);

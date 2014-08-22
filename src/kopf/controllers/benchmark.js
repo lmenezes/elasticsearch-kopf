@@ -37,14 +37,12 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
 					$scope.result = JSONTree.create(response);
 					$('#benchmark-result').html($scope.result);
 				},
-				function(error) {
-					$scope.updateModel(function() {
-						if (error.status == 503) {
-							AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
-						} else {
-							AlertService.error(error.responseJSON.error);
-						}
-					});
+				function(error, status) {
+                    if (status == 503) {
+                        AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+                    } else {
+                        AlertService.error(error.error);
+                    }
 				}
 			);
 		} catch (error) {

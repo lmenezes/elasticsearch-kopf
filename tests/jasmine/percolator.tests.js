@@ -11,7 +11,6 @@ describe('PercolatorController', function(){
         this.AlertService = $injector.get('AlertService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         this.AceEditorService = $injector.get('AceEditorService');
-        this.scope.updateModel=function(body) { body(); };
         this.createController = function() {
             return $controller('PercolatorController', {$scope: this.scope}, this.AlertService, this.ConfirmDialogService, this.AceEditorService);
         };
