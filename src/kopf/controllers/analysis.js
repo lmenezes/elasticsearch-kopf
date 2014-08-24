@@ -1,4 +1,4 @@
-kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
+kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'AlertService', 'ElasticService', function($scope, $location, $timeout, AlertService, ElasticService) {
 
 	$scope.indices = null;
 
@@ -27,7 +27,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         $scope.field_type = '';
         $scope.field_field = '';
         if (notEmpty(index)) {
-            $scope.client.getIndexMetadata(index,
+            ElasticService.client.getIndexMetadata(index,
                 function(metadata) {
                     $scope.field_index_metadata = metadata;
                 },
@@ -48,7 +48,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
     $scope.loadIndexAnalyzers=function(index) {
         $scope.analyzer_analyzer = '';
         if (notEmpty(index)) {
-            $scope.client.getIndexMetadata(index,
+            ElasticService.client.getIndexMetadata(index,
                 function(metadata) {
                     $scope.analyzer_index_metadata = metadata;
                 },
@@ -64,7 +64,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 	$scope.analyzeByField=function() {
 		if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
 			$scope.field_tokens = null;
-			$scope.client.analyzeByField($scope.field_index.name,$scope.field_type,$scope.field_field,$scope.field_text, 
+			ElasticService.client.analyzeByField($scope.field_index.name,$scope.field_type,$scope.field_field,$scope.field_text, 
 				function(response) {
                     $scope.field_tokens = response;
 				},
@@ -79,7 +79,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
 	$scope.analyzeByAnalyzer=function() {
 		if ($scope.analyzer_analyzer.length > 0 && $scope.analyzer_text.length > 0) {
 			$scope.analyzer_tokens = null;
-			$scope.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
+			ElasticService.client.analyzeByAnalyzer($scope.analyzer_index.name,$scope.analyzer_analyzer,$scope.analyzer_text,
 				function(response) {
 					$scope.analyzer_tokens = response;
 				},

@@ -7,7 +7,8 @@ describe('PercolatorController', function(){
     
     beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
         this.scope = $rootScope.$new();
-        this.scope.client = {};
+        this.ElasticService = $injector.get('ElasticService');
+        this.ElasticService.client = {};
         this.AlertService = $injector.get('AlertService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         this.AceEditorService = $injector.get('AceEditorService');
@@ -105,7 +106,7 @@ describe('PercolatorController', function(){
     });
 
     it('prevents creating a percolator query if json is mal formed', function() {
-        this.scope.client = {
+        this.ElasticService.client = {
             createPercolatorQuery: function() {}
         }
         var fake_editor = {
@@ -113,13 +114,13 @@ describe('PercolatorController', function(){
             format : function(){return {}; }
         };
         this.scope.editor = fake_editor;
-        spyOn(this.scope.client, 'createPercolatorQuery').andReturn(true);
+        spyOn(this.ElasticService.client, 'createPercolatorQuery').andReturn(true);
         this.scope.createNewQuery();
-        expect(this.scope.client.createPercolatorQuery).not.toHaveBeenCalled();
+        expect(this.ElasticService.client.createPercolatorQuery).not.toHaveBeenCalled();
     });
 	
     it('prevents creating a percolator query if no id is defined', function() {
-        this.scope.client = {
+        this.ElasticService.client = {
             createPercolatorQuery: function() {}
         }
         var fake_editor = {
@@ -128,13 +129,13 @@ describe('PercolatorController', function(){
         };
         this.scope.editor = fake_editor;
         this.scope.new_query = new PercolateQuery({'_index': 'a', 'type': 'foobar', '_id':'','_source': { "query": { "match_all" : {} } }});
-        spyOn(this.scope.client, 'createPercolatorQuery').andReturn(true);
+        spyOn(this.ElasticService.client, 'createPercolatorQuery').andReturn(true);
         this.scope.createNewQuery();
-        expect(this.scope.client.createPercolatorQuery).not.toHaveBeenCalled();
+        expect(this.ElasticService.client.createPercolatorQuery).not.toHaveBeenCalled();
     });
 
     it('attempts creating a percolator query if all data is ok', function() {
-        this.scope.client = {
+        this.ElasticService.client = {
             createPercolatorQuery: function() {}
         }
         var fake_editor = {
@@ -145,35 +146,35 @@ describe('PercolatorController', function(){
         var query = new PercolateQuery({'_index': 'a', 'type': 'foobar', '_id':'','_source': { "query": { "match_all" : {} } }});
         this.scope.new_query = query;
         this.scope.new_query.id = "foobar";
-        spyOn(this.scope.client, 'createPercolatorQuery').andReturn(true);
+        spyOn(this.ElasticService.client, 'createPercolatorQuery').andReturn(true);
         this.scope.createNewQuery();
-        expect(this.scope.client.createPercolatorQuery).toHaveBeenCalledWith(query, jasmine.any(Function),jasmine.any(Function));
+        expect(this.ElasticService.client.createPercolatorQuery).toHaveBeenCalledWith(query, jasmine.any(Function),jasmine.any(Function));
     });
 
     it('displays error when loading percolator query if filter is invalid', function() {
-        this.scope.client = {
+        this.ElasticService.client = {
             fetchPercolateQueries: function() {}
         }
-        spyOn(this.scope.client, 'fetchPercolateQueries').andReturn(true);
+        spyOn(this.ElasticService.client, 'fetchPercolateQueries').andReturn(true);
         spyOn(this.AlertService, 'error').andReturn(true);
         this.scope.filter = '{';
         this.scope.loadPercolatorQueries();
-        expect(this.scope.client.fetchPercolateQueries).not.toHaveBeenCalled();
+        expect(this.ElasticService.client.fetchPercolateQueries).not.toHaveBeenCalled();
         expect(this.AlertService.error).toHaveBeenCalled();
     });
 
     it('attempts loading percolator queries', function() {
-        this.scope.client = {
+        this.ElasticService.client = {
             fetchPercolateQueries: function() {}
         }
         this.scope.page = 1;
         this.scope.id = '';
         this.scope.filter = '';
         this.scope.index = 'a';
-        spyOn(this.scope.client, 'fetchPercolateQueries').andReturn(true);
+        spyOn(this.ElasticService.client, 'fetchPercolateQueries').andReturn(true);
         spyOn(this.AlertService, 'error').andReturn(true);
         this.scope.loadPercolatorQueries(0);
-        expect(this.scope.client.fetchPercolateQueries).toHaveBeenCalledWith('a', { from: 0, size: 10 }, jasmine.any(Function), jasmine.any(Function));
+        expect(this.ElasticService.client.fetchPercolateQueries).toHaveBeenCalledWith('a', { from: 0, size: 10 }, jasmine.any(Function), jasmine.any(Function));
         expect(this.AlertService.error).not.toHaveBeenCalled();
     });
 

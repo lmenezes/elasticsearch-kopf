@@ -1,6 +1,6 @@
-kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', function($scope, $location, $timeout, AlertService, AceEditorService) {
+kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, $location, $timeout, AlertService, AceEditorService, ElasticService) {
 
-	$scope.request = new Request($scope.connection.host + "/_search","GET","{}");
+	$scope.request = new Request(ElasticService.connection.host + "/_search","GET","{}");
 	$scope.validation_error = null;
 
 	$scope.loadHistory=function() {
@@ -62,7 +62,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
 			if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
 				AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
 			}
-			$scope.client.executeRequest($scope.request.method,$scope.request.url,username,password,$scope.request.body,
+			ElasticService.client.executeRequest($scope.request.method,$scope.request.url,username,password,$scope.request.body,
 				function(response) {
 					var content = response;
 					try {

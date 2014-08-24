@@ -1,4 +1,4 @@
-kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', 'IndexSettingsService', 'AlertService', function($scope, $location, $timeout, IndexSettingsService, AlertService) {
+kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', 'IndexSettingsService', 'AlertService', 'ElasticService', function($scope, $location, $timeout, IndexSettingsService, AlertService, ElasticService) {
 	$scope.service = IndexSettingsService;
 
 	$scope.save=function() {
@@ -12,7 +12,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 				new_settings[setting] = editable_settings[setting];
 			}
 		});
-		$scope.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
+		ElasticService.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
 			function(response) {
                 AlertService.success("Index settings were successfully updated", response);
 				$scope.refreshClusterState();

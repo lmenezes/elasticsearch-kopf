@@ -1,4 +1,4 @@
-kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', function($scope, ConfirmDialogService, AlertService, AceEditorService) {
+kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, ConfirmDialogService, AlertService, AceEditorService, ElasticService) {
 	$scope.editor = undefined;
 	$scope.indices = [];
 	$scope.index = null;
@@ -33,7 +33,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 			$scope.editor.format();
 			if (!isDefined($scope.editor.error)) {
                 $scope.warmer.source = $scope.editor.getValue();
-				$scope.client.registerWarmupQuery($scope.warmer,
+				ElasticService.client.registerWarmupQuery($scope.warmer,
 					function(response) {
                         $scope.loadIndexWarmers();
                         AlertService.success("Warmup query successfully registered", response);
@@ -54,7 +54,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 			warmer.source,
 			"Delete",
 			function() {
-				$scope.client.deleteWarmupQuery(warmer,
+				ElasticService.client.deleteWarmupQuery(warmer,
 					function(response) {
                         AlertService.success("Warmup query successfully deleted", response);
                         $scope.loadIndexWarmers();
@@ -69,7 +69,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 	
 	$scope.loadIndexWarmers=function() {
 		if (isDefined($scope.index)) {
-			$scope.client.getIndexWarmers($scope.index, "",
+			ElasticService.client.getIndexWarmers($scope.index, "",
 				function(warmers) {
                     $scope.paginator.setCollection(warmers);
                     $scope.page = $scope.paginator.getPage();

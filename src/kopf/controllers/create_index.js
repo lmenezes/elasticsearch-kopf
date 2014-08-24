@@ -1,4 +1,4 @@
-kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'AlertService', function($scope, $location, $timeout, AlertService) {
+kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'AlertService', 'ElasticService', function($scope, $location, $timeout, AlertService, ElasticService) {
 	$scope.settings = '';
 	$scope.shards = '';
 	$scope.replicas = '';
@@ -42,7 +42,7 @@ kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'Al
 			if ($scope.replicas.trim().length > 0) {
 				index_settings.number_of_replicas = $scope.replicas;
 			}
-			$scope.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
+			ElasticService.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
 				function(response) {
 					$scope.refreshClusterState();
 				}, function(error) { 

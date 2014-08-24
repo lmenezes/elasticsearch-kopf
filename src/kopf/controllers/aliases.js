@@ -1,4 +1,4 @@
-kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', function($scope, AlertService, AceEditorService) {
+kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, AlertService, AceEditorService, ElasticService) {
 	$scope.paginator = new Paginator(1,10, [], new AliasFilter("",""));
     $scope.page = $scope.paginator.getPage();
     $scope.original = [];
@@ -97,7 +97,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         if (adds.length === 0 && deletes.length === 0) {
             AlertService.warn("No changes were made: nothing to save");
         } else {
-            $scope.client.updateAliases(adds,deletes,
+            ElasticService.client.updateAliases(adds,deletes,
                 function(response) {
                     AlertService.success("Aliases were successfully updated",response);
                     $scope.loadAliases();
@@ -110,7 +110,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
 	};
 
 	$scope.loadAliases=function() {
-		$scope.client.fetchAliases(
+		ElasticService.client.fetchAliases(
 			function(index_aliases) {
                 $scope.original = index_aliases.map(function(ia) { return ia.clone(); });
                 $scope.paginator.setCollection(index_aliases);

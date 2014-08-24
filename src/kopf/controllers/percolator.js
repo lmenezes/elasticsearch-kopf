@@ -1,4 +1,4 @@
-kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', function($scope, ConfirmDialogService, AlertService, AceEditorService) {
+kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, ConfirmDialogService, AlertService, AceEditorService, ElasticService) {
 	$scope.editor = undefined;
 	$scope.pagination = new PercolatorsPage(0, 0, 0, []);
 
@@ -50,10 +50,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 			query.sourceAsJSON(),
 			"Delete",
 			function() {
-				$scope.client.deletePercolatorQuery(query.index, query.id,
+				ElasticService.client.deletePercolatorQuery(query.index, query.id,
 					function(response) {
 						var refreshIndex = query.index;
-						$scope.client.refreshIndex(refreshIndex,
+						ElasticService.client.refreshIndex(refreshIndex,
 							function(response) {
                                 AlertService.success("Query successfully deleted", response);
                                 $scope.loadPercolatorQueries();
@@ -87,10 +87,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 			AlertService.error("Query must be defined");
 			return;
 		}
-		$scope.client.createPercolatorQuery($scope.new_query,
+		ElasticService.client.createPercolatorQuery($scope.new_query,
 			function(response) {
 				var refreshIndex = $scope.new_query.index;
-				$scope.client.refreshIndex(refreshIndex,
+				ElasticService.client.refreshIndex(refreshIndex,
 					function(response) {
                         AlertService.success("Percolator Query successfully created", response);
                         $scope.index = $scope.new_query.index;
@@ -123,7 +123,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 			if (queries.length > 0) {
 				body.query = { bool: { must: queries } };
 			}
-			$scope.client.fetchPercolateQueries($scope.index, body,
+			ElasticService.client.fetchPercolateQueries($scope.index, body,
 				function(percolators) {
                     $scope.pagination = percolators;
 				},

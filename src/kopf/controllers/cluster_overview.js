@@ -1,4 +1,4 @@
-kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService) {
+kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService) {
 
     $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
 
@@ -50,7 +50,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 	
 	$scope.shutdownNode=function(node_id) {
-        $scope.client.shutdownNode(node_id,
+        ElasticService.client.shutdownNode(node_id,
             function(response) {
                 AlertService.success("Node [" + node_id + "] successfully shutdown", response);
                 $scope.refreshClusterState();
@@ -72,7 +72,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 
 	$scope.optimizeIndex=function(index) {
-        $scope.client.optimizeIndex(index,
+        ElasticService.client.optimizeIndex(index,
             function(response) {
                 AlertService.success("Index was successfully optimized", response);
             },
@@ -93,7 +93,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 	
 	$scope.deleteIndex=function(index) {
-        $scope.client.deleteIndex(index,
+        ElasticService.client.deleteIndex(index,
             function(response) {
                 $scope.refreshClusterState();
             },
@@ -113,7 +113,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 	
 	$scope.clearCache=function(index) {
-        $scope.client.clearCache(index,
+        ElasticService.client.clearCache(index,
             function(response) {
                 AlertService.success("Index cache was successfully cleared", response);
                 $scope.refreshClusterState();
@@ -134,7 +134,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 
 	$scope.refreshIndex=function(index) {
-        $scope.client.refreshIndex(index,
+        ElasticService.client.refreshIndex(index,
             function(response) {
                 AlertService.success("Index was successfully refreshed", response);
             },
@@ -154,7 +154,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 	
 	$scope.enableAllocation=function() {
-		$scope.client.enableShardAllocation(
+		ElasticService.client.enableShardAllocation(
 			function(response) {
                 AlertService.success("Shard allocation was successfully enabled", response);
 				$scope.refreshClusterState();
@@ -166,7 +166,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 	
 	$scope.disableAllocation=function() {
-		$scope.client.disableShardAllocation(
+		ElasticService.client.disableShardAllocation(
 			function(response) {
                 AlertService.success("Shard allocation was successfully disabled", response);
 				$scope.refreshClusterState();
@@ -178,7 +178,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 	
 	$scope.closeIndex=function(index) {
-        $scope.client.closeIndex(index,
+        ElasticService.client.closeIndex(index,
             function(response) {
                 AlertService.success("Index was successfully closed", response);
                 $scope.refreshClusterState();
@@ -199,7 +199,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 
     $scope.openIndex=function(index) {
-        $scope.client.openIndex(index,
+        ElasticService.client.openIndex(index,
             function(response) {
                 AlertService.success("Index was successfully opened", response);
                 $scope.refreshClusterState();
@@ -222,7 +222,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	
 	$scope.loadIndexSettings=function(index) {
 		$('#index_settings_option a').tab('show');
-        $scope.client.getIndexMetadata(index,
+        ElasticService.client.getIndexMetadata(index,
             function(metadata) {
                 IndexSettingsService.loadSettings(index, metadata.settings);
                 $('#idx_settings_tabs a:first').tab('show');
@@ -235,7 +235,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
 	};
 
     $scope.showIndexSettings=function(index) {
-        $scope.client.getIndexMetadata(index,
+        ElasticService.client.getIndexMetadata(index,
             function(metadata) {
                 $scope.displayInfo('settings for index ' + index, metadata.settings);
             },
@@ -246,7 +246,7 @@ kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 
     };
 
     $scope.showIndexMappings=function(index) {
-        $scope.client.getIndexMetadata(index,
+        ElasticService.client.getIndexMetadata(index,
             function(metadata) {
                 $scope.displayInfo('mappings for index ' + index, metadata.mappings);
             },

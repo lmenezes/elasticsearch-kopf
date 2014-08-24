@@ -6,16 +6,15 @@ describe('AliasesController', function(){
     beforeEach(angular.mock.module('kopf'));
     
     beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
-        //create an empty scope
         this.scope = $rootScope.$new();
-        this.scope.client = {}         //set fake client
         var $timeout = $injector.get('$timeout');
         var $location = $injector.get('$location');
         this.AlertService = $injector.get('AlertService');
-       this.createController = function() {
-            return $controller('AliasesController', {$scope: this.scope}, $location, $timeout, this.AlertService);
+        this.ElasticService = $injector.get('ElasticService');
+        this.ElasticService.client = {};
+        this.createController = function() {
+            return $controller('AliasesController', {$scope: this.scope}, $location, $timeout, this.AlertService, this.ElasticService);
         };
-
         this._controller = this.createController();
     }));
 
@@ -111,7 +110,7 @@ describe('AliasesController', function(){
     });
 
     it('mergeAliases : displays warn if no changes were made', function () {
-        this.scope.client.updateAliases = function(){};
+        this.ElasticService.client.updateAliases = function(){};
         this.scope.original = [new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] )];
         this.scope.paginator = new Paginator(1, 10, [new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] )], new AliasFilter("",""));
         spyOn(this.AlertService, "warn");
@@ -120,39 +119,39 @@ describe('AliasesController', function(){
     });
 
     it('mergeAliases : calls client updateAliases', function () {
-        this.scope.client.updateAliases = function(){};
+        this.ElasticService.client.updateAliases = function(){};
         this.scope.original = [];
         this.scope.paginator = new Paginator(1, 10, [new IndexAliases("myindex", [ new Alias("myalias", "myindex") ] )], new AliasFilter("",""));
         spyOn(this.scope.paginator, "setCollection");
-        spyOn(this.scope.client, "updateAliases");
+        spyOn(this.ElasticService.client, "updateAliases");
         this.scope.mergeAliases();
-        expect(this.scope.client.updateAliases).toHaveBeenCalled()
+        expect(this.ElasticService.client.updateAliases).toHaveBeenCalled()
     });
 
     it('mergeAliases : adds new', function () {
-        this.scope.client.updateAliases = function(){};
+        this.ElasticService.client.updateAliases = function(){};
         this.scope.original = [];
         var added = new Alias("myalias", "myindex");
         this.scope.paginator = new Paginator(1, 10, [ new IndexAliases("myindex", [ added ] ) ], new AliasFilter("",""));
         spyOn(this.scope.paginator, "setCollection");
-        spyOn(this.scope.client, "updateAliases");
+        spyOn(this.ElasticService.client, "updateAliases");
         this.scope.mergeAliases();
-        expect(this.scope.client.updateAliases).toHaveBeenCalledWith([added],[], jasmine.any(Function), jasmine.any(Function));
+        expect(this.ElasticService.client.updateAliases).toHaveBeenCalledWith([added],[], jasmine.any(Function), jasmine.any(Function));
     });
 
     it('mergeAliases : removes previous', function () {
-        this.scope.client.updateAliases = function(){};
+        this.ElasticService.client.updateAliases = function(){};
         var removed = new Alias("myalias", "myindex");
         this.scope.original = [ new IndexAliases("myindex", [ removed ] ) ];
         this.scope.paginator = new Paginator(1, 10, [], new AliasFilter("",""));
         spyOn(this.scope.paginator, "setCollection");
-        spyOn(this.scope.client, "updateAliases");
+        spyOn(this.ElasticService.client, "updateAliases");
         this.scope.mergeAliases();
-        expect(this.scope.client.updateAliases).toHaveBeenCalledWith([], [removed], jasmine.any(Function), jasmine.any(Function));
+        expect(this.ElasticService.client.updateAliases).toHaveBeenCalledWith([], [removed], jasmine.any(Function), jasmine.any(Function));
     });
 
     it('loadAliases : removes previous', function () {
-        this.scope.client.fetchAliases=function(success, failure) {
+        this.ElasticService.client.fetchAliases=function(success, failure) {
             success([ new IndexAliases("index_name", [ new Alias("alias_name", "index_name")])]);
         }
         this.scope.loadAliases();

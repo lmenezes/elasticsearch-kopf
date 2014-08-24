@@ -6,9 +6,9 @@ describe('WarmupController', function(){
     beforeEach(angular.mock.module('kopf'));
     
     beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
-        //create an empty scope
         this.scope = $rootScope.$new();
-        this.scope.client = {}         //set fake client
+        this.ElasticService = $injector.get('ElasticService');
+        this.ElasticService.client = {};
         var $timeout = $injector.get('$timeout');
         var $location = $injector.get('$location');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
@@ -88,39 +88,39 @@ describe('WarmupController', function(){
         var warmer = new Warmer("warmer_id", "index_name", { types: "type", source: {} });
         this.scope.warmer = warmer;
         this.scope.editor = editor;
-        this.scope.client.registerWarmupQuery = function(){};
-        spyOn(this.scope.client, "registerWarmupQuery").andReturn(true);
+        this.ElasticService.client.registerWarmupQuery = function(){};
+        spyOn(this.ElasticService.client, "registerWarmupQuery").andReturn(true);
         this.scope.createWarmerQuery();
         expect(this.scope.warmer.source).toEqual(editor.getValue());
-        expect(this.scope.client.registerWarmupQuery).toHaveBeenCalledWith(warmer,
+        expect(this.ElasticService.client.registerWarmupQuery).toHaveBeenCalledWith(warmer,
                                                                 jasmine.any(Function),
                                                                 jasmine.any(Function));
     });
 
     it('Loads index warmers for index and all types', function() {
         this.scope.index = "index_name";
-        this.scope.client.getIndexWarmers = function(){};
-        spyOn(this.scope.client, "getIndexWarmers").andReturn(true);
+        this.ElasticService.client.getIndexWarmers = function(){};
+        spyOn(this.ElasticService.client, "getIndexWarmers").andReturn(true);
         this.scope.warmer = new Warmer('', 'index_name', {});
         this.scope.loadIndexWarmers();
-        expect(this.scope.client.getIndexWarmers).toHaveBeenCalledWith("index_name", '', jasmine.any(Function), jasmine.any(Function));
+        expect(this.ElasticService.client.getIndexWarmers).toHaveBeenCalledWith("index_name", '', jasmine.any(Function), jasmine.any(Function));
     });
 
     it('Loads index warmers for index and specific type', function() {
         this.scope.index = "index_name";
         this.scope.paginator.filter.id = "warmer_id";
-        this.scope.client.getIndexWarmers = function(){};
-        spyOn(this.scope.client, "getIndexWarmers").andReturn(true);
+        this.ElasticService.client.getIndexWarmers = function(){};
+        spyOn(this.ElasticService.client, "getIndexWarmers").andReturn(true);
         this.scope.warmer = new Warmer('', 'index_name', {});
         this.scope.loadIndexWarmers();
-        expect(this.scope.client.getIndexWarmers).toHaveBeenCalledWith("index_name", '', jasmine.any(Function), jasmine.any(Function));
+        expect(this.ElasticService.client.getIndexWarmers).toHaveBeenCalledWith("index_name", '', jasmine.any(Function), jasmine.any(Function));
     });
 
     // TODO: how to make this work with the call that happens once user confirms?
     it('Deletes an existing Warmup query', function() {
         this.scope.index = { 'name': "index_name" };
-        this.scope.client.deleteWarmupQuery = function(){};
-        spyOn(this.scope.client, "deleteWarmupQuery").andReturn(true);
+        this.ElasticService.client.deleteWarmupQuery = function(){};
+        spyOn(this.ElasticService.client, "deleteWarmupQuery").andReturn(true);
         spyOn(this.ConfirmDialogService, "open").andReturn(true);
         this.scope.deleteWarmupQuery(new Warmer("warmer_id","index", { types: [], source: {}}));
         expect(this.ConfirmDialogService.open).toHaveBeenCalledWith("are you sure you want to delete query warmer_id?", {},"Delete",jasmine.any(Function));
