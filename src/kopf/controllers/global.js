@@ -1,4 +1,4 @@
-kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
+kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, $window, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
 	$scope.version = "1.3.0-SNAPSHOT";
 	$scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
@@ -16,7 +16,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
 	};
 	
 	$scope.readParameter=function(name){
-		var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
+		var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec($window.location.href);
 		return isDefined(results) ? results[1] : null;
 	};
 
