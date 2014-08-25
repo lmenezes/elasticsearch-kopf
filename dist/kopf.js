@@ -815,16 +815,15 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
 	this.size_in_bytes = readablizeBytes(this.size);
 	this.total_size_in_bytes = readablizeBytes(this.total_size);
 	
-	var unassigned = [];
-
-	// adds shard information
-	
-	var unhealthy = false;
+	this.unassigned = [];
+    this.unhealthy = false;
 
     this.getShards=function(node_id) {
         if (isDefined(index_info)) {
             if (this.shards === null) {
                 var index_shards = {};
+                var unassigned = [];
+                this.unassigned = unassigned;
                 $.map(index_info.shards, function(shards, shard_num) {
                     $.map(shards, function(shard_routing, shard_copy) {
                         if (shard_routing.node === null) {
@@ -842,11 +841,6 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
                                 });
                             }
                             var new_shard = new Shard(shard_routing, shard_status);
-
-                            if (new_shard.state == "RELOCATING" || new_shard.state == "INITIALIZING") {
-                                unhealthy = true;
-                            }
-
                             index_shards[shard_routing.node].push(new_shard);
                         }
                     });
@@ -859,8 +853,17 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
         return this.shards[node_id];
     };
 
-	this.unhealthy = unhealthy || unassigned.length > 0;
-	this.unassigned = unassigned;
+    if (isDefined(cluster_state) && isDefined(cluster_state.routing_table)) {
+        var instance = this;
+        var shards_map = cluster_state.routing_table.indices[this.name].shards;
+        Object.keys(shards_map).forEach(function(shard_num) {
+            shards_map[shard_num].forEach(function(shard) {
+               if (shard.state != "STARTED") {
+                   instance.unhealthy = true;
+               }
+            });
+        });
+    }
 
     this.special = this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0;
 
