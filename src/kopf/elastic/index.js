@@ -8,7 +8,7 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
     this.aliases = [];
     if (isDefined(aliases)) {
         var index_aliases = aliases.aliases;
-        if (isDefined(index_aliases) && index_aliases.length > 0) {
+        if (isDefined(index_aliases)) {
             this.aliases = Object.keys(aliases.aliases);
         }
     }
