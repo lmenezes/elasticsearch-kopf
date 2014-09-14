@@ -241,26 +241,22 @@ function ElasticClient(connection, http_service, q) {
 	};
 
     this.executeClusterRequest=function(method, path, data, callback_success, callback_error) {
-        var params = {
-            method: method,
-            url: this.host + path,
-            data: data,
-            withCredentials: auth !== null,
-            headers: { Authorization: auth}
-        };
+        var params = { method: method, url: this.host + path, data: data };
+        if (auth !== null) {
+            params.withCredentials = true;
+            params.headers = { Authorization: auth};
+        }
         http_service(params).
             success(function(data, status, headers, config) { callback_success(data); }).
             error(function(data, status, headers, config) { callback_error(data); });
     };
 	
 	this.executeRequest=function(method, url, username, password, data, callback_success, callback_error) {
-        var params = {
-            method: method,
-            url: url,
-            data: data,
-            withCredentials: auth !== null,
-            headers: { Authorization: auth}
-        };
+        var params = { method: method, url: url, data: data };
+        if (auth !== null) {
+            params.withCredentials = true;
+            params.headers = { Authorization: auth};
+        }
         http_service(params).
             success(function(data, status, headers, config) { callback_success(data); }).
             error(function(data, status, headers, config) { callback_error(data, status); });
@@ -293,8 +289,7 @@ function ElasticClient(connection, http_service, q) {
 
 	this.getClusterDetail=function(callback_success, callback_error) {
 		var host = this.host;
-		var auth = this.auth;
-        var params = { withCredentials: auth !== null, headers: { Authorization: auth } };
+        var params = auth !== null ? { withCredentials: true, headers: { Authorization: auth } } : {};
         q.all([
             http_service.get(host+"/_cluster/state/master_node,nodes,routing_table,blocks/", params),
             http_service.get(host+"/_status", params),
