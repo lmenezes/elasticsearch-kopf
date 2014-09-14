@@ -1964,7 +1964,7 @@ kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'Al
 	};
 }]);
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, $window, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
-	$scope.version = "1.3.0";
+	$scope.version = "1.3.1";
 	$scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
 

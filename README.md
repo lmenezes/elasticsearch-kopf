@@ -11,7 +11,7 @@ Versions
 | elasticsearch version | kopf version |
 | --------------------- | ------------ |
 | 0.90.X                | v0.90        |
-| 1.X                   | v1.3.0       |
+| 1.X                   | master       |
 
 Installation
 ------------
