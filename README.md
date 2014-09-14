@@ -11,14 +11,13 @@ Versions
 | elasticsearch version | kopf version |
 | --------------------- | ------------ |
 | 0.90.X                | 0.90         |
-| 1.0.X                 | 1.0          |
-| 1.1.X                 | 1.1          |
-| 1.2.X                 | 1.2          |
+| 1.X                   | 1.3          |
 
 Installation
 ------------
 
-Run locally:
+
+####Run locally:
 
     git clone git://github.com/lmenezes/elasticsearch-kopf.git
     cd elasticsearch-kopf
@@ -28,26 +27,47 @@ Run locally:
 ps: local execution doesn't work with Chrome(and maybe other browsers). See more [here](http://docs.angularjs.org/api/ng.directive:ngInclude).
 
 
-Install on a ElasticSearch instance:
+####Install on a ElasticSearch instance:
 
     ./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{version}
     open http://localhost:9200/_plugin/kopf
     
 
-Try the most recent version online at http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
+####Try it online:
+```
+http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
+```
 
-Basic HTTP Auth is also supported, so http://lmenezes.com/elasticsearch-kopf/?location=http://user:pwd@localhost:9200 should also work.
+####Basic HTTP Auth support:
+```
+http://lmenezes.com/elasticsearch-kopf/?location=http://user:pwd@localhost:9200
+```
+
+if using https://github.com/Asquera/elasticsearch-http-basic, try:
+```
+http://lmenezes.com/elasticsearch-kopf/?location=http://user:pwd@localhost:9200//
+```
+The plugin modifies the base elasticsearch response and therefore this workaround is needed.
 
 Screenshots
 ------------
-####Cluster overview
+####cluster overview
 ![cluster overview](imgs/cluster_view.png)
 
-####Header reflects cluster state
+####header reflects cluster state
 ![cluster state](imgs/cluster_state.png)
 
-####Rest Client
+####rest Client
 ![rest client](imgs/rest_client.png)
 
-####Aliases management
+####aliases management
 ![aliases management](imgs/aliases.png)
+
+####warmers management
+![warmers management](imgs/warmer.png)
+
+####percolator
+![percolator](imgs/percolator.png)
+
+####snapshots management
+![snapshots management](imgs/snapshot.png)
