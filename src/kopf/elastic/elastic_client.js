@@ -127,7 +127,6 @@ function ElasticClient(connection, http_service, q) {
 			});
 			callback_success(tokens);
 		};
-        console.log(text);
 		this.executeClusterRequest('POST', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
 	};
 
