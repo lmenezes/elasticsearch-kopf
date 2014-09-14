@@ -71,3 +71,6 @@ Screenshots
 
 ####snapshots management
 ![snapshots management](imgs/snapshot.png)
+
+####analysis api
+![analysis api](imgs/analysis.png)
