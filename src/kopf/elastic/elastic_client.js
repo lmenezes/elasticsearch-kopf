@@ -127,7 +127,7 @@ function ElasticClient(connection, http_service, q) {
 			});
 			callback_success(tokens);
 		};
-		this.executeClusterRequest('POST', "/" + index + "/_analyze?field=" + type +"."+field,{'text':text}, buildTokens, callback_error);
+		this.executeClusterRequest('POST', "/" + index + "/_analyze?field=" + type +"."+field, text, buildTokens, callback_error);
 	};
 
 	this.analyzeByAnalyzer=function(index, analyzer, text, callback_success, callback_error) {
@@ -137,7 +137,7 @@ function ElasticClient(connection, http_service, q) {
 			});
 			callback_success(tokens);
 		};
-		this.executeClusterRequest('POST', "/" + index + "/_analyze?analyzer=" + analyzer,{'text':text}, buildTokens, callback_error);
+		this.executeClusterRequest('POST', "/" + index + "/_analyze?analyzer=" + analyzer, text, buildTokens, callback_error);
 	};
 
 	this.updateAliases=function(add_aliases,remove_aliases, callback_success, callback_error) {
