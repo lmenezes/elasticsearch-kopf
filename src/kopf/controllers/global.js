@@ -1,5 +1,5 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, $window, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
-	$scope.version = "1.3.1";
+	$scope.version = "1.3.2";
 	$scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
 
