@@ -1,6 +1,5 @@
 kopf.controller('NavbarController', ['$scope', '$location', '$timeout', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, AlertService, SettingsService, ThemeService) {
-	$scope.settings_service = SettingsService;
-	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
+	$scope.new_refresh = SettingsService.getRefreshInterval();
 	$scope.theme = ThemeService.getTheme();
 	
     $scope.connectToHost=function(event) {
@@ -13,7 +12,7 @@ kopf.controller('NavbarController', ['$scope', '$location', '$timeout', 'AlertSe
 	};
 	
 	$scope.changeRefresh=function() {
-		$scope.settings_service.setRefreshInterval($scope.new_refresh);
+        SettingsService.setRefreshInterval($scope.new_refresh);
 	};
 	
 	$scope.changeTheme=function() {

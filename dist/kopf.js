@@ -1620,9 +1620,23 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 	$scope.gist_history = $scope.loadHistory();
 
 }]);
-kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService) {
+kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService', function($scope, $window, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService, SettingsService) {
 
-    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+    $($window).resize(function() {
+        if (SettingsService.getAutoAdjustLayout()) {
+            $scope.$apply(function(){
+                $scope.index_paginator.setPageSize($scope.getPageSize());
+            });
+        }
+    });
+
+    $scope.getPageSize=function() {
+        var auto = SettingsService.getAutoAdjustLayout();
+        var columns = Math.max(Math.round($window.innerWidth / 280), 1);
+        return auto ? columns : 5;
+    };
+
+    $scope.index_paginator = new Paginator(1, $scope.getPageSize(), [], new IndexFilter("","", true, 0));
 
     $scope.page = $scope.index_paginator.getPage();
 
@@ -2122,8 +2136,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 	};
  }]);
 kopf.controller('NavbarController', ['$scope', '$location', '$timeout', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, AlertService, SettingsService, ThemeService) {
-	$scope.settings_service = SettingsService;
-	$scope.new_refresh = $scope.settings_service.getRefreshInterval();
+	$scope.new_refresh = SettingsService.getRefreshInterval();
 	$scope.theme = ThemeService.getTheme();
 	
     $scope.connectToHost=function(event) {
@@ -2136,7 +2149,7 @@ kopf.controller('NavbarController', ['$scope', '$location', '$timeout', 'AlertSe
 	};
 	
 	$scope.changeRefresh=function() {
-		$scope.settings_service.setRefreshInterval($scope.new_refresh);
+        SettingsService.setRefreshInterval($scope.new_refresh);
 	};
 	
 	$scope.changeTheme=function() {
@@ -2821,20 +2834,35 @@ kopf.factory('AlertService', function() {
 kopf.factory('SettingsService', function() {
 	
 	this.refresh_interval = 3000;
-	
+
+    this.auto_adjust_layout = false;
+
 	this.setRefreshInterval=function(interval) {
 		this.refresh_interval = interval;
 		localStorage.kopf_refresh_interval = interval;
 	};
 	
 	this.getRefreshInterval=function() {
-		if (isDefined(localStorage.kopf_refresh_interval) && isDefined(localStorage.kopf_refresh_interval)) {
+		if (isDefined(localStorage.kopf_refresh_interval)) {
 			return localStorage.kopf_refresh_interval;
 		} else {
 			return this.refresh_interval;
 		}
 	};
-	
+
+    this.setAutoAdjustLayout=function(enabled) {
+        this.auto_adjust_layout = enabled;
+        localStorage.kopf_auto_adjust_layout = enabled;
+    };
+
+    this.getAutoAdjustLayout=function() {
+        if (isDefined(localStorage.kopf_auto_adjust_layout)) {
+            return localStorage.kopf_auto_adjust_layout == "true";
+        } else {
+            return this.auto_adjust_layout == "true";
+        }
+    };
+
 	return this;
 });
 
@@ -3156,6 +3184,10 @@ function Paginator(page, page_size, collection, filter) {
 
     this.previousPage=function() {
         this.page -= 1;
+    };
+
+    this.setPageSize=function(new_size) {
+      this.page_size = new_size;
     };
 
     this.getPage=function() {

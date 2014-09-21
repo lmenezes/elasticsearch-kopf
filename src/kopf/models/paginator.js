@@ -16,6 +16,10 @@ function Paginator(page, page_size, collection, filter) {
         this.page -= 1;
     };
 
+    this.setPageSize=function(new_size) {
+      this.page_size = new_size;
+    };
+
     this.getPage=function() {
         var results = this.getResults();
         var total = results.length;

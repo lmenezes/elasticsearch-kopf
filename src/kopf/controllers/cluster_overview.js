@@ -1,6 +1,20 @@
-kopf.controller('ClusterOverviewController', ['$scope', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', function($scope, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService) {
+kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService', function($scope, $window, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService, SettingsService) {
 
-    $scope.index_paginator = new Paginator(1, 5, [], new IndexFilter("","", true, 0));
+    $($window).resize(function() {
+        if (SettingsService.getAutoAdjustLayout()) {
+            $scope.$apply(function(){
+                $scope.index_paginator.setPageSize($scope.getPageSize());
+            });
+        }
+    });
+
+    $scope.getPageSize=function() {
+        var auto = SettingsService.getAutoAdjustLayout();
+        var columns = Math.max(Math.round($window.innerWidth / 280), 1);
+        return auto ? columns : 5;
+    };
+
+    $scope.index_paginator = new Paginator(1, $scope.getPageSize(), [], new IndexFilter("","", true, 0));
 
     $scope.page = $scope.index_paginator.getPage();
 
