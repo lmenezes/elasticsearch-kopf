@@ -1622,13 +1622,15 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 }]);
 kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService', function($scope, $window, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService, SettingsService) {
 
-    $($window).resize(function() {
+    $($window).resize(function() { $scope.adjustLayout(); });
+
+    $scope.adjustLayout=function() {
         if (SettingsService.getAutoAdjustLayout()) {
             $scope.$apply(function(){
                 $scope.index_paginator.setPageSize($scope.getPageSize());
             });
         }
-    });
+    };
 
     $scope.getPageSize=function() {
         var auto = SettingsService.getAutoAdjustLayout();

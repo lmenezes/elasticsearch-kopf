@@ -1,19 +1,39 @@
-'use strict';
+//'use strict';
 
 describe('ClusterOverviewController', function(){
     var scope, createController;
 
+    var $window;
+
     beforeEach(angular.mock.module('kopf'));
+
+    beforeEach(function () {
+        module('kopf');
+
+        var mock = { innerWidth: 560 };
+
+        module(function ($provide) {
+            $provide.value('$window', mock);
+        });
+
+        inject(function (_$compile_, _$rootScope_) {
+            $compile = _$compile_;
+            $rootScope = _$rootScope_;
+        });
+
+    });
 
     beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
         this.scope = $rootScope.$new();
+        $window = $injector.get('$window');
         this.ElasticService = $injector.get('ElasticService');
         this.ElasticService.client = {};
         this.AlertService = $injector.get('AlertService');
         this.IndexSettingsService = $injector.get('IndexSettingsService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
+        this.SettingsService = $injector.get('SettingsService');
         this.createController = function() {
-            return $controller('ClusterOverviewController', {$scope: this.scope}, this.IndexSettingsService, this.ConfirmDialogService, this.AlertService);
+            return $controller('ClusterOverviewController', {$scope: this.scope, $window: $window}, this.IndexSettingsService, this.ConfirmDialogService, this.AlertService, this.SettingsService);
         };
         this._controller = this.createController();
     }));
@@ -386,6 +406,31 @@ describe('ClusterOverviewController', function(){
         this.scope.showIndexMappings("index_name");
         expect(this.ElasticService.client.getIndexMetadata).toHaveBeenCalledWith("index_name", jasmine.any(Function), jasmine.any(Function));
         expect(this.AlertService.error).toHaveBeenCalledWith("Error while loading index mappings", "buuuu");
+    });
+
+    it('Should return the default page size of 5 if auto adjust is disabled', function() {
+        spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(false);
+        expect(this.scope.getPageSize()).toEqual(5);
+    });
+
+    it('Should return the adjusted page size if auto adjust is enabled', function() {
+        spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(true);
+        $window.innerWidth = 2800;
+        expect(this.scope.getPageSize()).toEqual(10);
+    });
+
+    it('Should change the page size if auto adjust is enabled', function() {
+        spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(true);
+        spyOn(this.scope.index_paginator, "setPageSize").andReturn(true);
+        this.scope.adjustLayout();
+        expect(this.scope.index_paginator.setPageSize).toHaveBeenCalled();
+    });
+
+    it('Should not change the page size if auto adjust is disabled', function() {
+        spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(false);
+        spyOn(this.scope.index_paginator, "setPageSize").andReturn(true);
+        this.scope.adjustLayout();
+        expect(this.scope.index_paginator.setPageSize).not.toHaveBeenCalled();
     });
 
 });
