@@ -1,15 +1,15 @@
-kopf.controller('NavbarController', ['$scope', '$location', '$timeout', 'AlertService', 'SettingsService', 'ThemeService', function($scope, $location, $timeout, AlertService, SettingsService, ThemeService) {
-	$scope.new_refresh = SettingsService.getRefreshInterval();
-	$scope.theme = ThemeService.getTheme();
-	
-    $scope.connectToHost=function(event) {
-		if (event.keyCode == 13) {
-			if (isDefined($scope.new_host) && $scope.new_host.length > 0) {
-				$scope.setHost($scope.new_host);
-				$scope.refreshClusterState();
-			}			
-		}
-	};
+kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, SettingsService, ThemeService, ElasticService) {
+
+    $scope.new_refresh = SettingsService.getRefreshInterval();
+    $scope.theme = ThemeService.getTheme();
+    $scope.new_host = '';
+
+    $scope.connectToHost = function (event) {
+        if (event.keyCode == 13 && notEmpty($scope.new_host)) {
+            ElasticService.connect($scope.new_host);
+            $scope.refreshClusterState();
+        }
+    };
 	
 	$scope.changeRefresh=function() {
         SettingsService.setRefreshInterval($scope.new_refresh);

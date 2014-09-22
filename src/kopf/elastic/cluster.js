@@ -1,6 +1,7 @@
 function Cluster(state,status,nodes,settings, aliases) {
 	this.created_at = new Date().getTime();
 
+    this.name = state.cluster_name;
     this.disableAllocation = "false";
     var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
     var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
@@ -67,7 +68,7 @@ function Cluster(state,status,nodes,settings, aliases) {
 		var nodes = this.nodes;
 		var indices = this.indices;
 		var changes = new ClusterChanges();
-		if (isDefined(old_cluster)) {
+		if (isDefined(old_cluster) && this.name === old_cluster.name) {
 			// checks for node differences
 			old_cluster.nodes.forEach(function(node) {
 				for (var i = 0; i < nodes.length; i++) {
