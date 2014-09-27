@@ -185,9 +185,15 @@ textarea {
 .cluster-stat-detail {
 	font-size: 9px;
 }
-
-table.overview tr td { width: 16.67%; }
-
+table.overview {
+    table-layout:fixed;
+}
+@-moz-document url-prefix() {
+    table.overview {
+        table-layout: auto;
+    }
+    table.overview tr td { width: 16.67%; }
+}
 .index-menu-icon {
 	padding-right: 18px;
 }

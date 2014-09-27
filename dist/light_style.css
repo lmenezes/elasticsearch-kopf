@@ -279,9 +279,6 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 	color: #D0D0D0 !important;
 	font-weight: 300 !important;
 }
-table.overview {
-	table-layout:fixed;
-}
 table {
 	border: 1px solid #ccc;
 }
