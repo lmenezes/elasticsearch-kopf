@@ -1917,63 +1917,64 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
 		);
 	};
 }]);
-kopf.controller('CreateIndexController', ['$scope', '$location', '$timeout', 'AlertService', 'ElasticService', function($scope, $location, $timeout, AlertService, ElasticService) {
-	$scope.settings = '';
+kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticService', 'AceEditorService', function($scope, AlertService, ElasticService, AceEditorService) {
+
+    $scope.source_index = null;
 	$scope.shards = '';
 	$scope.replicas = '';
 	$scope.name = '';
 	$scope.indices = [];
 
-	$scope.editor = new AceEditor('index-settings-editor');
-	
     $scope.$on('loadCreateIndex', function() {
 		$('#create_index_option a').tab('show');
 		$scope.prepareCreateIndex();
     });
 
 	$scope.updateEditor=function() {
-		$scope.editor.setValue($scope.settings);
+        ElasticService.client.getIndexMetadata($scope.source_index,
+            function(metadata) {
+                var body = { settings: metadata.settings, mappings: metadata.mappings };
+                $scope.editor.setValue(JSON.stringify(body, null, 2));
+            },
+            function(error) {
+                AlertService.error("Error while loading index settings", error);
+            }
+        );
 	};
 	
 	$scope.createIndex=function() {
 		if ($scope.name.trim().length === 0) {
-			AlertService.error("You must specify a valid index name", null);	
+			AlertService.error("You must specify a valid index name");
 		} else {
-			var settings = {};
-			var content = $scope.editor.getValue();
-			if (content.trim().length > 0) {
-				try {
-					settings = JSON.parse(content);
-				} catch (error) {
-					throw "Invalid JSON: " + error;
-				}
-			} 
-			if (!isDefined(settings.settings)) {
-				settings = {"settings":settings};
-			} 
-			if (!isDefined(settings.settings.index)) {
-				settings.settings.index = {};
-			} 
-			var index_settings = settings.settings.index;
-			if ($scope.shards.trim().length > 0) {
-				index_settings.number_of_shards = $scope.shards;
-			}
-			if ($scope.replicas.trim().length > 0) {
-				index_settings.number_of_replicas = $scope.replicas;
-			}
-			ElasticService.client.createIndex($scope.name, JSON.stringify(settings, undefined, ""), 
-				function(response) {
-					$scope.refreshClusterState();
-				}, function(error) { 
-                    AlertService.error("Error while creating index", error);
-				}
-			);
+            var body_string = $scope.editor.format();
+            if (isDefined($scope.editor.error)) {
+                AlertService.error("Invalid JSON: " + $scope.editor.error);
+            } else {
+                var body = JSON.parse(body_string);
+                if (Object.keys(body).length === 0) {
+                    body = { settings: { index: {} } };
+                    if ($scope.shards.trim().length > 0) {
+                        body.settings.index.number_of_shards = $scope.shards;
+                    }
+                    if ($scope.replicas.trim().length > 0) {
+                        body.settings.index.number_of_replicas = $scope.replicas;
+                    }
+                    body_string = JSON.stringify(body);
+                }
+                ElasticService.client.createIndex($scope.name, body_string,
+                    function(response) { $scope.refreshClusterState(); },
+                    function(error) { AlertService.error("Error while creating index", error); }
+                );
+            }
 		}
 	};
 	
 	$scope.prepareCreateIndex=function() {
+        if(!isDefined($scope.editor)){
+            $scope.editor = AceEditorService.init('index-settings-editor');
+        }
 		$scope.indices = $scope.cluster.indices;
-		$scope.settings = "";
+		$scope.source_index = null;
 		$scope.editor.setValue("{}");
 		$scope.shards = '';
 		$scope.name = '';
