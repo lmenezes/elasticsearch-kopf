@@ -3,6 +3,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
+    $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
 
     $scope.connectToHost = function (event) {
         if (event.keyCode == 13 && notEmpty($scope.new_host)) {
@@ -18,5 +19,9 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
 	$scope.changeTheme=function() {
 		ThemeService.setTheme($scope.theme);
 	};
+
+    $scope.setAutoAdjustLayout=function() {
+        SettingsService.setAutoAdjustLayout($scope.auto_adjust_layout);
+    };
 
 }]);

@@ -2144,6 +2144,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
+    $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
 
     $scope.connectToHost = function (event) {
         if (event.keyCode == 13 && notEmpty($scope.new_host)) {
@@ -2159,6 +2160,10 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
 	$scope.changeTheme=function() {
 		ThemeService.setTheme($scope.theme);
 	};
+
+    $scope.setAutoAdjustLayout=function() {
+        SettingsService.setAutoAdjustLayout($scope.auto_adjust_layout);
+    };
 
 }]);
 
@@ -2839,7 +2844,7 @@ kopf.factory('SettingsService', function() {
 	
 	this.refresh_interval = 3000;
 
-    this.auto_adjust_layout = false;
+    this.auto_adjust_layout = "true"; // enabled by default
 
 	this.setRefreshInterval=function(interval) {
 		this.refresh_interval = interval;
@@ -2855,15 +2860,15 @@ kopf.factory('SettingsService', function() {
 	};
 
     this.setAutoAdjustLayout=function(enabled) {
-        this.auto_adjust_layout = enabled;
-        localStorage.kopf_auto_adjust_layout = enabled;
+        this.auto_adjust_layout = "" + enabled;
+        localStorage.kopf_auto_adjust_layout = this.auto_adjust_layout;
     };
 
     this.getAutoAdjustLayout=function() {
         if (isDefined(localStorage.kopf_auto_adjust_layout)) {
-            return localStorage.kopf_auto_adjust_layout == "true";
+            return localStorage.kopf_auto_adjust_layout === "true";
         } else {
-            return this.auto_adjust_layout == "true";
+            return this.auto_adjust_layout === "true";
         }
     };
 
