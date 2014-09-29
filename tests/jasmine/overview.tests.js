@@ -10,7 +10,7 @@ describe('ClusterOverviewController', function(){
     beforeEach(function () {
         module('kopf');
 
-        var mock = { innerWidth: 560 };
+        var mock = { innerWidth: 1400 };
 
         module(function ($provide) {
             $provide.value('$window', mock);
