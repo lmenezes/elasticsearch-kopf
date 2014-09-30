@@ -12,6 +12,7 @@ function ElasticClient(connection, http_service, q) {
 	var fetch_version = $.ajax({
 		type: 'GET',
 		url: connection.host + "/",
+		dataType: 'json',
 		beforeSend: function(xhr) {
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
