@@ -614,7 +614,13 @@ function ElasticClient(connection, http_service, q) {
             params.headers = { Authorization: auth};
         }
         http_service(params).
-            success(function(data, status, headers, config) { callback_success(data); }).
+            success(function(data, status, headers, config) {
+                try {
+                    callback_success(data);
+                } catch (error) {
+                    callback_error(error);
+                }
+            }).
             error(function(data, status, headers, config) { callback_error(data); });
     };
 	
@@ -646,7 +652,11 @@ function ElasticClient(connection, http_service, q) {
 				}
 			})).then(
 				function(cluster_health) {
-					callback_success(new ClusterHealth(cluster_health));
+                    try {
+                        callback_success(new ClusterHealth(cluster_health));
+                    } catch (error) {
+                        callback_error(error);
+                    }
 				},
 				function(cluster_health) {
 					callback_error(cluster_health);
@@ -664,7 +674,11 @@ function ElasticClient(connection, http_service, q) {
             http_service.get(host+"/_cluster/settings", params),
             http_service.get(host+"/_aliases", params)
         ]).then(function(responses) {
-                callback_success(new Cluster(responses[0].data,responses[1].data,responses[2].data,responses[3].data,responses[4].data));
+                try {
+                    callback_success(new Cluster(responses[0].data,responses[1].data,responses[2].data,responses[3].data,responses[4].data));
+                } catch (error) {
+                    callback_error(error);
+                }
             },
             function(error) {
                 callback_error(error);
@@ -737,7 +751,11 @@ function ElasticClient(connection, http_service, q) {
 		}
 		$.when.apply($, deferreds).then(
 			function() {
-				callback_success(arguments);
+                try {
+                    callback_success(arguments);
+                } catch (error) {
+                    callback_error(error);
+                }
 			},
 			function(failed_request) {
 				callback_error(failed_request);
