@@ -2949,7 +2949,8 @@ kopf.factory('ElasticService', ['$http','$q', function($http, $q) {
 }]);
 function AceEditor(target) {
 	// ace editor
-	this.editor = ace.edit(target);
+    ace.config.set("basePath", "dist/");
+    this.editor = ace.edit(target);
 	this.editor.setFontSize("10px");
 	this.editor.setTheme("ace/theme/kopf");
 	this.editor.getSession().setMode("ace/mode/json");

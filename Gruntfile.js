@@ -18,9 +18,9 @@ module.exports = function(grunt) {
 		copy: {
 			main: {
 				files: [
-					{expand: true, flatten: true, src: ['src/lib/ace/mode-json.js'], dest: './'},
-					{expand: true, flatten: true, src: ['src/lib/ace/worker-json.js'], dest: './'},
-					{expand: true, flatten: true, src: ['src/kopf/theme-kopf.js'], dest: './'},
+					{expand: true, flatten: true, src: ['src/lib/ace/mode-json.js'], dest: './dist/'},
+					{expand: true, flatten: true, src: ['src/lib/ace/worker-json.js'], dest: './dist/'},
+					{expand: true, flatten: true, src: ['src/kopf/theme-kopf.js'], dest: './dist/'},
 					{expand: true, flatten: true, src: ['src/kopf/css/dark_style.css'], dest: './dist/'},
 					{expand: true, flatten: true, src: ['src/kopf/css/light_style.css'], dest: './dist/'}
 				]
