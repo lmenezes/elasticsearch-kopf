@@ -224,6 +224,8 @@ function Cluster(state,status,nodes,settings, aliases) {
 	this.created_at = new Date().getTime();
 
     this.name = state.cluster_name;
+    this.master_node = state.master_node;
+
     this.disableAllocation = "false";
     var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
     var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
@@ -236,39 +238,42 @@ function Cluster(state,status,nodes,settings, aliases) {
     }
 
 	this.settings = settings;
-	this.master_node = state.master_node;
-	var num_nodes = 0;
+
     var total_size = 0;
     var num_docs = 0;
 
-	this.nodes = Object.keys(state.nodes).map(function(x) {
-		var node = new Node(x,state.nodes[x],nodes.nodes[x]);
+	this.nodes = Object.keys(state.nodes).map(function(node_id) {
+        var node_state = state.nodes[node_id];
+        var node_stats = nodes.nodes[node_id];
+		var node = new Node(node_id, node_state, node_stats);
         total_size += parseInt(node.size_in_bytes);
         num_docs += node.docs;
-		num_nodes += 1;
-		if (node.id === state.master_node) {
+		if (node_id === state.master_node) {
 			node.setCurrentMaster();
 		}
 		return node;
 	}).sort(function(a,b) { return a.compare(b); });
-	this.number_of_nodes = num_nodes;
-	var iRoutingTable = state.routing_table.indices;
-	var iStatus = status.indices;
 
+	this.number_of_nodes = this.nodes.length;
+
+    var iRoutingTable = state.routing_table.indices;
+	var iStatus = status.indices;
 	var special_indices = 0;
-	this.indices = Object.keys(iRoutingTable).map(
-		function(x) {
-			var index = new Index(x, state, iRoutingTable[x], iStatus[x], aliases[x]);
-			if (index.special) {
-				special_indices++;
-			}
-			return index;
-		}
-	);
+	this.indices = Object.keys(iRoutingTable).map(function(index_name) {
+        var index_info    = iRoutingTable[index_name];
+        var index_status  = iStatus[index_name];
+        var index_aliases = aliases[index_name];
+        var index = new Index(index_name, state, index_info, index_status, index_aliases);
+        if (index.special) {
+            special_indices++;
+        }
+        return index;
+    });
+
     if (isDefined(state.blocks.indices)) {
         var indices = this.indices;
-        Object.keys(state.blocks.indices).forEach(function(index) {
-            indices.push(new Index(index));
+        Object.keys(state.blocks.indices).forEach(function(index_name) {
+            indices.push(new Index(index_name));
         });
     }
     this.indices = this.indices.sort(function(a,b) { return a.compare(b); });
@@ -277,12 +282,12 @@ function Cluster(state,status,nodes,settings, aliases) {
 	this.num_docs = num_docs;
 	this.total_indices = this.indices.length;
 
-    this.shards = status._shards.total;
-	this.failed_shards = status._shards.failed;
+    this.shards            = status._shards.total;
+	this.failed_shards     = status._shards.failed;
 	this.successful_shards = status._shards.successful;
     this.unassigned_shards = state.routing_nodes.unassigned.length;
 
-    this.total_size = readablizeBytes(total_size);
+    this.total_size          = readablizeBytes(total_size);
 	this.total_size_in_bytes = total_size;
 	this.changes = null;
 
