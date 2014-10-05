@@ -2097,7 +2097,10 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
 					}
 				);
 			}, 100);
-		}
+		} else {
+            $scope.cluster = null;
+            $scope.cluster_health = null;
+        }
 	};
 
 	$scope.autoRefreshCluster=function() {
@@ -2163,17 +2166,24 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 		);
 	};
  }]);
-kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, SettingsService, ThemeService, ElasticService) {
+kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', 'AlertService', function($scope, SettingsService, ThemeService, ElasticService, AlertService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
+    $scope.current_host = ElasticService.connection.host;
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
 
     $scope.connectToHost = function (event) {
         if (event.keyCode == 13 && notEmpty($scope.new_host)) {
-            ElasticService.connect($scope.new_host);
-            $scope.refreshClusterState();
+            try {
+                ElasticService.connect($scope.new_host);
+            } catch(error) {
+              AlertService.error("Error while connecting to new target host", error);
+            } finally {
+                $scope.current_host = ElasticService.connection.host;
+                $scope.refreshClusterState();
+            }
         }
     };
 	

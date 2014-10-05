@@ -114,3 +114,7 @@ a.setting-info:hover {
 textarea {
     resize: none;
 }
+.connect-menu {
+    line-height: 38px;
+    padding-right: 10px;
+}

@@ -39,16 +39,6 @@
 						</div>
 					</div>
 				</li>
-				<li class="navbar-menu-section">
-					<div class="row">
-						<div class="col-lg-12">
-							<h5>connect to host</h5>
-						</div>
-						<div class="col-lg-12">
-							<input type="text" class="form-control" ng-model="new_host" ng-keypress="connectToHost($event)" placeholder="connect to a different host">
-						</div>
-					</div>
-				</li>
                 <li class="navbar-menu-section">
                     <div class="row">
                         <div class="col-lg-12">
@@ -122,11 +112,27 @@
                     </a>
 				</li>
 			</ul>
+            <ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}} navbar-right visible-lg">
+                <li class="connect-menu">
+                    <a class="dropdown-toggle navbar-cluster-status-{{cluster_health.status}}" href="#" data-toggle="dropdown">
+                        {{current_host}} <i class="fa fa-fw fa-plug"></i>
+                    </a>
+                    <ul class="dropdown-menu form-horizontal navbar-app-settings">
+                        <li class="navbar-menu-section">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <input type="text" class="form-control" ng-model="new_host" ng-keypress="connectToHost($event)" placeholder="connect to a different host">
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
 		</div>
 	</div>
 </div>
 <script>
-$(function() { 
+$(function() {
   $('.dropdown-menu input').click(function(e) { e.stopPropagation(); });
   $('.dropdown-menu select').click(function(e) { e.stopPropagation(); });
 });

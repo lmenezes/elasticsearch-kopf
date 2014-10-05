@@ -114,6 +114,10 @@ a.setting-info:hover {
 textarea {
     resize: none;
 }
+.connect-menu {
+    line-height: 38px;
+    padding-right: 10px;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;

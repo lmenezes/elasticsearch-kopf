@@ -8,10 +8,13 @@ describe('NavbarController', function() {
     beforeEach(angular.mock.inject(function ($rootScope, $controller, $injector) {
         this.scope = $rootScope.$new();
         this.ElasticService = $injector.get('ElasticService');
+        this.ElasticService.connection = { host: 'http://localhost:9200'};
         this.ThemeService = $injector.get('ThemeService');
         this.SettingsService = $injector.get('SettingsService');
+        this.AlertService = $injector.get('AlertService');
+
         this.createController = function () {
-            return $controller('NavbarController', {$scope: this.scope}, this.ElasticService, this.ThemeService, this.SettingsService);
+            return $controller('NavbarController', {$scope: this.scope}, this.SettingsService, this.ThemeService, this.ElasticService, this.AlertService);
         };
         this._controller = this.createController();
     }));
@@ -22,6 +25,7 @@ describe('NavbarController', function() {
         this.scope.refreshClusterState=function() {};
         spyOn(this.scope, 'refreshClusterState').andReturn(true);
         this.scope.new_host = "http://newhost:1234";
+        expect(this.scope.current_host).toEqual("http://localhost:9200");
         this.scope.connectToHost({keyCode: 13}); // 13 = enter key code
         expect(this.ElasticService.connect).toHaveBeenCalledWith("http://newhost:1234");
         expect(this.scope.refreshClusterState).toHaveBeenCalled();
@@ -45,6 +49,17 @@ describe('NavbarController', function() {
         this.scope.connectToHost({keyCode: 13}); // 13 = enter key code
         expect(this.ElasticService.connect).not.toHaveBeenCalled();
         expect(this.scope.refreshClusterState).not.toHaveBeenCalled();
+    });
+
+    it('should NOT change the target for the ElasticService and refresh cluster state if not value is specified', function() {
+        spyOn(this.ElasticService, 'connect').andThrow("Y U NO CONNECT");
+        spyOn(this.AlertService, 'error').andReturn(true);
+        this.scope.refreshClusterState=function() {};
+        spyOn(this.scope, 'refreshClusterState').andReturn(true);
+        this.scope.new_host = "a";
+        this.scope.connectToHost({keyCode: 13}); // 13 = enter key code
+        expect(this.ElasticService.connect).toHaveBeenCalled();
+        expect(this.AlertService.error).toHaveBeenCalledWith("Error while connecting to new target host", "Y U NO CONNECT");
     });
 
 

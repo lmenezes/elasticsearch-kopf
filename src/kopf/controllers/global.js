@@ -90,7 +90,10 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
 					}
 				);
 			}, 100);
-		}
+		} else {
+            $scope.cluster = null;
+            $scope.cluster_health = null;
+        }
 	};
 
 	$scope.autoRefreshCluster=function() {
