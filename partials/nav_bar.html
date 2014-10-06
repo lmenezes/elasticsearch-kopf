@@ -121,9 +121,14 @@
                         <li class="navbar-menu-section">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <input type="text" class="form-control" ng-model="new_host" ng-keypress="connectToHost($event)" placeholder="connect to a different host">
+                                    <input type="text" class="form-control" ng-model="new_host" ng-keypress="handleConnectToHost($event)" placeholder="connect to a different host">
                                 </div>
                             </div>
+                        </li>
+                        <li ng-show="host_history.length > 0"><h5>previous hosts</h5></li>
+                        <li ng-show="host_history.length > 0" class="divider"></li>
+                        <li ng-show="host_history.length > 0" ng-repeat="host in host_history" ng-click="connectToHost(host.host)">
+                            <a href="#" class="host-history">{{host.host}}</a>
                         </li>
                     </ul>
                 </li>

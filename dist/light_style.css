@@ -424,3 +424,13 @@ thead.overview {
 	border: 0px;
 	padding: 0px;
 }
+.dropdown-menu > li > a {
+    color: #555555;
+}
+.dropdown-menu > li > a:hover {
+    background: #f9f9f9;
+    color: #555555;
+}
+.dropdown-menu {
+    background: #fff;
+}

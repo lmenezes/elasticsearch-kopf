@@ -85,6 +85,7 @@ module.exports = function(grunt) {
 					'src/kopf/services/aceeditor.js',
 					'src/kopf/services/theme.js',
                     'src/kopf/services/elastic.js',
+                    'src/kopf/services/host_history.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',
@@ -175,6 +176,7 @@ module.exports = function(grunt) {
 					'src/kopf/services/aceeditor.js',
 					'src/kopf/services/theme.js',
                     'src/kopf/services/elastic.js',
+                    'src/kopf/services/host_history.js',
 					// MODELS
 					'src/kopf/models/ace_editor.js',
 					'src/kopf/models/gist.js',

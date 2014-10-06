@@ -2166,27 +2166,34 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
 		);
 	};
  }]);
-kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', 'AlertService', function($scope, SettingsService, ThemeService, ElasticService, AlertService) {
+kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService', function($scope, SettingsService, ThemeService, ElasticService, AlertService, HostHistoryService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
     $scope.current_host = ElasticService.connection.host;
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
+    $scope.host_history = HostHistoryService.getHostHistory();
 
-    $scope.connectToHost = function (event) {
+    $scope.handleConnectToHost= function (event) {
         if (event.keyCode == 13 && notEmpty($scope.new_host)) {
-            try {
-                ElasticService.connect($scope.new_host);
-            } catch(error) {
-              AlertService.error("Error while connecting to new target host", error);
-            } finally {
-                $scope.current_host = ElasticService.connection.host;
-                $scope.refreshClusterState();
-            }
+            $scope.connectToHost($scope.new_host);
         }
     };
-	
+
+    $scope.connectToHost=function(host) {
+        try {
+            ElasticService.connect(host);
+            HostHistoryService.addToHistory(ElasticService.connection.host);
+            $scope.host_history = HostHistoryService.getHostHistory();
+        } catch(error) {
+            AlertService.error("Error while connecting to new target host", error);
+        } finally {
+            $scope.current_host = ElasticService.connection.host;
+            $scope.refreshClusterState();
+        }
+    };
+
 	$scope.changeRefresh=function() {
         SettingsService.setRefreshInterval($scope.new_refresh);
 	};
@@ -2957,6 +2964,38 @@ kopf.factory('ElasticService', ['$http','$q', function($http, $q) {
     return this;
 
 }]);
+kopf.factory('HostHistoryService', function() {
+
+    this.getHostHistory=function() {
+        var history = localStorage.getItem('kopf_host_history');
+        history = isDefined(history) ? history : "[]";
+        return JSON.parse(history);
+    };
+
+    this.addToHistory=function(host) {
+        host = host.toLowerCase();
+        var host_entry = { host: host };
+        var history = this.getHostHistory();
+        for (var i = 0; i < history.length; i++) {
+            if (history[i].host === host) {
+                history.splice(i, 1);
+                break;
+            }
+        }
+        history.splice(0,0,host_entry);
+        if (history.length > 10) {
+            history.length = 10;
+        }
+        localStorage.setItem('kopf_host_history', JSON.stringify(history));
+    };
+
+    this.clearHistory=function() {
+        localStorage.removeItem('kopf_host_history');
+    };
+
+    return this;
+
+});
 function AceEditor(target) {
 	// ace editor
     ace.config.set("basePath", "dist/");

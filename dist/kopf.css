@@ -118,6 +118,17 @@ textarea {
     line-height: 38px;
     padding-right: 10px;
 }
+.dropdown-menu > li > a {
+    font-weight: 300;
+}
+.dropdown-menu > li > a:hover {
+    font-weight: 300;
+}
+.host-history {
+    font-size: 12px;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;

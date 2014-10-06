@@ -1,24 +1,31 @@
-kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', 'AlertService', function($scope, SettingsService, ThemeService, ElasticService, AlertService) {
+kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService', function($scope, SettingsService, ThemeService, ElasticService, AlertService, HostHistoryService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
     $scope.current_host = ElasticService.connection.host;
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
+    $scope.host_history = HostHistoryService.getHostHistory();
 
-    $scope.connectToHost = function (event) {
+    $scope.handleConnectToHost= function (event) {
         if (event.keyCode == 13 && notEmpty($scope.new_host)) {
-            try {
-                ElasticService.connect($scope.new_host);
-            } catch(error) {
-              AlertService.error("Error while connecting to new target host", error);
-            } finally {
-                $scope.current_host = ElasticService.connection.host;
-                $scope.refreshClusterState();
-            }
+            $scope.connectToHost($scope.new_host);
         }
     };
-	
+
+    $scope.connectToHost=function(host) {
+        try {
+            ElasticService.connect(host);
+            HostHistoryService.addToHistory(ElasticService.connection.host);
+            $scope.host_history = HostHistoryService.getHostHistory();
+        } catch(error) {
+            AlertService.error("Error while connecting to new target host", error);
+        } finally {
+            $scope.current_host = ElasticService.connection.host;
+            $scope.refreshClusterState();
+        }
+    };
+
 	$scope.changeRefresh=function() {
         SettingsService.setRefreshInterval($scope.new_refresh);
 	};
