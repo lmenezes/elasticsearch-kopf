@@ -5,7 +5,7 @@ describe('RepositoryController', function(){
 
     beforeEach(angular.mock.module('kopf'));
     
-    beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
+    beforeEach(angular.mock.inject(function($rootScope, $controller, $injector, $httpBackend){
         this.scope = $rootScope.$new();
         this.ElasticService = $injector.get('ElasticService');
         this.ElasticService.client = {};
@@ -13,7 +13,7 @@ describe('RepositoryController', function(){
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         var AlertService = $injector.get('AlertService');
         this.AlertService = AlertService;
-
+        $httpBackend.whenGET('./kopf_external_settings.json').respond(200, {});
         this.createController = function() {
             return $controller('RepositoryController', {$scope: this.scope}, this.ConfirmDialogService, AlertService);
         };

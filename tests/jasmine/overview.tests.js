@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 
 describe('ClusterOverviewController', function(){
     var scope, createController;
@@ -9,21 +9,14 @@ describe('ClusterOverviewController', function(){
 
     beforeEach(function () {
         module('kopf');
-
         var mock = { innerWidth: 1400 };
-
         module(function ($provide) {
             $provide.value('$window', mock);
         });
-
-        inject(function (_$compile_, _$rootScope_) {
-            $compile = _$compile_;
-            $rootScope = _$rootScope_;
-        });
-
     });
 
-    beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
+    beforeEach(angular.mock.inject(function($rootScope, $controller, $injector, $httpBackend){
+        $httpBackend.whenGET('./kopf_external_settings.json').respond(200, {});
         this.scope = $rootScope.$new();
         $window = $injector.get('$window');
         this.ElasticService = $injector.get('ElasticService');

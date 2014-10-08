@@ -5,7 +5,8 @@ describe('AnalysisController', function(){
 
     beforeEach(angular.mock.module('kopf'));
     
-    beforeEach(angular.mock.inject(function($rootScope, $controller, $injector){
+    beforeEach(angular.mock.inject(function($rootScope, $controller, $injector, $httpBackend){
+        $httpBackend.whenGET('./kopf_external_settings.json').respond(200, {});
         this.scope = $rootScope.$new();
         this.ElasticService = $injector.get('ElasticService');
         this.ElasticService.client = {};

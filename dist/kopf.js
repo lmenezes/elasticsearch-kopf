@@ -2171,7 +2171,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
-    $scope.current_host = ElasticService.connection.host;
+    $scope.current_host = ElasticService.getHost();
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
     $scope.host_history = HostHistoryService.getHostHistory();
 
@@ -2210,7 +2210,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
 
 kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, $location, $timeout, AlertService, AceEditorService, ElasticService) {
 
-	$scope.request = new Request(ElasticService.connection.host + "/_search","GET","{}");
+	$scope.request = new Request(ElasticService.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
 
 	$scope.loadHistory=function() {
@@ -2943,22 +2943,31 @@ kopf.factory('ThemeService', function() {
 	
 	return this;
 });
-kopf.factory('ElasticService', ['$http','$q', function($http, $q) {
+kopf.factory('ElasticService', ['$http','$q', 'ExternalSettingsService', function($http, $q, ExternalSettingsService) {
     this.client = null;
     this.connection = null;
 
     this.connect=function(url) {
-        this.client = null;
-        this.connection = null;
-        if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
-            url = "http://" + url;
+        var root = ExternalSettingsService.getElasticsearchRootPath();
+        try {
+            this.client = null;
+            this.connection = null;
+            if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
+                url = "http://" + url;
+            }
+            this.connection = new ESConnection(url + root);
+            this.client = new ElasticClient(this.connection, $http, $q);
+        } catch (error) {
+            throw { message: "Error while connecting to [" + url + root + "]", body: error };
         }
-        this.connection = new ESConnection(url);
-        this.client = new ElasticClient(this.connection, $http, $q);
     };
 
     this.isConnected=function() {
       return isDefined(this.client);
+    };
+
+    this.getHost=function() {
+        return isDefined(this.connection) ? this.connection.host : '';
     };
 
     return this;
@@ -2991,6 +3000,39 @@ kopf.factory('HostHistoryService', function() {
 
     this.clearHistory=function() {
         localStorage.removeItem('kopf_host_history');
+    };
+
+    return this;
+
+});
+kopf.factory('ExternalSettingsService', function ($http, $q) {
+
+    this.settings = null;
+
+    this.loadSettings = function () {
+        if (!isDefined(this.settings)) {
+            this.settings = {};
+            var settings = this.settings;
+            var settings_future = $.ajax({ type: 'GET', url: "./kopf_external_settings.json", dataType: 'json', async: false });
+            settings_future.done(function (data) {
+                try {
+                    Object.keys(data).forEach(function (setting) {
+                        settings[setting] = data[setting];
+                    });
+                } catch (error) {
+                    throw { message: "Error processing external settings", body: data };
+                }
+            });
+            settings_future.fail(function (error) {
+                throw { message: "Error fetching external settings from file", body: error };
+            });
+        }
+    };
+
+    this.getElasticsearchRootPath = function () {
+        this.loadSettings();
+        return this.settings.elasticsearch_root_path;
+
     };
 
     return this;

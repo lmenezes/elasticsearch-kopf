@@ -1,6 +1,6 @@
 kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, $location, $timeout, AlertService, AceEditorService, ElasticService) {
 
-	$scope.request = new Request(ElasticService.connection.host + "/_search","GET","{}");
+	$scope.request = new Request(ElasticService.getHost() + "/_search","GET","{}");
 	$scope.validation_error = null;
 
 	$scope.loadHistory=function() {

@@ -3,7 +3,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
-    $scope.current_host = ElasticService.connection.host;
+    $scope.current_host = ElasticService.getHost();
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
     $scope.host_history = HostHistoryService.getHostHistory();
 
