@@ -653,33 +653,14 @@ function ElasticClient(connection, http_service, q) {
 	/** ####### END OF REFACTORED AREA ####### **/
 
 	this.getClusterHealth=function(callback_success, callback_error) {
-		var url = this.host + "/_cluster/health";
-		$.when(
-			$.ajax({
-				type: 'GET',
-				url: url,
-				dataType: 'json',
-				data: {},
-				beforeSend: function(xhr) {
-					if (isDefined(auth)) {
-						xhr.setRequestHeader("Authorization", auth);
-					}
-                    if (this.with_credentials) {
-                        xhr.setRequestHeader("withCredentials", true);
-                    }
-				}
-			})).then(
-				function(cluster_health) {
-                    try {
-                        callback_success(new ClusterHealth(cluster_health));
-                    } catch (error) {
-                        callback_error(error);
-                    }
-				},
-				function(cluster_health) {
-					callback_error(cluster_health);
-				}
-		);
+		var create_cluster_health=function(cluster_health) {
+            try {
+                callback_success(new ClusterHealth(cluster_health));
+            } catch (error) {
+                callback_error(error);
+            }
+        };
+        this.executeClusterRequest('GET', "/_cluster/health", {}, create_cluster_health, callback_error);
 	};
 
 	this.getClusterDetail=function(callback_success, callback_error) {
