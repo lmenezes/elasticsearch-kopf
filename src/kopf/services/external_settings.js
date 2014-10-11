@@ -2,7 +2,7 @@ kopf.factory('ExternalSettingsService', function ($http, $q) {
 
     this.settings = null;
 
-    this.loadSettings = function () {
+    this.getSettings=function() {
         if (!isDefined(this.settings)) {
             this.settings = {};
             var settings = this.settings;
@@ -20,13 +20,12 @@ kopf.factory('ExternalSettingsService', function ($http, $q) {
                 throw { message: "Error fetching external settings from file", body: error };
             });
         }
+        return this.settings;
     };
 
-    this.getElasticsearchRootPath = function () {
-        this.loadSettings();
-        return this.settings.elasticsearch_root_path;
+    this.getElasticsearchRootPath=function() { return this.getSettings().elasticsearch_root_path; };
 
-    };
+    this.withCredentials=function() { return this.getSettings().with_credentials; };
 
     return this;
 

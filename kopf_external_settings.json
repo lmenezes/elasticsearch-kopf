@@ -1,3 +1,4 @@
 {
-    "elasticsearch_root_path": ""
+    "elasticsearch_root_path": "",
+    "with_credentials": false
 }

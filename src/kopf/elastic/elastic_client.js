@@ -2,6 +2,7 @@ function ElasticClient(connection, http_service, q) {
 	this.host = connection.host;
 	this.username = connection.username;
 	this.password = connection.password;
+    this.with_credentials = connection.with_credentials;
 
 	this.createAuthToken=function(username,password) {
 		var hasAuth = isDefined(username) && isDefined(password);
@@ -16,7 +17,10 @@ function ElasticClient(connection, http_service, q) {
 		beforeSend: function(xhr) {
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
-			} 
+			}
+            if (this.with_credentials) {
+                xhr.setRequestHeader("withCredentials", true);
+            }
 		},
 		async: false
 	});
@@ -247,6 +251,9 @@ function ElasticClient(connection, http_service, q) {
             params.withCredentials = true;
             params.headers = { Authorization: auth};
         }
+        if (this.with_credentials) {
+            params.withCredentials = true;
+        }
         http_service(params).
             success(function(data, status, headers, config) {
                 try {
@@ -263,6 +270,9 @@ function ElasticClient(connection, http_service, q) {
         if (auth !== null) {
             params.withCredentials = true;
             params.headers = { Authorization: auth};
+        }
+        if (this.with_credentials) {
+            params.withCredentials = true;
         }
         http_service(params).
             success(function(data, status, headers, config) { callback_success(data); }).
@@ -283,6 +293,9 @@ function ElasticClient(connection, http_service, q) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
 					}
+                    if (this.with_credentials) {
+                        xhr.setRequestHeader("withCredentials", true);
+                    }
 				}
 			})).then(
 				function(cluster_health) {
@@ -300,7 +313,14 @@ function ElasticClient(connection, http_service, q) {
 
 	this.getClusterDetail=function(callback_success, callback_error) {
 		var host = this.host;
-        var params = auth !== null ? { withCredentials: true, headers: { Authorization: auth } } : {};
+        var params = {};
+        if (isDefined(auth)) {
+            params.withCredentials = true;
+            params.headers = { Authorization: auth };
+        }
+        if (this.with_credentials) {
+            params.withCredentials = true;
+        }
         q.all([
             http_service.get(host+"/_cluster/state/master_node,nodes,routing_table,blocks/", params),
             http_service.get(host+"/_status", params),
@@ -334,7 +354,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})
 			);
@@ -349,7 +372,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})
 			);
@@ -364,7 +390,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})
 			);
@@ -378,7 +407,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})	
 			);
@@ -397,15 +429,3 @@ function ElasticClient(connection, http_service, q) {
 		);
 	};
 }
-
-
-
-
-
-
-
-
-
-
-
-

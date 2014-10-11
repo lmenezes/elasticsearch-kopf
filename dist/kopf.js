@@ -373,6 +373,7 @@ function ElasticClient(connection, http_service, q) {
 	this.host = connection.host;
 	this.username = connection.username;
 	this.password = connection.password;
+    this.with_credentials = connection.with_credentials;
 
 	this.createAuthToken=function(username,password) {
 		var hasAuth = isDefined(username) && isDefined(password);
@@ -387,7 +388,10 @@ function ElasticClient(connection, http_service, q) {
 		beforeSend: function(xhr) {
 			if (isDefined(auth)) {
 				xhr.setRequestHeader("Authorization", auth);
-			} 
+			}
+            if (this.with_credentials) {
+                xhr.setRequestHeader("withCredentials", true);
+            }
 		},
 		async: false
 	});
@@ -618,6 +622,9 @@ function ElasticClient(connection, http_service, q) {
             params.withCredentials = true;
             params.headers = { Authorization: auth};
         }
+        if (this.with_credentials) {
+            params.withCredentials = true;
+        }
         http_service(params).
             success(function(data, status, headers, config) {
                 try {
@@ -634,6 +641,9 @@ function ElasticClient(connection, http_service, q) {
         if (auth !== null) {
             params.withCredentials = true;
             params.headers = { Authorization: auth};
+        }
+        if (this.with_credentials) {
+            params.withCredentials = true;
         }
         http_service(params).
             success(function(data, status, headers, config) { callback_success(data); }).
@@ -654,6 +664,9 @@ function ElasticClient(connection, http_service, q) {
 					if (isDefined(auth)) {
 						xhr.setRequestHeader("Authorization", auth);
 					}
+                    if (this.with_credentials) {
+                        xhr.setRequestHeader("withCredentials", true);
+                    }
 				}
 			})).then(
 				function(cluster_health) {
@@ -671,7 +684,14 @@ function ElasticClient(connection, http_service, q) {
 
 	this.getClusterDetail=function(callback_success, callback_error) {
 		var host = this.host;
-        var params = auth !== null ? { withCredentials: true, headers: { Authorization: auth } } : {};
+        var params = {};
+        if (isDefined(auth)) {
+            params.withCredentials = true;
+            params.headers = { Authorization: auth };
+        }
+        if (this.with_credentials) {
+            params.withCredentials = true;
+        }
         q.all([
             http_service.get(host+"/_cluster/state/master_node,nodes,routing_table,blocks/", params),
             http_service.get(host+"/_status", params),
@@ -705,7 +725,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})
 			);
@@ -720,7 +743,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})
 			);
@@ -735,7 +761,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})
 			);
@@ -749,7 +778,10 @@ function ElasticClient(connection, http_service, q) {
 					beforeSend: function(xhr) { 
 						if (isDefined(auth)) {
 							xhr.setRequestHeader("Authorization", auth);
-						} 
+						}
+                        if (this.with_credentials) {
+                            xhr.setRequestHeader("withCredentials", true);
+                        }
 					}
 				})	
 			);
@@ -768,27 +800,15 @@ function ElasticClient(connection, http_service, q) {
 		);
 	};
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Expects URL according to /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
 // Examples:
 // http://localhost:9200
 // http://user:password@localhost:9200
 // https://localhost:9200
-function ESConnection(url) {
+function ESConnection(url, with_credentials) {
 	var protected_url = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
 	this.host = "http://localhost:9200"; // default
+    this.with_credentials = with_credentials;
 	if (notEmpty(url)) {
 		var connection_parts = protected_url.exec(url);
 		if (isDefined(connection_parts)) {
@@ -2949,13 +2969,14 @@ kopf.factory('ElasticService', ['$http','$q', 'ExternalSettingsService', functio
 
     this.connect=function(url) {
         var root = ExternalSettingsService.getElasticsearchRootPath();
+        var with_credentials = ExternalSettingsService.withCredentials();
         try {
             this.client = null;
             this.connection = null;
             if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
                 url = "http://" + url;
             }
-            this.connection = new ESConnection(url + root);
+            this.connection = new ESConnection(url + root, with_credentials);
             this.client = new ElasticClient(this.connection, $http, $q);
         } catch (error) {
             throw { message: "Error while connecting to [" + url + root + "]", body: error };
@@ -3009,7 +3030,7 @@ kopf.factory('ExternalSettingsService', function ($http, $q) {
 
     this.settings = null;
 
-    this.loadSettings = function () {
+    this.getSettings=function() {
         if (!isDefined(this.settings)) {
             this.settings = {};
             var settings = this.settings;
@@ -3027,13 +3048,12 @@ kopf.factory('ExternalSettingsService', function ($http, $q) {
                 throw { message: "Error fetching external settings from file", body: error };
             });
         }
+        return this.settings;
     };
 
-    this.getElasticsearchRootPath = function () {
-        this.loadSettings();
-        return this.settings.elasticsearch_root_path;
+    this.getElasticsearchRootPath=function() { return this.getSettings().elasticsearch_root_path; };
 
-    };
+    this.withCredentials=function() { return this.getSettings().with_credentials; };
 
     return this;
 
