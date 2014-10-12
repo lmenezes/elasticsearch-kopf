@@ -695,90 +695,38 @@ function ElasticClient(connection, http_service, q) {
 	this.getClusterDiagnosis=function(health, state, stats, hotthreads, callback_success,callback_error) {
 		var host = this.host;
 		var auth = this.createAuthToken(this.username,this.password);
-		var deferreds = [];
+        var params = {};
+        if (isDefined(auth)) {
+            params.withCredentials = true;
+            params.headers = { Authorization: auth };
+        }
+        if (this.with_credentials) {
+            params.withCredentials = true;
+        }
+		var requests = [];
 		if (health) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_cluster/health", 
-					dataType: 'json', 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})
-			);
+            requests.push(http_service.get(host+"/_cluster/health", params));
 		}
 		if (state) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_cluster/state", 
-					dataType: 'json', 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})
-			);
+            requests.push(http_service.get(host+"/_cluster/state", params));
 		}
 		if (stats) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_nodes/stats?all=true", 
-					dataType: 'json', 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})
-			);
+            requests.push(http_service.get(host+"/_nodes/stats?all=true", params));
 		}
 		if (hotthreads) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_nodes/hot_threads", 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})	
-			);
+            requests.push(http_service.get(host+"/_nodes/hot_threads", params));
 		}
-		$.when.apply($, deferreds).then(
-			function() {
+        q.all(requests).then(function(responses) {
                 try {
-                    callback_success(arguments);
+                    callback_success(responses.map(function(response) { return response.data; }));
                 } catch (error) {
                     callback_error(error);
                 }
-			},
-			function(failed_request) {
-				callback_error(failed_request);
-			}
-		);
+            },
+            function(error) {
+                callback_error(error);
+            }
+        );
 	};
 }
 // Expects URL according to /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
@@ -1552,36 +1500,32 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 		ElasticService.client.getClusterDiagnosis($scope.retrieveHealth, $scope.retrieveState, $scope.retrieveStats, $scope.retrieveHotThreads,
 			function(responses) {
 				$scope.state = '';
-				if (!(responses[0] instanceof Array)) {
+				if (!(responses instanceof Array)) {
 					responses = [responses]; // so logic bellow remains the same in case result is not an array
 				}
 				var idx = 0;
 				if ($scope.retrieveHealth) {
-					results.health_raw = responses[idx++][0];
+					results.health_raw = responses[idx++];
 					results.health = $sce.trustAsHtml(JSONTree.create(results.health_raw));
 				}
 				if ($scope.retrieveState) {
-					results.state_raw = responses[idx++][0];
+					results.state_raw = responses[idx++];
 					results.state =  $sce.trustAsHtml(JSONTree.create(results.state_raw));
 				}
 				if ($scope.retrieveStats) {
-					results.stats_raw = responses[idx++][0];
+					results.stats_raw = responses[idx++];
 					results.stats = $sce.trustAsHtml(JSONTree.create(results.stats_raw));
 				}
 				if ($scope.retrieveHotThreads) {
-					results.hot_threads = responses[idx][0];
+					results.hot_threads = responses[idx];
 				}
-				$scope.updateModel(function() {
-					$scope.results = results;
-					$scope.state = '';
-					AlertService.remove(info_id);
-				});
+				$scope.results = results;
+				$scope.state = '';
+				AlertService.remove(info_id);
 			},
 			function(failed_request) {
-				$scope.updateModel(function() {
-					AlertService.remove(info_id);
-					AlertService.error("Error while retrieving cluster health information", failed_request.responseText);
-				});
+				AlertService.remove(info_id);
+				AlertService.error("Error while retrieving cluster health information", failed_request.data);
 			}
 		);
 	};

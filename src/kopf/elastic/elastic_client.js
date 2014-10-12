@@ -324,89 +324,37 @@ function ElasticClient(connection, http_service, q) {
 	this.getClusterDiagnosis=function(health, state, stats, hotthreads, callback_success,callback_error) {
 		var host = this.host;
 		var auth = this.createAuthToken(this.username,this.password);
-		var deferreds = [];
+        var params = {};
+        if (isDefined(auth)) {
+            params.withCredentials = true;
+            params.headers = { Authorization: auth };
+        }
+        if (this.with_credentials) {
+            params.withCredentials = true;
+        }
+		var requests = [];
 		if (health) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_cluster/health", 
-					dataType: 'json', 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})
-			);
+            requests.push(http_service.get(host+"/_cluster/health", params));
 		}
 		if (state) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_cluster/state", 
-					dataType: 'json', 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})
-			);
+            requests.push(http_service.get(host+"/_cluster/state", params));
 		}
 		if (stats) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_nodes/stats?all=true", 
-					dataType: 'json', 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})
-			);
+            requests.push(http_service.get(host+"/_nodes/stats?all=true", params));
 		}
 		if (hotthreads) {
-			deferreds.push(
-				$.ajax({ 
-					type: 'GET', 
-					url: host+"/_nodes/hot_threads", 
-					data: {},
-					beforeSend: function(xhr) { 
-						if (isDefined(auth)) {
-							xhr.setRequestHeader("Authorization", auth);
-						}
-                        if (this.with_credentials) {
-                            xhr.setRequestHeader("withCredentials", true);
-                        }
-					}
-				})	
-			);
+            requests.push(http_service.get(host+"/_nodes/hot_threads", params));
 		}
-		$.when.apply($, deferreds).then(
-			function() {
+        q.all(requests).then(function(responses) {
                 try {
-                    callback_success(arguments);
+                    callback_success(responses.map(function(response) { return response.data; }));
                 } catch (error) {
                     callback_error(error);
                 }
-			},
-			function(failed_request) {
-				callback_error(failed_request);
-			}
-		);
+            },
+            function(error) {
+                callback_error(error);
+            }
+        );
 	};
 }

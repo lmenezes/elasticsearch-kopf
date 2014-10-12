@@ -34,36 +34,32 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 		ElasticService.client.getClusterDiagnosis($scope.retrieveHealth, $scope.retrieveState, $scope.retrieveStats, $scope.retrieveHotThreads,
 			function(responses) {
 				$scope.state = '';
-				if (!(responses[0] instanceof Array)) {
+				if (!(responses instanceof Array)) {
 					responses = [responses]; // so logic bellow remains the same in case result is not an array
 				}
 				var idx = 0;
 				if ($scope.retrieveHealth) {
-					results.health_raw = responses[idx++][0];
+					results.health_raw = responses[idx++];
 					results.health = $sce.trustAsHtml(JSONTree.create(results.health_raw));
 				}
 				if ($scope.retrieveState) {
-					results.state_raw = responses[idx++][0];
+					results.state_raw = responses[idx++];
 					results.state =  $sce.trustAsHtml(JSONTree.create(results.state_raw));
 				}
 				if ($scope.retrieveStats) {
-					results.stats_raw = responses[idx++][0];
+					results.stats_raw = responses[idx++];
 					results.stats = $sce.trustAsHtml(JSONTree.create(results.stats_raw));
 				}
 				if ($scope.retrieveHotThreads) {
-					results.hot_threads = responses[idx][0];
+					results.hot_threads = responses[idx];
 				}
-				$scope.updateModel(function() {
-					$scope.results = results;
-					$scope.state = '';
-					AlertService.remove(info_id);
-				});
+				$scope.results = results;
+				$scope.state = '';
+				AlertService.remove(info_id);
 			},
 			function(failed_request) {
-				$scope.updateModel(function() {
-					AlertService.remove(info_id);
-					AlertService.error("Error while retrieving cluster health information", failed_request.responseText);
-				});
+				AlertService.remove(info_id);
+				AlertService.error("Error while retrieving cluster health information", failed_request.data);
 			}
 		);
 	};
