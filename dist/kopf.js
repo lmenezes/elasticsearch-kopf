@@ -88,6 +88,7 @@ function Alias(alias, index, filter, index_routing, search_routing) {
     return new Alias(this.alias, this.index, this.filter, this.index_routing, this.search_routing);
   };
 }
+
 function ClusterChanges() {
 
   this.nodeJoins = null;
@@ -178,6 +179,7 @@ function ClusterChanges() {
   };
 
 }
+
 function ClusterHealth(health) {
   this.status = health.status;
   this.cluster_name = health.cluster_name;
@@ -192,6 +194,7 @@ function ClusterHealth(health) {
   this.shards = this.active_shards + this.relocating_shards + this.unassigned_shards + this.initializing_shards;
   this.fetched_at = getTimeString(new Date());
 }
+
 function ClusterSettings(settings) {
   // FIXME: 0.90/1.0 check
   var valid = [
@@ -224,6 +227,7 @@ function ClusterSettings(settings) {
     });
   });
 }
+
 function Cluster(state, status, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
 
@@ -377,6 +381,7 @@ function Cluster(state, status, nodes, settings, aliases) {
   };
 
 }
+
 function ElasticClient(connection, http_service, q) {
   this.host = connection.host;
   this.username = connection.username;
@@ -755,6 +760,7 @@ function ElasticClient(connection, http_service, q) {
     );
   };
 }
+
 // Expects URL according to /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
 // Examples:
 // http://localhost:9200
@@ -775,6 +781,7 @@ function ESConnection(url, with_credentials) {
     }
   }
 }
+
 function Index(index_name, cluster_state, index_info, index_status, aliases) {
   this.name = index_name;
   this.shards = null;
@@ -881,7 +888,6 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   };
 }
 
-
 function EditableIndexSettings(settings) {
   // FIXME: 0.90/1.0 check
   this.valid_settings = [
@@ -938,6 +944,7 @@ function EditableIndexSettings(settings) {
     instance[setting] = getProperty(settings, setting);
   });
 }
+
 function Node(node_id, node_info, node_stats) {
   this.id = node_id;
   this.name = node_info.name;
@@ -1010,6 +1017,7 @@ function UnassignedShard(shard_info) {
   this.index = shard_info.index;
   this.id = this.node + "_" + this.shard + "_" + this.index;
 }
+
 /** TYPES **/
 function Token(token, start_offset, end_offset, position) {
   this.token = token;
@@ -1017,6 +1025,7 @@ function Token(token, start_offset, end_offset, position) {
   this.end_offset = end_offset;
   this.position = position;
 }
+
 function Repository(name, info) {
   this.name = name;
   this.type = info.type;
@@ -1092,6 +1101,7 @@ function Repository(name, info) {
     return settings;
   };
 }
+
 function Snapshot(info) {
   this.name = info.snapshot;
   this.indices = info.indices;
@@ -1104,12 +1114,14 @@ function Snapshot(info) {
   this.failures = info.failures;
   this.shards = info.shards;
 }
+
 function Warmer(id, index, body) {
   this.id = id;
   this.index = index;
   this.source = body.source;
   this.types = body.types;
 }
+
 function PercolateQuery(query_info) {
   this.index = query_info._index;
   this.id = query_info._id;
@@ -1170,6 +1182,7 @@ function PercolatorsPage(from, size, total, percolators) {
     return total;
   };
 }
+
 function IndexMetadata(index, metadata) {
   this.index = index;
   this.mappings = metadata.mappings;
@@ -1236,6 +1249,7 @@ function IndexMetadata(index, metadata) {
     return validFields;
   };
 }
+
 var kopf = angular.module('kopf', []);
 
 kopf.factory('IndexSettingsService', function() {
@@ -1510,6 +1524,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
   });
 
 }]);
+
 kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '$sce', 'AlertService', 'ConfirmDialogService', 'ElasticService', function($scope, $location, $timeout, $sce, AlertService, ConfirmDialogService, ElasticService) {
   $scope.shared_url = '';
   $scope.results = null;
@@ -1636,6 +1651,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
   $scope.gist_history = $scope.loadHistory();
 
 }]);
+
 kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSettingsService', 'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService', function($scope, $window, IndexSettingsService, ConfirmDialogService, AlertService, ElasticService, SettingsService) {
 
   $($window).resize(function() {
@@ -1931,6 +1947,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   };
 
 }]);
+
 kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout', 'AlertService', 'ElasticService', function($scope, $location, $timeout, AlertService, ElasticService) {
   $scope.$on('loadClusterSettingsEvent', function() {
     $('#cluster_settings_option a').tab('show');
@@ -1952,6 +1969,7 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
     );
   };
 }]);
+
 kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticService', 'AceEditorService', function($scope, AlertService, ElasticService, AceEditorService) {
 
   $scope.source_index = null;
@@ -2020,6 +2038,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
     $scope.replicas = '';
   };
 }]);
+
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, $window, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
   $scope.version = "1.3.6-SNAPSHOT";
   $scope.alert_service = AlertService;
@@ -2191,6 +2210,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
     );
   };
 }]);
+
 kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService', function($scope, SettingsService, ThemeService, ElasticService, AlertService, HostHistoryService) {
 
   $scope.new_refresh = SettingsService.getRefreshInterval();
@@ -2324,6 +2344,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
     }
   };
 }]);
+
 kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, ConfirmDialogService, AlertService, AceEditorService, ElasticService) {
   $scope.editor = undefined;
   $scope.pagination = new PercolatorsPage(0, 0, 0, []);
@@ -2691,6 +2712,7 @@ kopf.controller('ConfirmDialogController', ['$scope', '$location', '$timeout', '
   };
 
 }]);
+
 kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, ConfirmDialogService, AlertService, AceEditorService, ElasticService) {
   $scope.editor = undefined;
   $scope.indices = [];
@@ -2780,6 +2802,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
   };
 
 }]);
+
 kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'AlertService', 'ElasticService', function($scope, $location, $timeout, AlertService, ElasticService) {
   $scope.bench = new Benchmark();
   $scope.competitor = new Competitor();
@@ -2833,6 +2856,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
   };
 
 }]);
+
 var Alert = function(message, response, level, _class, icon) {
   var current_date = new Date();
   this.message = message;
@@ -2912,6 +2936,7 @@ kopf.factory('AlertService', function() {
 
   return this;
 });
+
 kopf.factory('SettingsService', function() {
 
   this.refresh_interval = 3000;
@@ -2946,6 +2971,7 @@ kopf.factory('SettingsService', function() {
 
   return this;
 });
+
 kopf.factory('AceEditorService', function() {
 
   this.init = function(name) {
@@ -2954,6 +2980,7 @@ kopf.factory('AceEditorService', function() {
 
   return this;
 });
+
 kopf.factory('ThemeService', function() {
 
   this.theme = "dark";
@@ -2973,6 +3000,7 @@ kopf.factory('ThemeService', function() {
 
   return this;
 });
+
 kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService', function($http, $q, ExternalSettingsService) {
   this.client = null;
   this.connection = null;
@@ -3004,6 +3032,7 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService', functi
   return this;
 
 }]);
+
 kopf.factory('HostHistoryService', function() {
 
   this.getHostHistory = function() {
@@ -3036,6 +3065,7 @@ kopf.factory('HostHistoryService', function() {
   return this;
 
 });
+
 kopf.factory('ExternalSettingsService', function($http, $q) {
 
   this.settings = null;
@@ -3072,6 +3102,7 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
   return this;
 
 });
+
 function AceEditor(target) {
   // ace editor
   ace.config.set("basePath", "dist/");
@@ -3113,6 +3144,7 @@ function AceEditor(target) {
     return this.editor.getValue().trim().length > 0;
   };
 }
+
 function Gist(title, url) {
   this.timestamp = getTimeString(new Date());
   this.title = title;
@@ -3126,6 +3158,7 @@ function Gist(title, url) {
   };
 
 }
+
 function Benchmark() {
   this.name = '';
   this.num_executor = 1;
@@ -3259,6 +3292,7 @@ function Competitor() {
   };
 
 }
+
 function Request(url, method, body) {
   this.timestamp = getTimeString(new Date());
   this.url = url;
@@ -3287,6 +3321,7 @@ function Request(url, method, body) {
       );
   };
 }
+
 function ClusterNavigation() {
   this.page = 1;
   this.page_size = 5; // TODO: move it to a single place?
@@ -3331,12 +3366,14 @@ function ClusterNavigation() {
   };
 
 }
+
 function ModalControls() {
   this.alert = null;
   this.active = false;
   this.title = '';
   this.info = '';
 }
+
 function Paginator(page, page_size, collection, filter) {
 
   this.filter = filter;
@@ -3415,6 +3452,7 @@ function Page(elements, total, first, last, next, previous) {
   this.next = next;
   this.previous = previous;
 }
+
 function AliasFilter(index, alias) {
 
   this.index = index;
@@ -3453,6 +3491,7 @@ function AliasFilter(index, alias) {
   };
 
 }
+
 function SnapshotFilter() {
 
   this.clone = function() {
@@ -3497,6 +3536,7 @@ function WarmerFilter(id) {
   };
 
 }
+
 function IndexFilter(name, state, hide_special, timestamp) {
   this.name = name;
   this.state = state;
@@ -3550,6 +3590,7 @@ function IndexFilter(name, state, hide_special, timestamp) {
   };
 
 }
+
 function NodeFilter(name, data, master, client, timestamp) {
   this.name = name;
   this.data = data;
@@ -3586,6 +3627,7 @@ function NodeFilter(name, data, master, client, timestamp) {
   };
 
 }
+
 function readablizeBytes(bytes) {
   if (bytes > 0) {
     var s = ['b', 'KB', 'MB', 'GB', 'TB', 'PB'];

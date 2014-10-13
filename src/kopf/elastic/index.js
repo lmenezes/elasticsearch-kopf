@@ -103,4 +103,3 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
     return this.state === "open";
   };
 }
-
