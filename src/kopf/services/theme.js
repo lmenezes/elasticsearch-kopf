@@ -1,6 +1,6 @@
 kopf.factory('ThemeService', function() {
 
-  this.theme = "dark";
+  this.theme = 'dark';
 
   this.setTheme = function(theme) {
     this.theme = theme;

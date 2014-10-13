@@ -6,20 +6,20 @@ function ElasticClient(connection, http_service, q) {
 
   this.createAuthToken = function(username, password) {
     var hasAuth = isDefined(username) && isDefined(password);
-    return hasAuth ? "Basic " + window.btoa(username + ":" + password) : null;
+    return hasAuth ? 'Basic ' + window.btoa(username + ':' + password) : null;
   };
 
   var auth = this.createAuthToken(this.username, this.password);
   var fetch_version = $.ajax({
     type: 'GET',
-    url: connection.host + "/",
+    url: connection.host + '/',
     dataType: 'json',
     beforeSend: function(xhr) {
       if (isDefined(auth)) {
-        xhr.setRequestHeader("Authorization", auth);
+        xhr.setRequestHeader('Authorization', auth);
       }
       if (this.with_credentials) {
-        xhr.setRequestHeader("withCredentials", true);
+        xhr.setRequestHeader('withCredentials', true);
       }
     },
     async: false
@@ -35,7 +35,7 @@ function ElasticClient(connection, http_service, q) {
       client.version.minor = parseInt(parts[1]);
       client.version.build = parseInt(parts[2]);
     } catch (error) {
-      throw { message: "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + connection.host + "]?", body: response };
+      throw { message: 'Version property could not bet read. Are you sure there is an ElasticSearch runnning at [' + connection.host + ']?', body: response };
     }
   });
 
@@ -53,60 +53,60 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.createIndex = function(name, settings, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + name, settings, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + name, settings, callback_success, callback_error);
   };
 
   this.enableShardAllocation = function(callback_success, callback_error) {
-    var new_settings = { "transient": { "cluster.routing.allocation": { "enable": 'all', "disable_allocation": false } } };
-    this.executeClusterRequest('PUT', "/_cluster/settings", JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+    var new_settings = { 'transient': { 'cluster.routing.allocation': { 'enable': 'all', 'disable_allocation': false } } };
+    this.executeClusterRequest('PUT', '/_cluster/settings', JSON.stringify(new_settings, undefined, ''), callback_success, callback_error);
   };
 
   this.disableShardAllocation = function(callback_success, callback_error) {
-    var new_settings = { "transient": { "cluster.routing.allocation": { "enable": 'none', "disable_allocation": true } } };
-    this.executeClusterRequest('PUT', "/_cluster/settings", JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+    var new_settings = { 'transient': { 'cluster.routing.allocation': { 'enable': 'none', 'disable_allocation': true } } };
+    this.executeClusterRequest('PUT', '/_cluster/settings', JSON.stringify(new_settings, undefined, ''), callback_success, callback_error);
   };
 
   this.shutdownNode = function(node_id, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_cluster/nodes/' + node_id + '/_shutdown', {}, callback_success, callback_error);
   };
 
   this.openIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_open', {}, callback_success, callback_error);
   };
 
   this.optimizeIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_optimize', {}, callback_success, callback_error);
   };
 
   this.clearCache = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_cache/clear', {}, callback_success, callback_error);
   };
 
   this.closeIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_close', {}, callback_success, callback_error);
   };
 
   this.refreshIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_refresh', {}, callback_success, callback_error);
   };
 
   this.deleteIndex = function(name, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', "/" + name, {}, callback_success, callback_error);
+    this.executeClusterRequest('DELETE', '/' + name, {}, callback_success, callback_error);
   };
 
   this.updateIndexSettings = function(name, settings, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/' + name + '/_settings', settings, callback_success, callback_error);
   };
 
   this.updateClusterSettings = function(settings, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/_cluster/settings', settings, callback_success, callback_error);
   };
 
   this.getIndexMetadata = function(name, callback_success, callback_error) {
     var transformed = function(response) {
       callback_success(new IndexMetadata(name, response.metadata.indices[name]));
     };
-    this.executeClusterRequest('GET', "/_cluster/state/metadata/" + name, {}, transformed, callback_error);
+    this.executeClusterRequest('GET', '/_cluster/state/metadata/' + name, {}, transformed, callback_error);
   };
 
   this.fetchAliases = function(callback_success, callback_error) {
@@ -124,7 +124,7 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(index_aliases);
     };
-    this.executeClusterRequest('GET', "/_aliases", {}, createAliases, callback_error);
+    this.executeClusterRequest('GET', '/_aliases', {}, createAliases, callback_error);
   };
 
   this.analyzeByField = function(index, type, field, text, callback_success, callback_error) {
@@ -134,7 +134,7 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(tokens);
     };
-    this.executeClusterRequest('POST', "/" + index + "/_analyze?field=" + type + "." + field, text, buildTokens, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_analyze?field=' + type + '.' + field, text, buildTokens, callback_error);
   };
 
   this.analyzeByAnalyzer = function(index, analyzer, text, callback_success, callback_error) {
@@ -144,7 +144,7 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(tokens);
     };
-    this.executeClusterRequest('POST', "/" + index + "/_analyze?analyzer=" + analyzer, text, buildTokens, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_analyze?analyzer=' + analyzer, text, buildTokens, callback_error);
   };
 
   this.updateAliases = function(add_aliases, remove_aliases, callback_success, callback_error) {
@@ -155,11 +155,11 @@ function ElasticClient(connection, http_service, q) {
     add_aliases.forEach(function(alias) {
       data.actions.push({'add': alias.info()});
     });
-    this.executeClusterRequest('POST', "/_aliases", JSON.stringify(data), callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_aliases', JSON.stringify(data), callback_success, callback_error);
   };
 
   this.getIndexWarmers = function(index, warmer, callback_success, callback_error) {
-    var path = "/" + index + "/_warmer/" + warmer.trim();
+    var path = '/' + index + '/_warmer/' + warmer.trim();
     var parseWarmers = function(response) {
       var warmers = [];
       Object.keys(response).forEach(function(i) {
@@ -175,21 +175,21 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.deleteWarmupQuery = function(warmer, callback_success, callback_error) {
-    var path = "/" + warmer.index + "/_warmer/" + warmer.id;
+    var path = '/' + warmer.index + '/_warmer/' + warmer.id;
     this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
   };
 
   this.registerWarmupQuery = function(warmer, callback_success, callback_error) {
-    var path = "/" + warmer.index + "/";
+    var path = '/' + warmer.index + '/';
     if (notEmpty(warmer.types)) {
-      path += warmer.types + "/";
+      path += warmer.types + '/';
     }
-    path += "/_warmer/" + warmer.id.trim();
+    path += '/_warmer/' + warmer.id.trim();
     this.executeClusterRequest('PUT', path, warmer.source, callback_success, callback_error);
   };
 
   this.fetchPercolateQueries = function(index, body, callback_success, callback_error) {
-    var path = "/" + index + "/.percolator/_search";
+    var path = '/' + index + '/.percolator/_search';
     var parsePercolators = function(response) {
       var collection = response.hits.hits.map(function(q) {
         return new PercolateQuery(q);
@@ -201,12 +201,12 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.deletePercolatorQuery = function(index, id, callback_success, callback_error) {
-    var path = "/" + index + "/.percolator/" + id;
+    var path = '/' + index + '/.percolator/' + id;
     this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
   };
 
   this.createPercolatorQuery = function(percolator, callback_success, callback_error) {
-    var path = "/" + percolator.index + "/.percolator/" + percolator.id;
+    var path = '/' + percolator.index + '/.percolator/' + percolator.id;
     this.executeClusterRequest('PUT', path, percolator.source, callback_success, callback_error);
   };
 
@@ -217,19 +217,19 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(repositories);
     };
-    this.executeClusterRequest('GET', "/_snapshot/_all", {}, parse_repositories, callback_error);
+    this.executeClusterRequest('GET', '/_snapshot/_all', {}, parse_repositories, callback_error);
   };
 
   this.createRepository = function(repository, body, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_snapshot/' + repository, body, callback_success, callback_error);
   };
 
   this.deleteRepository = function(repository, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error);
+    this.executeClusterRequest('DELETE', '/_snapshot/' + repository, {}, callback_success, callback_error);
   };
 
   this.getSnapshots = function(repository, callback_success, callback_error) {
-    var path = "/_snapshot/" + repository + "/_all";
+    var path = '/_snapshot/' + repository + '/_all';
     var parseSnapshots = function(response) {
       var snapshots = response.snapshots.map(function(snapshot) {
         return new Snapshot(snapshot);
@@ -240,19 +240,19 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.deleteSnapshot = function(repository, snapshot, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', "/_snapshot/" + repository + "/" + snapshot, {}, callback_success, callback_error);
+    this.executeClusterRequest('DELETE', '/_snapshot/' + repository + '/' + snapshot, {}, callback_success, callback_error);
   };
 
   this.restoreSnapshot = function(repository, snapshot, body, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/_snapshot/" + repository + "/" + snapshot + "/_restore", body, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_snapshot/' + repository + '/' + snapshot + '/_restore', body, callback_success, callback_error);
   };
 
   this.createSnapshot = function(repository, snapshot, body, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/_snapshot/" + repository + "/" + snapshot, body, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/_snapshot/' + repository + '/' + snapshot, body, callback_success, callback_error);
   };
 
   this.executeBenchmark = function(body, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/_bench", body, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/_bench', body, callback_success, callback_error);
   };
 
   this.executeClusterRequest = function(method, path, data, callback_success, callback_error) {
@@ -305,7 +305,7 @@ function ElasticClient(connection, http_service, q) {
         callback_error(error);
       }
     };
-    this.executeClusterRequest('GET', "/_cluster/health", {}, create_cluster_health, callback_error);
+    this.executeClusterRequest('GET', '/_cluster/health', {}, create_cluster_health, callback_error);
   };
 
   this.getClusterDetail = function(callback_success, callback_error) {
@@ -319,11 +319,11 @@ function ElasticClient(connection, http_service, q) {
       params.withCredentials = true;
     }
     q.all([
-      http_service.get(host + "/_cluster/state/master_node,nodes,routing_table,blocks/", params),
-      http_service.get(host + "/_status", params),
-      http_service.get(host + "/_nodes/stats?all=true", params),
-      http_service.get(host + "/_cluster/settings", params),
-      http_service.get(host + "/_aliases", params)
+      http_service.get(host + '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
+      http_service.get(host + '/_status', params),
+      http_service.get(host + '/_nodes/stats?all=true', params),
+      http_service.get(host + '/_cluster/settings', params),
+      http_service.get(host + '/_aliases', params)
     ]).then(function(responses) {
         try {
           callback_success(new Cluster(responses[0].data, responses[1].data, responses[2].data, responses[3].data, responses[4].data));
@@ -350,16 +350,16 @@ function ElasticClient(connection, http_service, q) {
     }
     var requests = [];
     if (health) {
-      requests.push(http_service.get(host + "/_cluster/health", params));
+      requests.push(http_service.get(host + '/_cluster/health', params));
     }
     if (state) {
-      requests.push(http_service.get(host + "/_cluster/state", params));
+      requests.push(http_service.get(host + '/_cluster/state', params));
     }
     if (stats) {
-      requests.push(http_service.get(host + "/_nodes/stats?all=true", params));
+      requests.push(http_service.get(host + '/_nodes/stats?all=true', params));
     }
     if (hotthreads) {
-      requests.push(http_service.get(host + "/_nodes/hot_threads", params));
+      requests.push(http_service.get(host + '/_nodes/hot_threads', params));
     }
     q.all(requests).then(function(responses) {
         try {

@@ -33,7 +33,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.field_index = '';
-          AlertService.error("Error while loading index metadata", error);
+          AlertService.error('Error while loading index metadata', error);
         }
       );
     }
@@ -54,7 +54,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.analyzer_index = '';
-          AlertService.error("Error while loading index metadata", error);
+          AlertService.error('Error while loading index metadata', error);
         }
       );
     }
@@ -70,7 +70,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.field_tokens = null;
-          AlertService.error("Error while analyzing text", error);
+          AlertService.error('Error while analyzing text', error);
         }
       );
     }
@@ -85,7 +85,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.analyzer_tokens = null;
-          AlertService.error("Error while analyzing text", error);
+          AlertService.error('Error while analyzing text', error);
         }
       );
     }

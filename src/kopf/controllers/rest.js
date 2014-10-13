@@ -1,6 +1,6 @@
 kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, $location, $timeout, AlertService, AceEditorService, ElasticService) {
 
-  $scope.request = new Request(ElasticService.getHost() + "/_search", "GET", "{}");
+  $scope.request = new Request(ElasticService.getHost() + '/_search', 'GET', '{}');
   $scope.validation_error = null;
 
   $scope.loadHistory = function() {
@@ -60,7 +60,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
       var username = a.username || null;
       var password = a.password || null;
       if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
-        AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
+        AlertService.info('You are executing a GET request with body content. Maybe you meant to use POST or PUT?');
       }
       ElasticService.client.executeRequest($scope.request.method, $scope.request.url, username, password, $scope.request.body,
         function(response) {
@@ -75,14 +75,14 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
         },
         function(error, status) {
           if (status !== 0) {
-            AlertService.error("Request was not successful");
+            AlertService.error('Request was not successful');
             try {
               $('#rest-client-response').html(JSONTree.create(error));
             } catch (invalid_json) {
               $('#rest-client-response').html(error);
             }
           } else {
-            AlertService.error($scope.request.url + " is unreachable");
+            AlertService.error($scope.request.url + ' is unreachable');
           }
         }
       );

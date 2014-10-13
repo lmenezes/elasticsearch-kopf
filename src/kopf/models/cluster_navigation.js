@@ -2,15 +2,15 @@ function ClusterNavigation() {
   this.page = 1;
   this.page_size = 5; // TODO: move it to a single place?
 
-  this.query = "";
+  this.query = '';
   this.previous_query = null;
   this.hide_special = true;
 
   this.data = true;
   this.master = true;
   this.client = true;
-  this.state = "";
-  this.node_name = "";
+  this.state = '';
+  this.node_name = '';
   this.cached_result = [];
   this.cluster_timestamp = null;
 

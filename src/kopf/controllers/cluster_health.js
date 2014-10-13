@@ -16,10 +16,10 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 
   $scope.checkPublishClusterHealth = function() {
     ConfirmDialogService.open(
-      "Are you share you want to share your cluster information through a Gist?",
-        "By sharing information through a public Gist you might be exposing sensitive information about your cluster, such as " +
-        "host name, indices names and etc.",
-      "Agree",
+      'Are you share you want to share your cluster information through a Gist?',
+        'By sharing information through a public Gist you might be exposing sensitive information about your cluster, such as ' +
+        'host name, indices names and etc.',
+      'Agree',
       function() {
         $scope.confirm_share = true;
         $scope.publishClusterHealth();
@@ -30,7 +30,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
   $scope.loadClusterHealth = function() {
     var results = {};
     $scope.results = null;
-    var info_id = AlertService.info("Loading cluster health state. This could take a few moments.", {}, 30000);
+    var info_id = AlertService.info('Loading cluster health state. This could take a few moments.', {}, 30000);
     ElasticService.client.getClusterDiagnosis($scope.retrieveHealth, $scope.retrieveState, $scope.retrieveStats, $scope.retrieveHotThreads,
       function(responses) {
         $scope.state = '';
@@ -59,7 +59,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
       },
       function(failed_request) {
         AlertService.remove(info_id);
-        AlertService.error("Error while retrieving cluster health information", failed_request.data);
+        AlertService.error('Error while retrieving cluster health information', failed_request.data);
       }
     );
   };
@@ -84,16 +84,16 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
       }
     }
     var data = JSON.stringify(gist, undefined, 4);
-    $.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data})
+    $.ajax({ type: 'POST', url: 'https://api.github.com/gists', dataType: 'json', data: data})
       .done(function(response) {
         $scope.updateModel(function() {
           $scope.addToHistory(new Gist(gist.description, response.html_url));
-          AlertService.success("Cluster health information successfully shared at: " + response.html_url, null, 60000);
+          AlertService.success('Cluster health information successfully shared at: ' + response.html_url, null, 60000);
         });
       })
       .fail(function(response) {
         $scope.updateModel(function() {
-          AlertService.error("Error while publishing Gist", responseText);
+          AlertService.error('Error while publishing Gist', responseText);
         });
       }
     );

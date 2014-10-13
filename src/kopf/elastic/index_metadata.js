@@ -15,7 +15,7 @@ function IndexMetadata(index, metadata) {
       Object.keys(this.settings).forEach(function(setting) {
         if (setting.indexOf('index.analysis.analyzer') === 0) {
           var analyzer = setting.substring('index.analysis.analyzer.'.length);
-          analyzer = analyzer.substring(0, analyzer.indexOf("."));
+          analyzer = analyzer.substring(0, analyzer.indexOf('.'));
           if ($.inArray(analyzer, analyzers) == -1) {
             analyzers.push(analyzer);
           }
@@ -34,7 +34,7 @@ function IndexMetadata(index, metadata) {
   this.getFields = function(type) {
     var fields = [];
     if (isDefined(this.mappings[type])) {
-      fields = this.getProperties("", this.mappings[type].properties);
+      fields = this.getProperties('', this.mappings[type].properties);
     }
     return fields.sort(function(a, b) {
       return a.localeCompare(b);
@@ -42,7 +42,7 @@ function IndexMetadata(index, metadata) {
   };
 
   this.getProperties = function(parent, fields) {
-    var prefix = parent !== "" ? parent + "." : "";
+    var prefix = parent !== '' ? parent + '.' : '';
     var validFields = [];
     for (var field in fields) {
       // multi field

@@ -1,9 +1,9 @@
 kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, AlertService, AceEditorService, ElasticService) {
-  $scope.paginator = new Paginator(1, 10, [], new AliasFilter("", ""));
+  $scope.paginator = new Paginator(1, 10, [], new AliasFilter('', ''));
   $scope.page = $scope.paginator.getPage();
   $scope.original = [];
   $scope.editor = undefined;
-  $scope.new_alias = new Alias("", "", "", "", "");
+  $scope.new_alias = new Alias('', '', '', '', '');
 
   $scope.aliases = [];
 
@@ -41,7 +41,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
             return alias_name == a.alias;
           });
           if (aliases.length > 0) {
-            throw "Alias is already associated with this index";
+            throw 'Alias is already associated with this index';
           } else {
             index_aliases.aliases.push($scope.new_alias);
           }
@@ -49,12 +49,12 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         $scope.new_alias = new Alias();
         $scope.paginator.setCollection(collection);
         $scope.page = $scope.paginator.getPage();
-        AlertService.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
+        AlertService.success('Alias successfully added. Note that changes made will only be persisted after saving changes');
       } catch (error) {
         AlertService.error(error, null);
       }
     } else {
-      AlertService.error("Invalid filter defined for alias", $scope.editor.error);
+      AlertService.error('Invalid filter defined for alias', $scope.editor.error);
     }
   };
 
@@ -68,7 +68,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     }
     $scope.paginator.setCollection(collection);
     $scope.page = $scope.paginator.getPage();
-    AlertService.success("All aliases were removed for " + index);
+    AlertService.success('All aliases were removed for ' + index);
   };
 
   $scope.removeIndexAlias = function(index, alias) {
@@ -91,7 +91,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     }
     $scope.paginator.setCollection(collection);
     $scope.page = $scope.paginator.getPage();
-    AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
+    AlertService.success('Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes');
   };
 
   $scope.mergeAliases = function() {
@@ -99,15 +99,15 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     var deletes = IndexAliases.diff(collection, $scope.original);
     var adds = IndexAliases.diff($scope.original, collection);
     if (adds.length === 0 && deletes.length === 0) {
-      AlertService.warn("No changes were made: nothing to save");
+      AlertService.warn('No changes were made: nothing to save');
     } else {
       ElasticService.client.updateAliases(adds, deletes,
         function(response) {
-          AlertService.success("Aliases were successfully updated", response);
+          AlertService.success('Aliases were successfully updated', response);
           $scope.loadAliases();
         },
         function(error) {
-          AlertService.error("Error while updating aliases", error);
+          AlertService.error('Error while updating aliases', error);
         }
       );
     }
@@ -123,7 +123,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         $scope.page = $scope.paginator.getPage();
       },
       function(error) {
-        AlertService.error("Error while fetching aliases", error);
+        AlertService.error('Error while fetching aliases', error);
       }
     );
   };

@@ -49,23 +49,23 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
   $scope.executeDeleteRepository = function(repository) {
     ElasticService.client.deleteRepository(repository.name,
       function(response) {
-        AlertService.success("Repository successfully deleted", response);
+        AlertService.success('Repository successfully deleted', response);
         if (notEmpty($scope.snapshot_repository) && $scope.snapshot_repository == repository.name) {
           $scope.snapshot_repository = '';
         }
         $scope.reload();
       },
       function(error) {
-        AlertService.error("Error while deleting repositor", error);
+        AlertService.error('Error while deleting repositor', error);
       }
     );
   };
 
   $scope.deleteRepository = function(repository) {
     ConfirmDialogService.open(
-        "are you sure you want to delete repository " + repository.name + "?",
+        'are you sure you want to delete repository ' + repository.name + '?',
       repository.settings,
-      "Delete",
+      'Delete',
       function() {
         $scope.executeDeleteRepository(repository);
       }
@@ -76,24 +76,24 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
     var body = {};
     // dont add to body if not present, these are optional, all indices included by default
     if (angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0) {
-      body.indices = $scope.restore_snap.indices.join(",");
+      body.indices = $scope.restore_snap.indices.join(',');
     }
 
     if (angular.isDefined($scope.restore_snap.include_global_state)) {
       body.include_global_state = $scope.restore_snap.include_global_state;
     }
 
-    $scope.optionalParam(body, $scope.restore_snap, "ignore_unavailable");
-    $scope.optionalParam(body, $scope.restore_snap, "rename_replacement");
-    $scope.optionalParam(body, $scope.restore_snap, "rename_pattern");
+    $scope.optionalParam(body, $scope.restore_snap, 'ignore_unavailable');
+    $scope.optionalParam(body, $scope.restore_snap, 'rename_replacement');
+    $scope.optionalParam(body, $scope.restore_snap, 'rename_pattern');
 
     ElasticService.client.restoreSnapshot($scope.snapshot_repository, $scope.snapshot.name, JSON.stringify(body),
       function(response) {
-        AlertService.success("Snapshot Restored Started");
+        AlertService.success('Snapshot Restored Started');
         $scope.reload();
       },
       function(error) {
-        AlertService.error("Error while started restore of snapshot", error);
+        AlertService.error('Error while started restore of snapshot', error);
       }
     );
   };
@@ -103,11 +103,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
       $scope.repository_form.validate();
       ElasticService.client.createRepository($scope.repository_form.name, $scope.repository_form.asJson(),
         function(response) {
-          AlertService.success("Repository created");
+          AlertService.success('Repository created');
           $scope.loadRepositories();
         },
         function(error) {
-          AlertService.error("Error while creating repository", error);
+          AlertService.error('Error while creating repository', error);
         }
       );
     } catch (error) {
@@ -122,7 +122,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
       },
       function(error) {
         $scope.repositories = [];
-        AlertService.error("Error while reading repositories", error);
+        AlertService.error('Error while reading repositories', error);
       }
     );
   };
@@ -132,52 +132,52 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 
     // name and repo required
     if (!isDefined($scope.new_snap.repository)) {
-      AlertService.warn("Repository is required");
+      AlertService.warn('Repository is required');
       return;
     }
 
     if (!isDefined($scope.new_snap.name)) {
-      AlertService.warn("Snapshot name is required");
+      AlertService.warn('Snapshot name is required');
       return;
     }
 
     // dont add to body if not present, these are optional, all indices included by default
     if (isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0) {
-      body.indices = $scope.new_snap.indices.join(",");
+      body.indices = $scope.new_snap.indices.join(',');
     }
 
     if (isDefined($scope.new_snap.include_global_state)) {
       body.include_global_state = $scope.new_snap.include_global_state;
     }
 
-    $scope.optionalParam(body, $scope.new_snap, "ignore_unavailable");
+    $scope.optionalParam(body, $scope.new_snap, 'ignore_unavailable');
 
     ElasticService.client.createSnapshot($scope.new_snap.repository.name, $scope.new_snap.name, JSON.stringify(body),
       function(response) {
-        AlertService.success("Snapshot created");
+        AlertService.success('Snapshot created');
         $scope.reload();
       },
       function(error) {
-        AlertService.error("Error while creating snapshot", error);
+        AlertService.error('Error while creating snapshot', error);
       }
     );
   };
 
   $scope.deleteSnapshot = function(snapshot) {
     ConfirmDialogService.open(
-        "are you sure you want to delete snapshot " + snapshot.name + "?",
+        'are you sure you want to delete snapshot ' + snapshot.name + '?',
       snapshot,
-      "Delete",
+      'Delete',
       function() {
         ElasticService.client.deleteSnapshot(
           $scope.snapshot_repository,
           snapshot.name,
           function(response) {
-            AlertService.success("Snapshot successfully deleted", response);
+            AlertService.success('Snapshot successfully deleted', response);
             $scope.reload();
           },
           function(error) {
-            AlertService.error("Error while deleting snapshot", error);
+            AlertService.error('Error while deleting snapshot', error);
           }
         );
       }
@@ -193,7 +193,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
       function(error) {
         $scope.paginator.setCollection([]);
         $scope.page = $scope.paginator.getPage();
-        AlertService.error("Error while fetching snapshots", error);
+        AlertService.error('Error while fetching snapshots', error);
       }
     );
   };

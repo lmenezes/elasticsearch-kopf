@@ -2,7 +2,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
   $scope.editor = undefined;
   $scope.indices = [];
   $scope.index = null;
-  $scope.paginator = new Paginator(1, 10, [], new WarmerFilter(""));
+  $scope.paginator = new Paginator(1, 10, [], new WarmerFilter(''));
   $scope.page = $scope.paginator.getPage();
 
   $scope.warmer = new Warmer('', '', { types: [], source: {} });
@@ -36,31 +36,31 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
         ElasticService.client.registerWarmupQuery($scope.warmer,
           function(response) {
             $scope.loadIndexWarmers();
-            AlertService.success("Warmup query successfully registered", response);
+            AlertService.success('Warmup query successfully registered', response);
           },
           function(error) {
-            AlertService.error("Request did not return a valid JSON", error);
+            AlertService.error('Request did not return a valid JSON', error);
           }
         );
       }
     } else {
-      AlertService.error("Warmup query body can't be empty");
+      AlertService.error('Warmup query body can\'t be empty');
     }
   };
 
   $scope.deleteWarmupQuery = function(warmer) {
     ConfirmDialogService.open(
-        "are you sure you want to delete query " + warmer.id + "?",
+        'are you sure you want to delete query ' + warmer.id + '?',
       warmer.source,
-      "Delete",
+      'Delete',
       function() {
         ElasticService.client.deleteWarmupQuery(warmer,
           function(response) {
-            AlertService.success("Warmup query successfully deleted", response);
+            AlertService.success('Warmup query successfully deleted', response);
             $scope.loadIndexWarmers();
           },
           function(error) {
-            AlertService.error("Error while deleting warmup query", error);
+            AlertService.error('Error while deleting warmup query', error);
           }
         );
       }
@@ -69,7 +69,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 
   $scope.loadIndexWarmers = function() {
     if (isDefined($scope.index)) {
-      ElasticService.client.getIndexWarmers($scope.index, "",
+      ElasticService.client.getIndexWarmers($scope.index, '',
         function(warmers) {
           $scope.paginator.setCollection(warmers);
           $scope.page = $scope.paginator.getPage();
@@ -77,7 +77,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
         function(error) {
           $scope.paginator.setCollection([]);
           $scope.page = $scope.paginator.getPage();
-          AlertService.error("Error while fetching warmup queries", error);
+          AlertService.error('Error while fetching warmup queries', error);
         }
       );
     } else {

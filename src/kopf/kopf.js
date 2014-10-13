@@ -13,10 +13,10 @@ kopf.factory('IndexSettingsService', function() {
 
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
-  this.header = "Default Header";
-  this.body = "Default Body";
-  this.cancel_text = "cancel";
-  this.confirm_text = "confirm";
+  this.header = 'Default Header';
+  this.body = 'Default Body';
+  this.cancel_text = 'cancel';
+  this.confirm_text = 'confirm';
 
   this.confirm = function() {
     // when created, does nothing

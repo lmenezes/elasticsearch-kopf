@@ -38,18 +38,18 @@ IndexAliases.diff = function(original, modified) {
 };
 
 function Alias(alias, index, filter, index_routing, search_routing) {
-  this.alias = isDefined(alias) ? alias.toLowerCase() : "";
-  this.index = isDefined(index) ? index.toLowerCase() : "";
-  this.filter = isDefined(filter) ? filter : "";
-  this.index_routing = isDefined(index_routing) ? index_routing : "";
-  this.search_routing = isDefined(search_routing) ? search_routing : "";
+  this.alias = isDefined(alias) ? alias.toLowerCase() : '';
+  this.index = isDefined(index) ? index.toLowerCase() : '';
+  this.filter = isDefined(filter) ? filter : '';
+  this.index_routing = isDefined(index_routing) ? index_routing : '';
+  this.search_routing = isDefined(search_routing) ? search_routing : '';
 
   this.validate = function() {
     if (!notEmpty(this.alias)) {
-      throw "Alias must have a non empty name";
+      throw 'Alias must have a non empty name';
     }
     if (!notEmpty(this.index)) {
-      throw "Alias must have a valid index name";
+      throw 'Alias must have a valid index name';
     }
   };
 

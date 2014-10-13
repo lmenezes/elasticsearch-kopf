@@ -30,10 +30,10 @@ function Repository(name, info) {
 
   this.validate = function() {
     if (!notEmpty(this.name)) {
-      throw "Repository name is required";
+      throw 'Repository name is required';
     }
     if (!notEmpty(this.type)) {
-      throw "Repository type is required";
+      throw 'Repository type is required';
     }
     if (this.type === 'fs') {
       var fsRequired = ['location'];
@@ -57,7 +57,7 @@ function Repository(name, info) {
     var repository = this;
     required.forEach(function(setting) {
       if (!notEmpty(repository.settings[setting])) {
-        throw(setting + " is required for repositories of type " + repository.type);
+        throw(setting + ' is required for repositories of type ' + repository.type);
       }
     });
   };

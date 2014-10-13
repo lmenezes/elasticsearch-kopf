@@ -1,5 +1,5 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, $window, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
-  $scope.version = "1.3.6-SNAPSHOT";
+  $scope.version = '1.3.6-SNAPSHOT';
   $scope.alert_service = AlertService;
   $scope.modal = new ModalControls();
 
@@ -22,14 +22,14 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
 
   $scope.connect = function() {
     try {
-      var host = "http://localhost:9200"; // default
-      if ($location.host() !== "") { // not opening from fs
+      var host = 'http://localhost:9200'; // default
+      if ($location.host() !== '') { // not opening from fs
         var location = $scope.readParameter('location');
         if (isDefined(location)) {
           host = location;
         } else {
           var url = $location.absUrl();
-          host = url.substring(0, url.indexOf("/_plugin/kopf"));
+          host = url.substring(0, url.indexOf('/_plugin/kopf'));
         }
       }
       ElasticService.connect(host);
@@ -47,27 +47,27 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
       if (changes.hasChanges()) {
         if (changes.hasJoins()) {
           var joins = changes.nodeJoins.map(function(node) {
-            return node.name + "[" + node.transport_address + "]";
+            return node.name + '[' + node.transport_address + ']';
           });
-          AlertService.info(joins.length + " new node(s) joined the cluster", joins);
+          AlertService.info(joins.length + ' new node(s) joined the cluster', joins);
         }
         if (changes.hasLeaves()) {
           var leaves = changes.nodeLeaves.map(function(node) {
-            return node.name + "[" + node.transport_address + "]";
+            return node.name + '[' + node.transport_address + ']';
           });
-          AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
+          AlertService.warn(changes.nodeLeaves.length + ' node(s) left the cluster', leaves);
         }
         if (changes.hasCreatedIndices()) {
           var created = changes.indicesCreated.map(function(index) {
             return index.name;
           });
-          AlertService.info(changes.indicesCreated.length + " indices created: [" + created.join(",") + "]");
+          AlertService.info(changes.indicesCreated.length + ' indices created: [' + created.join(',') + ']');
         }
         if (changes.hasDeletedIndices()) {
           var deleted = changes.indicesDeleted.map(function(index) {
             return index.name;
           });
-          AlertService.info(changes.indicesDeleted.length + " indices deleted: [" + deleted.join(",") + "]");
+          AlertService.info(changes.indicesDeleted.length + ' indices deleted: [' + deleted.join(',') + ']');
         }
       }
     }
@@ -83,7 +83,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
             $scope.alertClusterChanges();
           },
           function(error) {
-            AlertService.error("Error while retrieving cluster information", error);
+            AlertService.error('Error while retrieving cluster information', error);
             $scope.cluster = null;
           }
         );
@@ -94,7 +94,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
           },
           function(error) {
             $scope.cluster_health = null;
-            AlertService.error("Error connecting to [" + $scope.host + "]", error);
+            AlertService.error('Error connecting to [' + $scope.host + ']', error);
           }
         );
       }, 100);

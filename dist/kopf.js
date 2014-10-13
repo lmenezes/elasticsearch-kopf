@@ -38,18 +38,18 @@ IndexAliases.diff = function(original, modified) {
 };
 
 function Alias(alias, index, filter, index_routing, search_routing) {
-  this.alias = isDefined(alias) ? alias.toLowerCase() : "";
-  this.index = isDefined(index) ? index.toLowerCase() : "";
-  this.filter = isDefined(filter) ? filter : "";
-  this.index_routing = isDefined(index_routing) ? index_routing : "";
-  this.search_routing = isDefined(search_routing) ? search_routing : "";
+  this.alias = isDefined(alias) ? alias.toLowerCase() : '';
+  this.index = isDefined(index) ? index.toLowerCase() : '';
+  this.filter = isDefined(filter) ? filter : '';
+  this.index_routing = isDefined(index_routing) ? index_routing : '';
+  this.search_routing = isDefined(search_routing) ? search_routing : '';
 
   this.validate = function() {
     if (!notEmpty(this.alias)) {
-      throw "Alias must have a non empty name";
+      throw 'Alias must have a non empty name';
     }
     if (!notEmpty(this.index)) {
-      throw "Alias must have a valid index name";
+      throw 'Alias must have a valid index name';
     }
   };
 
@@ -234,14 +234,14 @@ function Cluster(state, status, nodes, settings, aliases) {
   this.name = state.cluster_name;
   this.master_node = state.master_node;
 
-  this.disableAllocation = "false";
-  var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
-  var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
-  if (transientAllocation !== "") {
-    this.disableAllocation = transientAllocation == "all" ? "false" : "true";
+  this.disableAllocation = 'false';
+  var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', 'all');
+  var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', '');
+  if (transientAllocation !== '') {
+    this.disableAllocation = transientAllocation == 'all' ? 'false' : 'true';
   } else {
-    if (persistentAllocation != "all") {
-      this.disableAllocation = "true";
+    if (persistentAllocation != 'all') {
+      this.disableAllocation = 'true';
     }
   }
 
@@ -390,20 +390,20 @@ function ElasticClient(connection, http_service, q) {
 
   this.createAuthToken = function(username, password) {
     var hasAuth = isDefined(username) && isDefined(password);
-    return hasAuth ? "Basic " + window.btoa(username + ":" + password) : null;
+    return hasAuth ? 'Basic ' + window.btoa(username + ':' + password) : null;
   };
 
   var auth = this.createAuthToken(this.username, this.password);
   var fetch_version = $.ajax({
     type: 'GET',
-    url: connection.host + "/",
+    url: connection.host + '/',
     dataType: 'json',
     beforeSend: function(xhr) {
       if (isDefined(auth)) {
-        xhr.setRequestHeader("Authorization", auth);
+        xhr.setRequestHeader('Authorization', auth);
       }
       if (this.with_credentials) {
-        xhr.setRequestHeader("withCredentials", true);
+        xhr.setRequestHeader('withCredentials', true);
       }
     },
     async: false
@@ -419,7 +419,7 @@ function ElasticClient(connection, http_service, q) {
       client.version.minor = parseInt(parts[1]);
       client.version.build = parseInt(parts[2]);
     } catch (error) {
-      throw { message: "Version property could not bet read. Are you sure there is an ElasticSearch runnning at [" + connection.host + "]?", body: response };
+      throw { message: 'Version property could not bet read. Are you sure there is an ElasticSearch runnning at [' + connection.host + ']?', body: response };
     }
   });
 
@@ -437,60 +437,60 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.createIndex = function(name, settings, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + name, settings, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + name, settings, callback_success, callback_error);
   };
 
   this.enableShardAllocation = function(callback_success, callback_error) {
-    var new_settings = { "transient": { "cluster.routing.allocation": { "enable": 'all', "disable_allocation": false } } };
-    this.executeClusterRequest('PUT', "/_cluster/settings", JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+    var new_settings = { 'transient': { 'cluster.routing.allocation': { 'enable': 'all', 'disable_allocation': false } } };
+    this.executeClusterRequest('PUT', '/_cluster/settings', JSON.stringify(new_settings, undefined, ''), callback_success, callback_error);
   };
 
   this.disableShardAllocation = function(callback_success, callback_error) {
-    var new_settings = { "transient": { "cluster.routing.allocation": { "enable": 'none', "disable_allocation": true } } };
-    this.executeClusterRequest('PUT', "/_cluster/settings", JSON.stringify(new_settings, undefined, ""), callback_success, callback_error);
+    var new_settings = { 'transient': { 'cluster.routing.allocation': { 'enable': 'none', 'disable_allocation': true } } };
+    this.executeClusterRequest('PUT', '/_cluster/settings', JSON.stringify(new_settings, undefined, ''), callback_success, callback_error);
   };
 
   this.shutdownNode = function(node_id, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/_cluster/nodes/" + node_id + "/_shutdown", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_cluster/nodes/' + node_id + '/_shutdown', {}, callback_success, callback_error);
   };
 
   this.openIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_open", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_open', {}, callback_success, callback_error);
   };
 
   this.optimizeIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_optimize", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_optimize', {}, callback_success, callback_error);
   };
 
   this.clearCache = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_cache/clear", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_cache/clear', {}, callback_success, callback_error);
   };
 
   this.closeIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_close", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_close', {}, callback_success, callback_error);
   };
 
   this.refreshIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/" + index + "/_refresh", {}, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_refresh', {}, callback_success, callback_error);
   };
 
   this.deleteIndex = function(name, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', "/" + name, {}, callback_success, callback_error);
+    this.executeClusterRequest('DELETE', '/' + name, {}, callback_success, callback_error);
   };
 
   this.updateIndexSettings = function(name, settings, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/" + name + "/_settings", settings, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/' + name + '/_settings', settings, callback_success, callback_error);
   };
 
   this.updateClusterSettings = function(settings, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/_cluster/settings", settings, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/_cluster/settings', settings, callback_success, callback_error);
   };
 
   this.getIndexMetadata = function(name, callback_success, callback_error) {
     var transformed = function(response) {
       callback_success(new IndexMetadata(name, response.metadata.indices[name]));
     };
-    this.executeClusterRequest('GET', "/_cluster/state/metadata/" + name, {}, transformed, callback_error);
+    this.executeClusterRequest('GET', '/_cluster/state/metadata/' + name, {}, transformed, callback_error);
   };
 
   this.fetchAliases = function(callback_success, callback_error) {
@@ -508,7 +508,7 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(index_aliases);
     };
-    this.executeClusterRequest('GET', "/_aliases", {}, createAliases, callback_error);
+    this.executeClusterRequest('GET', '/_aliases', {}, createAliases, callback_error);
   };
 
   this.analyzeByField = function(index, type, field, text, callback_success, callback_error) {
@@ -518,7 +518,7 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(tokens);
     };
-    this.executeClusterRequest('POST', "/" + index + "/_analyze?field=" + type + "." + field, text, buildTokens, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_analyze?field=' + type + '.' + field, text, buildTokens, callback_error);
   };
 
   this.analyzeByAnalyzer = function(index, analyzer, text, callback_success, callback_error) {
@@ -528,7 +528,7 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(tokens);
     };
-    this.executeClusterRequest('POST', "/" + index + "/_analyze?analyzer=" + analyzer, text, buildTokens, callback_error);
+    this.executeClusterRequest('POST', '/' + index + '/_analyze?analyzer=' + analyzer, text, buildTokens, callback_error);
   };
 
   this.updateAliases = function(add_aliases, remove_aliases, callback_success, callback_error) {
@@ -539,11 +539,11 @@ function ElasticClient(connection, http_service, q) {
     add_aliases.forEach(function(alias) {
       data.actions.push({'add': alias.info()});
     });
-    this.executeClusterRequest('POST', "/_aliases", JSON.stringify(data), callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_aliases', JSON.stringify(data), callback_success, callback_error);
   };
 
   this.getIndexWarmers = function(index, warmer, callback_success, callback_error) {
-    var path = "/" + index + "/_warmer/" + warmer.trim();
+    var path = '/' + index + '/_warmer/' + warmer.trim();
     var parseWarmers = function(response) {
       var warmers = [];
       Object.keys(response).forEach(function(i) {
@@ -559,21 +559,21 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.deleteWarmupQuery = function(warmer, callback_success, callback_error) {
-    var path = "/" + warmer.index + "/_warmer/" + warmer.id;
+    var path = '/' + warmer.index + '/_warmer/' + warmer.id;
     this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
   };
 
   this.registerWarmupQuery = function(warmer, callback_success, callback_error) {
-    var path = "/" + warmer.index + "/";
+    var path = '/' + warmer.index + '/';
     if (notEmpty(warmer.types)) {
-      path += warmer.types + "/";
+      path += warmer.types + '/';
     }
-    path += "/_warmer/" + warmer.id.trim();
+    path += '/_warmer/' + warmer.id.trim();
     this.executeClusterRequest('PUT', path, warmer.source, callback_success, callback_error);
   };
 
   this.fetchPercolateQueries = function(index, body, callback_success, callback_error) {
-    var path = "/" + index + "/.percolator/_search";
+    var path = '/' + index + '/.percolator/_search';
     var parsePercolators = function(response) {
       var collection = response.hits.hits.map(function(q) {
         return new PercolateQuery(q);
@@ -585,12 +585,12 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.deletePercolatorQuery = function(index, id, callback_success, callback_error) {
-    var path = "/" + index + "/.percolator/" + id;
+    var path = '/' + index + '/.percolator/' + id;
     this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
   };
 
   this.createPercolatorQuery = function(percolator, callback_success, callback_error) {
-    var path = "/" + percolator.index + "/.percolator/" + percolator.id;
+    var path = '/' + percolator.index + '/.percolator/' + percolator.id;
     this.executeClusterRequest('PUT', path, percolator.source, callback_success, callback_error);
   };
 
@@ -601,19 +601,19 @@ function ElasticClient(connection, http_service, q) {
       });
       callback_success(repositories);
     };
-    this.executeClusterRequest('GET', "/_snapshot/_all", {}, parse_repositories, callback_error);
+    this.executeClusterRequest('GET', '/_snapshot/_all', {}, parse_repositories, callback_error);
   };
 
   this.createRepository = function(repository, body, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/_snapshot/" + repository, body, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_snapshot/' + repository, body, callback_success, callback_error);
   };
 
   this.deleteRepository = function(repository, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', "/_snapshot/" + repository, {}, callback_success, callback_error);
+    this.executeClusterRequest('DELETE', '/_snapshot/' + repository, {}, callback_success, callback_error);
   };
 
   this.getSnapshots = function(repository, callback_success, callback_error) {
-    var path = "/_snapshot/" + repository + "/_all";
+    var path = '/_snapshot/' + repository + '/_all';
     var parseSnapshots = function(response) {
       var snapshots = response.snapshots.map(function(snapshot) {
         return new Snapshot(snapshot);
@@ -624,19 +624,19 @@ function ElasticClient(connection, http_service, q) {
   };
 
   this.deleteSnapshot = function(repository, snapshot, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', "/_snapshot/" + repository + "/" + snapshot, {}, callback_success, callback_error);
+    this.executeClusterRequest('DELETE', '/_snapshot/' + repository + '/' + snapshot, {}, callback_success, callback_error);
   };
 
   this.restoreSnapshot = function(repository, snapshot, body, callback_success, callback_error) {
-    this.executeClusterRequest('POST', "/_snapshot/" + repository + "/" + snapshot + "/_restore", body, callback_success, callback_error);
+    this.executeClusterRequest('POST', '/_snapshot/' + repository + '/' + snapshot + '/_restore', body, callback_success, callback_error);
   };
 
   this.createSnapshot = function(repository, snapshot, body, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/_snapshot/" + repository + "/" + snapshot, body, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/_snapshot/' + repository + '/' + snapshot, body, callback_success, callback_error);
   };
 
   this.executeBenchmark = function(body, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', "/_bench", body, callback_success, callback_error);
+    this.executeClusterRequest('PUT', '/_bench', body, callback_success, callback_error);
   };
 
   this.executeClusterRequest = function(method, path, data, callback_success, callback_error) {
@@ -689,7 +689,7 @@ function ElasticClient(connection, http_service, q) {
         callback_error(error);
       }
     };
-    this.executeClusterRequest('GET', "/_cluster/health", {}, create_cluster_health, callback_error);
+    this.executeClusterRequest('GET', '/_cluster/health', {}, create_cluster_health, callback_error);
   };
 
   this.getClusterDetail = function(callback_success, callback_error) {
@@ -703,11 +703,11 @@ function ElasticClient(connection, http_service, q) {
       params.withCredentials = true;
     }
     q.all([
-      http_service.get(host + "/_cluster/state/master_node,nodes,routing_table,blocks/", params),
-      http_service.get(host + "/_status", params),
-      http_service.get(host + "/_nodes/stats?all=true", params),
-      http_service.get(host + "/_cluster/settings", params),
-      http_service.get(host + "/_aliases", params)
+      http_service.get(host + '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
+      http_service.get(host + '/_status', params),
+      http_service.get(host + '/_nodes/stats?all=true', params),
+      http_service.get(host + '/_cluster/settings', params),
+      http_service.get(host + '/_aliases', params)
     ]).then(function(responses) {
         try {
           callback_success(new Cluster(responses[0].data, responses[1].data, responses[2].data, responses[3].data, responses[4].data));
@@ -734,16 +734,16 @@ function ElasticClient(connection, http_service, q) {
     }
     var requests = [];
     if (health) {
-      requests.push(http_service.get(host + "/_cluster/health", params));
+      requests.push(http_service.get(host + '/_cluster/health', params));
     }
     if (state) {
-      requests.push(http_service.get(host + "/_cluster/state", params));
+      requests.push(http_service.get(host + '/_cluster/state', params));
     }
     if (stats) {
-      requests.push(http_service.get(host + "/_nodes/stats?all=true", params));
+      requests.push(http_service.get(host + '/_nodes/stats?all=true', params));
     }
     if (hotthreads) {
-      requests.push(http_service.get(host + "/_nodes/hot_threads", params));
+      requests.push(http_service.get(host + '/_nodes/hot_threads', params));
     }
     q.all(requests).then(function(responses) {
         try {
@@ -768,12 +768,12 @@ function ElasticClient(connection, http_service, q) {
 // https://localhost:9200
 function ESConnection(url, with_credentials) {
   var protected_url = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
-  this.host = "http://localhost:9200"; // default
+  this.host = 'http://localhost:9200'; // default
   this.with_credentials = with_credentials;
   if (notEmpty(url)) {
     var connection_parts = protected_url.exec(url);
     if (isDefined(connection_parts)) {
-      this.host = connection_parts[1] + "://" + connection_parts[4];
+      this.host = connection_parts[1] + '://' + connection_parts[4];
       this.username = connection_parts[2];
       this.password = connection_parts[3];
     } else {
@@ -786,7 +786,7 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   this.name = index_name;
   this.shards = null;
   this.metadata = {};
-  this.state = "close";
+  this.state = 'close';
   this.num_of_shards = 0;
   this.num_of_replicas = 0;
   this.aliases = [];
@@ -802,8 +802,8 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   };
 
   if (isDefined(cluster_state)) {
-    var routing = getProperty(cluster_state, "routing_table.indices");
-    this.state = "open";
+    var routing = getProperty(cluster_state, 'routing_table.indices');
+    this.state = 'open';
     if (isDefined(routing)) {
       var shards = Object.keys(cluster_state.routing_table.indices[index_name].shards);
       this.num_of_shards = shards.length;
@@ -862,14 +862,14 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
     var shards_map = cluster_state.routing_table.indices[this.name].shards;
     Object.keys(shards_map).forEach(function(shard_num) {
       shards_map[shard_num].forEach(function(shard) {
-        if (shard.state != "STARTED") {
+        if (shard.state != 'STARTED') {
           instance.unhealthy = true;
         }
       });
     });
   }
 
-  this.special = this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0;
+  this.special = this.name.indexOf('.') === 0 || this.name.indexOf('_') === 0;
 
   this.compare = function(b) { // TODO: take into account index properties?
     return this.name.localeCompare(b.name);
@@ -880,11 +880,11 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   };
 
   this.closed = function() {
-    return this.state === "close";
+    return this.state === 'close';
   };
 
   this.open = function() {
-    return this.state === "open";
+    return this.state === 'open';
   };
 }
 
@@ -1006,7 +1006,7 @@ function Shard(shard_routing, shard_info) {
   this.state = shard_routing.state;
   this.node = shard_routing.node;
   this.index = shard_routing.index;
-  this.id = this.node + "_" + this.shard + "_" + this.index;
+  this.id = this.node + '_' + this.shard + '_' + this.index;
 }
 
 function UnassignedShard(shard_info) {
@@ -1015,7 +1015,7 @@ function UnassignedShard(shard_info) {
   this.state = shard_info.state;
   this.node = shard_info.node;
   this.index = shard_info.index;
-  this.id = this.node + "_" + this.shard + "_" + this.index;
+  this.id = this.node + '_' + this.shard + '_' + this.index;
 }
 
 /** TYPES **/
@@ -1058,10 +1058,10 @@ function Repository(name, info) {
 
   this.validate = function() {
     if (!notEmpty(this.name)) {
-      throw "Repository name is required";
+      throw 'Repository name is required';
     }
     if (!notEmpty(this.type)) {
-      throw "Repository type is required";
+      throw 'Repository type is required';
     }
     if (this.type === 'fs') {
       var fsRequired = ['location'];
@@ -1085,7 +1085,7 @@ function Repository(name, info) {
     var repository = this;
     required.forEach(function(setting) {
       if (!notEmpty(repository.settings[setting])) {
-        throw(setting + " is required for repositories of type " + repository.type);
+        throw(setting + ' is required for repositories of type ' + repository.type);
       }
     });
   };
@@ -1200,7 +1200,7 @@ function IndexMetadata(index, metadata) {
       Object.keys(this.settings).forEach(function(setting) {
         if (setting.indexOf('index.analysis.analyzer') === 0) {
           var analyzer = setting.substring('index.analysis.analyzer.'.length);
-          analyzer = analyzer.substring(0, analyzer.indexOf("."));
+          analyzer = analyzer.substring(0, analyzer.indexOf('.'));
           if ($.inArray(analyzer, analyzers) == -1) {
             analyzers.push(analyzer);
           }
@@ -1219,7 +1219,7 @@ function IndexMetadata(index, metadata) {
   this.getFields = function(type) {
     var fields = [];
     if (isDefined(this.mappings[type])) {
-      fields = this.getProperties("", this.mappings[type].properties);
+      fields = this.getProperties('', this.mappings[type].properties);
     }
     return fields.sort(function(a, b) {
       return a.localeCompare(b);
@@ -1227,7 +1227,7 @@ function IndexMetadata(index, metadata) {
   };
 
   this.getProperties = function(parent, fields) {
-    var prefix = parent !== "" ? parent + "." : "";
+    var prefix = parent !== '' ? parent + '.' : '';
     var validFields = [];
     for (var field in fields) {
       // multi field
@@ -1265,10 +1265,10 @@ kopf.factory('IndexSettingsService', function() {
 
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
-  this.header = "Default Header";
-  this.body = "Default Body";
-  this.cancel_text = "cancel";
-  this.confirm_text = "confirm";
+  this.header = 'Default Header';
+  this.body = 'Default Body';
+  this.cancel_text = 'cancel';
+  this.confirm_text = 'confirm';
 
   this.confirm = function() {
     // when created, does nothing
@@ -1290,11 +1290,11 @@ kopf.factory('ConfirmDialogService', function() {
 });
 
 kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, AlertService, AceEditorService, ElasticService) {
-  $scope.paginator = new Paginator(1, 10, [], new AliasFilter("", ""));
+  $scope.paginator = new Paginator(1, 10, [], new AliasFilter('', ''));
   $scope.page = $scope.paginator.getPage();
   $scope.original = [];
   $scope.editor = undefined;
-  $scope.new_alias = new Alias("", "", "", "", "");
+  $scope.new_alias = new Alias('', '', '', '', '');
 
   $scope.aliases = [];
 
@@ -1332,7 +1332,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
             return alias_name == a.alias;
           });
           if (aliases.length > 0) {
-            throw "Alias is already associated with this index";
+            throw 'Alias is already associated with this index';
           } else {
             index_aliases.aliases.push($scope.new_alias);
           }
@@ -1340,12 +1340,12 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         $scope.new_alias = new Alias();
         $scope.paginator.setCollection(collection);
         $scope.page = $scope.paginator.getPage();
-        AlertService.success("Alias successfully added. Note that changes made will only be persisted after saving changes");
+        AlertService.success('Alias successfully added. Note that changes made will only be persisted after saving changes');
       } catch (error) {
         AlertService.error(error, null);
       }
     } else {
-      AlertService.error("Invalid filter defined for alias", $scope.editor.error);
+      AlertService.error('Invalid filter defined for alias', $scope.editor.error);
     }
   };
 
@@ -1359,7 +1359,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     }
     $scope.paginator.setCollection(collection);
     $scope.page = $scope.paginator.getPage();
-    AlertService.success("All aliases were removed for " + index);
+    AlertService.success('All aliases were removed for ' + index);
   };
 
   $scope.removeIndexAlias = function(index, alias) {
@@ -1382,7 +1382,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     }
     $scope.paginator.setCollection(collection);
     $scope.page = $scope.paginator.getPage();
-    AlertService.success("Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes");
+    AlertService.success('Alias successfully dissociated from index. Note that changes made will only be persisted after saving changes');
   };
 
   $scope.mergeAliases = function() {
@@ -1390,15 +1390,15 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
     var deletes = IndexAliases.diff(collection, $scope.original);
     var adds = IndexAliases.diff($scope.original, collection);
     if (adds.length === 0 && deletes.length === 0) {
-      AlertService.warn("No changes were made: nothing to save");
+      AlertService.warn('No changes were made: nothing to save');
     } else {
       ElasticService.client.updateAliases(adds, deletes,
         function(response) {
-          AlertService.success("Aliases were successfully updated", response);
+          AlertService.success('Aliases were successfully updated', response);
           $scope.loadAliases();
         },
         function(error) {
-          AlertService.error("Error while updating aliases", error);
+          AlertService.error('Error while updating aliases', error);
         }
       );
     }
@@ -1414,7 +1414,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService', 'AceEditorServic
         $scope.page = $scope.paginator.getPage();
       },
       function(error) {
-        AlertService.error("Error while fetching aliases", error);
+        AlertService.error('Error while fetching aliases', error);
       }
     );
   };
@@ -1461,7 +1461,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.field_index = '';
-          AlertService.error("Error while loading index metadata", error);
+          AlertService.error('Error while loading index metadata', error);
         }
       );
     }
@@ -1482,7 +1482,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.analyzer_index = '';
-          AlertService.error("Error while loading index metadata", error);
+          AlertService.error('Error while loading index metadata', error);
         }
       );
     }
@@ -1498,7 +1498,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.field_tokens = null;
-          AlertService.error("Error while analyzing text", error);
+          AlertService.error('Error while analyzing text', error);
         }
       );
     }
@@ -1513,7 +1513,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout', 'Alert
         },
         function(error) {
           $scope.analyzer_tokens = null;
-          AlertService.error("Error while analyzing text", error);
+          AlertService.error('Error while analyzing text', error);
         }
       );
     }
@@ -1543,10 +1543,10 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
 
   $scope.checkPublishClusterHealth = function() {
     ConfirmDialogService.open(
-      "Are you share you want to share your cluster information through a Gist?",
-        "By sharing information through a public Gist you might be exposing sensitive information about your cluster, such as " +
-        "host name, indices names and etc.",
-      "Agree",
+      'Are you share you want to share your cluster information through a Gist?',
+        'By sharing information through a public Gist you might be exposing sensitive information about your cluster, such as ' +
+        'host name, indices names and etc.',
+      'Agree',
       function() {
         $scope.confirm_share = true;
         $scope.publishClusterHealth();
@@ -1557,7 +1557,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
   $scope.loadClusterHealth = function() {
     var results = {};
     $scope.results = null;
-    var info_id = AlertService.info("Loading cluster health state. This could take a few moments.", {}, 30000);
+    var info_id = AlertService.info('Loading cluster health state. This could take a few moments.', {}, 30000);
     ElasticService.client.getClusterDiagnosis($scope.retrieveHealth, $scope.retrieveState, $scope.retrieveStats, $scope.retrieveHotThreads,
       function(responses) {
         $scope.state = '';
@@ -1586,7 +1586,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
       },
       function(failed_request) {
         AlertService.remove(info_id);
-        AlertService.error("Error while retrieving cluster health information", failed_request.data);
+        AlertService.error('Error while retrieving cluster health information', failed_request.data);
       }
     );
   };
@@ -1611,16 +1611,16 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout', '
       }
     }
     var data = JSON.stringify(gist, undefined, 4);
-    $.ajax({ type: 'POST', url: "https://api.github.com/gists", dataType: 'json', data: data})
+    $.ajax({ type: 'POST', url: 'https://api.github.com/gists', dataType: 'json', data: data})
       .done(function(response) {
         $scope.updateModel(function() {
           $scope.addToHistory(new Gist(gist.description, response.html_url));
-          AlertService.success("Cluster health information successfully shared at: " + response.html_url, null, 60000);
+          AlertService.success('Cluster health information successfully shared at: ' + response.html_url, null, 60000);
         });
       })
       .fail(function(response) {
         $scope.updateModel(function() {
-          AlertService.error("Error while publishing Gist", responseText);
+          AlertService.error('Error while publishing Gist', responseText);
         });
       }
     );
@@ -1672,11 +1672,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
     return auto ? columns : 5;
   };
 
-  $scope.index_paginator = new Paginator(1, $scope.getPageSize(), [], new IndexFilter("", "", true, 0));
+  $scope.index_paginator = new Paginator(1, $scope.getPageSize(), [], new IndexFilter('', '', true, 0));
 
   $scope.page = $scope.index_paginator.getPage();
 
-  $scope.node_filter = new NodeFilter("", true, true, true, 0);
+  $scope.node_filter = new NodeFilter('', true, true, true, 0);
 
   $scope.nodes = [];
 
@@ -1726,21 +1726,21 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.shutdownNode = function(node_id) {
     ElasticService.client.shutdownNode(node_id,
       function(response) {
-        AlertService.success("Node [" + node_id + "] successfully shutdown", response);
+        AlertService.success('Node [' + node_id + '] successfully shutdown', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while shutting down node", error);
+        AlertService.error('Error while shutting down node', error);
       }
     );
   };
 
   $scope.promptShutdownNode = function(node_id, node_name) {
     ConfirmDialogService.open(
-        "are you sure you want to shutdown node " + node_name + "?",
-        "Shutting down a node will make all data stored in this node inaccessible, unless this data is replicated across other nodes." +
-        "Replicated shards will be promoted to primary if the primary shard is no longer reachable.",
-      "Shutdown",
+        'are you sure you want to shutdown node ' + node_name + '?',
+        'Shutting down a node will make all data stored in this node inaccessible, unless this data is replicated across other nodes.' +
+        'Replicated shards will be promoted to primary if the primary shard is no longer reachable.',
+      'Shutdown',
       function() {
         $scope.shutdownNode(node_id);
       }
@@ -1750,20 +1750,20 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.optimizeIndex = function(index) {
     ElasticService.client.optimizeIndex(index,
       function(response) {
-        AlertService.success("Index was successfully optimized", response);
+        AlertService.success('Index was successfully optimized', response);
       },
       function(error) {
-        AlertService.error("Error while optimizing index", error);
+        AlertService.error('Error while optimizing index', error);
       }
     );
   };
 
   $scope.promptOptimizeIndex = function(index) {
     ConfirmDialogService.open(
-        "are you sure you want to optimize index " + index + "?",
-        "Optimizing an index is a resource intensive operation and should be done with caution." +
-        "Usually, you will only want to optimize an index when it will no longer receive updates",
-      "Optimize",
+        'are you sure you want to optimize index ' + index + '?',
+        'Optimizing an index is a resource intensive operation and should be done with caution.' +
+        'Usually, you will only want to optimize an index when it will no longer receive updates',
+      'Optimize',
       function() {
         $scope.optimizeIndex(index);
       }
@@ -1776,16 +1776,16 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while deleting index", error);
+        AlertService.error('Error while deleting index', error);
       }
     );
   };
 
   $scope.promptDeleteIndex = function(index) {
     ConfirmDialogService.open(
-        "are you sure you want to delete index " + index + "?",
-      "Deleting an index cannot be undone and all data for this index will be lost",
-      "Delete",
+        'are you sure you want to delete index ' + index + '?',
+      'Deleting an index cannot be undone and all data for this index will be lost',
+      'Delete',
       function() {
         $scope.deleteIndex(index);
       }
@@ -1795,20 +1795,20 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.clearCache = function(index) {
     ElasticService.client.clearCache(index,
       function(response) {
-        AlertService.success("Index cache was successfully cleared", response);
+        AlertService.success('Index cache was successfully cleared', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while clearing index cache", error);
+        AlertService.error('Error while clearing index cache', error);
       }
     );
   };
 
   $scope.promptClearCache = function(index) {
     ConfirmDialogService.open(
-        "are you sure you want to clear the cache for index " + index + "?",
-      "This will clear all caches for this index.",
-      "Clear",
+        'are you sure you want to clear the cache for index ' + index + '?',
+      'This will clear all caches for this index.',
+      'Clear',
       function() {
         $scope.clearCache(index);
       }
@@ -1818,19 +1818,19 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.refreshIndex = function(index) {
     ElasticService.client.refreshIndex(index,
       function(response) {
-        AlertService.success("Index was successfully refreshed", response);
+        AlertService.success('Index was successfully refreshed', response);
       },
       function(error) {
-        AlertService.error("Error while refreshing index", error);
+        AlertService.error('Error while refreshing index', error);
       }
     );
   };
 
   $scope.promptRefreshIndex = function(index) {
     ConfirmDialogService.open(
-        "are you sure you want to refresh index " + index + "?",
-      "Refreshing an index makes all operations performed since the last refresh available for search.",
-      "Refresh",
+        'are you sure you want to refresh index ' + index + '?',
+      'Refreshing an index makes all operations performed since the last refresh available for search.',
+      'Refresh',
       function() {
         $scope.refreshIndex(index);
       }
@@ -1840,11 +1840,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.enableAllocation = function() {
     ElasticService.client.enableShardAllocation(
       function(response) {
-        AlertService.success("Shard allocation was successfully enabled", response);
+        AlertService.success('Shard allocation was successfully enabled', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while enabling shard allocation", error);
+        AlertService.error('Error while enabling shard allocation', error);
       }
     );
   };
@@ -1852,11 +1852,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.disableAllocation = function() {
     ElasticService.client.disableShardAllocation(
       function(response) {
-        AlertService.success("Shard allocation was successfully disabled", response);
+        AlertService.success('Shard allocation was successfully disabled', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while disabling shard allocation", error);
+        AlertService.error('Error while disabling shard allocation', error);
       }
     );
   };
@@ -1864,22 +1864,22 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.closeIndex = function(index) {
     ElasticService.client.closeIndex(index,
       function(response) {
-        AlertService.success("Index was successfully closed", response);
+        AlertService.success('Index was successfully closed', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while closing index", error);
+        AlertService.error('Error while closing index', error);
       }
     );
   };
 
   $scope.promptCloseIndex = function(index) {
     ConfirmDialogService.open(
-        "are you sure you want to close index " + index + "?",
-        "Closing an index will remove all it's allocated shards from the cluster. " +
-        "Both searches and updates will no longer be accepted for the index." +
-        "A closed index can be reopened at any time",
-      "Close index",
+        'are you sure you want to close index ' + index + '?',
+        'Closing an index will remove all it\'s allocated shards from the cluster. ' +
+        'Both searches and updates will no longer be accepted for the index.' +
+        'A closed index can be reopened at any time',
+      'Close index',
       function() {
         $scope.closeIndex(index);
       }
@@ -1889,21 +1889,21 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
   $scope.openIndex = function(index) {
     ElasticService.client.openIndex(index,
       function(response) {
-        AlertService.success("Index was successfully opened", response);
+        AlertService.success('Index was successfully opened', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while opening index", error);
+        AlertService.error('Error while opening index', error);
       }
     );
   };
 
   $scope.promptOpenIndex = function(index) {
     ConfirmDialogService.open(
-        "are you sure you want to open index " + index + "?",
-        "Opening an index will trigger the recovery process for the index. " +
-        "This process could take sometime depending on the index size.",
-      "Open index",
+        'are you sure you want to open index ' + index + '?',
+        'Opening an index will trigger the recovery process for the index. ' +
+        'This process could take sometime depending on the index size.',
+      'Open index',
       function() {
         $scope.openIndex(index);
       }
@@ -1916,10 +1916,10 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
       function(metadata) {
         IndexSettingsService.loadSettings(index, metadata.settings);
         $('#idx_settings_tabs a:first').tab('show');
-        $(".setting-info").popover();
+        $('.setting-info').popover();
       },
       function(error) {
-        AlertService.error("Error while loading index settings", error);
+        AlertService.error('Error while loading index settings', error);
       }
     );
   };
@@ -1930,7 +1930,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
         $scope.displayInfo('settings for index ' + index, metadata.settings);
       },
       function(error) {
-        AlertService.error("Error while loading index settings", error);
+        AlertService.error('Error while loading index settings', error);
       }
     );
   };
@@ -1941,7 +1941,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window', 'IndexSetting
         $scope.displayInfo('mappings for index ' + index, metadata.mappings);
       },
       function(error) {
-        AlertService.error("Error while loading index mappings", error);
+        AlertService.error('Error while loading index mappings', error);
       }
     );
   };
@@ -1952,19 +1952,19 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
   $scope.$on('loadClusterSettingsEvent', function() {
     $('#cluster_settings_option a').tab('show');
     $('#cluster_settings_tabs a:first').tab('show');
-    $(".setting-info").popover();
-    $scope.active_settings = "transient"; // remember last active?
+    $('.setting-info').popover();
+    $scope.active_settings = 'transient'; // remember last active?
     $scope.settings = new ClusterSettings($scope.cluster.settings);
   });
 
   $scope.save = function() {
-    ElasticService.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ""),
+    ElasticService.client.updateClusterSettings(JSON.stringify($scope.settings, undefined, ''),
       function(response) {
-        AlertService.success("Cluster settings were successfully updated", response);
+        AlertService.success('Cluster settings were successfully updated', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while updating cluster settings", error);
+        AlertService.error('Error while updating cluster settings', error);
       }
     );
   };
@@ -1990,18 +1990,18 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
         $scope.editor.setValue(JSON.stringify(body, null, 2));
       },
       function(error) {
-        AlertService.error("Error while loading index settings", error);
+        AlertService.error('Error while loading index settings', error);
       }
     );
   };
 
   $scope.createIndex = function() {
     if ($scope.name.trim().length === 0) {
-      AlertService.error("You must specify a valid index name");
+      AlertService.error('You must specify a valid index name');
     } else {
       var body_string = $scope.editor.format();
       if (isDefined($scope.editor.error)) {
-        AlertService.error("Invalid JSON: " + $scope.editor.error);
+        AlertService.error('Invalid JSON: ' + $scope.editor.error);
       } else {
         var body = JSON.parse(body_string);
         if (Object.keys(body).length === 0) {
@@ -2019,7 +2019,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
             $scope.refreshClusterState();
           },
           function(error) {
-            AlertService.error("Error while creating index", error);
+            AlertService.error('Error while creating index', error);
           }
         );
       }
@@ -2032,7 +2032,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
     }
     $scope.indices = $scope.cluster.indices;
     $scope.source_index = null;
-    $scope.editor.setValue("{}");
+    $scope.editor.setValue('{}');
     $scope.shards = '';
     $scope.name = '';
     $scope.replicas = '';
@@ -2040,7 +2040,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
 }]);
 
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService', 'SettingsService', 'ThemeService', 'ElasticService', function($scope, $location, $timeout, $http, $q, $sce, $window, ConfirmDialogService, AlertService, SettingsService, ThemeService, ElasticService) {
-  $scope.version = "1.3.6-SNAPSHOT";
+  $scope.version = '1.3.6-SNAPSHOT';
   $scope.alert_service = AlertService;
   $scope.modal = new ModalControls();
 
@@ -2063,14 +2063,14 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
 
   $scope.connect = function() {
     try {
-      var host = "http://localhost:9200"; // default
-      if ($location.host() !== "") { // not opening from fs
+      var host = 'http://localhost:9200'; // default
+      if ($location.host() !== '') { // not opening from fs
         var location = $scope.readParameter('location');
         if (isDefined(location)) {
           host = location;
         } else {
           var url = $location.absUrl();
-          host = url.substring(0, url.indexOf("/_plugin/kopf"));
+          host = url.substring(0, url.indexOf('/_plugin/kopf'));
         }
       }
       ElasticService.connect(host);
@@ -2088,27 +2088,27 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
       if (changes.hasChanges()) {
         if (changes.hasJoins()) {
           var joins = changes.nodeJoins.map(function(node) {
-            return node.name + "[" + node.transport_address + "]";
+            return node.name + '[' + node.transport_address + ']';
           });
-          AlertService.info(joins.length + " new node(s) joined the cluster", joins);
+          AlertService.info(joins.length + ' new node(s) joined the cluster', joins);
         }
         if (changes.hasLeaves()) {
           var leaves = changes.nodeLeaves.map(function(node) {
-            return node.name + "[" + node.transport_address + "]";
+            return node.name + '[' + node.transport_address + ']';
           });
-          AlertService.warn(changes.nodeLeaves.length + " node(s) left the cluster", leaves);
+          AlertService.warn(changes.nodeLeaves.length + ' node(s) left the cluster', leaves);
         }
         if (changes.hasCreatedIndices()) {
           var created = changes.indicesCreated.map(function(index) {
             return index.name;
           });
-          AlertService.info(changes.indicesCreated.length + " indices created: [" + created.join(",") + "]");
+          AlertService.info(changes.indicesCreated.length + ' indices created: [' + created.join(',') + ']');
         }
         if (changes.hasDeletedIndices()) {
           var deleted = changes.indicesDeleted.map(function(index) {
             return index.name;
           });
-          AlertService.info(changes.indicesDeleted.length + " indices deleted: [" + deleted.join(",") + "]");
+          AlertService.info(changes.indicesDeleted.length + ' indices deleted: [' + deleted.join(',') + ']');
         }
       }
     }
@@ -2124,7 +2124,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
             $scope.alertClusterChanges();
           },
           function(error) {
-            AlertService.error("Error while retrieving cluster information", error);
+            AlertService.error('Error while retrieving cluster information', error);
             $scope.cluster = null;
           }
         );
@@ -2135,7 +2135,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout', '$http',
           },
           function(error) {
             $scope.cluster_health = null;
-            AlertService.error("Error connecting to [" + $scope.host + "]", error);
+            AlertService.error('Error connecting to [' + $scope.host + ']', error);
           }
         );
       }, 100);
@@ -2199,13 +2199,13 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
         new_settings[setting] = editable_settings[setting];
       }
     });
-    ElasticService.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
+    ElasticService.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ''),
       function(response) {
-        AlertService.success("Index settings were successfully updated", response);
+        AlertService.success('Index settings were successfully updated', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while updating index settings", error);
+        AlertService.error('Error while updating index settings', error);
       }
     );
   };
@@ -2232,7 +2232,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
       HostHistoryService.addToHistory(ElasticService.connection.host);
       $scope.host_history = HostHistoryService.getHostHistory();
     } catch (error) {
-      AlertService.error("Error while connecting to new target host", error);
+      AlertService.error('Error while connecting to new target host', error);
     } finally {
       $scope.current_host = ElasticService.connection.host;
       $scope.refreshClusterState();
@@ -2255,7 +2255,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
 
 kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertService', 'AceEditorService', 'ElasticService', function($scope, $location, $timeout, AlertService, AceEditorService, ElasticService) {
 
-  $scope.request = new Request(ElasticService.getHost() + "/_search", "GET", "{}");
+  $scope.request = new Request(ElasticService.getHost() + '/_search', 'GET', '{}');
   $scope.validation_error = null;
 
   $scope.loadHistory = function() {
@@ -2315,7 +2315,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
       var username = a.username || null;
       var password = a.password || null;
       if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
-        AlertService.info("You are executing a GET request with body content. Maybe you meant to use POST or PUT?");
+        AlertService.info('You are executing a GET request with body content. Maybe you meant to use POST or PUT?');
       }
       ElasticService.client.executeRequest($scope.request.method, $scope.request.url, username, password, $scope.request.body,
         function(response) {
@@ -2330,14 +2330,14 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout', 'AlertServ
         },
         function(error, status) {
           if (status !== 0) {
-            AlertService.error("Request was not successful");
+            AlertService.error('Request was not successful');
             try {
               $('#rest-client-response').html(JSONTree.create(error));
             } catch (invalid_json) {
               $('#rest-client-response').html(error);
             }
           } else {
-            AlertService.error($scope.request.url + " is unreachable");
+            AlertService.error($scope.request.url + ' is unreachable');
           }
         }
       );
@@ -2349,8 +2349,8 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
   $scope.editor = undefined;
   $scope.pagination = new PercolatorsPage(0, 0, 0, []);
 
-  $scope.filter = "";
-  $scope.id = "";
+  $scope.filter = '';
+  $scope.id = '';
 
   $scope.index = null;
   $scope.indices = [];
@@ -2378,14 +2378,14 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
   $scope.parseSearchParams = function() {
     var queries = [];
     if ($scope.id.trim().length > 0) {
-      queries.push({"query_string": { default_field: '_id', query: $scope.id}});
+      queries.push({'query_string': { default_field: '_id', query: $scope.id}});
     }
     if ($scope.filter.trim().length > 0) {
       var filter = JSON.parse($scope.filter);
       Object.keys(filter).forEach(function(field) {
         var q = {};
         q[field] = filter[field];
-        queries.push({"term": q});
+        queries.push({'term': q});
       });
     }
     return queries;
@@ -2393,25 +2393,25 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 
   $scope.deletePercolatorQuery = function(query) {
     ConfirmDialogService.open(
-        "are you sure you want to delete query " + query.id + " for index " + query.index + "?",
+        'are you sure you want to delete query ' + query.id + ' for index ' + query.index + '?',
       query.sourceAsJSON(),
-      "Delete",
+      'Delete',
       function() {
         ElasticService.client.deletePercolatorQuery(query.index, query.id,
           function(response) {
             var refreshIndex = query.index;
             ElasticService.client.refreshIndex(refreshIndex,
               function(response) {
-                AlertService.success("Query successfully deleted", response);
+                AlertService.success('Query successfully deleted', response);
                 $scope.loadPercolatorQueries();
               },
               function(error) {
-                AlertService.error("Error while reloading queries", error);
+                AlertService.error('Error while reloading queries', error);
               }
             );
           },
           function(error) {
-            AlertService.error("Error while deleting query", error);
+            AlertService.error('Error while deleting query', error);
           }
         );
       }
@@ -2420,18 +2420,18 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
 
   $scope.createNewQuery = function() {
     if (!notEmpty($scope.new_query.index) || !notEmpty($scope.new_query.id)) {
-      AlertService.error("Both index and query id must be specified");
+      AlertService.error('Both index and query id must be specified');
       return;
     }
 
     $scope.new_query.source = $scope.editor.format();
     if (isDefined($scope.editor.error)) {
-      AlertService.error("Invalid percolator query");
+      AlertService.error('Invalid percolator query');
       return;
     }
 
     if (!notEmpty($scope.new_query.source)) {
-      AlertService.error("Query must be defined");
+      AlertService.error('Query must be defined');
       return;
     }
     ElasticService.client.createPercolatorQuery($scope.new_query,
@@ -2439,17 +2439,17 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
         var refreshIndex = $scope.new_query.index;
         ElasticService.client.refreshIndex(refreshIndex,
           function(response) {
-            AlertService.success("Percolator Query successfully created", response);
+            AlertService.success('Percolator Query successfully created', response);
             $scope.index = $scope.new_query.index;
             $scope.loadPercolatorQueries(0);
           },
           function(error) {
-            AlertService.success("Error while reloading queries", error);
+            AlertService.success('Error while reloading queries', error);
           }
         );
       },
       function(error) {
-        AlertService.error("Error while creating percolator query", error);
+        AlertService.error('Error while creating percolator query', error);
       }
     );
   };
@@ -2458,7 +2458,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
     if (isDefined($scope.index)) {
       $scope.loadPercolatorQueries();
     } else {
-      AlertService.info("No index is selected");
+      AlertService.info('No index is selected');
     }
   };
 
@@ -2475,11 +2475,11 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService', 'Aler
           $scope.pagination = percolators;
         },
         function(error) {
-          AlertService.error("Error while reading loading percolate queries", error);
+          AlertService.error('Error while reading loading percolate queries', error);
         }
       );
     } catch (error) {
-      AlertService.error("Filter is not a valid JSON");
+      AlertService.error('Filter is not a valid JSON');
     }
   };
 
@@ -2536,23 +2536,23 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
   $scope.executeDeleteRepository = function(repository) {
     ElasticService.client.deleteRepository(repository.name,
       function(response) {
-        AlertService.success("Repository successfully deleted", response);
+        AlertService.success('Repository successfully deleted', response);
         if (notEmpty($scope.snapshot_repository) && $scope.snapshot_repository == repository.name) {
           $scope.snapshot_repository = '';
         }
         $scope.reload();
       },
       function(error) {
-        AlertService.error("Error while deleting repositor", error);
+        AlertService.error('Error while deleting repositor', error);
       }
     );
   };
 
   $scope.deleteRepository = function(repository) {
     ConfirmDialogService.open(
-        "are you sure you want to delete repository " + repository.name + "?",
+        'are you sure you want to delete repository ' + repository.name + '?',
       repository.settings,
-      "Delete",
+      'Delete',
       function() {
         $scope.executeDeleteRepository(repository);
       }
@@ -2563,24 +2563,24 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
     var body = {};
     // dont add to body if not present, these are optional, all indices included by default
     if (angular.isDefined($scope.restore_snap.indices) && $scope.restore_snap.indices.length > 0) {
-      body.indices = $scope.restore_snap.indices.join(",");
+      body.indices = $scope.restore_snap.indices.join(',');
     }
 
     if (angular.isDefined($scope.restore_snap.include_global_state)) {
       body.include_global_state = $scope.restore_snap.include_global_state;
     }
 
-    $scope.optionalParam(body, $scope.restore_snap, "ignore_unavailable");
-    $scope.optionalParam(body, $scope.restore_snap, "rename_replacement");
-    $scope.optionalParam(body, $scope.restore_snap, "rename_pattern");
+    $scope.optionalParam(body, $scope.restore_snap, 'ignore_unavailable');
+    $scope.optionalParam(body, $scope.restore_snap, 'rename_replacement');
+    $scope.optionalParam(body, $scope.restore_snap, 'rename_pattern');
 
     ElasticService.client.restoreSnapshot($scope.snapshot_repository, $scope.snapshot.name, JSON.stringify(body),
       function(response) {
-        AlertService.success("Snapshot Restored Started");
+        AlertService.success('Snapshot Restored Started');
         $scope.reload();
       },
       function(error) {
-        AlertService.error("Error while started restore of snapshot", error);
+        AlertService.error('Error while started restore of snapshot', error);
       }
     );
   };
@@ -2590,11 +2590,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
       $scope.repository_form.validate();
       ElasticService.client.createRepository($scope.repository_form.name, $scope.repository_form.asJson(),
         function(response) {
-          AlertService.success("Repository created");
+          AlertService.success('Repository created');
           $scope.loadRepositories();
         },
         function(error) {
-          AlertService.error("Error while creating repository", error);
+          AlertService.error('Error while creating repository', error);
         }
       );
     } catch (error) {
@@ -2609,7 +2609,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
       },
       function(error) {
         $scope.repositories = [];
-        AlertService.error("Error while reading repositories", error);
+        AlertService.error('Error while reading repositories', error);
       }
     );
   };
@@ -2619,52 +2619,52 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
 
     // name and repo required
     if (!isDefined($scope.new_snap.repository)) {
-      AlertService.warn("Repository is required");
+      AlertService.warn('Repository is required');
       return;
     }
 
     if (!isDefined($scope.new_snap.name)) {
-      AlertService.warn("Snapshot name is required");
+      AlertService.warn('Snapshot name is required');
       return;
     }
 
     // dont add to body if not present, these are optional, all indices included by default
     if (isDefined($scope.new_snap.indices) && $scope.new_snap.indices.length > 0) {
-      body.indices = $scope.new_snap.indices.join(",");
+      body.indices = $scope.new_snap.indices.join(',');
     }
 
     if (isDefined($scope.new_snap.include_global_state)) {
       body.include_global_state = $scope.new_snap.include_global_state;
     }
 
-    $scope.optionalParam(body, $scope.new_snap, "ignore_unavailable");
+    $scope.optionalParam(body, $scope.new_snap, 'ignore_unavailable');
 
     ElasticService.client.createSnapshot($scope.new_snap.repository.name, $scope.new_snap.name, JSON.stringify(body),
       function(response) {
-        AlertService.success("Snapshot created");
+        AlertService.success('Snapshot created');
         $scope.reload();
       },
       function(error) {
-        AlertService.error("Error while creating snapshot", error);
+        AlertService.error('Error while creating snapshot', error);
       }
     );
   };
 
   $scope.deleteSnapshot = function(snapshot) {
     ConfirmDialogService.open(
-        "are you sure you want to delete snapshot " + snapshot.name + "?",
+        'are you sure you want to delete snapshot ' + snapshot.name + '?',
       snapshot,
-      "Delete",
+      'Delete',
       function() {
         ElasticService.client.deleteSnapshot(
           $scope.snapshot_repository,
           snapshot.name,
           function(response) {
-            AlertService.success("Snapshot successfully deleted", response);
+            AlertService.success('Snapshot successfully deleted', response);
             $scope.reload();
           },
           function(error) {
-            AlertService.error("Error while deleting snapshot", error);
+            AlertService.error('Error while deleting snapshot', error);
           }
         );
       }
@@ -2680,7 +2680,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService', 'Aler
       function(error) {
         $scope.paginator.setCollection([]);
         $scope.page = $scope.paginator.getPage();
-        AlertService.error("Error while fetching snapshots", error);
+        AlertService.error('Error while fetching snapshots', error);
       }
     );
   };
@@ -2717,7 +2717,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
   $scope.editor = undefined;
   $scope.indices = [];
   $scope.index = null;
-  $scope.paginator = new Paginator(1, 10, [], new WarmerFilter(""));
+  $scope.paginator = new Paginator(1, 10, [], new WarmerFilter(''));
   $scope.page = $scope.paginator.getPage();
 
   $scope.warmer = new Warmer('', '', { types: [], source: {} });
@@ -2751,31 +2751,31 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
         ElasticService.client.registerWarmupQuery($scope.warmer,
           function(response) {
             $scope.loadIndexWarmers();
-            AlertService.success("Warmup query successfully registered", response);
+            AlertService.success('Warmup query successfully registered', response);
           },
           function(error) {
-            AlertService.error("Request did not return a valid JSON", error);
+            AlertService.error('Request did not return a valid JSON', error);
           }
         );
       }
     } else {
-      AlertService.error("Warmup query body can't be empty");
+      AlertService.error('Warmup query body can\'t be empty');
     }
   };
 
   $scope.deleteWarmupQuery = function(warmer) {
     ConfirmDialogService.open(
-        "are you sure you want to delete query " + warmer.id + "?",
+        'are you sure you want to delete query ' + warmer.id + '?',
       warmer.source,
-      "Delete",
+      'Delete',
       function() {
         ElasticService.client.deleteWarmupQuery(warmer,
           function(response) {
-            AlertService.success("Warmup query successfully deleted", response);
+            AlertService.success('Warmup query successfully deleted', response);
             $scope.loadIndexWarmers();
           },
           function(error) {
-            AlertService.error("Error while deleting warmup query", error);
+            AlertService.error('Error while deleting warmup query', error);
           }
         );
       }
@@ -2784,7 +2784,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
 
   $scope.loadIndexWarmers = function() {
     if (isDefined($scope.index)) {
-      ElasticService.client.getIndexWarmers($scope.index, "",
+      ElasticService.client.getIndexWarmers($scope.index, '',
         function(warmers) {
           $scope.paginator.setCollection(warmers);
           $scope.page = $scope.paginator.getPage();
@@ -2792,7 +2792,7 @@ kopf.controller('WarmupController', ['$scope', 'ConfirmDialogService', 'AlertSer
         function(error) {
           $scope.paginator.setCollection([]);
           $scope.page = $scope.paginator.getPage();
-          AlertService.error("Error while fetching warmup queries", error);
+          AlertService.error('Error while fetching warmup queries', error);
         }
       );
     } else {
@@ -2820,7 +2820,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
       this.bench.addCompetitor($scope.competitor);
       $scope.competitor = new Competitor();
     } else {
-      AlertService.error("Competitor needs a name");
+      AlertService.error('Competitor needs a name');
     }
   };
 
@@ -2844,7 +2844,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
         },
         function(error, status) {
           if (status == 503) {
-            AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+            AlertService.info('No available nodes for executing benchmark. At least one node must be started with \'--node.bench true\' option.');
           } else {
             AlertService.error(error.error);
           }
@@ -2865,7 +2865,7 @@ var Alert = function(message, response, level, _class, icon) {
   this.class = _class;
   this.icon = icon;
   this.timestamp = getTimeString(current_date);
-  this.id = "alert_box_" + current_date.getTime();
+  this.id = 'alert_box_' + current_date.getTime();
 
   this.hasResponse = function() {
     return isDefined(this.response);
@@ -2890,7 +2890,7 @@ kopf.factory('AlertService', function() {
 
   // remove a particular alert message
   this.remove = function(id) {
-    $("#" + id).fadeTo(1000, 0).slideUp(200, function() {
+    $('#' + id).fadeTo(1000, 0).slideUp(200, function() {
       $(this).remove();
     });
     this.alerts = this.alerts.filter(function(a) {
@@ -2901,25 +2901,25 @@ kopf.factory('AlertService', function() {
   // creates an error alert
   this.error = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 15000;
-    return this.addAlert(new Alert(message, response, "error", "alert-danger", "fa fa-warning"), timeout);
+    return this.addAlert(new Alert(message, response, 'error', 'alert-danger', 'fa fa-warning'), timeout);
   };
 
   // creates an info alert
   this.info = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 5000;
-    return this.addAlert(new Alert(message, response, "info", "alert-info", "fa fa-info"), timeout);
+    return this.addAlert(new Alert(message, response, 'info', 'alert-info', 'fa fa-info'), timeout);
   };
 
   // creates success alert
   this.success = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 5000;
-    return this.addAlert(new Alert(message, response, "success", "alert-success", "fa fa-check"), timeout);
+    return this.addAlert(new Alert(message, response, 'success', 'alert-success', 'fa fa-check'), timeout);
   };
 
   // creates a warn alert
   this.warn = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 10000;
-    return this.addAlert(new Alert(message, response, "warn", "alert-warning", "fa fa-info"), timeout);
+    return this.addAlert(new Alert(message, response, 'warn', 'alert-warning', 'fa fa-info'), timeout);
   };
 
   this.addAlert = function(alert, timeout) {
@@ -2941,7 +2941,7 @@ kopf.factory('SettingsService', function() {
 
   this.refresh_interval = 3000;
 
-  this.auto_adjust_layout = "true"; // enabled by default
+  this.auto_adjust_layout = 'true'; // enabled by default
 
   this.setRefreshInterval = function(interval) {
     this.refresh_interval = interval;
@@ -2957,15 +2957,15 @@ kopf.factory('SettingsService', function() {
   };
 
   this.setAutoAdjustLayout = function(enabled) {
-    this.auto_adjust_layout = "" + enabled;
+    this.auto_adjust_layout = '' + enabled;
     localStorage.kopf_auto_adjust_layout = this.auto_adjust_layout;
   };
 
   this.getAutoAdjustLayout = function() {
     if (isDefined(localStorage.kopf_auto_adjust_layout)) {
-      return localStorage.kopf_auto_adjust_layout === "true";
+      return localStorage.kopf_auto_adjust_layout === 'true';
     } else {
-      return this.auto_adjust_layout === "true";
+      return this.auto_adjust_layout === 'true';
     }
   };
 
@@ -2983,7 +2983,7 @@ kopf.factory('AceEditorService', function() {
 
 kopf.factory('ThemeService', function() {
 
-  this.theme = "dark";
+  this.theme = 'dark';
 
   this.setTheme = function(theme) {
     this.theme = theme;
@@ -3011,13 +3011,13 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService', functi
     try {
       this.client = null;
       this.connection = null;
-      if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
-        url = "http://" + url;
+      if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+        url = 'http://' + url;
       }
       this.connection = new ESConnection(url + root, with_credentials);
       this.client = new ElasticClient(this.connection, $http, $q);
     } catch (error) {
-      throw { message: "Error while connecting to [" + url + root + "]", body: error };
+      throw { message: 'Error while connecting to [' + url + root + ']', body: error };
     }
   };
 
@@ -3037,7 +3037,7 @@ kopf.factory('HostHistoryService', function() {
 
   this.getHostHistory = function() {
     var history = localStorage.getItem('kopf_host_history');
-    history = isDefined(history) ? history : "[]";
+    history = isDefined(history) ? history : '[]';
     return JSON.parse(history);
   };
 
@@ -3074,18 +3074,18 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
     if (!isDefined(this.settings)) {
       this.settings = {};
       var settings = this.settings;
-      var settings_future = $.ajax({ type: 'GET', url: "./kopf_external_settings.json", dataType: 'json', async: false });
+      var settings_future = $.ajax({ type: 'GET', url: './kopf_external_settings.json', dataType: 'json', async: false });
       settings_future.done(function(data) {
         try {
           Object.keys(data).forEach(function(setting) {
             settings[setting] = data[setting];
           });
         } catch (error) {
-          throw { message: "Error processing external settings", body: data };
+          throw { message: 'Error processing external settings', body: data };
         }
       });
       settings_future.fail(function(error) {
-        throw { message: "Error fetching external settings from file", body: error };
+        throw { message: 'Error fetching external settings from file', body: error };
       });
     }
     return this.settings;
@@ -3105,11 +3105,11 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
 
 function AceEditor(target) {
   // ace editor
-  ace.config.set("basePath", "dist/");
+  ace.config.set('basePath', 'dist/');
   this.editor = ace.edit(target);
-  this.editor.setFontSize("10px");
-  this.editor.setTheme("ace/theme/kopf");
-  this.editor.getSession().setMode("ace/mode/json");
+  this.editor.setFontSize('10px');
+  this.editor.setTheme('ace/theme/kopf');
+  this.editor.getSession().setMode('ace/mode/json');
 
   // validation error
   this.error = null;
@@ -3235,37 +3235,37 @@ function Competitor() {
       if (isNumber(this.iterations)) {
         body.iterations = parseInt(this.iterations);
       } else {
-        throw "Iterations must be a valid number";
+        throw 'Iterations must be a valid number';
       }
     }
     if (notEmpty(this.concurrency)) {
       if (isNumber(this.concurrency)) {
         body.concurrency = parseInt(this.concurrency);
       } else {
-        throw "Concurrency must be a valid number";
+        throw 'Concurrency must be a valid number';
       }
     }
     if (notEmpty(this.multiplier)) {
       if (isNumber(this.multiplier)) {
         body.multiplier = parseInt(this.multiplier);
       } else {
-        throw "Multiplier must be a valid number";
+        throw 'Multiplier must be a valid number';
       }
     }
     if (notEmpty(this.num_slowest)) {
       if (isNumber(this.num_slowest)) {
         body.num_slowest = parseInt(this.num_slowest);
       } else {
-        throw "Num slowest must be a valid number";
+        throw 'Num slowest must be a valid number';
       }
     }
     if (notEmpty(this.indices)) {
-      body.indices = this.indices.split(",").map(function(index) {
+      body.indices = this.indices.split(',').map(function(index) {
         return index.trim();
       });
     }
     if (notEmpty(this.types)) {
-      body.types = this.types.split(",").map(function(type) {
+      body.types = this.types.split(',').map(function(type) {
         return type.trim();
       });
     }
@@ -3278,12 +3278,12 @@ function Competitor() {
     body.clear_caches.id = this.id_cache;
     body.clear_caches.recycler = this.recycler_cache;
     if (notEmpty(this.cache_fields)) {
-      body.clear_caches.fields = this.cache_fields.split(",").map(function(field) {
+      body.clear_caches.fields = this.cache_fields.split(',').map(function(field) {
         return field.trim();
       });
     }
     if (notEmpty(this.cache_keys)) {
-      body.clear_caches.filter_keys = this.cache_keys.split(",").map(function(key) {
+      body.clear_caches.filter_keys = this.cache_keys.split(',').map(function(key) {
         return key.trim();
       });
     }
@@ -3326,15 +3326,15 @@ function ClusterNavigation() {
   this.page = 1;
   this.page_size = 5; // TODO: move it to a single place?
 
-  this.query = "";
+  this.query = '';
   this.previous_query = null;
   this.hide_special = true;
 
   this.data = true;
   this.master = true;
   this.client = true;
-  this.state = "";
-  this.node_name = "";
+  this.state = '';
+  this.node_name = '';
   this.cached_result = [];
   this.cluster_timestamp = null;
 
@@ -3570,15 +3570,15 @@ function IndexFilter(name, state, hide_special, timestamp) {
         matches = !index.special;
       }
       if (matches && notEmpty(this.state)) {
-        if (this.state == "unhealthy" && !index.unhealthy) {
+        if (this.state == 'unhealthy' && !index.unhealthy) {
           matches = false;
-        } else if ((this.state == "open" || this.state == "close") && this.state != index.state) {
+        } else if ((this.state == 'open' || this.state == 'close') && this.state != index.state) {
           matches = false;
         }
       }
       if (matches && notEmpty(this.name)) {
         try {
-          var reg = new RegExp(this.name.trim(), "i");
+          var reg = new RegExp(this.name.trim(), 'i');
           matches = reg.test(index.name);
         }
         catch (err) { // if not valid regexp, still try normal matching
@@ -3642,17 +3642,17 @@ function readablizeBytes(bytes) {
 // Otherwise returns the default_value given.
 // Example: get the value of object[a][b][c][d]
 // where property_path is [a,b,c,d]
-function getProperty(object, property_path, default_value) {
+function getProperty(object, propertyPath, defaultValue) {
   if (isDefined(object)) {
-    if (isDefined(object[property_path])) {
-      return object[property_path];
+    if (isDefined(object[propertyPath])) {
+      return object[propertyPath];
     }
-    var path_parts = property_path.split('.'); // path as nested properties
+    var path_parts = propertyPath.split('.'); // path as nested properties
     for (var i = 0; i < path_parts.length && isDefined(object); i++) {
       object = object[path_parts[i]];
     }
   }
-  return isDefined(object) ? object : default_value;
+  return isDefined(object) ? object : defaultValue;
 }
 
 // Checks if value is both non null and undefined
@@ -3673,13 +3673,16 @@ function isNumber(value) {
 
 // Returns the given date as a String formatted as hh:MM:ss
 function getTimeString(date) {
-  return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
+  var hh = ('0' + date.getHours()).slice(-2);
+  var mm = ('0' + date.getMinutes()).slice(-2);
+  var ss = ('0' + date.getSeconds()).slice(-2);
+  return hh + ':' + mm + ':' + ss;
 }
 
 function prettyPrintObject(object) {
   var prettyObject = {};
   Object.keys(object).forEach(function(key) {
-    var parts = key.split(".");
+    var parts = key.split('.');
     var property = null;
     var reference = prettyObject;
     var previous = null;

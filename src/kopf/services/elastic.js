@@ -8,13 +8,13 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService', functi
     try {
       this.client = null;
       this.connection = null;
-      if (url.indexOf("http://") !== 0 && url.indexOf("https://") !== 0) {
-        url = "http://" + url;
+      if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+        url = 'http://' + url;
       }
       this.connection = new ESConnection(url + root, with_credentials);
       this.client = new ElasticClient(this.connection, $http, $q);
     } catch (error) {
-      throw { message: "Error while connecting to [" + url + root + "]", body: error };
+      throw { message: 'Error while connecting to [' + url + root + ']', body: error };
     }
   };
 

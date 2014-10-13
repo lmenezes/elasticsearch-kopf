@@ -19,7 +19,7 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService', 'ThemeService'
       HostHistoryService.addToHistory(ElasticService.connection.host);
       $scope.host_history = HostHistoryService.getHostHistory();
     } catch (error) {
-      AlertService.error("Error while connecting to new target host", error);
+      AlertService.error('Error while connecting to new target host', error);
     } finally {
       $scope.current_host = ElasticService.connection.host;
       $scope.refreshClusterState();

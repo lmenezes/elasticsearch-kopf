@@ -18,18 +18,18 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
         $scope.editor.setValue(JSON.stringify(body, null, 2));
       },
       function(error) {
-        AlertService.error("Error while loading index settings", error);
+        AlertService.error('Error while loading index settings', error);
       }
     );
   };
 
   $scope.createIndex = function() {
     if ($scope.name.trim().length === 0) {
-      AlertService.error("You must specify a valid index name");
+      AlertService.error('You must specify a valid index name');
     } else {
       var body_string = $scope.editor.format();
       if (isDefined($scope.editor.error)) {
-        AlertService.error("Invalid JSON: " + $scope.editor.error);
+        AlertService.error('Invalid JSON: ' + $scope.editor.error);
       } else {
         var body = JSON.parse(body_string);
         if (Object.keys(body).length === 0) {
@@ -47,7 +47,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
             $scope.refreshClusterState();
           },
           function(error) {
-            AlertService.error("Error while creating index", error);
+            AlertService.error('Error while creating index', error);
           }
         );
       }
@@ -60,7 +60,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService', 'ElasticServ
     }
     $scope.indices = $scope.cluster.indices;
     $scope.source_index = null;
-    $scope.editor.setValue("{}");
+    $scope.editor.setValue('{}');
     $scope.shards = '';
     $scope.name = '';
     $scope.replicas = '';

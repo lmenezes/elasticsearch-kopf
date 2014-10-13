@@ -31,15 +31,15 @@ function IndexFilter(name, state, hide_special, timestamp) {
         matches = !index.special;
       }
       if (matches && notEmpty(this.state)) {
-        if (this.state == "unhealthy" && !index.unhealthy) {
+        if (this.state == 'unhealthy' && !index.unhealthy) {
           matches = false;
-        } else if ((this.state == "open" || this.state == "close") && this.state != index.state) {
+        } else if ((this.state == 'open' || this.state == 'close') && this.state != index.state) {
           matches = false;
         }
       }
       if (matches && notEmpty(this.name)) {
         try {
-          var reg = new RegExp(this.name.trim(), "i");
+          var reg = new RegExp(this.name.trim(), 'i');
           matches = reg.test(index.name);
         }
         catch (err) { // if not valid regexp, still try normal matching

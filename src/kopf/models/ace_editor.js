@@ -1,10 +1,10 @@
 function AceEditor(target) {
   // ace editor
-  ace.config.set("basePath", "dist/");
+  ace.config.set('basePath', 'dist/');
   this.editor = ace.edit(target);
-  this.editor.setFontSize("10px");
-  this.editor.setTheme("ace/theme/kopf");
-  this.editor.getSession().setMode("ace/mode/json");
+  this.editor.setFontSize('10px');
+  this.editor.setTheme('ace/theme/kopf');
+  this.editor.getSession().setMode('ace/mode/json');
 
   // validation error
   this.error = null;

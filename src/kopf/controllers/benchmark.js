@@ -15,7 +15,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
       this.bench.addCompetitor($scope.competitor);
       $scope.competitor = new Competitor();
     } else {
-      AlertService.error("Competitor needs a name");
+      AlertService.error('Competitor needs a name');
     }
   };
 
@@ -39,7 +39,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout', 'Aler
         },
         function(error, status) {
           if (status == 503) {
-            AlertService.info("No available nodes for executing benchmark. At least one node must be started with '--node.bench true' option.");
+            AlertService.info('No available nodes for executing benchmark. At least one node must be started with \'--node.bench true\' option.');
           } else {
             AlertService.error(error.error);
           }

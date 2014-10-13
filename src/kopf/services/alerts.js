@@ -6,7 +6,7 @@ var Alert = function(message, response, level, _class, icon) {
   this.class = _class;
   this.icon = icon;
   this.timestamp = getTimeString(current_date);
-  this.id = "alert_box_" + current_date.getTime();
+  this.id = 'alert_box_' + current_date.getTime();
 
   this.hasResponse = function() {
     return isDefined(this.response);
@@ -31,7 +31,7 @@ kopf.factory('AlertService', function() {
 
   // remove a particular alert message
   this.remove = function(id) {
-    $("#" + id).fadeTo(1000, 0).slideUp(200, function() {
+    $('#' + id).fadeTo(1000, 0).slideUp(200, function() {
       $(this).remove();
     });
     this.alerts = this.alerts.filter(function(a) {
@@ -42,25 +42,25 @@ kopf.factory('AlertService', function() {
   // creates an error alert
   this.error = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 15000;
-    return this.addAlert(new Alert(message, response, "error", "alert-danger", "fa fa-warning"), timeout);
+    return this.addAlert(new Alert(message, response, 'error', 'alert-danger', 'fa fa-warning'), timeout);
   };
 
   // creates an info alert
   this.info = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 5000;
-    return this.addAlert(new Alert(message, response, "info", "alert-info", "fa fa-info"), timeout);
+    return this.addAlert(new Alert(message, response, 'info', 'alert-info', 'fa fa-info'), timeout);
   };
 
   // creates success alert
   this.success = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 5000;
-    return this.addAlert(new Alert(message, response, "success", "alert-success", "fa fa-check"), timeout);
+    return this.addAlert(new Alert(message, response, 'success', 'alert-success', 'fa fa-check'), timeout);
   };
 
   // creates a warn alert
   this.warn = function(message, response, timeout) {
     timeout = isDefined(timeout) ? timeout : 10000;
-    return this.addAlert(new Alert(message, response, "warn", "alert-warning", "fa fa-info"), timeout);
+    return this.addAlert(new Alert(message, response, 'warn', 'alert-warning', 'fa fa-info'), timeout);
   };
 
   this.addAlert = function(alert, timeout) {

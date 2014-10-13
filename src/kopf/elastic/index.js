@@ -2,7 +2,7 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   this.name = index_name;
   this.shards = null;
   this.metadata = {};
-  this.state = "close";
+  this.state = 'close';
   this.num_of_shards = 0;
   this.num_of_replicas = 0;
   this.aliases = [];
@@ -18,8 +18,8 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   };
 
   if (isDefined(cluster_state)) {
-    var routing = getProperty(cluster_state, "routing_table.indices");
-    this.state = "open";
+    var routing = getProperty(cluster_state, 'routing_table.indices');
+    this.state = 'open';
     if (isDefined(routing)) {
       var shards = Object.keys(cluster_state.routing_table.indices[index_name].shards);
       this.num_of_shards = shards.length;
@@ -78,14 +78,14 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
     var shards_map = cluster_state.routing_table.indices[this.name].shards;
     Object.keys(shards_map).forEach(function(shard_num) {
       shards_map[shard_num].forEach(function(shard) {
-        if (shard.state != "STARTED") {
+        if (shard.state != 'STARTED') {
           instance.unhealthy = true;
         }
       });
     });
   }
 
-  this.special = this.name.indexOf(".") === 0 || this.name.indexOf("_") === 0;
+  this.special = this.name.indexOf('.') === 0 || this.name.indexOf('_') === 0;
 
   this.compare = function(b) { // TODO: take into account index properties?
     return this.name.localeCompare(b.name);
@@ -96,10 +96,10 @@ function Index(index_name, cluster_state, index_info, index_status, aliases) {
   };
 
   this.closed = function() {
-    return this.state === "close";
+    return this.state === 'close';
   };
 
   this.open = function() {
-    return this.state === "open";
+    return this.state === 'open';
   };
 }

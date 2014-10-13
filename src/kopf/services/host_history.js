@@ -2,7 +2,7 @@ kopf.factory('HostHistoryService', function() {
 
   this.getHostHistory = function() {
     var history = localStorage.getItem('kopf_host_history');
-    history = isDefined(history) ? history : "[]";
+    history = isDefined(history) ? history : '[]';
     return JSON.parse(history);
   };
 

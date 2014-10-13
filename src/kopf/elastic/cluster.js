@@ -4,14 +4,14 @@ function Cluster(state, status, nodes, settings, aliases) {
   this.name = state.cluster_name;
   this.master_node = state.master_node;
 
-  this.disableAllocation = "false";
-  var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', "all");
-  var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', "");
-  if (transientAllocation !== "") {
-    this.disableAllocation = transientAllocation == "all" ? "false" : "true";
+  this.disableAllocation = 'false';
+  var persistentAllocation = getProperty(settings, 'persistent.cluster.routing.allocation.enable', 'all');
+  var transientAllocation = getProperty(settings, 'transient.cluster.routing.allocation.enable', '');
+  if (transientAllocation !== '') {
+    this.disableAllocation = transientAllocation == 'all' ? 'false' : 'true';
   } else {
-    if (persistentAllocation != "all") {
-      this.disableAllocation = "true";
+    if (persistentAllocation != 'all') {
+      this.disableAllocation = 'true';
     }
   }
 

@@ -12,17 +12,17 @@ function readablizeBytes(bytes) {
 // Otherwise returns the default_value given.
 // Example: get the value of object[a][b][c][d]
 // where property_path is [a,b,c,d]
-function getProperty(object, property_path, default_value) {
+function getProperty(object, propertyPath, defaultValue) {
   if (isDefined(object)) {
-    if (isDefined(object[property_path])) {
-      return object[property_path];
+    if (isDefined(object[propertyPath])) {
+      return object[propertyPath];
     }
-    var path_parts = property_path.split('.'); // path as nested properties
+    var path_parts = propertyPath.split('.'); // path as nested properties
     for (var i = 0; i < path_parts.length && isDefined(object); i++) {
       object = object[path_parts[i]];
     }
   }
-  return isDefined(object) ? object : default_value;
+  return isDefined(object) ? object : defaultValue;
 }
 
 // Checks if value is both non null and undefined
@@ -43,13 +43,16 @@ function isNumber(value) {
 
 // Returns the given date as a String formatted as hh:MM:ss
 function getTimeString(date) {
-  return ('0' + date.getHours()).slice(-2) + ":" + ('0' + date.getMinutes()).slice(-2) + ":" + ('0' + date.getSeconds()).slice(-2);
+  var hh = ('0' + date.getHours()).slice(-2);
+  var mm = ('0' + date.getMinutes()).slice(-2);
+  var ss = ('0' + date.getSeconds()).slice(-2);
+  return hh + ':' + mm + ':' + ss;
 }
 
 function prettyPrintObject(object) {
   var prettyObject = {};
   Object.keys(object).forEach(function(key) {
-    var parts = key.split(".");
+    var parts = key.split('.');
     var property = null;
     var reference = prettyObject;
     var previous = null;

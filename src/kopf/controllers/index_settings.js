@@ -12,13 +12,13 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout', '
         new_settings[setting] = editable_settings[setting];
       }
     });
-    ElasticService.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ""),
+    ElasticService.client.updateIndexSettings(index, JSON.stringify(new_settings, undefined, ''),
       function(response) {
-        AlertService.success("Index settings were successfully updated", response);
+        AlertService.success('Index settings were successfully updated', response);
         $scope.refreshClusterState();
       },
       function(error) {
-        AlertService.error("Error while updating index settings", error);
+        AlertService.error('Error while updating index settings', error);
       }
     );
   };

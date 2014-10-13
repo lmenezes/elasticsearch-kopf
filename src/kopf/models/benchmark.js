@@ -74,37 +74,37 @@ function Competitor() {
       if (isNumber(this.iterations)) {
         body.iterations = parseInt(this.iterations);
       } else {
-        throw "Iterations must be a valid number";
+        throw 'Iterations must be a valid number';
       }
     }
     if (notEmpty(this.concurrency)) {
       if (isNumber(this.concurrency)) {
         body.concurrency = parseInt(this.concurrency);
       } else {
-        throw "Concurrency must be a valid number";
+        throw 'Concurrency must be a valid number';
       }
     }
     if (notEmpty(this.multiplier)) {
       if (isNumber(this.multiplier)) {
         body.multiplier = parseInt(this.multiplier);
       } else {
-        throw "Multiplier must be a valid number";
+        throw 'Multiplier must be a valid number';
       }
     }
     if (notEmpty(this.num_slowest)) {
       if (isNumber(this.num_slowest)) {
         body.num_slowest = parseInt(this.num_slowest);
       } else {
-        throw "Num slowest must be a valid number";
+        throw 'Num slowest must be a valid number';
       }
     }
     if (notEmpty(this.indices)) {
-      body.indices = this.indices.split(",").map(function(index) {
+      body.indices = this.indices.split(',').map(function(index) {
         return index.trim();
       });
     }
     if (notEmpty(this.types)) {
-      body.types = this.types.split(",").map(function(type) {
+      body.types = this.types.split(',').map(function(type) {
         return type.trim();
       });
     }
@@ -117,12 +117,12 @@ function Competitor() {
     body.clear_caches.id = this.id_cache;
     body.clear_caches.recycler = this.recycler_cache;
     if (notEmpty(this.cache_fields)) {
-      body.clear_caches.fields = this.cache_fields.split(",").map(function(field) {
+      body.clear_caches.fields = this.cache_fields.split(',').map(function(field) {
         return field.trim();
       });
     }
     if (notEmpty(this.cache_keys)) {
-      body.clear_caches.filter_keys = this.cache_keys.split(",").map(function(key) {
+      body.clear_caches.filter_keys = this.cache_keys.split(',').map(function(key) {
         return key.trim();
       });
     }
