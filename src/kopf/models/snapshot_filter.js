@@ -1,11 +1,19 @@
 function SnapshotFilter() {
 
-    this.clone=function() { return new SnapshotFilter(); };
+  this.clone = function() {
+    return new SnapshotFilter();
+  };
 
-    this.equals=function(other) { return other !== null; };
+  this.equals = function(other) {
+    return other !== null;
+  };
 
-    this.isBlank=function() { return true; };
+  this.isBlank = function() {
+    return true;
+  };
 
-    this.matches=function(snapshot) { return true; };
+  this.matches = function(snapshot) {
+    return true;
+  };
 
 }
