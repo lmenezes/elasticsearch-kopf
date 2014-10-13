@@ -202,7 +202,14 @@ module.exports = function(grunt) {
 		},
 		karma: {
 			unit: { configFile: 'tests/karma.config.js', keepalive: true }
-		}
+		},
+        jscs: {
+            main: [ 'src/kopf/**/*.js' ],
+            except: [ 'src/kopf/theme-kopf.js' ],
+            options: {
+                preset: 'google'
+            }
+        }
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -212,8 +219,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
 	grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks("grunt-jscs");
 	grunt.registerTask('dev', ['karma', 'watch'])
 	grunt.registerTask('test', ['karma'])
-	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat']);
+	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat', 'jscs']);
 	grunt.registerTask('server', ['clean', 'jshint', 'qunit', 'copy', 'concat','connect:server']);
 };
