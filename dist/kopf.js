@@ -3536,6 +3536,7 @@ function SnapshotFilter() {
   };
 
 }
+
 function WarmerFilter(id) {
 
   this.id = id;
