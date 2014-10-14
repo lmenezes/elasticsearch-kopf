@@ -4,12 +4,12 @@ kopf.factory('ThemeService', function() {
 
   this.setTheme = function(theme) {
     this.theme = theme;
-    localStorage.kopf_theme = theme;
+    localStorage.kopfTheme = theme;
   };
 
   this.getTheme = function() {
-    if (isDefined(localStorage.kopf_theme)) {
-      return localStorage.kopf_theme;
+    if (isDefined(localStorage.kopfTheme)) {
+      return localStorage.kopfTheme;
     } else {
       return this.theme;
     }
