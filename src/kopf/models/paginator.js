@@ -1,10 +1,10 @@
-function Paginator(page, page_size, collection, filter) {
+function Paginator(page, pageSize, collection, filter) {
 
   this.filter = filter;
 
   this.page = page;
 
-  this.page_size = page_size;
+  this.pageSize = pageSize;
 
   this.$collection = isDefined(collection) ? collection : [];
 
@@ -16,26 +16,35 @@ function Paginator(page, page_size, collection, filter) {
     this.page -= 1;
   };
 
-  this.setPageSize = function(new_size) {
-    this.page_size = new_size;
+  this.setPageSize = function(newSize) {
+    this.pageSize = newSize;
+  };
+
+  this.getPageSize = function() {
+    return this.pageSize;
+  };
+
+  this.getCurrentPage = function() {
+    return this.page;
   };
 
   this.getPage = function() {
     var results = this.getResults();
     var total = results.length;
 
-    var first = total > 0 ? ((this.page - 1) * this.page_size) + 1 : 0;
+    var first = total > 0 ? ((this.page - 1) * this.pageSize) + 1 : 0;
     while (total < first) {
       this.previousPage();
-      first = (this.page - 1) * this.page_size + 1;
+      first = (this.page - 1) * this.pageSize + 1;
     }
-    var last = this.page * this.page_size > total ? total : this.page * this.page_size;
+    var lastPage = this.page * this.pageSize > total;
+    var last = lastPage ? total : this.page * this.pageSize;
 
     var elements = total > 0 ? results.slice(first - 1, last) : [];
 
-    var next = this.page_size * this.page < total;
+    var next = this.pageSize * this.page < total;
     var previous = this.page > 1;
-    while (elements.length < this.page_size) {
+    while (elements.length < this.pageSize) {
       elements.push(null);
     }
     return new Page(elements, total, first, last, next, previous);
@@ -51,16 +60,15 @@ function Paginator(page, page_size, collection, filter) {
     if (filter.isBlank()) {
       return collection;
     } else {
-      var filtered_collection = [];
+      var filtered = [];
       collection.forEach(function(item) {
         if (filter.matches(item)) {
-          filtered_collection.push(item);
+          filtered.push(item);
         }
       });
-      return filtered_collection;
+      return filtered;
     }
   };
-
 
   this.getCollection = function() {
     return this.$collection;

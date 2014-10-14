@@ -35,8 +35,8 @@ describe('ClusterOverviewController', function(){
     it('has an empty paginator with page size 5 and empty index and node filters when initialized', function(){
         // paginator
         expect(this.scope.index_paginator.getCollection()).toEqual([]);
-        expect(this.scope.index_paginator.page).toEqual(1);
-        expect(this.scope.index_paginator.page_size).toEqual(5);
+        expect(this.scope.index_paginator.getCurrentPage()).toEqual(1);
+        expect(this.scope.index_paginator.getPageSize()).toEqual(5);
         expect(this.scope.index_paginator.filter.name).toEqual("");
         expect(this.scope.index_paginator.filter.state).toEqual("");
         expect(this.scope.index_paginator.filter.hide_special).toEqual(true);
