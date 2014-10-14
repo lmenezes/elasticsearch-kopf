@@ -17,9 +17,9 @@ function getProperty(object, propertyPath, defaultValue) {
     if (isDefined(object[propertyPath])) {
       return object[propertyPath];
     }
-    var path_parts = propertyPath.split('.'); // path as nested properties
-    for (var i = 0; i < path_parts.length && isDefined(object); i++) {
-      object = object[path_parts[i]];
+    var pathParts = propertyPath.split('.'); // path as nested properties
+    for (var i = 0; i < pathParts.length && isDefined(object); i++) {
+      object = object[pathParts[i]];
     }
   }
   return isDefined(object) ? object : defaultValue;
