@@ -3036,14 +3036,14 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService', functi
 kopf.factory('HostHistoryService', function() {
 
   this.getHostHistory = function() {
-    var history = localStorage.getItem('kopf_host_history');
+    var history = localStorage.getItem('kopfHostHistory');
     history = isDefined(history) ? history : '[]';
     return JSON.parse(history);
   };
 
   this.addToHistory = function(host) {
     host = host.toLowerCase();
-    var host_entry = { host: host };
+    var hostEntry = {host: host};
     var history = this.getHostHistory();
     for (var i = 0; i < history.length; i++) {
       if (history[i].host === host) {
@@ -3051,15 +3051,15 @@ kopf.factory('HostHistoryService', function() {
         break;
       }
     }
-    history.splice(0, 0, host_entry);
+    history.splice(0, 0, hostEntry);
     if (history.length > 10) {
       history.length = 10;
     }
-    localStorage.setItem('kopf_host_history', JSON.stringify(history));
+    localStorage.setItem('kopfHostHistory', JSON.stringify(history));
   };
 
   this.clearHistory = function() {
-    localStorage.removeItem('kopf_host_history');
+    localStorage.removeItem('kopfHostHistory');
   };
 
   return this;
