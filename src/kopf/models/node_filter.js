@@ -28,8 +28,23 @@ function NodeFilter(name, data, master, client, timestamp) {
     if (this.isBlank()) {
       return true;
     } else {
-      var matches = notEmpty(this.name) ? node.name.toLowerCase().indexOf(this.name.toLowerCase()) != -1 : true;
-      return matches && (node.data && this.data || node.master && this.master || node.client && this.client);
+      return this.matchesName(node.name) && this.matchesType(node);
+    }
+  };
+
+  this.matchesType = function(node) {
+    return (
+      node.data && this.data ||
+      node.master && this.master ||
+      node.client && this.client
+      );
+  };
+
+  this.matchesName = function(name) {
+    if (notEmpty(this.name)) {
+      return name.toLowerCase().indexOf(this.name.toLowerCase()) != -1;
+    } else {
+      return true;
     }
   };
 
