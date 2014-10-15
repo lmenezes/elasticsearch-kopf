@@ -202,10 +202,10 @@ module.exports = function(grunt) {
 			unit: { configFile: 'tests/karma.config.js', keepalive: true }
 		},
         jscs: {
-            main: [ 'src/kopf/**/*.js' ],
-            except: [ 'src/kopf/theme-kopf.js' ],
+            src: [ 'src/kopf/**/*.js' ],
             options: {
-                preset: 'google'
+                preset: 'google',
+                excludeFiles: [ 'src/kopf/theme-kopf.js' ]
             }
         }
 	});
