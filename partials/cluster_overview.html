@@ -76,12 +76,12 @@
 		    		<span ng-show="node.master">
 		    			<i ng-class="{true:'fa fa-fw fa-hdd-o',false:''}[node.data]" title="data node"></i>
 		    			<a ng-show="!node.data" data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
-                            <i class="fa fa-fw fa-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i>
+                            <i class="fa fa-fw fa-power-off normal-action" title="shutdown node" ng-click="promptShutdownNode(node.id,node.name)"></i>
                         </a>
 		    		</span>
 		    		<span ng-show="!node.master">
 		    			<a data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
-                            <i class="fa fa-fw fa-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i>
+                            <i class="fa fa-fw fa-power-off normal-action" title="shutdown node" ng-click="promptShutdownNode(node.id,node.name)"></i>
                         </a>
 		    		</span>
                             <span class="cluster-map-node-detail">{{node.host}} - {{node.transport_address}}</span>
@@ -89,7 +89,7 @@
                         <div class="col-lg-12 cluster-map-header-index-name">
 		    		<span ng-show="node.master && node.data">
 		    			<a data-toggle="modal" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
-                            <i class="fa fa-fw fa-power-off normal-action" title="shutdown node" ng-click="shutdown_node(node.id,node.name)"></i>
+                            <i class="fa fa-fw fa-power-off normal-action" title="shutdown node" ng-click="promptShutdownNode(node.id,node.name)"></i>
                         </a>
 		    		</span>
 		    		<span ng-show="!node.master || !node.data">
