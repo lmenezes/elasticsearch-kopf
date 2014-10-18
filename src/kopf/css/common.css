@@ -129,3 +129,6 @@ textarea {
     padding-left: 5px !important;
     padding-right: 5px !important;
 }
+.section-title {
+    padding-bottom: 20px;
+}

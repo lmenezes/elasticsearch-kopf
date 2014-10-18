@@ -129,6 +129,9 @@ textarea {
     padding-left: 5px !important;
     padding-right: 5px !important;
 }
+.section-title {
+    padding-bottom: 20px;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
