@@ -1,7 +1,7 @@
-function PercolateQuery(query_info) {
-  this.index = query_info._index;
-  this.id = query_info._id;
-  this.source = query_info._source;
+function PercolateQuery(queryInfo) {
+  this.index = queryInfo._index;
+  this.id = queryInfo._id;
+  this.source = queryInfo._source;
   this.filter = {};
 
   this.sourceAsJSON = function() {
