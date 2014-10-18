@@ -1,18 +1,18 @@
-function Shard(shard_routing, shard_info) {
-	this.info = isDefined(shard_info) ? shard_info : shard_routing;
-	this.primary = shard_routing.primary;
-	this.shard = shard_routing.shard;
-	this.state = shard_routing.state;
-	this.node = shard_routing.node;
-	this.index = shard_routing.index;
-	this.id = this.node + "_" + this.shard + "_" + this.index;
+function Shard(routing, info) {
+  this.info = isDefined(info) ? info : routing;
+  this.primary = routing.primary;
+  this.shard = routing.shard;
+  this.state = routing.state;
+  this.node = routing.node;
+  this.index = routing.index;
+  this.id = this.node + '_' + this.shard + '_' + this.index;
 }
 
-function UnassignedShard(shard_info) {
-	this.primary = shard_info.primary;
-	this.shard = shard_info.shard;
-	this.state = shard_info.state;
-	this.node = shard_info.node;
-	this.index = shard_info.index;
-	this.id = this.node + "_" + this.shard + "_" + this.index;
+function UnassignedShard(info) {
+  this.primary = info.primary;
+  this.shard = info.shard;
+  this.state = info.state;
+  this.node = info.node;
+  this.index = info.index;
+  this.id = this.node + '_' + this.shard + '_' + this.index;
 }

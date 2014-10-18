@@ -92,7 +92,6 @@ module.exports = function(grunt) {
 					'src/kopf/models/gist.js',
 					'src/kopf/models/benchmark.js',
                     'src/kopf/models/request.js',
-                    'src/kopf/models/cluster_navigation.js',
                     'src/kopf/models/modal_controls.js',
                     'src/kopf/models/paginator.js',
                     'src/kopf/models/alias_filter.js',
@@ -184,7 +183,6 @@ module.exports = function(grunt) {
 					'src/kopf/models/gist.js',
 					'src/kopf/models/benchmark.js',
                     'src/kopf/models/request.js',
-                    'src/kopf/models/cluster_navigation.js',
                     'src/kopf/models/modal_controls.js',
                     'src/kopf/models/paginator.js',
                     'src/kopf/models/alias_filter.js',
@@ -202,7 +200,15 @@ module.exports = function(grunt) {
 		},
 		karma: {
 			unit: { configFile: 'tests/karma.config.js', keepalive: true }
-		}
+		},
+        jscs: {
+            src: [ 'src/kopf/**/*.js' ],
+            options: {
+                preset: 'google',
+                excludeFiles: [ 'src/kopf/theme-kopf.js' ],
+                requireCamelCaseOrUpperCaseIdentifiers: "ignoreProperties"
+            }
+        }
 	});
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -212,8 +218,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
 	grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks("grunt-jscs");
 	grunt.registerTask('dev', ['karma', 'watch'])
 	grunt.registerTask('test', ['karma'])
-	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat']);
+	grunt.registerTask('build', ['clean', 'jshint', 'qunit', 'copy', 'concat', 'jscs']);
 	grunt.registerTask('server', ['clean', 'jshint', 'qunit', 'copy', 'concat','connect:server']);
 };
