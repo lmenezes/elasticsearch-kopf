@@ -24,9 +24,9 @@ function ClusterSettings(settings) {
   var instance = this;
   ['persistent', 'transient'].forEach(function(type) {
     instance[type] = {};
-    var current_settings = settings[type];
+    var currentSettings = settings[type];
     valid.forEach(function(setting) {
-      instance[type][setting] = getProperty(current_settings, setting);
+      instance[type][setting] = getProperty(currentSettings, setting);
     });
   });
 }
