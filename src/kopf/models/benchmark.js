@@ -2,7 +2,7 @@ function Benchmark() {
   this.name = '';
   this.num_executor = 1;
   this.percentiles = '[10, 25, 50, 75, 90, 99]';
-  this.competitors = [ ];
+  this.competitors = [];
 
   this.addCompetitor = function(competitor) {
     this.competitors.push(competitor);
@@ -117,14 +117,16 @@ function Competitor() {
     body.clear_caches.id = this.id_cache;
     body.clear_caches.recycler = this.recycler_cache;
     if (notEmpty(this.cache_fields)) {
-      body.clear_caches.fields = this.cache_fields.split(',').map(function(field) {
-        return field.trim();
-      });
+      body.clear_caches.fields = this.cache_fields.split(',').map(
+        function(field) {
+          return field.trim();
+        });
     }
     if (notEmpty(this.cache_keys)) {
-      body.clear_caches.filter_keys = this.cache_keys.split(',').map(function(key) {
-        return key.trim();
-      });
+      body.clear_caches.filter_keys = this.cache_keys.split(',').map(
+        function(key) {
+          return key.trim();
+        });
     }
 
     return body;
