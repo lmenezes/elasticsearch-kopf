@@ -3607,14 +3607,15 @@ function WarmerFilter(id) {
 
 }
 
-function IndexFilter(name, state, hide_special, timestamp) {
+function IndexFilter(name, state, hideSpecial, timestamp) {
   this.name = name;
   this.state = state;
-  this.hide_special = hide_special;
+  this.hide_special = hideSpecial;
   this.timestamp = timestamp;
 
   this.clone = function() {
-    return new IndexFilter(this.name, this.state, this.hide_special, this.timestamp);
+    return new IndexFilter(this.name, this.state, this.hide_special,
+      this.timestamp);
   };
 
   this.equals = function(other) {
@@ -3628,7 +3629,10 @@ function IndexFilter(name, state, hide_special, timestamp) {
   };
 
   this.isBlank = function() {
-    return !notEmpty(this.name) && !notEmpty(this.state) && !notEmpty(this.hide_special);
+    var emptyNameFilter = !notEmpty(this.name);
+    var emptyStateFilter = !notEmpty(this.state);
+    var disabledHideSpecial = !notEmpty(this.hide_special);
+    return emptyNameFilter && emptyStateFilter && disabledHideSpecial;
   };
 
   this.matches = function(index) {
@@ -3642,8 +3646,12 @@ function IndexFilter(name, state, hide_special, timestamp) {
       if (matches && notEmpty(this.state)) {
         if (this.state == 'unhealthy' && !index.unhealthy) {
           matches = false;
-        } else if ((this.state == 'open' || this.state == 'close') && this.state != index.state) {
-          matches = false;
+        } else {
+          var open = this.state == 'open';
+          var closed = this.state == 'close';
+          if ((open || closed) && this.state != index.state) {
+            matches = false;
+          }
         }
       }
       if (matches && notEmpty(this.name)) {
