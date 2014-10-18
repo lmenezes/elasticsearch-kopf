@@ -10,6 +10,7 @@ function ElasticClient(connection, httpService, q) {
   };
 
   var auth = this.createAuthToken(this.username, this.password);
+  var withCredentials = this.withCredentials;
   var fetchVersion = $.ajax({
     type: 'GET',
     url: connection.host + '/',
@@ -18,7 +19,7 @@ function ElasticClient(connection, httpService, q) {
       if (isDefined(auth)) {
         xhr.setRequestHeader('Authorization', auth);
       }
-      if (this.withCredentials) {
+      if (withCredentials) {
         xhr.setRequestHeader('withCredentials', true);
       }
     },
