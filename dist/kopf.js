@@ -1108,10 +1108,10 @@ function UnassignedShard(info) {
 }
 
 /** TYPES **/
-function Token(token, start_offset, end_offset, position) {
+function Token(token, startOffset, endOffset, position) {
   this.token = token;
-  this.start_offset = start_offset;
-  this.end_offset = end_offset;
+  this.start_offset = startOffset;
+  this.end_offset = endOffset;
   this.position = position;
 }
 
