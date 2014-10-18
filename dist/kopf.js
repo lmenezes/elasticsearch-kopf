@@ -2230,7 +2230,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
   function($scope, $location, $timeout, $http, $q, $sce, $window,
            ConfirmDialogService, AlertService, SettingsService, ThemeService,
            ElasticService) {
-    $scope.version = '1.3.6-SNAPSHOT';
+    $scope.version = '1.3.7-SNAPSHOT';
     $scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
 
