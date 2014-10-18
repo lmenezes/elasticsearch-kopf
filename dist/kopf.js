@@ -1367,12 +1367,12 @@ kopf.factory('ConfirmDialogService', function() {
     // when created, does nothing
   };
 
-  this.open = function(header, body, action, confirm_callback, close_callback) {
+  this.open = function(header, body, action, confirmCallback, closeCallback) {
     this.header = header;
     this.body = body;
     this.action = action;
-    this.confirm = confirm_callback;
-    this.close = close_callback;
+    this.confirm = confirmCallback;
+    this.close = closeCallback;
   };
 
   return this;
