@@ -205,7 +205,8 @@ module.exports = function(grunt) {
             src: [ 'src/kopf/**/*.js' ],
             options: {
                 preset: 'google',
-                excludeFiles: [ 'src/kopf/theme-kopf.js' ]
+                excludeFiles: [ 'src/kopf/theme-kopf.js' ],
+                requireCamelCaseOrUpperCaseIdentifiers: "ignoreProperties"
             }
         }
 	});

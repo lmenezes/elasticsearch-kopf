@@ -1,8 +1,8 @@
-function ElasticClient(connection, http_service, q) {
+function ElasticClient(connection, httpService, q) {
   this.host = connection.host;
   this.username = connection.username;
   this.password = connection.password;
-  this.with_credentials = connection.with_credentials;
+  this.withCredentials = connection.with_credentials;
 
   this.createAuthToken = function(username, password) {
     var hasAuth = isDefined(username) && isDefined(password);
@@ -10,7 +10,7 @@ function ElasticClient(connection, http_service, q) {
   };
 
   var auth = this.createAuthToken(this.username, this.password);
-  var fetch_version = $.ajax({
+  var fetchVersion = $.ajax({
     type: 'GET',
     url: connection.host + '/',
     dataType: 'json',
@@ -18,7 +18,7 @@ function ElasticClient(connection, http_service, q) {
       if (isDefined(auth)) {
         xhr.setRequestHeader('Authorization', auth);
       }
-      if (this.with_credentials) {
+      if (this.withCredentials) {
         xhr.setRequestHeader('withCredentials', true);
       }
     },
@@ -26,352 +26,433 @@ function ElasticClient(connection, http_service, q) {
   });
 
   var client = this;
-  fetch_version.done(function(response) {
+  fetchVersion.done(function(response) {
     try {
       var version = response.version.number;
-      client.version = { 'str': version };
+      client.version = {'str': version};
       var parts = version.split('.');
       client.version.major = parseInt(parts[0]);
       client.version.minor = parseInt(parts[1]);
       client.version.build = parseInt(parts[2]);
     } catch (error) {
-      throw { message: 'Version property could not bet read. Are you sure there is an ElasticSearch runnning at [' + connection.host + ']?', body: response };
+      throw {
+        message: 'Version property could not bet read. Are you sure there ' +
+          'is an ElasticSearch runnning at [' + connection.host + ']?',
+        body: response
+      };
     }
   });
 
-  fetch_version.fail(function(error) {
+  fetchVersion.fail(function(error) {
     throw error.statusText;
   });
 
   this.versionCheck = function(version) {
     var parts = version.split('.');
-    var mjr = parseInt(parts[0]);
-    var mnr = parseInt(parts[1]);
-    var bld = parseInt(parts[2]);
+    var major = parseInt(parts[0]);
+    var minor = parseInt(parts[1]);
+    var build = parseInt(parts[2]);
     var v = this.version;
-    return (v.major > mjr || v.major == mjr && v.minor > mnr || v.major == mjr && v.minor == mnr && v.build >= bld);
+    var higherMajor = v.major > major;
+    var higherMinor = v.major == major && v.minor > minor;
+    var higherBuild = v.major == major && v.minor == minor && v.build >= build;
+    return (higherMajor || higherMinor || higherBuild);
   };
 
-  this.createIndex = function(name, settings, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/' + name, settings, callback_success, callback_error);
+  this.createIndex = function(name, settings, callbackSuccess, callbackError) {
+    var path = '/' + name;
+    this.clusterRequest('POST', path, settings, callbackSuccess, callbackError);
   };
 
-  this.enableShardAllocation = function(callback_success, callback_error) {
-    var new_settings = { 'transient': { 'cluster.routing.allocation': { 'enable': 'all', 'disable_allocation': false } } };
-    this.executeClusterRequest('PUT', '/_cluster/settings', JSON.stringify(new_settings, undefined, ''), callback_success, callback_error);
-  };
-
-  this.disableShardAllocation = function(callback_success, callback_error) {
-    var new_settings = { 'transient': { 'cluster.routing.allocation': { 'enable': 'none', 'disable_allocation': true } } };
-    this.executeClusterRequest('PUT', '/_cluster/settings', JSON.stringify(new_settings, undefined, ''), callback_success, callback_error);
-  };
-
-  this.shutdownNode = function(node_id, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/_cluster/nodes/' + node_id + '/_shutdown', {}, callback_success, callback_error);
-  };
-
-  this.openIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/' + index + '/_open', {}, callback_success, callback_error);
-  };
-
-  this.optimizeIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/' + index + '/_optimize', {}, callback_success, callback_error);
-  };
-
-  this.clearCache = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/' + index + '/_cache/clear', {}, callback_success, callback_error);
-  };
-
-  this.closeIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/' + index + '/_close', {}, callback_success, callback_error);
-  };
-
-  this.refreshIndex = function(index, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/' + index + '/_refresh', {}, callback_success, callback_error);
-  };
-
-  this.deleteIndex = function(name, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', '/' + name, {}, callback_success, callback_error);
-  };
-
-  this.updateIndexSettings = function(name, settings, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', '/' + name + '/_settings', settings, callback_success, callback_error);
-  };
-
-  this.updateClusterSettings = function(settings, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', '/_cluster/settings', settings, callback_success, callback_error);
-  };
-
-  this.getIndexMetadata = function(name, callback_success, callback_error) {
-    var transformed = function(response) {
-      callback_success(new IndexMetadata(name, response.metadata.indices[name]));
+  this.enableShardAllocation = function(callbackSuccess, callbackError) {
+    var newSettings = {
+      'transient': {
+        'cluster.routing.allocation': {
+          'enable': 'all', 'disable_allocation': false
+        }
+      }
     };
-    this.executeClusterRequest('GET', '/_cluster/state/metadata/' + name, {}, transformed, callback_error);
+    var body = JSON.stringify(newSettings, undefined, '');
+    var path = '/_cluster/settings';
+    this.clusterRequest('PUT', path, body, callbackSuccess, callbackError);
   };
 
-  this.fetchAliases = function(callback_success, callback_error) {
+  this.disableShardAllocation = function(callbackSuccess, callbackError) {
+    var newSettings = {
+      'transient': {
+        'cluster.routing.allocation': {
+          'enable': 'none',
+          'disable_allocation': true
+        }
+      }
+    };
+    var body = JSON.stringify(newSettings, undefined, '');
+    var path = '/_cluster/settings';
+    this.clusterRequest('PUT', path, body, callbackSuccess, callbackError);
+  };
+
+  this.shutdownNode = function(nodeId, callbackSuccess, callbackError) {
+    var path = '/_cluster/nodes/' + nodeId + '/_shutdown';
+    this.clusterRequest('POST', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.openIndex = function(index, callbackSuccess, callbackError) {
+    var path = '/' + index + '/_open';
+    this.clusterRequest('POST', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.optimizeIndex = function(index, callbackSuccess, callbackError) {
+    var path = '/' + index + '/_optimize';
+    this.clusterRequest('POST', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.clearCache = function(index, callbackSuccess, callbackError) {
+    var path = '/' + index + '/_cache/clear';
+    this.clusterRequest('POST', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.closeIndex = function(index, callbackSuccess, callbackError) {
+    var path = '/' + index + '/_close';
+    this.clusterRequest('POST', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.refreshIndex = function(index, callbackSuccess, callbackError) {
+    var path = '/' + index + '/_refresh';
+    this.clusterRequest('POST', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.deleteIndex = function(name, callbackSuccess, callbackError) {
+    var path = '/' + name;
+    this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
+  };
+
+  this.updateIndexSettings = function(name, settings, callbackSuccess,
+                                      callbackError) {
+    var path = '/' + name + '/_settings';
+    this.clusterRequest('PUT', path, settings, callbackSuccess, callbackError);
+  };
+
+  this.updateClusterSettings = function(settings, callbackSuccess,
+                                        callbackError) {
+    var path = '/_cluster/settings';
+    this.clusterRequest('PUT', path, settings, callbackSuccess, callbackError);
+  };
+
+  this.getIndexMetadata = function(name, callbackSuccess, callbackError) {
+    var transformed = function(response) {
+      callbackSuccess(new IndexMetadata(name, response.metadata.indices[name]));
+    };
+    var path = '/_cluster/state/metadata/' + name;
+    this.clusterRequest('GET', path, {}, transformed, callbackError);
+  };
+
+  this.fetchAliases = function(callbackSuccess, callbackError) {
     var createAliases = function(response) {
       var indices = Object.keys(response);
-      var index_aliases = [];
+      var allAliases = [];
       indices.forEach(function(index) {
-        if (Object.keys(response[index].aliases).length > 0) {
-          var aliases = Object.keys(response[index].aliases).map(function(alias) {
-            var info = response[index].aliases[alias];
-            return new Alias(alias, index, info.filter, info.index_routing, info.search_routing);
+        var indexAliases = response[index].aliases;
+        if (Object.keys(indexAliases).length > 0) {
+          var aliases = Object.keys(indexAliases).map(function(alias) {
+            var info = indexAliases[alias];
+            return new Alias(alias, index, info.filter, info.index_routing,
+              info.search_routing);
           });
-          index_aliases.push(new IndexAliases(index, aliases));
+          allAliases.push(new IndexAliases(index, aliases));
         }
       });
-      callback_success(index_aliases);
+      callbackSuccess(allAliases);
     };
-    this.executeClusterRequest('GET', '/_aliases', {}, createAliases, callback_error);
+    this.clusterRequest('GET', '/_aliases', {}, createAliases, callbackError);
   };
 
-  this.analyzeByField = function(index, type, field, text, callback_success, callback_error) {
+  this.analyzeByField = function(index, type, field, text, callbackSuccess,
+                                 callbackError) {
     var buildTokens = function(response) {
       var tokens = response.tokens.map(function(token) {
-        return new Token(token.token, token.start_offset, token.end_offset, token.position);
+        return new Token(token.token, token.start_offset, token.end_offset,
+          token.position);
       });
-      callback_success(tokens);
+      callbackSuccess(tokens);
     };
-    this.executeClusterRequest('POST', '/' + index + '/_analyze?field=' + type + '.' + field, text, buildTokens, callback_error);
+    var path = '/' + index + '/_analyze?field=' + type + '.' + field;
+    this.clusterRequest('POST', path, text, buildTokens, callbackError);
   };
 
-  this.analyzeByAnalyzer = function(index, analyzer, text, callback_success, callback_error) {
+  this.analyzeByAnalyzer = function(index, analyzer, text, callbackSuccess,
+                                    callbackError) {
     var buildTokens = function(response) {
       var tokens = response.tokens.map(function(token) {
-        return new Token(token.token, token.start_offset, token.end_offset, token.position);
+        return new Token(token.token, token.start_offset, token.end_offset,
+          token.position);
       });
-      callback_success(tokens);
+      callbackSuccess(tokens);
     };
-    this.executeClusterRequest('POST', '/' + index + '/_analyze?analyzer=' + analyzer, text, buildTokens, callback_error);
+    var path = '/' + index + '/_analyze?analyzer=' + analyzer;
+    this.clusterRequest('POST', path, text, buildTokens, callbackError);
   };
 
-  this.updateAliases = function(add_aliases, remove_aliases, callback_success, callback_error) {
-    var data = { actions: [] };
-    remove_aliases.forEach(function(alias) {
+  this.updateAliases = function(addAliases, removeAliases, callbackSuccess,
+                                callbackError) {
+    var data = {actions: []};
+    removeAliases.forEach(function(alias) {
       data.actions.push({'remove': alias.info()});
     });
-    add_aliases.forEach(function(alias) {
+    addAliases.forEach(function(alias) {
       data.actions.push({'add': alias.info()});
     });
-    this.executeClusterRequest('POST', '/_aliases', JSON.stringify(data), callback_success, callback_error);
+    var body = JSON.stringify(data);
+    var path = '/_aliases';
+    this.clusterRequest('POST', path, body, callbackSuccess, callbackError);
   };
 
-  this.getIndexWarmers = function(index, warmer, callback_success, callback_error) {
+  this.getIndexWarmers = function(index, warmer, callbackSuccess,
+                                  callbackError) {
     var path = '/' + index + '/_warmer/' + warmer.trim();
     var parseWarmers = function(response) {
       var warmers = [];
       Object.keys(response).forEach(function(i) {
         var index = i;
-        var index_warmers = response[index].warmers;
-        Object.keys(index_warmers).forEach(function(warmer_id) {
-          warmers.push(new Warmer(warmer_id, index, index_warmers[warmer_id]));
+        var indexWarmers = response[index].warmers;
+        Object.keys(indexWarmers).forEach(function(warmerId) {
+          warmers.push(new Warmer(warmerId, index, indexWarmers[warmerId]));
         });
       });
-      callback_success(warmers);
+      callbackSuccess(warmers);
     };
-    this.executeClusterRequest('GET', path, {}, parseWarmers, callback_error);
+    this.clusterRequest('GET', path, {}, parseWarmers, callbackError);
   };
 
-  this.deleteWarmupQuery = function(warmer, callback_success, callback_error) {
+  this.deleteWarmupQuery = function(warmer, callbackSuccess, callbackError) {
     var path = '/' + warmer.index + '/_warmer/' + warmer.id;
-    this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
+    this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
   };
 
-  this.registerWarmupQuery = function(warmer, callback_success, callback_error) {
+  this.registerWarmupQuery = function(warmer, callbackSuccess, callbackError) {
     var path = '/' + warmer.index + '/';
     if (notEmpty(warmer.types)) {
       path += warmer.types + '/';
     }
     path += '/_warmer/' + warmer.id.trim();
-    this.executeClusterRequest('PUT', path, warmer.source, callback_success, callback_error);
+    var body = warmer.source;
+    this.clusterRequest('PUT', path, body, callbackSuccess, callbackError);
   };
 
-  this.fetchPercolateQueries = function(index, body, callback_success, callback_error) {
+  this.fetchPercolateQueries = function(index, query, callbackSuccess,
+                                        callbackError) {
     var path = '/' + index + '/.percolator/_search';
     var parsePercolators = function(response) {
       var collection = response.hits.hits.map(function(q) {
         return new PercolateQuery(q);
       });
-      var percolators = new PercolatorsPage(body.from, body.size, response.hits.total, collection);
-      callback_success(percolators);
+      var from = query.from;
+      var total = response.hits.total;
+      var size = query.size;
+      var percolators = new PercolatorsPage(from, size, total, collection);
+      callbackSuccess(percolators);
     };
-    this.executeClusterRequest('POST', path, JSON.stringify(body), parsePercolators, callback_error);
+    var body = JSON.stringify(query);
+    this.clusterRequest('POST', path, body, parsePercolators, callbackError);
   };
 
-  this.deletePercolatorQuery = function(index, id, callback_success, callback_error) {
+  this.deletePercolatorQuery = function(index, id, callbackSuccess,
+                                        callbackError) {
     var path = '/' + index + '/.percolator/' + id;
-    this.executeClusterRequest('DELETE', path, {}, callback_success, callback_error);
+    this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
   };
 
-  this.createPercolatorQuery = function(percolator, callback_success, callback_error) {
+  this.createPercolatorQuery = function(percolator, callbackSuccess,
+                                        callbackError) {
     var path = '/' + percolator.index + '/.percolator/' + percolator.id;
-    this.executeClusterRequest('PUT', path, percolator.source, callback_success, callback_error);
+    var body = percolator.source;
+    this.clusterRequest('PUT', path, body, callbackSuccess, callbackError);
   };
 
-  this.getRepositories = function(callback_success, callback_error) {
-    var parse_repositories = function(response) {
+  this.getRepositories = function(callbackSuccess, callbackError) {
+    var parseRepositories = function(response) {
       var repositories = Object.keys(response).map(function(repository) {
         return new Repository(repository, response[repository]);
       });
-      callback_success(repositories);
+      callbackSuccess(repositories);
     };
-    this.executeClusterRequest('GET', '/_snapshot/_all', {}, parse_repositories, callback_error);
+    var path = '/_snapshot/_all';
+    this.clusterRequest('GET', path, {}, parseRepositories, callbackError);
   };
 
-  this.createRepository = function(repository, body, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/_snapshot/' + repository, body, callback_success, callback_error);
+  this.createRepository = function(repository, body, callbackSuccess,
+                                   callbackError) {
+    var path = '/_snapshot/' + repository;
+    this.clusterRequest('POST', path, body, callbackSuccess, callbackError);
   };
 
-  this.deleteRepository = function(repository, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', '/_snapshot/' + repository, {}, callback_success, callback_error);
+  this.deleteRepository = function(repository, callbackSuccess, callbackError) {
+    var path = '/_snapshot/' + repository;
+    this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
   };
 
-  this.getSnapshots = function(repository, callback_success, callback_error) {
+  this.getSnapshots = function(repository, callbackSuccess, callbackError) {
     var path = '/_snapshot/' + repository + '/_all';
     var parseSnapshots = function(response) {
       var snapshots = response.snapshots.map(function(snapshot) {
         return new Snapshot(snapshot);
       });
-      callback_success(snapshots);
+      callbackSuccess(snapshots);
     };
-    this.executeClusterRequest('GET', path, {}, parseSnapshots, callback_error);
+    this.clusterRequest('GET', path, {}, parseSnapshots, callbackError);
   };
 
-  this.deleteSnapshot = function(repository, snapshot, callback_success, callback_error) {
-    this.executeClusterRequest('DELETE', '/_snapshot/' + repository + '/' + snapshot, {}, callback_success, callback_error);
+  this.deleteSnapshot = function(repository, snapshot, callbackSuccess,
+                                 callbackError) {
+    var path = '/_snapshot/' + repository + '/' + snapshot;
+    this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
   };
 
-  this.restoreSnapshot = function(repository, snapshot, body, callback_success, callback_error) {
-    this.executeClusterRequest('POST', '/_snapshot/' + repository + '/' + snapshot + '/_restore', body, callback_success, callback_error);
+  this.restoreSnapshot = function(repository, snapshot, body, callbackSuccess,
+                                  callbackError) {
+    var path = '/_snapshot/' + repository + '/' + snapshot + '/_restore';
+    this.clusterRequest('POST', path, body, callbackSuccess, callbackError);
   };
 
-  this.createSnapshot = function(repository, snapshot, body, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', '/_snapshot/' + repository + '/' + snapshot, body, callback_success, callback_error);
+  this.createSnapshot = function(repository, snapshot, body, callbackSuccess,
+                                 callbackError) {
+    var path = '/_snapshot/' + repository + '/' + snapshot;
+    this.clusterRequest('PUT', path, body, callbackSuccess, callbackError);
   };
 
-  this.executeBenchmark = function(body, callback_success, callback_error) {
-    this.executeClusterRequest('PUT', '/_bench', body, callback_success, callback_error);
+  this.executeBenchmark = function(body, callbackSuccess, callbackError) {
+    this.clusterRequest('PUT', '/_bench', body, callbackSuccess, callbackError);
   };
 
-  this.executeClusterRequest = function(method, path, data, callback_success, callback_error) {
-    var params = { method: method, url: this.host + path, data: data };
+  this.clusterRequest = function(method, path, data, callbackSuccess,
+                                 callbackError) {
+    var params = {method: method, url: this.host + path, data: data};
     if (auth !== null) {
       params.withCredentials = true;
-      params.headers = { Authorization: auth};
+      params.headers = {Authorization: auth};
     }
-    if (this.with_credentials) {
+    if (this.withCredentials) {
       params.withCredentials = true;
     }
-    http_service(params).
+    httpService(params).
       success(function(data, status, headers, config) {
         try {
-          callback_success(data);
+          callbackSuccess(data);
         } catch (error) {
-          callback_error(error);
+          callbackError(error);
         }
       }).
       error(function(data, status, headers, config) {
-        callback_error(data);
+        callbackError(data);
       });
   };
 
-  this.executeRequest = function(method, url, username, password, data, callback_success, callback_error) {
-    var params = { method: method, url: url, data: data };
+  this.executeRequest = function(method, url, username, password, data,
+                                 callbackSuccess, callbackError) {
+    var params = {method: method, url: url, data: data};
     if (auth !== null) {
       params.withCredentials = true;
-      params.headers = { Authorization: auth};
+      params.headers = {Authorization: auth};
     }
-    if (this.with_credentials) {
+    if (this.withCredentials) {
       params.withCredentials = true;
     }
-    http_service(params).
+    httpService(params).
       success(function(data, status, headers, config) {
-        callback_success(data);
+        callbackSuccess(data);
       }).
       error(function(data, status, headers, config) {
-        callback_error(data, status);
+        callbackError(data, status);
       });
   };
 
   /** ####### END OF REFACTORED AREA ####### **/
 
-  this.getClusterHealth = function(callback_success, callback_error) {
-    var create_cluster_health = function(cluster_health) {
+  this.getClusterHealth = function(callbackSuccess, callbackError) {
+    var createClusterHealth = function(clusterHealth) {
       try {
-        callback_success(new ClusterHealth(cluster_health));
+        callbackSuccess(new ClusterHealth(clusterHealth));
       } catch (error) {
-        callback_error(error);
+        callbackError(error);
       }
     };
-    this.executeClusterRequest('GET', '/_cluster/health', {}, create_cluster_health, callback_error);
+    var path = '/_cluster/health';
+    this.clusterRequest('GET', path, {}, createClusterHealth, callbackError);
   };
 
-  this.getClusterDetail = function(callback_success, callback_error) {
+  this.getClusterDetail = function(callbackSuccess, callbackError) {
     var host = this.host;
     var params = {};
     if (isDefined(auth)) {
       params.withCredentials = true;
-      params.headers = { Authorization: auth };
+      params.headers = {Authorization: auth};
     }
-    if (this.with_credentials) {
+    if (this.withCredentials) {
       params.withCredentials = true;
     }
+
     q.all([
-      http_service.get(host + '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
-      http_service.get(host + '/_status', params),
-      http_service.get(host + '/_nodes/stats?all=true', params),
-      http_service.get(host + '/_cluster/settings', params),
-      http_service.get(host + '/_aliases', params)
-    ]).then(function(responses) {
+      httpService.get(host +
+        '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
+      httpService.get(host + '/_status', params),
+      httpService.get(host + '/_nodes/stats?all=true', params),
+      httpService.get(host + '/_cluster/settings', params),
+      httpService.get(host + '/_aliases', params)
+    ]).then(
+      function(responses) {
         try {
-          callback_success(new Cluster(responses[0].data, responses[1].data, responses[2].data, responses[3].data, responses[4].data));
+          var state = responses[0].data;
+          var status = responses[1].data;
+          var stats = responses[2].data;
+          var settings = responses[3].data;
+          var aliases = responses[4].data;
+          callbackSuccess(new Cluster(state, status, stats, settings, aliases));
         } catch (error) {
-          callback_error(error);
+          callbackError(error);
         }
       },
       function(error) {
-        callback_error(error);
+        callbackError(error);
       }
     );
   };
 
-  this.getClusterDiagnosis = function(health, state, stats, hotthreads, callback_success, callback_error) {
+  this.getClusterDiagnosis = function(health, state, stats, hotthreads,
+                                      callbackSuccess, callbackError) {
     var host = this.host;
     var auth = this.createAuthToken(this.username, this.password);
     var params = {};
     if (isDefined(auth)) {
       params.withCredentials = true;
-      params.headers = { Authorization: auth };
+      params.headers = {Authorization: auth};
     }
-    if (this.with_credentials) {
+    if (this.withCredentials) {
       params.withCredentials = true;
     }
     var requests = [];
     if (health) {
-      requests.push(http_service.get(host + '/_cluster/health', params));
+      requests.push(httpService.get(host + '/_cluster/health', params));
     }
     if (state) {
-      requests.push(http_service.get(host + '/_cluster/state', params));
+      requests.push(httpService.get(host + '/_cluster/state', params));
     }
     if (stats) {
-      requests.push(http_service.get(host + '/_nodes/stats?all=true', params));
+      requests.push(httpService.get(host + '/_nodes/stats?all=true', params));
     }
     if (hotthreads) {
-      requests.push(http_service.get(host + '/_nodes/hot_threads', params));
+      requests.push(httpService.get(host + '/_nodes/hot_threads', params));
     }
-    q.all(requests).then(function(responses) {
+    q.all(requests).then(
+      function(responses) {
         try {
-          callback_success(responses.map(function(response) {
+          callbackSuccess(responses.map(function(response) {
             return response.data;
           }));
         } catch (error) {
-          callback_error(error);
+          callbackError(error);
         }
       },
       function(error) {
-        callback_error(error);
+        callbackError(error);
       }
     );
   };
