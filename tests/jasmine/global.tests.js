@@ -5,34 +5,19 @@ describe('GlobalController', function() {
 
     beforeEach(angular.mock.module('kopf'));
 
-    beforeEach(function () {
-        module('kopf');
-
-        var mock = { location: { href: 'http://whateverhost:1234?location=http://anotherhost:12345' } };
-
-        module(function ($provide) {
-            $provide.value('$window', mock);
-        });
-
-        inject(function (_$compile_, _$rootScope_) {
-            $compile = _$compile_;
-            $rootScope = _$rootScope_;
-        });
-    });
-
     beforeEach(angular.mock.inject(function($rootScope, $controller, $injector) {
         this.scope = $rootScope.$new();
         $timeout = $injector.get('$timeout');
         $location = $injector.get('$location');
-        $window = $injector.get('$window');
         this.AlertService = $injector.get('AlertService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         this.SettingsService = $injector.get('SettingsService');
         this.ThemeService = $injector.get('ThemeService');
         this.ElasticService = $injector.get('ElasticService');
         this.ElasticService.client = {};
+        var mock = { location: { href: 'http://whateverhost:1234?location=http://anotherhost:12345' } };
         this.createController = function() {
-            return $controller('GlobalController', {$scope: this.scope, $location: $location, $timeout: $timeout, $window: $window});
+            return $controller('GlobalController', {$scope: this.scope, $location: $location, $timeout: $timeout, $window: mock});
         };
         this._controller = this.createController();
     }));
