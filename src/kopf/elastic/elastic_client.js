@@ -347,25 +347,6 @@ function ElasticClient(connection, httpService, q) {
       });
   };
 
-  this.executeRequest = function(method, url, username, password, data,
-                                 callbackSuccess, callbackError) {
-    var params = {method: method, url: url, data: data};
-    if (auth !== null) {
-      params.withCredentials = true;
-      params.headers = {Authorization: auth};
-    }
-    if (this.withCredentials) {
-      params.withCredentials = true;
-    }
-    httpService(params).
-      success(function(data, status, headers, config) {
-        callbackSuccess(data);
-      }).
-      error(function(data, status, headers, config) {
-        callbackError(data, status);
-      });
-  };
-
   /** ####### END OF REFACTORED AREA ####### **/
 
   this.getClusterHealth = function(callbackSuccess, callbackError) {
