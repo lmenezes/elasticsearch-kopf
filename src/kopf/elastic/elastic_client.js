@@ -20,7 +20,7 @@ function ElasticClient(connection, httpService, q) {
         xhr.setRequestHeader('Authorization', auth);
       }
       if (withCredentials) {
-        xhr.setRequestHeader('withCredentials', true);
+        xhr.withCredentials = true;
       }
     },
     async: false
