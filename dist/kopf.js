@@ -2216,7 +2216,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
       ev.preventDefault();
     });
 
-    $scope.version = '1.3.7-SNAPSHOT';
+    $scope.version = '1.3.7';
     $scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
 
