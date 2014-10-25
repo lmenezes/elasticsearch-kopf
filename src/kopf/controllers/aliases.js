@@ -135,10 +135,11 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
       );
     };
 
-    $scope.$on('loadAliasesEvent', function() {
+    $scope.initializeController = function() {
       $scope.indices = $scope.cluster.indices;
       $scope.loadAliases();
       $scope.initEditor();
-    });
+    };
+
   }
 ]);

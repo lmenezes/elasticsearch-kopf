@@ -12,11 +12,6 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     $scope.indices = [];
     $scope.new_query = new PercolateQuery({});
 
-    $scope.$on('loadPercolatorEvent', function() {
-      $scope.indices = $scope.cluster.indices;
-      $scope.initEditor();
-    });
-
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('percolator-query-editor');
@@ -141,6 +136,11 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
       } catch (error) {
         AlertService.error('Filter is not a valid JSON');
       }
+    };
+
+    $scope.initializeController = function() {
+      $scope.indices = $scope.cluster.indices;
+      $scope.initEditor();
     };
 
   }

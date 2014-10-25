@@ -1347,7 +1347,7 @@ function IndexMetadata(index, metadata) {
   };
 }
 
-var kopf = angular.module('kopf', []);
+var kopf = angular.module('kopf', ['ngRoute']);
 
 kopf.factory('IndexSettingsService', function() {
 
@@ -1384,6 +1384,60 @@ kopf.factory('ConfirmDialogService', function() {
   };
 
   return this;
+});
+
+kopf.config(function($routeProvider, $locationProvider) {
+  $locationProvider.hashPrefix('!');
+  $routeProvider.
+      when('/cluster', {
+        templateUrl: 'partials/cluster_overview.html',
+        controller: 'ClusterOverviewController'
+      }).
+      when('/cluster', {
+        templateUrl: 'partials/cluster_overview.html',
+        controller: 'ClusterOverviewController'
+      }).
+      when('/rest', {
+        templateUrl: 'partials/rest_client.html',
+        controller: 'RestController'
+      }).
+      when('/aliases', {
+        templateUrl: 'partials/aliases.html',
+        controller: 'AliasesController'
+      }).
+      when('/analysis', {
+        templateUrl: 'partials/analysis.html',
+        controller: 'AnalysisController'
+      }).
+      when('/percolator', {
+        templateUrl: 'partials/percolator.html',
+        controller: 'PercolatorController'
+      }).
+      when('/warmup', {
+        templateUrl: 'partials/warmup.html',
+        controller: 'WarmupController'
+      }).
+      when('/repository', {
+        templateUrl: 'partials/repository.html',
+        controller: 'RepositoryController'
+      }).
+      when('/createIndex', {
+        templateUrl: 'partials/create_index.html',
+        controller: 'CreateIndexController'
+      }).
+      when('/clusterHealth', {
+        templateUrl: 'partials/cluster_health.html',
+        controller: 'ClusterHealthController'
+      }).
+      when('/clusterSettings', {
+        templateUrl: 'partials/cluster_settings.html',
+        controller: 'ClusterSettingsController'
+      }).
+      when('/indexSettings', {
+        templateUrl: 'partials/index_settings.html',
+        controller: 'IndexSettingsController'
+      }).
+      otherwise({redirectTo: '/cluster'});
 });
 
 kopf.controller('AliasesController', ['$scope', 'AlertService',
@@ -1523,11 +1577,12 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
       );
     };
 
-    $scope.$on('loadAliasesEvent', function() {
+    $scope.initializeController = function() {
       $scope.indices = $scope.cluster.indices;
       $scope.loadAliases();
       $scope.initEditor();
-    });
+    };
+
   }
 ]);
 
@@ -1628,9 +1683,10 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
       }
     };
 
-    $scope.$on('loadAnalysisEvent', function() {
+    $scope.initializeController = function() {
       $scope.indices = $scope.cluster.open_indices();
-    });
+      console.log($scope.indices);
+    };
 
   }
 ]);
@@ -1642,7 +1698,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
     $scope.shared_url = '';
     $scope.results = null;
 
-    $scope.$on('loadClusterHealth', function() {
+    $scope.initializeController = function() {
       $('#cluster_health_option a').tab('show');
       $scope.results = null;
       // selects which info should be retrieved
@@ -1650,9 +1706,8 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
       $scope.retrieveState = true;
       $scope.retrieveStats = true;
       $scope.retrieveHotThreads = true;
-
       $scope.gist_title = '';
-    });
+    };
 
     $scope.checkPublishClusterHealth = function() {
       ConfirmDialogService.open(
@@ -2065,20 +2120,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
-    $scope.loadIndexSettings = function(index) {
-      $('#index_settings_option a').tab('show');
-      ElasticService.client.getIndexMetadata(index,
-          function(metadata) {
-            IndexSettingsService.loadSettings(index, metadata.settings);
-            $('#idx_settings_tabs a:first').tab('show');
-            $('.setting-info').popover();
-          },
-          function(error) {
-            AlertService.error('Error while loading index settings', error);
-          }
-      );
-    };
-
     $scope.showIndexSettings = function(index) {
       ElasticService.client.getIndexMetadata(index,
           function(metadata) {
@@ -2109,13 +2150,14 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
   'AlertService', 'ElasticService',
   function($scope, $location, $timeout, AlertService, ElasticService) {
-    $scope.$on('loadClusterSettingsEvent', function() {
+
+    $scope.initializeController = function() {
       $('#cluster_settings_option a').tab('show');
       $('#cluster_settings_tabs a:first').tab('show');
       $('.setting-info').popover();
       $scope.active_settings = 'transient'; // remember last active?
       $scope.settings = new ClusterSettings($scope.cluster.settings);
-    });
+    };
 
     $scope.save = function() {
       var settings = JSON.stringify($scope.settings, undefined, '');
@@ -2143,10 +2185,10 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
     $scope.name = '';
     $scope.indices = [];
 
-    $scope.$on('loadCreateIndex', function() {
+    $scope.initializeController = function() {
       $('#create_index_option a').tab('show');
       $scope.prepareCreateIndex();
-    });
+    };
 
     $scope.updateEditor = function() {
       ElasticService.client.getIndexMetadata($scope.source_index,
@@ -2212,10 +2254,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
            ConfirmDialogService, AlertService, SettingsService, ThemeService,
            ElasticService) {
 
-    $scope.$on('$locationChangeStart', function(ev) {
-      ev.preventDefault();
-    });
-
     $scope.version = '1.3.8-SNAPSHOT';
     $scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
@@ -2251,7 +2289,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
           }
         }
         ElasticService.connect(host);
-        this.home_screen(); // FIXME: not even sure why this is here
       } catch (error) {
         AlertService.error(error.message, error.body);
       }
@@ -2399,13 +2436,28 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
           }
       );
     };
+
+    $scope.initializeController = function() {
+      var index = $location.search().index;
+      ElasticService.client.getIndexMetadata(index,
+          function(metadata) {
+            IndexSettingsService.loadSettings(index, metadata.settings);
+          },
+          function(error) {
+            AlertService.error('Error while loading index settings for [' +
+                index + ']',
+                error);
+          }
+      );
+    };
+
   }
 ]);
 
-kopf.controller('NavbarController', ['$scope', 'SettingsService',
+kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
   'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  function($scope, SettingsService, ThemeService, ElasticService, AlertService,
-           HostHistoryService) {
+  function($scope, $location, SettingsService, ThemeService, ElasticService,
+           AlertService, HostHistoryService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
@@ -2443,6 +2495,10 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService',
 
     $scope.setAutoAdjustLayout = function() {
       SettingsService.setAutoAdjustLayout($scope.auto_adjust_layout);
+    };
+
+    $scope.isActive = function(name) {
+      return name === $location.path().substring(1);
     };
 
   }
@@ -2541,17 +2597,18 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       }
     };
 
-    $scope.$on('loadRestEvent', function() {
-      $scope.initEditor();
-      $scope.history = $scope.loadHistory();
-    });
-
     $scope.initEditor = function() {
       if (!isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('rest-client-editor');
         $scope.editor.setValue($scope.request.body);
       }
     };
+
+    $scope.initializeController = function() {
+      $scope.initEditor();
+      $scope.history = $scope.loadHistory();
+    };
+
   }
 
 ]);
@@ -2569,11 +2626,6 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     $scope.index = null;
     $scope.indices = [];
     $scope.new_query = new PercolateQuery({});
-
-    $scope.$on('loadPercolatorEvent', function() {
-      $scope.indices = $scope.cluster.indices;
-      $scope.initEditor();
-    });
 
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
@@ -2701,6 +2753,11 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
       }
     };
 
+    $scope.initializeController = function() {
+      $scope.indices = $scope.cluster.indices;
+      $scope.initEditor();
+    };
+
   }
 ]);
 
@@ -2727,11 +2784,6 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
-
-    $scope.$on('loadRepositoryEvent', function() {
-      $scope.snapshot = null; // clear 'active' snapshot
-      $scope.reload();
-    });
 
     $scope.reload = function() {
       $scope.loadIndices();
@@ -2926,6 +2978,12 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
       $scope.snapshot_repository = repository;
       $scope.fetchSnapshots(repository);
     };
+
+    $scope.initializeController = function() {
+      $scope.snapshot = null; // clear 'active' snapshot
+      $scope.reload();
+    };
+
   }
 ]);
 
@@ -2963,11 +3021,6 @@ kopf.controller('WarmupController', [
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
-
-    $scope.$on('loadWarmupEvent', function() {
-      $scope.loadIndices();
-      $scope.initEditor();
-    });
 
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
@@ -3041,6 +3094,11 @@ kopf.controller('WarmupController', [
       }
     };
 
+    $scope.initializeController = function() {
+      $scope.loadIndices();
+      $scope.initEditor();
+    };
+
   }
 ]);
 
@@ -3052,11 +3110,11 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
     $scope.indices = [];
     $scope.types = [];
 
-    $scope.$on('loadBenchmarkEvent', function() {
+    $scope.initializeController = function() {
       if (isDefined($scope.cluster)) {
         $scope.indices = $scope.cluster.indices || [];
       }
-    });
+    };
 
     $scope.addCompetitor = function() {
       if (notEmpty($scope.competitor.name)) {

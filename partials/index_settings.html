@@ -1,4 +1,4 @@
-<div ng-controller="IndexSettingsController">
+<div>
 	<div class="content-panel">
         <div class="row section-title">
             <div class="col-xs-12">
@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-sm-2">
 				<ul class="nav nav-pills nav-stacked" id="idx_settings_tabs">
-					<li><a href="#idx_settings_index" data-toggle="tab">index</a></li>
+					<li class="active"><a href="#idx_settings_index" data-toggle="tab">index</a></li>
 					<li><a href="#idx_settings_index_blocks" data-toggle="tab">block operations</a></li>
 					<li><a href="#idx_settings_index_translog" data-toggle="tab">translog</a></li>
 					<li><a href="#idx_settings_index_routing" data-toggle="tab">routing</a></li>
@@ -30,7 +30,7 @@
 		<div class="row">
 			<div class="col-xs-12">
 				<span class="pull-right">
-					<button type="button" class="btn btn-default" data-dismiss="modal" ng-click='home_screen()'>back</button>
+					<a href="#!cluster" class="btn btn-default">back</a>
 					<button type="button" class="btn btn-primary" ng-click='save()'><i class="fa fa-check"></i> save</button>
 				</span>
 			</div>

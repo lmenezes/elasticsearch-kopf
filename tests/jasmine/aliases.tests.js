@@ -37,7 +37,7 @@ describe('AliasesController', function(){
         this.scope.cluster = { indices: [ 'one', 'two'] };
         spyOn(this.scope, 'loadAliases').andReturn(true);
         spyOn(this.scope, 'initEditor').andReturn(true);
-        this.scope.$emit("loadAliasesEvent");
+        this.scope.initializeController();
         expect(this.scope.loadAliases).toHaveBeenCalled();
         expect(this.scope.initEditor).toHaveBeenCalled();
         expect(this.scope.indices).toEqual(['one','two']);

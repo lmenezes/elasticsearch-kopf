@@ -37,7 +37,7 @@ describe('RestController', function() {
     spyOn(mockEditor, 'setValue').andReturn(true);
     spyOn(this.scope, 'loadHistory').andReturn([ '1', '2']);
 
-    this.scope.$emit("loadRestEvent");
+    this.scope.initializeController();
 
     expect(this.scope.initEditor).toHaveBeenCalled();
     var editorId = 'rest-client-editor';

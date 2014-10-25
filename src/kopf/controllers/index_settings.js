@@ -28,5 +28,20 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
           }
       );
     };
+
+    $scope.initializeController = function() {
+      var index = $location.search().index;
+      ElasticService.client.getIndexMetadata(index,
+          function(metadata) {
+            IndexSettingsService.loadSettings(index, metadata.settings);
+          },
+          function(error) {
+            AlertService.error('Error while loading index settings for [' +
+                index + ']',
+                error);
+          }
+      );
+    };
+
   }
 ]);

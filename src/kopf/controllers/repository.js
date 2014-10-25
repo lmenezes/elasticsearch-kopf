@@ -22,11 +22,6 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
       $scope.page = $scope.paginator.getPage();
     }, true);
 
-    $scope.$on('loadRepositoryEvent', function() {
-      $scope.snapshot = null; // clear 'active' snapshot
-      $scope.reload();
-    });
-
     $scope.reload = function() {
       $scope.loadIndices();
       $scope.loadRepositories();
@@ -220,5 +215,11 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
       $scope.snapshot_repository = repository;
       $scope.fetchSnapshots(repository);
     };
+
+    $scope.initializeController = function() {
+      $scope.snapshot = null; // clear 'active' snapshot
+      $scope.reload();
+    };
+
   }
 ]);

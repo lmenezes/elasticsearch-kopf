@@ -31,6 +31,7 @@ module.exports = function(grunt) {
 				src: [
 					'src/lib/jquery/jquery-1.10.2.min.js',
 					'src/lib/angularjs/angular.min.js',
+					'src/lib/angularjs/angular-route.min.js',
 					'src/lib/ace/ace.js',
 					'src/lib/jsontree/jsontree.min.js',
 					'src/lib/bootstrap/js/bootstrap.js'

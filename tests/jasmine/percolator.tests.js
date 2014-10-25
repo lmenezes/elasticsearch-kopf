@@ -42,7 +42,7 @@ describe('PercolatorController', function(){
         };
         this.scope.cluster = cluster;
         spyOn(this.scope, 'initEditor').andReturn(true);
-        this.scope.$emit("loadPercolatorEvent");
+        this.scope.initializeController();
         expect(this.scope.initEditor).toHaveBeenCalled();
         expect(this.scope.indices).toEqual(indices);
     });

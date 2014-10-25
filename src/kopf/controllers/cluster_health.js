@@ -5,7 +5,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
     $scope.shared_url = '';
     $scope.results = null;
 
-    $scope.$on('loadClusterHealth', function() {
+    $scope.initializeController = function() {
       $('#cluster_health_option a').tab('show');
       $scope.results = null;
       // selects which info should be retrieved
@@ -13,9 +13,8 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
       $scope.retrieveState = true;
       $scope.retrieveStats = true;
       $scope.retrieveHotThreads = true;
-
       $scope.gist_title = '';
-    });
+    };
 
     $scope.checkPublishClusterHealth = function() {
       ConfirmDialogService.open(

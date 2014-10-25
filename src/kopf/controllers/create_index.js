@@ -8,10 +8,10 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
     $scope.name = '';
     $scope.indices = [];
 
-    $scope.$on('loadCreateIndex', function() {
+    $scope.initializeController = function() {
       $('#create_index_option a').tab('show');
       $scope.prepareCreateIndex();
-    });
+    };
 
     $scope.updateEditor = function() {
       ElasticService.client.getIndexMetadata($scope.source_index,

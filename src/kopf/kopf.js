@@ -1,4 +1,4 @@
-var kopf = angular.module('kopf', []);
+var kopf = angular.module('kopf', ['ngRoute']);
 
 kopf.factory('IndexSettingsService', function() {
 
@@ -35,4 +35,58 @@ kopf.factory('ConfirmDialogService', function() {
   };
 
   return this;
+});
+
+kopf.config(function($routeProvider, $locationProvider) {
+  $locationProvider.hashPrefix('!');
+  $routeProvider.
+      when('/cluster', {
+        templateUrl: 'partials/cluster_overview.html',
+        controller: 'ClusterOverviewController'
+      }).
+      when('/cluster', {
+        templateUrl: 'partials/cluster_overview.html',
+        controller: 'ClusterOverviewController'
+      }).
+      when('/rest', {
+        templateUrl: 'partials/rest_client.html',
+        controller: 'RestController'
+      }).
+      when('/aliases', {
+        templateUrl: 'partials/aliases.html',
+        controller: 'AliasesController'
+      }).
+      when('/analysis', {
+        templateUrl: 'partials/analysis.html',
+        controller: 'AnalysisController'
+      }).
+      when('/percolator', {
+        templateUrl: 'partials/percolator.html',
+        controller: 'PercolatorController'
+      }).
+      when('/warmup', {
+        templateUrl: 'partials/warmup.html',
+        controller: 'WarmupController'
+      }).
+      when('/repository', {
+        templateUrl: 'partials/repository.html',
+        controller: 'RepositoryController'
+      }).
+      when('/createIndex', {
+        templateUrl: 'partials/create_index.html',
+        controller: 'CreateIndexController'
+      }).
+      when('/clusterHealth', {
+        templateUrl: 'partials/cluster_health.html',
+        controller: 'ClusterHealthController'
+      }).
+      when('/clusterSettings', {
+        templateUrl: 'partials/cluster_settings.html',
+        controller: 'ClusterSettingsController'
+      }).
+      when('/indexSettings', {
+        templateUrl: 'partials/index_settings.html',
+        controller: 'IndexSettingsController'
+      }).
+      otherwise({redirectTo: '/cluster'});
 });

@@ -40,7 +40,7 @@ describe('RepositoryController', function(){
     it('on : makes calls reload and sets snapshot to null', function() {
         spyOn(this.scope, 'reload').andReturn(true);
         this.scope.snapshot = "not_null";
-        this.scope.$emit("loadRepositoryEvent");
+        this.scope.initializeController("loadRepositoryEvent");
         expect(this.scope.reload).toHaveBeenCalled();
         expect(this.scope.snapshot).toEqual(null);
     });

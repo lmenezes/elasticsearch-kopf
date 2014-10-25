@@ -5,10 +5,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
            ConfirmDialogService, AlertService, SettingsService, ThemeService,
            ElasticService) {
 
-    $scope.$on('$locationChangeStart', function(ev) {
-      ev.preventDefault();
-    });
-
     $scope.version = '1.3.8-SNAPSHOT';
     $scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
@@ -44,7 +40,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
           }
         }
         ElasticService.connect(host);
-        this.home_screen(); // FIXME: not even sure why this is here
       } catch (error) {
         AlertService.error(error.message, error.body);
       }

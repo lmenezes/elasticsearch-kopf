@@ -91,17 +91,18 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       }
     };
 
-    $scope.$on('loadRestEvent', function() {
-      $scope.initEditor();
-      $scope.history = $scope.loadHistory();
-    });
-
     $scope.initEditor = function() {
       if (!isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('rest-client-editor');
         $scope.editor.setValue($scope.request.body);
       }
     };
+
+    $scope.initializeController = function() {
+      $scope.initEditor();
+      $scope.history = $scope.loadHistory();
+    };
+
   }
 
 ]);

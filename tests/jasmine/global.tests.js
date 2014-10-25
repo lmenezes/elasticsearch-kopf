@@ -64,29 +64,23 @@ describe('GlobalController', function(){
     it('should connect to default address when running kopf from file', function() {
         spyOn(this.ElasticService, 'connect').andReturn('');
         spyOn($location, 'host').andReturn('');
-        spyOn(this.scope, 'home_screen').andReturn('');
         this.scope.connect();
         expect(this.ElasticService.connect).toHaveBeenCalledWith('http://localhost:9200');
-        expect(this.scope.home_screen).toHaveBeenCalled();
     });
 
     it('should read from location parameter when present', function() {
         spyOn(this.ElasticService, 'connect').andReturn('');
         spyOn($location, 'host').andReturn('http://localhost:9200');
-        spyOn(this.scope, 'home_screen').andReturn('');
         spyOn(this.scope, 'readParameter').andReturn('http://1.2.3.4:9200');
         this.scope.connect();
         expect(this.ElasticService.connect).toHaveBeenCalledWith('http://1.2.3.4:9200');
-        expect(this.scope.home_screen).toHaveBeenCalled();
     });
 
     it('should use kopf running host if no location parameter is found', function() {
         spyOn(this.ElasticService, 'connect').andReturn('');
         spyOn($location, 'absUrl').andReturn('http://thishost:4321/_plugin/kopf');
-        spyOn(this.scope, 'home_screen').andReturn('');
         this.scope.connect();
         expect(this.ElasticService.connect).toHaveBeenCalledWith('http://thishost:4321');
-        expect(this.scope.home_screen).toHaveBeenCalled();
     });
 
 });

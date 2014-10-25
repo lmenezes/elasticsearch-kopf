@@ -270,20 +270,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
-    $scope.loadIndexSettings = function(index) {
-      $('#index_settings_option a').tab('show');
-      ElasticService.client.getIndexMetadata(index,
-          function(metadata) {
-            IndexSettingsService.loadSettings(index, metadata.settings);
-            $('#idx_settings_tabs a:first').tab('show');
-            $('.setting-info').popover();
-          },
-          function(error) {
-            AlertService.error('Error while loading index settings', error);
-          }
-      );
-    };
-
     $scope.showIndexSettings = function(index) {
       ElasticService.client.getIndexMetadata(index,
           function(metadata) {

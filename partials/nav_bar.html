@@ -59,55 +59,43 @@
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}}">
-				<li class="active" id="cluster_option" ng-click="selectTab()">
-					<a href="#cluster" data-toggle="tab">
+				<li ng-class="{active: isActive('cluster')}">
+					<a href="#!cluster">
                         <i class="fa fa-fw fa-sitemap"></i> cluster
                     </a>
 				</li>
-				<li id="index_settings_option" style="display: none;">
-					<a href="#index_settings" data-toggle="tab"></a>
-				</li>
-				<li id="cluster_settings_option" style="display: none;">
-					<a href="#cluster_settings" data-toggle="tab"></a>
-				</li>
-				<li id="cluster_health_option" style="display: none;">
-					<a href="#cluster_health" data-toggle="tab"></a>
-				</li>
-				<li id="create_index_option" style="display: none;">
-					<a href="#create_index" data-toggle="tab"></a>
-				</li>
-				<li id="rest_option" ng-click="selectTab('loadRestEvent')">
-					<a href="#rest" data-toggle="tab">
+				<li ng-class="{active: isActive('rest')}">
+					<a href="#!rest">
                         <i class="fa fa-fw fa-edit"></i> rest
                     </a>
 				</li>
-				<li id="aliases_option" ng-click="selectTab('loadAliasesEvent')">
-					<a href="#aliases" data-toggle="tab">
+				<li ng-class="{active: isActive('aliases')}">
+					<a href="#!aliases">
                         <i class="fa fa-fw fa-tags"></i> aliases
                     </a>
 				</li>
-				<li id="analysis_option" ng-click="selectTab('loadAnalysisEvent')">
-					<a href="#analysis" data-toggle="tab">
+				<li ng-class="{active: isActive('analysis')}">
+					<a href="#!analysis">
                         <i class="fa fa-fw fa-puzzle-piece"></i> analysis
                     </a>
 				</li>
-				<li id="percolator_option" ng-click="selectTab('loadPercolatorEvent')">
-					<a href="#percolator" data-toggle="tab">
+				<li ng-class="{active: isActive('percolator')}">
+					<a href="#!percolator">
                         <i class="fa fa-fw fa-bell-o"></i> percolator
                     </a>
 				</li>
-				<li id="warmup_option" ng-click="selectTab('loadWarmupEvent')">
-					<a href="#warmup" data-toggle="tab">
+				<li ng-class="{active: isActive('warmup')}">
+					<a href="#!warmup">
                         <i class="fa fa-fw fa-fire"></i> warmers
                     </a>
 				</li>
-				<li id="repository_option" ng-click="selectTab('loadRepositoryEvent')">
-					<a href="#repository" data-toggle="tab">
+				<li ng-class="{active: isActive('repository')}">
+					<a href="#!repository">
                         <i class="fa fa-fw fa-camera"></i> snapshot
                     </a>
 				</li>
-				<li id="benchmark_option" ng-click="selectTab('loadBenchmarkEvent')" ng-show="client.versionCheck('1.4.0')">
-					<a href="#benchmark" data-toggle="tab">
+				<li ng-class="{active: isActive('benchmark')}"ng-show="client.versionCheck('1.4.0')">
+					<a href="#!benchmark">
                         <i class="fa fa-fw fa-bar-chart-o"></i> benchmark
                     </a>
 				</li>

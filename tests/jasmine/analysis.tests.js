@@ -42,7 +42,7 @@ describe('AnalysisController', function(){
             open_indices: function(){return indices}
         };
         this.scope.cluster = cluster;
-        this.scope.$emit('loadAnalysisEvent');
+        this.scope.initializeController('loadAnalysisEvent');
         expect(this.scope.indices).toEqual(indices);
     });
 

@@ -6,11 +6,11 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
     $scope.indices = [];
     $scope.types = [];
 
-    $scope.$on('loadBenchmarkEvent', function() {
+    $scope.initializeController = function() {
       if (isDefined($scope.cluster)) {
         $scope.indices = $scope.cluster.indices || [];
       }
-    });
+    };
 
     $scope.addCompetitor = function() {
       if (notEmpty($scope.competitor.name)) {

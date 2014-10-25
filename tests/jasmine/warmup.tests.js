@@ -39,7 +39,7 @@ describe('WarmupController', function(){
     it('Initializes data when warmup tab is selected', function() {
         spyOn(this.scope, 'loadIndices').andReturn(true);
         spyOn(this.scope, 'initEditor').andReturn(true);
-        this.scope.$emit("loadWarmupEvent");
+        this.scope.initializeController("loadWarmupEvent");
         expect(this.scope.loadIndices).toHaveBeenCalled();
         expect(this.scope.initEditor).toHaveBeenCalled();
     });

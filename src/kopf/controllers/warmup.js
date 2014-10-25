@@ -17,11 +17,6 @@ kopf.controller('WarmupController', [
       $scope.page = $scope.paginator.getPage();
     }, true);
 
-    $scope.$on('loadWarmupEvent', function() {
-      $scope.loadIndices();
-      $scope.initEditor();
-    });
-
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('warmup-query-editor');
@@ -92,6 +87,11 @@ kopf.controller('WarmupController', [
         $scope.paginator.setCollection([]);
         $scope.page = $scope.paginator.getPage();
       }
+    };
+
+    $scope.initializeController = function() {
+      $scope.loadIndices();
+      $scope.initEditor();
     };
 
   }

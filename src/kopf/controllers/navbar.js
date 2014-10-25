@@ -1,7 +1,7 @@
-kopf.controller('NavbarController', ['$scope', 'SettingsService',
+kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
   'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  function($scope, SettingsService, ThemeService, ElasticService, AlertService,
-           HostHistoryService) {
+  function($scope, $location, SettingsService, ThemeService, ElasticService,
+           AlertService, HostHistoryService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
@@ -39,6 +39,10 @@ kopf.controller('NavbarController', ['$scope', 'SettingsService',
 
     $scope.setAutoAdjustLayout = function() {
       SettingsService.setAutoAdjustLayout($scope.auto_adjust_layout);
+    };
+
+    $scope.isActive = function(name) {
+      return name === $location.path().substring(1);
     };
 
   }
