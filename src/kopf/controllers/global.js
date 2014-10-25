@@ -9,10 +9,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
     $scope.alert_service = AlertService;
     $scope.modal = new ModalControls();
 
-    $scope.home_screen = function() {
-      $('#cluster_option a').tab('show');
-    };
-
     $scope.getTheme = function() {
       return ThemeService.getTheme();
     };
@@ -129,10 +125,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
       return isDefined($scope.cluster_health);
     };
 
-    $scope.isActive = function(tab) {
-      return $('#' + tab).hasClass('active');
-    };
-
     $scope.displayInfo = function(title, info) {
       $scope.modal.title = title;
       $scope.modal.info = $sce.trustAsHtml(JSONTree.create(info));
@@ -143,15 +135,8 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
       return getTimeString(new Date());
     };
 
-    $scope.selectTab = function(event) {
-      AlertService.clear();
-      if (isDefined(event)) {
-        $scope.broadcastMessage(event, {});
-      }
-    };
-
     $scope.updateModel = function(action) {
-      $scope.$apply(action);
+      $scope.$apply(action); // #FIXME: only cluster health depends on it
     };
 
   }
