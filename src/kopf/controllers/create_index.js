@@ -1,6 +1,7 @@
 kopf.controller('CreateIndexController', ['$scope', 'AlertService',
-  'ElasticService', 'AceEditorService',
-  function($scope, AlertService, ElasticService, AceEditorService) {
+  'ElasticService', 'AceEditorService', 'ClusterService',
+  function($scope, AlertService, ElasticService, AceEditorService,
+           ClusterService) {
 
     $scope.source_index = null;
     $scope.shards = '';
@@ -46,7 +47,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
           }
           ElasticService.client.createIndex($scope.name, bodyString,
               function(response) {
-                $scope.refreshClusterState();
+                ClusterService.refresh();
               },
               function(error) {
                 AlertService.error('Error while creating index', error);
@@ -60,7 +61,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
       if (!isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('index-settings-editor');
       }
-      $scope.indices = $scope.cluster.indices;
+      $scope.indices = ClusterService.cluster.indices;
       $scope.source_index = null;
       $scope.editor.setValue('{}');
       $scope.shards = '';

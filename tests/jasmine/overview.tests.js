@@ -25,8 +25,9 @@ describe('ClusterOverviewController', function(){
         this.IndexSettingsService = $injector.get('IndexSettingsService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         this.SettingsService = $injector.get('SettingsService');
+        this.ClusterService = $injector.get('ClusterService');
         this.createController = function() {
-            return $controller('ClusterOverviewController', {$scope: this.scope, $window: $window}, this.IndexSettingsService, this.ConfirmDialogService, this.AlertService, this.SettingsService);
+            return $controller('ClusterOverviewController', {$scope: this.scope, $window: $window}, this.IndexSettingsService, this.ConfirmDialogService, this.AlertService, this.SettingsService, this.ClusterService);
         };
         this._controller = this.createController();
     }));
@@ -58,7 +59,7 @@ describe('ClusterOverviewController', function(){
 
     it('should detect when cluster changes and update indices and nodes', function(){
         // paginator
-        this.scope.cluster = { indices: [ 1, 2, 3 ], nodes: [ 3, 2, 1] };
+        this.ClusterService.cluster = { indices: [ 1, 2, 3 ], nodes: [ 3, 2, 1] };
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
         this.scope.$digest();
@@ -169,14 +170,14 @@ describe('ClusterOverviewController', function(){
     // shutdown node
     it('shutdownNode must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.shutdownNode=function(node_id, success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "shutdownNode").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.shutdownNode("node_id");
         expect(this.ElasticService.client.shutdownNode).toHaveBeenCalledWith("node_id", jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
-        
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
+
         expect(this.AlertService.success).toHaveBeenCalled();
     });
 
@@ -211,13 +212,13 @@ describe('ClusterOverviewController', function(){
     // delete index
     it('deleteIndex must invoke client method and refresh cluster state', function(){
         this.ElasticService.client.deleteIndex=function(index, success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "deleteIndex").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.deleteIndex("index_id");
         expect(this.ElasticService.client.deleteIndex).toHaveBeenCalledWith("index_id", jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
     });
 
     it('deleteIndex must display message if operation fails', function(){
@@ -232,13 +233,13 @@ describe('ClusterOverviewController', function(){
     // clear cache
     it('clearCache must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.clearCache=function(index_id, success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "clearCache").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.clearCache("index_id");
         expect(this.ElasticService.client.clearCache).toHaveBeenCalledWith("index_id", jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
         expect(this.AlertService.success).toHaveBeenCalled();
     });
 
@@ -254,7 +255,7 @@ describe('ClusterOverviewController', function(){
     // refresh index
     it('refreshIndex must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.refreshIndex=function(index_id, success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
+        this.ClusterService.refresh=function(){};
         spyOn(this.ElasticService.client, "refreshIndex").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.refreshIndex("index_id");
@@ -274,13 +275,13 @@ describe('ClusterOverviewController', function(){
     // enable allocation
     it('enableAllocation must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.enableShardAllocation=function(success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "enableShardAllocation").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.enableAllocation("node_id");
         expect(this.ElasticService.client.enableShardAllocation).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
         expect(this.AlertService.success).toHaveBeenCalled();
     });
 
@@ -296,13 +297,13 @@ describe('ClusterOverviewController', function(){
     // disable allocation
     it('disableAllocation must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.disableShardAllocation=function(success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "disableShardAllocation").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.disableAllocation("node_id");
         expect(this.ElasticService.client.disableShardAllocation).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
         expect(this.AlertService.success).toHaveBeenCalled();
     });
 
@@ -318,13 +319,13 @@ describe('ClusterOverviewController', function(){
     // close index
     it('closeIndex must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.closeIndex=function(index_id, success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "closeIndex").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.closeIndex("index_id");
         expect(this.ElasticService.client.closeIndex).toHaveBeenCalledWith("index_id", jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
         expect(this.AlertService.success).toHaveBeenCalled();
     });
 
@@ -340,13 +341,13 @@ describe('ClusterOverviewController', function(){
     // open index
     it('openIndex must invoke client method, display alert and refresh model', function(){
         this.ElasticService.client.openIndex=function(index_id, success, failed) { return success(); };
-        this.scope.refreshClusterState=function(){};
-        spyOn(this.scope, "refreshClusterState").andReturn(true);
+        this.ClusterService.refresh=function(){};
+        spyOn(this.ClusterService, "refresh").andReturn(true);
         spyOn(this.ElasticService.client, "openIndex").andCallThrough();
         spyOn(this.AlertService, "success").andReturn(true);
         this.scope.openIndex("index_id");
         expect(this.ElasticService.client.openIndex).toHaveBeenCalledWith("index_id", jasmine.any(Function), jasmine.any(Function));
-        expect(this.scope.refreshClusterState).toHaveBeenCalled();
+        expect(this.ClusterService.refresh).toHaveBeenCalled();
         expect(this.AlertService.success).toHaveBeenCalled();
     });
 

@@ -1,6 +1,7 @@
 kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'ElasticService',
-  function($scope, ConfirmDialogService, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, ConfirmDialogService, AlertService, ElasticService,
+           ClusterService) {
     // registered repositories
     $scope.repositories = [];
     $scope.indices = [];
@@ -31,8 +32,8 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.loadIndices = function() {
-      if (isDefined($scope.cluster)) {
-        $scope.indices = $scope.cluster.indices || [];
+      if (isDefined(ClusterService.cluster)) {
+        $scope.indices = ClusterService.cluster.indices || [];
       }
     };
 

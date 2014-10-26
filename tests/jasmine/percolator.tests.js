@@ -12,8 +12,9 @@ describe('PercolatorController', function(){
         this.AlertService = $injector.get('AlertService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         this.AceEditorService = $injector.get('AceEditorService');
+        this.ClusterService = $injector.get('ClusterService');
         this.createController = function() {
-            return $controller('PercolatorController', {$scope: this.scope}, this.AlertService, this.ConfirmDialogService, this.AceEditorService);
+            return $controller('PercolatorController', {$scope: this.scope}, this.AlertService, this.ConfirmDialogService, this.AceEditorService, this.ClusterService);
         };
         this._controller = this.createController();
     }));
@@ -40,7 +41,7 @@ describe('PercolatorController', function(){
         var cluster = {
             indices: indices
         };
-        this.scope.cluster = cluster;
+        this.ClusterService.cluster = cluster;
         spyOn(this.scope, 'initEditor').andReturn(true);
         this.scope.initializeController();
         expect(this.scope.initEditor).toHaveBeenCalled();

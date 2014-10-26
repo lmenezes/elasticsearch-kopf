@@ -1,8 +1,8 @@
 kopf.controller('WarmupController', [
   '$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService',
-  'ElasticService',
+  'ElasticService', 'ClusterService',
   function($scope, ConfirmDialogService, AlertService, AceEditorService,
-           ElasticService) {
+           ElasticService, ClusterService) {
     $scope.editor = undefined;
     $scope.indices = [];
     $scope.index = null;
@@ -24,7 +24,7 @@ kopf.controller('WarmupController', [
     };
 
     $scope.loadIndices = function() {
-      $scope.indices = $scope.cluster.indices;
+      $scope.indices = ClusterService.cluster.indices;
     };
 
     $scope.createWarmerQuery = function() {

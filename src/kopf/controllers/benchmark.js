@@ -1,14 +1,16 @@
 kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
-  'AlertService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, $location, $timeout, AlertService, ElasticService,
+           ClusterService) {
+
     $scope.bench = new Benchmark();
     $scope.competitor = new Competitor();
     $scope.indices = [];
     $scope.types = [];
 
     $scope.initializeController = function() {
-      if (isDefined($scope.cluster)) {
-        $scope.indices = $scope.cluster.indices || [];
+      if (isDefined(ClusterService.cluster)) {
+        $scope.indices = ClusterService.cluster.indices || [];
       }
     };
 

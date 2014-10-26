@@ -1,9 +1,9 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
   '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService',
-  'SettingsService', 'ThemeService', 'ElasticService',
+  'SettingsService', 'ThemeService', 'ElasticService', 'ClusterService',
   function($scope, $location, $timeout, $http, $q, $sce, $window,
            ConfirmDialogService, AlertService, SettingsService, ThemeService,
-           ElasticService) {
+           ElasticService, ClusterService) {
 
     $scope.version = '1.3.8-SNAPSHOT';
     $scope.alert_service = AlertService;
@@ -11,10 +11,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
 
     $scope.getTheme = function() {
       return ThemeService.getTheme();
-    };
-
-    $scope.broadcastMessage = function(message, args) {
-      $scope.$broadcast(message, args);
     };
 
     $scope.readParameter = function(name) {
@@ -43,86 +39,10 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
 
     $scope.connect();
 
-    $scope.alertClusterChanges = function() {
-      if (isDefined($scope.cluster)) {
-        var changes = $scope.cluster.changes;
-        if (changes.hasChanges()) {
-          if (changes.hasJoins()) {
-            var joins = changes.nodeJoins.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
-            });
-            AlertService.info(joins.length + ' new node(s) joined the cluster',
-                joins);
-          }
-          if (changes.hasLeaves()) {
-            var leaves = changes.nodeLeaves.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
-            });
-            AlertService.warn(changes.nodeLeaves.length +
-                    ' node(s) left the cluster', leaves);
-          }
-          if (changes.hasCreatedIndices()) {
-            var created = changes.indicesCreated.map(function(index) {
-              return index.name;
-            });
-            AlertService.info(changes.indicesCreated.length +
-                ' indices created: [' + created.join(',') + ']');
-          }
-          if (changes.hasDeletedIndices()) {
-            var deleted = changes.indicesDeleted.map(function(index) {
-              return index.name;
-            });
-            AlertService.info(changes.indicesDeleted.length +
-                ' indices deleted: [' + deleted.join(',') + ']');
-          }
-        }
-      }
-    };
-
-    $scope.refreshClusterState = function() {
-      if (ElasticService.isConnected()) {
-        $timeout(function() {
-          ElasticService.client.getClusterDetail(
-              function(cluster) {
-                cluster.computeChanges($scope.cluster);
-                $scope.cluster = cluster;
-                $scope.alertClusterChanges();
-              },
-              function(error) {
-                AlertService.error('Error while retrieving cluster information',
-                    error);
-                $scope.cluster = null;
-              }
-          );
-
-          ElasticService.client.getClusterHealth(
-              function(cluster) {
-                $scope.cluster_health = cluster;
-              },
-              function(error) {
-                $scope.cluster_health = null;
-                AlertService.error('Error connecting to [' + $scope.host + ']',
-                    error);
-              }
-          );
-        }, 100);
-      } else {
-        $scope.cluster = null;
-        $scope.cluster_health = null;
-      }
-    };
-
-    $scope.autoRefreshCluster = function() {
-      $scope.refreshClusterState();
-      $timeout(function() {
-        $scope.autoRefreshCluster();
-      }, SettingsService.getRefreshInterval());
-    };
-
-    $scope.autoRefreshCluster();
+    ClusterService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined($scope.cluster_health);
+      return isDefined(ClusterService.clusterHealth);
     };
 
     $scope.displayInfo = function(title, info) {
@@ -133,10 +53,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
 
     $scope.getCurrentTime = function() {
       return getTimeString(new Date());
-    };
-
-    $scope.updateModel = function(action) {
-      $scope.$apply(action); // #FIXME: only cluster health depends on it
     };
 
   }

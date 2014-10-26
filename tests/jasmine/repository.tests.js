@@ -11,11 +11,11 @@ describe('RepositoryController', function(){
         this.ElasticService.client = {};
         this._rootScope = $rootScope;
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
-        var AlertService = $injector.get('AlertService');
-        this.AlertService = AlertService;
+        this.AlertService = $injector.get('AlertService');
+        this.ClusterService = $injector.get('ClusterService');
         $httpBackend.whenGET('./kopf_external_settings.json').respond(200, {});
         this.createController = function() {
-            return $controller('RepositoryController', {$scope: this.scope}, this.ConfirmDialogService, AlertService);
+            return $controller('RepositoryController', {$scope: this.scope}, this.ConfirmDialogService, this.AlertService, this.ClusterService);
         };
 
         this._controller = this.createController();
@@ -46,8 +46,7 @@ describe('RepositoryController', function(){
     });
 
     it('loadIndices : assigns a value to indices from cluster.indices', function() {
-        this.scope.cluster = {};
-        this.scope.cluster.indices = ["chicken", "kale", "potatoes"];
+        this.ClusterService.cluster = {indices: ["chicken", "kale", "potatoes"]};
         this.scope.loadIndices();
         expect(this.scope.indices).toEqual(["chicken", "kale", "potatoes"]);
     });

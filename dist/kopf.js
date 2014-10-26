@@ -1441,8 +1441,10 @@ kopf.config(function($routeProvider, $locationProvider) {
 });
 
 kopf.controller('AliasesController', ['$scope', 'AlertService',
-  'AceEditorService', 'ElasticService',
-  function($scope, AlertService, AceEditorService, ElasticService) {
+  'AceEditorService', 'ElasticService', 'ClusterService',
+  function($scope, AlertService, AceEditorService, ElasticService,
+           ClusterService) {
+
     $scope.paginator = new Paginator(1, 10, [], new AliasFilter('', ''));
     $scope.page = $scope.paginator.getPage();
     $scope.original = [];
@@ -1578,7 +1580,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = $scope.cluster.indices;
+      $scope.indices = ClusterService.cluster.indices;
       $scope.loadAliases();
       $scope.initEditor();
     };
@@ -1587,8 +1589,9 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
 ]);
 
 kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
-  'AlertService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, $location, $timeout, AlertService, ElasticService,
+           ClusterService) {
 
     $scope.indices = null;
 
@@ -1684,7 +1687,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = $scope.cluster.open_indices();
+      $scope.indices = ClusterService.cluster.open_indices();
     };
 
   }
@@ -1838,9 +1841,12 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
 
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
   'IndexSettingsService', 'ConfirmDialogService', 'AlertService',
-  'ElasticService', 'SettingsService',
+  'ElasticService', 'SettingsService', 'ClusterService',
   function($scope, $window, IndexSettingsService, ConfirmDialogService,
-           AlertService, ElasticService, SettingsService) {
+           AlertService, ElasticService, SettingsService, ClusterService) {
+
+    $scope.cluster = null;
+    $scope.cluster_health = null;
 
     $($window).resize(function() {
       $scope.adjustLayout();
@@ -1869,27 +1875,45 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.nodes = [];
 
-    $scope.$watch('cluster', function(cluster, previous) {
-      if (isDefined(cluster)) {
-        $scope.setIndices(cluster.indices);
-        $scope.setNodes($scope.cluster.nodes);
-      } else {
-        $scope.setIndices([]);
-        $scope.setNodes([]);
-      }
-    });
+    $scope.$watch(function() {
+      return ClusterService.clusterHealth;
+    },
+        function(newValue, oldValue) {
+          if (isDefined(ClusterService.clusterHealth)) {
+            $scope.cluster_health = ClusterService.clusterHealth;
+          } else {
+            $scope.cluster_health = null;
+          }
+        }
+    );
+
+    $scope.$watch(function() {
+      return ClusterService.cluster;
+    },
+        function(newValue, oldValue) {
+          if (isDefined(ClusterService.cluster)) {
+            $scope.cluster = ClusterService.cluster;
+            $scope.setIndices(ClusterService.cluster.indices);
+            $scope.setNodes(ClusterService.cluster.nodes);
+          } else {
+            $scope.cluster = null;
+            $scope.setIndices([]);
+            $scope.setNodes([]);
+          }
+        }
+    );
 
     $scope.$watch('index_paginator', function(filter, previous) {
-      if (isDefined($scope.cluster)) {
-        $scope.setIndices($scope.cluster.indices);
+      if (isDefined(ClusterService.cluster)) {
+        $scope.setIndices(ClusterService.cluster.indices);
       } else {
         $scope.setIndices([]); // could it even happen?
       }
     }, true);
 
     $scope.$watch('node_filter', function(filter, previous) {
-      if (isDefined($scope.cluster)) {
-        $scope.setNodes($scope.cluster.nodes);
+      if (isDefined(ClusterService.cluster)) {
+        $scope.setNodes(ClusterService.cluster.nodes);
       } else {
         $scope.setNodes([]);
       }
@@ -1908,7 +1932,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.closeModal = function(forcedRefresh) {
       if (forcedRefresh) {
-        $scope.refreshClusterState();
+        ClusterService.refresh();
       }
     };
 
@@ -1917,7 +1941,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           function(response) {
             AlertService.success('Node [' + nodeId + '] successfully shutdown',
                 response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while shutting down node', error);
@@ -1966,7 +1990,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.deleteIndex = function(index) {
       ElasticService.client.deleteIndex(index,
           function(response) {
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while deleting index', error);
@@ -1991,7 +2015,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           function(response) {
             AlertService.success('Index cache was successfully cleared',
                 response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while clearing index cache', error);
@@ -2038,7 +2062,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           function(response) {
             AlertService.success('Shard allocation was successfully enabled',
                 response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while enabling shard allocation', error);
@@ -2051,7 +2075,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           function(response) {
             AlertService.success('Shard allocation was successfully disabled',
                 response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while disabling shard allocation', error);
@@ -2063,7 +2087,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.client.closeIndex(index,
           function(response) {
             AlertService.success('Index was successfully closed', response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while closing index', error);
@@ -2088,7 +2112,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.client.openIndex(index,
           function(response) {
             AlertService.success('Index was successfully opened', response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while opening index', error);
@@ -2136,15 +2160,16 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 ]);
 
 kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
-  'AlertService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, $location, $timeout, AlertService, ElasticService,
+           ClusterService) {
 
     $scope.initializeController = function() {
       $('#cluster_settings_option a').tab('show');
       $('#cluster_settings_tabs a:first').tab('show');
       $('.setting-info').popover();
       $scope.active_settings = 'transient'; // remember last active?
-      $scope.settings = new ClusterSettings($scope.cluster.settings);
+      $scope.settings = new ClusterSettings(ClusterService.cluster.settings);
     };
 
     $scope.save = function() {
@@ -2153,7 +2178,7 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
           function(response) {
             AlertService.success('Cluster settings were successfully updated',
                 response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while updating cluster settings', error);
@@ -2164,8 +2189,9 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
 ]);
 
 kopf.controller('CreateIndexController', ['$scope', 'AlertService',
-  'ElasticService', 'AceEditorService',
-  function($scope, AlertService, ElasticService, AceEditorService) {
+  'ElasticService', 'AceEditorService', 'ClusterService',
+  function($scope, AlertService, ElasticService, AceEditorService,
+           ClusterService) {
 
     $scope.source_index = null;
     $scope.shards = '';
@@ -2211,7 +2237,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
           }
           ElasticService.client.createIndex($scope.name, bodyString,
               function(response) {
-                $scope.refreshClusterState();
+                ClusterService.refresh();
               },
               function(error) {
                 AlertService.error('Error while creating index', error);
@@ -2225,7 +2251,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
       if (!isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('index-settings-editor');
       }
-      $scope.indices = $scope.cluster.indices;
+      $scope.indices = ClusterService.cluster.indices;
       $scope.source_index = null;
       $scope.editor.setValue('{}');
       $scope.shards = '';
@@ -2237,10 +2263,10 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
 
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
   '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService',
-  'SettingsService', 'ThemeService', 'ElasticService',
+  'SettingsService', 'ThemeService', 'ElasticService', 'ClusterService',
   function($scope, $location, $timeout, $http, $q, $sce, $window,
            ConfirmDialogService, AlertService, SettingsService, ThemeService,
-           ElasticService) {
+           ElasticService, ClusterService) {
 
     $scope.version = '1.3.8-SNAPSHOT';
     $scope.alert_service = AlertService;
@@ -2248,10 +2274,6 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
 
     $scope.getTheme = function() {
       return ThemeService.getTheme();
-    };
-
-    $scope.broadcastMessage = function(message, args) {
-      $scope.$broadcast(message, args);
     };
 
     $scope.readParameter = function(name) {
@@ -2280,86 +2302,10 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
 
     $scope.connect();
 
-    $scope.alertClusterChanges = function() {
-      if (isDefined($scope.cluster)) {
-        var changes = $scope.cluster.changes;
-        if (changes.hasChanges()) {
-          if (changes.hasJoins()) {
-            var joins = changes.nodeJoins.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
-            });
-            AlertService.info(joins.length + ' new node(s) joined the cluster',
-                joins);
-          }
-          if (changes.hasLeaves()) {
-            var leaves = changes.nodeLeaves.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
-            });
-            AlertService.warn(changes.nodeLeaves.length +
-                    ' node(s) left the cluster', leaves);
-          }
-          if (changes.hasCreatedIndices()) {
-            var created = changes.indicesCreated.map(function(index) {
-              return index.name;
-            });
-            AlertService.info(changes.indicesCreated.length +
-                ' indices created: [' + created.join(',') + ']');
-          }
-          if (changes.hasDeletedIndices()) {
-            var deleted = changes.indicesDeleted.map(function(index) {
-              return index.name;
-            });
-            AlertService.info(changes.indicesDeleted.length +
-                ' indices deleted: [' + deleted.join(',') + ']');
-          }
-        }
-      }
-    };
-
-    $scope.refreshClusterState = function() {
-      if (ElasticService.isConnected()) {
-        $timeout(function() {
-          ElasticService.client.getClusterDetail(
-              function(cluster) {
-                cluster.computeChanges($scope.cluster);
-                $scope.cluster = cluster;
-                $scope.alertClusterChanges();
-              },
-              function(error) {
-                AlertService.error('Error while retrieving cluster information',
-                    error);
-                $scope.cluster = null;
-              }
-          );
-
-          ElasticService.client.getClusterHealth(
-              function(cluster) {
-                $scope.cluster_health = cluster;
-              },
-              function(error) {
-                $scope.cluster_health = null;
-                AlertService.error('Error connecting to [' + $scope.host + ']',
-                    error);
-              }
-          );
-        }, 100);
-      } else {
-        $scope.cluster = null;
-        $scope.cluster_health = null;
-      }
-    };
-
-    $scope.autoRefreshCluster = function() {
-      $scope.refreshClusterState();
-      $timeout(function() {
-        $scope.autoRefreshCluster();
-      }, SettingsService.getRefreshInterval());
-    };
-
-    $scope.autoRefreshCluster();
+    ClusterService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined($scope.cluster_health);
+      return isDefined(ClusterService.clusterHealth);
     };
 
     $scope.displayInfo = function(title, info) {
@@ -2372,17 +2318,13 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
       return getTimeString(new Date());
     };
 
-    $scope.updateModel = function(action) {
-      $scope.$apply(action); // #FIXME: only cluster health depends on it
-    };
-
   }
 ]);
 
 kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
-  'IndexSettingsService', 'AlertService', 'ElasticService',
+  'IndexSettingsService', 'AlertService', 'ElasticService', 'ClusterService',
   function($scope, $location, $timeout, IndexSettingsService, AlertService,
-           ElasticService) {
+           ElasticService, ClusterService) {
 
     $scope.service = IndexSettingsService;
 
@@ -2402,7 +2344,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
           function(response) {
             AlertService.success('Index settings were successfully updated',
                 response);
-            $scope.refreshClusterState();
+            ClusterService.refresh();
           },
           function(error) {
             AlertService.error('Error while updating index settings', error);
@@ -2429,8 +2371,9 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
 
 kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
   'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
+  'ClusterService',
   function($scope, $location, SettingsService, ThemeService, ElasticService,
-           AlertService, HostHistoryService) {
+           AlertService, HostHistoryService, ClusterService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
@@ -2438,6 +2381,21 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     $scope.current_host = ElasticService.getHost();
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
     $scope.host_history = HostHistoryService.getHostHistory();
+
+    $scope.clusterStatus = '';
+
+    $scope.$watch(
+        function() {
+          return ClusterService.clusterHealth;
+        },
+        function(newValue, oldValue) {
+          if (isDefined(ClusterService.clusterHealth)) {
+            $scope.clusterStatus = ClusterService.clusterHealth.status;
+          } else {
+            $scope.clusterStatus = '';
+          }
+        }
+    );
 
     $scope.handleConnectToHost = function(event) {
       if (event.keyCode == 13 && notEmpty($scope.new_host)) {
@@ -2454,7 +2412,7 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
         AlertService.error('Error while connecting to new target host', error);
       } finally {
         $scope.current_host = ElasticService.connection.host;
-        $scope.refreshClusterState();
+        ClusterService.refresh();
       }
     };
 
@@ -2587,9 +2545,9 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 ]);
 
 kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'AceEditorService', 'ElasticService',
+  'AlertService', 'AceEditorService', 'ElasticService', 'ClusterService',
   function($scope, ConfirmDialogService, AlertService, AceEditorService,
-           ElasticService) {
+           ElasticService, ClusterService) {
     $scope.editor = undefined;
     $scope.pagination = new PercolatorsPage(0, 0, 0, []);
 
@@ -2727,7 +2685,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = $scope.cluster.indices;
+      $scope.indices = ClusterService.cluster.indices;
       $scope.initEditor();
     };
 
@@ -2735,8 +2693,9 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
 ]);
 
 kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'ElasticService',
-  function($scope, ConfirmDialogService, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, ConfirmDialogService, AlertService, ElasticService,
+           ClusterService) {
     // registered repositories
     $scope.repositories = [];
     $scope.indices = [];
@@ -2767,8 +2726,8 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.loadIndices = function() {
-      if (isDefined($scope.cluster)) {
-        $scope.indices = $scope.cluster.indices || [];
+      if (isDefined(ClusterService.cluster)) {
+        $scope.indices = ClusterService.cluster.indices || [];
       }
     };
 
@@ -2978,9 +2937,9 @@ kopf.controller('ConfirmDialogController', ['$scope', 'ConfirmDialogService',
 
 kopf.controller('WarmupController', [
   '$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService',
-  'ElasticService',
+  'ElasticService', 'ClusterService',
   function($scope, ConfirmDialogService, AlertService, AceEditorService,
-           ElasticService) {
+           ElasticService, ClusterService) {
     $scope.editor = undefined;
     $scope.indices = [];
     $scope.index = null;
@@ -3002,7 +2961,7 @@ kopf.controller('WarmupController', [
     };
 
     $scope.loadIndices = function() {
-      $scope.indices = $scope.cluster.indices;
+      $scope.indices = ClusterService.cluster.indices;
     };
 
     $scope.createWarmerQuery = function() {
@@ -3076,16 +3035,18 @@ kopf.controller('WarmupController', [
 ]);
 
 kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
-  'AlertService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, $location, $timeout, AlertService, ElasticService,
+           ClusterService) {
+
     $scope.bench = new Benchmark();
     $scope.competitor = new Competitor();
     $scope.indices = [];
     $scope.types = [];
 
     $scope.initializeController = function() {
-      if (isDefined($scope.cluster)) {
-        $scope.indices = $scope.cluster.indices || [];
+      if (isDefined(ClusterService.cluster)) {
+        $scope.indices = ClusterService.cluster.indices || [];
       }
     };
 
@@ -3404,6 +3365,96 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
   return this;
 
 });
+
+kopf.factory('ClusterService', ['$timeout', 'ElasticService', 'SettingsService',
+  'AlertService',
+  function($timeout, ElasticService, SettingsService, AlertService) {
+
+    this.cluster = null;
+    this.clusterHealth = null;
+
+    var instance = this;
+
+    this.refresh = function() {
+      if (ElasticService.isConnected()) {
+        $timeout(function() {
+          ElasticService.client.getClusterDetail(
+              function(cluster) {
+                cluster.computeChanges(instance.cluster);
+                instance.cluster = cluster;
+                instance.alertClusterChanges();
+              },
+              function(error) {
+                AlertService.error('Error refreshing cluster state', error);
+                instance.cluster = null;
+              }
+          );
+          ElasticService.client.getClusterHealth(
+              function(clusterHealth) {
+                instance.clusterHealth = clusterHealth;
+              },
+              function(error) {
+                instance.clusterHealth = null;
+                AlertService.error('Error refreshing cluster health', error);
+              }
+          );
+        }, 100);
+      } else {
+        this.cluster = null;
+        this.cluster_health = null;
+      }
+    };
+
+    this.autoRefreshCluster = function() {
+      this.refresh();
+      $timeout(function() {
+        instance.autoRefreshCluster();
+      }, SettingsService.getRefreshInterval());
+    };
+
+    this.autoRefreshCluster();
+
+    this.alertClusterChanges = function() {
+      if (isDefined(this.cluster)) {
+        var changes = this.cluster.changes;
+        if (changes.hasChanges()) {
+          if (changes.hasJoins()) {
+            var joins = changes.nodeJoins.map(function(node) {
+              return node.name + '[' + node.transport_address + ']';
+            });
+            AlertService.info(joins.length + ' new node(s) joined the cluster',
+                joins);
+          }
+          if (changes.hasLeaves()) {
+            var leaves = changes.nodeLeaves.map(function(node) {
+              return node.name + '[' + node.transport_address + ']';
+            });
+            AlertService.warn(changes.nodeLeaves.length +
+                ' node(s) left the cluster', leaves);
+          }
+          if (changes.hasCreatedIndices()) {
+            var created = changes.indicesCreated.map(function(index) {
+              return index.name;
+            });
+            AlertService.info(changes.indicesCreated.length +
+                ' indices created: [' + created.join(',') + ']');
+          }
+          if (changes.hasDeletedIndices()) {
+            var deleted = changes.indicesDeleted.map(function(index) {
+              return index.name;
+            });
+            AlertService.info(changes.indicesDeleted.length +
+                ' indices deleted: [' + deleted.join(',') + ']');
+          }
+        }
+      }
+    };
+
+    return this;
+
+  }
+
+]);
 
 function AceEditor(target) {
   // ace editor
