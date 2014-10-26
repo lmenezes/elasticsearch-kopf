@@ -97,7 +97,6 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
 
     $scope.initializeController = function() {
       $scope.indices = $scope.cluster.open_indices();
-      console.log($scope.indices);
     };
 
   }

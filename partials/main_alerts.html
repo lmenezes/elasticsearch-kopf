@@ -4,7 +4,7 @@
 			<i class="fa fa-times-circle"></i>
 		</span>
 		<i ng-class="a.icon" class="big-icon">&nbsp;</i>
-		<a ng-class="a.class" data-toggle="collapse" data-parent="#alert_box_{{a.id}}" href="#alert_details_{{a.id}}" ng-show="a.hasResponse()">
+		<a ng-class="a.class" data-toggle="collapse" data-parent="#alert_box_{{a.id}}" target="_self" href="#alert_details_{{a.id}}" ng-show="a.hasResponse()">
 			{{a.message}}
 		</a>
 		<span ng-show="!a.hasResponse()">{{a.message}}</span>

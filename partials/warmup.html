@@ -6,7 +6,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#newWarmupAccordion" href="#newWarmupQuery">
+								<a data-toggle="collapse" data-parent="#newWarmupAccordion" target="_self" href="#newWarmupQuery">
 									create warmer
 								</a>
 							</h4>
@@ -58,7 +58,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#warmupListAccordion" href="#warmupQueries">
+								<a data-toggle="collapse" data-parent="#warmupListAccordion" target="_self" href="#warmupQueries">
 									registered warmers
 								</a>
 							</h4>
@@ -104,11 +104,11 @@
                                                 <td>{{warmer.id}}</td>
 												<td>{{warmer.types}}</td>
                                                 <td class="table-actions">{{warmer.source}}
-													<a data-toggle="modal" href="#confirm_dialog" 
+													<a data-toggle="modal" target="_self" href="#confirm_dialog"
 													class="remove-icon" data-backdrop="static">
 														<i class="fa fa-times remove-icon" title="remove query" ng-click="deleteWarmupQuery(warmer)"></i>
 													</a>
-													<a data-toggle="modal" href="#" 
+													<a data-toggle="modal" target="_self" href="#"
 													class="details-icon" data-backdrop="static">
 														<i class="fa fa-info-circle details-icon" title="view details" ng-click="displayInfo('warmup query ' + warmer.id,warmer.source)"></i>
 													</a>

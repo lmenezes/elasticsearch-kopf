@@ -6,7 +6,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#newPercolatorAccordion" href="#newPercolatorQuery">
+								<a data-toggle="collapse" data-parent="#newPercolatorAccordion" target="_self" href="#newPercolatorQuery">
 									create new percolator query
 								</a>
 							</h4>
@@ -53,7 +53,7 @@
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#percolatorListAccordion" href="#percolatorQueries">
+								<a data-toggle="collapse" data-parent="#percolatorListAccordion" target="_self" href="#percolatorQueries">
 									registered percolator queries
 								</a>
 							</h4>
@@ -110,7 +110,7 @@
 												<tr ng-repeat="q in pagination.getPage()">
 													<td>{{q.id}}</td>
 													<td>{{q.source}}
-														<a data-toggle="modal" href="#confirm_dialog"	class="remove-icon" data-backdrop="static" data-keyboard="false">
+														<a data-toggle="modal" target="_self" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false">
 															<i class="fa fa-times remove-icon" ng-click="deletePercolatorQuery(q)"></i>
 														</a>
 													</td>

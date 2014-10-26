@@ -2,7 +2,7 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-				<a data-toggle="collapse" data-parent="#repositoriesAccordion" href="#repositoryAccordionContent">
+				<a data-toggle="collapse" data-parent="#repositoriesAccordion" target="_self" href="#repositoryAccordionContent">
 					repositories
 				</a>
 			</h4>
@@ -42,7 +42,7 @@
 							<tr ng-repeat="r in repositories track by $index" ng-show="r != null">
 								<td>
                                     {{r.name}}
-                                    <a data-toggle="modal" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false">
+                                    <a data-toggle="modal" target="_self" href="#confirm_dialog" class="remove-icon" data-backdrop="static" data-keyboard="false">
                                         <i class="fa fa-times remove-icon" ng-click="deleteRepository(r)"></i>
                                     </a>
                                     <span class="normal-action" ng-click="displayInfo(r.name,r.settings)">

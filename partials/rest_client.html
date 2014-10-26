@@ -5,14 +5,14 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title">
-							<a data-toggle="collapse" data-parent="#restRequestAccordion" href="#restRequest">request</a>
+							<a data-toggle="collapse" data-parent="#restRequestAccordion" target="_self" href="#restRequest">request</a>
 						</h4>
 					</div>
 					<div id="restRequest" class="panel-collapse collapse in">
 						<div class="panel-body">
 							<div>
 								<span class="history-icon">
-									<a title="show/hide request history" data-toggle="collapse" data-parent="#restAccordion" href="#restHistory"><i class="fa fa-history"></i></a>
+									<a title="show/hide request history" data-toggle="collapse" data-parent="#restAccordion" target="_self" href="#restHistory"><i class="fa fa-history"></i></a>
 								</span>
 								<span>
 									<select ng-model="request.method" class="form-control input-sm rest-client-request-method">
@@ -25,7 +25,7 @@
 										<input type="text" ng-model="request.path" class="form-control input-sm" placeholder="path relative to connected node (e.g.: /index/type/_search)">
 									</span>
 									<div id="restHistory" class="panel-collapse collapse" style="margin-right: 30px">
-										<a data-toggle="collapse" data-parent="#restAccordion" href="#restHistory">
+										<a data-toggle="collapse" data-parent="#restAccordion" target="_self" href="#restHistory">
 											<span>
 												<table class="table table-striped table-condensed" style="width: 100%; margin-bottom: 0px;">
 													<tr ng-repeat="h in history" ng-click="loadFromHistory(h)" title="{{h.body}}" class="normal-action">
@@ -63,7 +63,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h4 class="panel-title">
-							<a data-toggle="collapse" data-parent="#restResponseAccordion" href="#restResponse">response</a>
+							<a data-toggle="collapse" data-parent="#restResponseAccordion" target="_self" href="#restResponse">response</a>
 						</h4>
 					</div>
 					<div id="restResponse" class="panel-collapse collapse in" style="min-height: 691px">

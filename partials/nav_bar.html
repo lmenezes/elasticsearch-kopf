@@ -6,7 +6,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand dropdown-toggle navbar-cluster-status-{{cluster_health.status}}" href="#" data-toggle="dropdown">kopf
+			<a class="navbar-brand dropdown-toggle navbar-cluster-status-{{cluster_health.status}}" href="#" target="_self" data-toggle="dropdown">kopf
 				<i class="fa fa-fw fa-caret-down navbar-logo-action"></i>
 			</a>
 			<ul class="dropdown-menu form-horizontal navbar-app-settings">
@@ -102,7 +102,7 @@
 			</ul>
             <ul class="nav navbar-nav navbar-cluster-status-{{cluster_health.status}} navbar-right visible-lg">
                 <li class="connect-menu">
-                    <a class="dropdown-toggle navbar-cluster-status-{{cluster_health.status}}" href="#" data-toggle="dropdown">
+                    <a class="dropdown-toggle navbar-cluster-status-{{cluster_health.status}}" target="_self" href="#" data-toggle="dropdown">
                         {{current_host}} <i class="fa fa-fw fa-plug"></i>
                     </a>
                     <ul class="dropdown-menu form-horizontal navbar-app-settings">
@@ -116,7 +116,7 @@
                         <li ng-show="host_history.length > 0"><h5>previous hosts</h5></li>
                         <li ng-show="host_history.length > 0" class="divider"></li>
                         <li ng-show="host_history.length > 0" ng-repeat="host in host_history" ng-click="connectToHost(host.host)">
-                            <a href="#" class="host-history">{{host.host}}</a>
+                            <a target="_self" href="#" class="host-history">{{host.host}}</a>
                         </li>
                     </ul>
                 </li>
