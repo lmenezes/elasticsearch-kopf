@@ -1,7 +1,9 @@
 kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
-  '$sce', 'AlertService', 'ConfirmDialogService', 'ElasticService',
-  function($scope, $location, $timeout, $sce, AlertService,
+  '$sce', '$http', 'AlertService', 'ConfirmDialogService', 'ElasticService',
+  function($scope, $location, $timeout, $sce, $http, AlertService,
            ConfirmDialogService, ElasticService) {
+
+    var defaultDescription = 'Cluster information delivered by kopf';
     $scope.shared_url = '';
     $scope.results = null;
 
@@ -75,57 +77,44 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
     };
 
     $scope.publishClusterHealth = function() {
-      var gist = {};
-      gist.description = 'Cluster information delivered by kopf';
+      var gist = {description: defaultDescription, public: true};
       if (notEmpty($scope.gist_title)) {
         gist.description = $scope.gist_title;
       }
-      gist.public = true;
-      gist.files = {};
+      var files = {};
       if (isDefined($scope.results)) {
         if (isDefined($scope.results.health_raw)) {
           var health = JSON.stringify($scope.results.health_raw, undefined, 4);
-          gist.files.health = {'content': health,
-            'indent': '2', 'language': 'JSON'
-          };
+          files.health = {'content': health, 'indent': '2', 'language': 'JSON'};
         }
         if (isDefined($scope.results.state_raw)) {
           var state = JSON.stringify($scope.results.state_raw, undefined, 4);
-          gist.files.state = {'content': state,
-            'indent': '2', 'language': 'JSON'
-          };
+          files.state = {'content': state, 'indent': '2', 'language': 'JSON'};
         }
         if (isDefined($scope.results.stats_raw)) {
           var stats = JSON.stringify($scope.results.stats_raw, undefined, 4);
-          gist.files.stats = {'content': stats,
-            'indent': '2', 'language': 'JSON'
-          };
+          files.stats = {'content': stats, 'indent': '2', 'language': 'JSON'};
         }
         if (isDefined($scope.results.hot_threads)) {
-          var hotThreads = $scope.results.hot_threads;
-          gist.files.hot_threads = {'content': hotThreads,
+          var ht = $scope.results.hot_threads;
+          files.hot_threads = {'content': ht,
             'indent': '2', 'language': 'JSON'
           };
         }
       }
+      gist.files = files;
       var data = JSON.stringify(gist, undefined, 4);
-      var url = 'https://api.github.com/gists';
-      $.ajax({type: 'POST', url: url, dataType: 'json', data: data})
-          .done(function(response) {
-            $scope.updateModel(function() {
-              $scope.addToHistory(new Gist(gist.description,
-                  response.html_url));
-              AlertService.success('Cluster health information successfully ' +
-                      'shared at: ' + response.html_url,
-                  null, 60000);
-            });
-          })
-          .fail(function(response) {
-            $scope.updateModel(function() {
-              AlertService.error('Error while publishing Gist', responseText);
-            });
-          }
-      );
+
+      $http({method: 'POST', url: 'https://api.github.com/gists', data: data}).
+          success(function(data, status, headers, config) {
+            $scope.addToHistory(new Gist(gist.description, data.html_url));
+            AlertService.success('Cluster health information successfully ' +
+                    'shared at: ' + data.html_url,
+                null, 60000);
+          }).
+          error(function(data, status, headers, config) {
+            AlertService.error('Error while publishing Gist', data);
+          });
     };
 
     $scope.addToHistory = function(gist) {
