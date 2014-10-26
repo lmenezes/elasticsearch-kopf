@@ -2,59 +2,59 @@
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">concurrent_streams</label>
-			<a target="_self" href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="defaults to 3" data-original-title="concurrent_streams" title="">
+			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="defaults to 3">
 				<i class="fa fa-info-circle"></i>
-			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.concurrent_streams']" placeholder="">
+			</span>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.concurrent_streams']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">file_chunk_size</label>
-			<a target="_self" href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="defaults to 512kb" data-original-title="file_chunk_size" title="">
+			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="defaults to 512kb">
 				<i class="fa fa-info-circle"></i>
-			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.file_chunk_size']" placeholder="">
+			</span>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.file_chunk_size']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">translog_ops</label>
-			<a target="_self" href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="defaults to 1000" data-original-title="translog_ops" title="">
+			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="defaults to 1000">
 				<i class="fa fa-info-circle"></i>
-			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.translog_ops']" placeholder="">
+			</span>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.translog_ops']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">translog_size</label>
-			<a target="_self" href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="defaults to 512kb" data-original-title="translog_size" title="">
+			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="defaults to 512kb">
 				<i class="fa fa-info-circle"></i>
-			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.translog_size']" placeholder="">
+			</span>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.translog_size']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">max_bytes_per_sec</label>
-			<a target="_self" href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="defaults to 20mb" data-original-title="max_bytes_per_sec" title="">
+			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="defaults to 20mb">
 				<i class="fa fa-info-circle"></i>
-			</a>
-			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.max_bytes_per_sec']" placeholder="">
+			</span>
+			<input type="text" class="form-control input-sm" ng-model="settings[active_settings]['indices.recovery.max_bytes_per_sec']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="form-group">
 			<label class="form-label">compress</label>
-			<a target="_self" href="#" class="setting-info" data-container="body" data-trigger="hover" data-toggle="popover" data-placement="bottom" data-content="defaults to true" data-original-title="compress" title="">
+			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="defaults to true">
 				<i class="fa fa-info-circle"></i>
-			</a>
+			</span>
 			<BR>
 			<label class="cluster-map-node-type">
 				<!-- input type checkbox margin-top -5px -->
-				<input type="checkbox" ng-model="settings[active_settings]['indices.recovery.compress']" ng-true-value="true"  class=""> True
-				<input type="checkbox" ng-model="settings[active_settings]['indices.recovery.compress']" ng-true-value="false"  class=""> False
+				<input type="checkbox" ng-model="settings[active_settings]['indices.recovery.compress']" ng-true-value="true"> True
+				<input type="checkbox" ng-model="settings[active_settings]['indices.recovery.compress']" ng-true-value="false"> False
 			</label>			
 		</div>
 	</div>	
