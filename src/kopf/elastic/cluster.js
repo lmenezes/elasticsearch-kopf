@@ -28,8 +28,6 @@ function Cluster(state, status, nodes, settings, aliases) {
     var nodeState = state.nodes[nodeId];
     var nodeStats = nodes.nodes[nodeId];
     var node = new Node(nodeId, nodeState, nodeStats);
-    totalSize += parseInt(node.size_in_bytes);
-    numDocs += node.docs;
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }
@@ -52,6 +50,8 @@ function Cluster(state, status, nodes, settings, aliases) {
     if (index.special) {
       specialIndices++;
     }
+    totalSize += parseInt(index.total_size);
+    numDocs += index.num_docs;
     return index;
   });
 
