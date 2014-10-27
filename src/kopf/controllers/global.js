@@ -26,11 +26,12 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
           var location = $scope.readParameter('location');
           var url = $location.absUrl();
           if (isDefined(location)) {
-              host = location;
-          } else if (url.indexOf("/_plugin/kopf") > -1) {
-              host = url.substring(0, url.indexOf("/_plugin/kopf"));
+            host = location;
+          } else if (url.indexOf('/_plugin/kopf') > -1) {
+            host = url.substring(0, url.indexOf('/_plugin/kopf'));
           } else {
-              host = $location.protocol() + "://" + $location.host() + ":" + $location.port();
+            host = $location.protocol() + '://' + $location.host() +
+                ':' + $location.port();
           }
         }
         ElasticService.connect(host);
