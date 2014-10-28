@@ -22,12 +22,11 @@ describe('ClusterOverviewController', function(){
         this.ElasticService = $injector.get('ElasticService');
         this.ElasticService.client = {};
         this.AlertService = $injector.get('AlertService');
-        this.IndexSettingsService = $injector.get('IndexSettingsService');
         this.ConfirmDialogService = $injector.get('ConfirmDialogService');
         this.SettingsService = $injector.get('SettingsService');
         this.ClusterService = $injector.get('ClusterService');
         this.createController = function() {
-            return $controller('ClusterOverviewController', {$scope: this.scope, $window: $window}, this.IndexSettingsService, this.ConfirmDialogService, this.AlertService, this.SettingsService, this.ClusterService);
+            return $controller('ClusterOverviewController', {$scope: this.scope, $window: $window}, this.ConfirmDialogService, this.AlertService, this.SettingsService, this.ClusterService);
         };
         this._controller = this.createController();
     }));

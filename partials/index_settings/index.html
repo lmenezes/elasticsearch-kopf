@@ -5,7 +5,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="number of replicas each shard has. value must be a number equal or greather than 0">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.number_of_replicas']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.number_of_replicas']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -14,7 +14,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="limit on the number of concurrent threads that are allowed to perform indexing at the same time. defaults to 8">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.index_concurrency']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.index_concurrency']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -23,7 +23,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="enables/disables warmpup">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.warmer.enabled']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.warmer.enabled']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -32,7 +32,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="the async refresh interval of a shard">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.refresh_interval']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.refresh_interval']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -41,7 +41,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="the lucene reader term index divisor">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.term_index_divisor']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.term_index_divisor']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -50,7 +50,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="disables temporarily the purge of expired docs">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<select ng-model="service.editable_settings['index.ttl.disable_purge']" class="form-control input-sm">
+			<select ng-model="editable_settings['index.ttl.disable_purge']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
@@ -62,7 +62,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="should fail when index settings merge isn't successful">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.fail_on_merge_failure']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.fail_on_merge_failure']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -71,7 +71,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="time for which elasticsearch keeps information about deleted documents. value should be a time interval(defaults to 1m)">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.gc_deletes']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.gc_deletes']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -80,7 +80,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="codec. defaults to default">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.codec']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.codec']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -89,7 +89,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="new segments (create by indexing, not by merging) should be written in compound format. Boolean setting, defaults to true">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.compound_on_flush']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.compound_on_flush']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -98,7 +98,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="the lucene index term interval. only applies to newly created docs">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.term_index_interval']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.term_index_interval']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -107,7 +107,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="set to an actual value (like 0-all) or false to disable it">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.auto_expand_replicas']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.auto_expand_replicas']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -116,7 +116,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="when using local gateway a particular shard is recovered only if there can be allocated quorum shards in the cluster. it can be set to quorum (default), quorum-1 (or half), full and full-1. number values are also supported, e.g. 1">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.recovery.initial_shards']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.recovery.initial_shards']">
 		</div>
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
@@ -125,7 +125,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="Use the compound file. The compound format reduces the number of open file handles when using file based storage, but is less performant. Boolean setting, defaults to false.">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.compound_format']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.compound_format']">
 		</div>
 	</div>
 </div>

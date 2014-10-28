@@ -1,16 +1,5 @@
 var kopf = angular.module('kopf', ['ngRoute']);
 
-kopf.factory('IndexSettingsService', function() {
-
-  this.loadSettings = function(index, settings) {
-    this.index = index;
-    this.settings = settings;
-    this.editable_settings = new EditableIndexSettings(settings);
-  };
-
-  return this;
-});
-
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
   this.header = 'Default Header';

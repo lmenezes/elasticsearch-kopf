@@ -5,7 +5,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="disable shards allocation. defaults to false">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<select ng-model="service.editable_settings['index.routing.allocation.disable_allocation']" class="form-control input-sm">
+			<select ng-model="editable_settings['index.routing.allocation.disable_allocation']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
@@ -17,7 +17,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="disable new shards allocation. defaults to false">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<select ng-model="service.editable_settings['index.routing.allocation.disable_new_allocation']" class="form-control input-sm">
+			<select ng-model="editable_settings['index.routing.allocation.disable_new_allocation']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
@@ -29,7 +29,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="disable shard replica allocation. defaults to false">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<select ng-model="service.editable_settings['index.routing.allocation.disable_replica_allocation']" class="form-control input-sm">
+			<select ng-model="editable_settings['index.routing.allocation.disable_replica_allocation']" class="form-control input-sm">
 				<option value="true">true</option>
 				<option value="false">false</option>
 			</select>
@@ -41,7 +41,7 @@
 			<span class="setting-info" data-toggle="tooltip" data-placement="bottom" title="maximum number of shards for this index that each node can have">
 				<i class="fa fa-info-circle"></i>
 			</span>
-			<input type="text" class="form-control input-sm" ng-model="service.editable_settings['index.routing.allocation.total_shards_per_node']">
+			<input type="text" class="form-control input-sm" ng-model="editable_settings['index.routing.allocation.total_shards_per_node']">
 		</div>
 	</div>
 </div>

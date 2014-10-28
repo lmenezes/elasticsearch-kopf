@@ -1349,17 +1349,6 @@ function IndexMetadata(index, metadata) {
 
 var kopf = angular.module('kopf', ['ngRoute']);
 
-kopf.factory('IndexSettingsService', function() {
-
-  this.loadSettings = function(index, settings) {
-    this.index = index;
-    this.settings = settings;
-    this.editable_settings = new EditableIndexSettings(settings);
-  };
-
-  return this;
-});
-
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
   this.header = 'Default Header';
@@ -1840,10 +1829,10 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
 ]);
 
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
-  'IndexSettingsService', 'ConfirmDialogService', 'AlertService',
-  'ElasticService', 'SettingsService', 'ClusterService',
-  function($scope, $window, IndexSettingsService, ConfirmDialogService,
-           AlertService, ElasticService, SettingsService, ClusterService) {
+  'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService',
+  'ClusterService',
+  function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
+           SettingsService, ClusterService) {
 
     $scope.cluster = null;
     $scope.cluster_health = null;
@@ -2324,18 +2313,19 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
   }
 ]);
 
-kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
-  'IndexSettingsService', 'AlertService', 'ElasticService', 'ClusterService',
-  function($scope, $location, $timeout, IndexSettingsService, AlertService,
-           ElasticService, ClusterService) {
+kopf.controller('IndexSettingsController', ['$scope', '$location',
+  'AlertService', 'ElasticService', 'ClusterService',
+  function($scope, $location, AlertService, ElasticService, ClusterService) {
 
-    $scope.service = IndexSettingsService;
+    $scope.index = null;
+    $scope.settings = null;
+    $scope.editable_settings = null;
 
     $scope.save = function() {
-      var index = $scope.service.index;
-      var settings = $scope.service.settings;
+      var index = $scope.index;
+      var settings = $scope.settings;
       var newSettings = {};
-      var editableSettings = $scope.service.editable_settings;
+      var editableSettings = $scope.editable_settings;
       // TODO: could move that to editable_index_settings model
       editableSettings.valid_settings.forEach(function(setting) {
         if (notEmpty(editableSettings[setting])) {
@@ -2359,11 +2349,15 @@ kopf.controller('IndexSettingsController', ['$scope', '$location', '$timeout',
       var index = $location.search().index;
       ElasticService.client.getIndexMetadata(index,
           function(metadata) {
-            IndexSettingsService.loadSettings(index, metadata.settings);
+            $scope.index = index;
+            $scope.settings = metadata.settings;
+            $scope.editable_settings = new EditableIndexSettings(
+                $scope.settings
+            );
           },
           function(error) {
             AlertService.error('Error while loading index settings for [' +
-                index + ']',
+                    index + ']',
                 error);
           }
       );
