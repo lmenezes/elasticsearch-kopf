@@ -768,7 +768,7 @@ function ElasticClient(connection, httpService, q) {
       httpService.get(host +
         '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
       httpService.get(host + '/_status', params),
-      httpService.get(host + '/_nodes/stats?all=true', params),
+      httpService.get(host + '/_nodes/stats/jvm,fs,os,indices', params),
       httpService.get(host + '/_cluster/settings', params),
       httpService.get(host + '/_aliases', params)
     ]).then(
