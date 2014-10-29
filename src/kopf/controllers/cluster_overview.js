@@ -315,5 +315,17 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
+    $scope.showNodeStats = function(nodeId) {
+      ElasticService.client.getNodeStats(nodeId,
+          function(nodeStats) {
+            $scope.displayInfo('stats for node ' + nodeStats.name,
+                nodeStats.stats);
+          },
+          function(error) {
+            AlertService.error('Error while loading node stats', error);
+          }
+      );
+    };
+
   }
 ]);

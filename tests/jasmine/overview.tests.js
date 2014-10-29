@@ -426,4 +426,26 @@ describe('ClusterOverviewController', function(){
         expect(this.scope.index_paginator.setPageSize).not.toHaveBeenCalled();
     });
 
+    it('show node stats', function(){
+      var stats = { nodes: {} };
+      stats.nodes['nodeId'] = {name: 'nodeName'};
+      this.ElasticService.client.getNodeStats=function(nodeId, success, failed) { return success(new NodeStats(nodeId, stats.nodes[nodeId])); };
+      this.scope.displayInfo=function(header, body) {};
+      spyOn(this.ElasticService.client, "getNodeStats").andCallThrough();
+      spyOn(this.scope, "displayInfo").andReturn();
+      this.scope.showNodeStats("nodeId");
+      expect(this.ElasticService.client.getNodeStats).toHaveBeenCalledWith("nodeId", jasmine.any(Function), jasmine.any(Function));
+      expect(this.scope.displayInfo).toHaveBeenCalledWith("stats for node nodeName", stats.nodes['nodeId']);
+    });
+
+    it('show node stats if request fails', function(){
+      this.ElasticService.client.getNodeStats=function(nodeId, success, failed) { return failed("buuuu"); };
+      this.scope.displayInfo=function(header, body) {};
+      spyOn(this.ElasticService.client, "getNodeStats").andCallThrough();
+      spyOn(this.AlertService, "error").andReturn();
+      this.scope.showNodeStats("nodeId");
+      expect(this.ElasticService.client.getNodeStats).toHaveBeenCalledWith("nodeId", jasmine.any(Function), jasmine.any(Function));
+      expect(this.AlertService.error).toHaveBeenCalledWith("Error while loading node stats", "buuuu");
+    });
+
 });

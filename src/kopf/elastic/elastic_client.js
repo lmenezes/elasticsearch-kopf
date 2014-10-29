@@ -147,6 +147,14 @@ function ElasticClient(connection, httpService, q) {
     this.clusterRequest('GET', path, {}, transformed, callbackError);
   };
 
+  this.getNodeStats = function(nodeId, callbackSuccess, callbackError) {
+    var transformed = function(response) {
+      callbackSuccess(new NodeStats(name, response.nodes[nodeId]));
+    };
+    var path = '/_nodes/' + nodeId + '/stats/';
+    this.clusterRequest('GET', path, {}, transformed, callbackError);
+  };
+
   this.fetchAliases = function(callbackSuccess, callbackError) {
     var createAliases = function(response) {
       var indices = Object.keys(response);

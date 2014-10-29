@@ -539,6 +539,14 @@ function ElasticClient(connection, httpService, q) {
     this.clusterRequest('GET', path, {}, transformed, callbackError);
   };
 
+  this.getNodeStats = function(nodeId, callbackSuccess, callbackError) {
+    var transformed = function(response) {
+      callbackSuccess(new NodeStats(name, response.nodes[nodeId]));
+    };
+    var path = '/_nodes/' + nodeId + '/stats/';
+    this.clusterRequest('GET', path, {}, transformed, callbackError);
+  };
+
   this.fetchAliases = function(callbackSuccess, callbackError) {
     var createAliases = function(response) {
       var indices = Object.keys(response);
@@ -1344,6 +1352,12 @@ function IndexMetadata(index, metadata) {
   };
 }
 
+function NodeStats(id, stats) {
+  this.id = id;
+  this.name = stats.name;
+  this.stats = stats;
+}
+
 var kopf = angular.module('kopf', ['ngRoute']);
 
 // manages behavior of confirmation dialog
@@ -2138,6 +2152,18 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           },
           function(error) {
             AlertService.error('Error while loading index mappings', error);
+          }
+      );
+    };
+
+    $scope.showNodeStats = function(nodeId) {
+      ElasticService.client.getNodeStats(nodeId,
+          function(nodeStats) {
+            $scope.displayInfo('stats for node ' + nodeStats.name,
+                nodeStats.stats);
+          },
+          function(error) {
+            AlertService.error('Error while loading node stats', error);
           }
       );
     };

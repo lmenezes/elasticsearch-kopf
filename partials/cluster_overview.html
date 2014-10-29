@@ -68,7 +68,7 @@
 		    			<i ng-class="{true:'fa fa-fw fa-search',false:''}[node.client]" title="client node"></i>
 		    			<i ng-class="{true:'fa fa-fw fa-hdd-o',false:''}[node.data]" title="data node"></i>
 		    		</span>
-		    		<span class="normal-action" ng-click="displayInfo(node.name + ' node stats',node.metadata)" title="view node stats">
+		    		<span class="normal-action" ng-click="showNodeStats(node.id)" title="view node stats">
 		    			{{node.name}}
 		    		</span>
                         </div>
