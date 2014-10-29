@@ -58,7 +58,6 @@ test("cluster creating", function() {
 		ok(size_pattern.test(node.disk_total), "Checking disk total [" + node.disk_total + "]");
 		ok(size_pattern.test(node.disk_free), "Checking free disk [" + node.disk_total + "]");
 		ok(node.disk_used_percent >= 0 && node.disk_used_percent <= 100, "Checking disk usage in percent [" + node.disk_used_percent + "]");
-		ok(size_pattern.test(node.size), "Checking node sotre size [" + node.size + "]");
 		ok(size_pattern.test(node.heap_used), "Checking node heap used [" + node.heap_used + "]");
 		ok(size_pattern.test(node.heap_committed), "Checking node heap commited [" + node.heap_committed + "]");
 		ok(size_pattern.test(node.heap_max), "Checking max heap size [" + node.heap_max + "]");
@@ -66,7 +65,6 @@ test("cluster creating", function() {
 		ok(node.cpu_user >= 0 && number_pattern.test(node.cpu_user), "Checking os user cpu [" + node.cpu_user + "]");
 		ok(node.cpu_sys >= 0 && number_pattern.test(node.cpu_sys), "Checking os sys cpu [" + node.cpu_sys + "]");
 		equal(node.id.length, 22, "Checking node id length");
-		ok(number_pattern.test(node.docs), "Checking number of documents per node " + node.docs);
 		if (node.current_master) {
 			master_nodes += 1;
 			equal(master_node, node.id, "Checking current master");

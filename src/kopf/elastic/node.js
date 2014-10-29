@@ -36,9 +36,6 @@ function Node(nodeId, nodeInfo, nodeStats) {
 
   this.cpu_user = getProperty(this.stats, 'os.cpu.user');
   this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
-  this.docs = getProperty(this.stats, 'indices.docs.count');
-  this.size_in_bytes = getProperty(this.stats, 'indices.store.size_in_bytes');
-  this.size = readablizeBytes(this.size_in_bytes);
 
   this.setCurrentMaster = function() {
     this.current_master = true;
