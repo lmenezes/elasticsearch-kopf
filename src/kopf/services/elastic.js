@@ -1,5 +1,5 @@
 kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
-  function($http, $q, ExternalSettingsService) {
+  'DebugService', function($http, $q, ExternalSettingsService, DebugService) {
 
     this.client = null;
     this.connection = null;

@@ -2391,9 +2391,9 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
 
 kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
   'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  'ClusterService',
+  'ClusterService', 'DebugService',
   function($scope, $location, SettingsService, ThemeService, ElasticService,
-           AlertService, HostHistoryService, ClusterService) {
+           AlertService, HostHistoryService, ClusterService, DebugService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
@@ -2403,6 +2403,14 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     $scope.host_history = HostHistoryService.getHostHistory();
 
     $scope.clusterStatus = '';
+
+    $scope.debugEnabled = DebugService.isEnabled();
+
+    $scope.$watch('debugEnabled',
+        function(newValue, oldValue) {
+          DebugService.toggleEnabled();
+        }
+    );
 
     $scope.$watch(
         function() {
@@ -3264,7 +3272,7 @@ kopf.factory('ThemeService', function() {
 });
 
 kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
-  function($http, $q, ExternalSettingsService) {
+  'DebugService', function($http, $q, ExternalSettingsService, DebugService) {
 
     this.client = null;
     this.connection = null;
@@ -3475,6 +3483,26 @@ kopf.factory('ClusterService', ['$timeout', 'ElasticService', 'SettingsService',
   }
 
 ]);
+
+kopf.factory('DebugService', function() {
+
+  this.enabled = false;
+
+  this.toggleEnabled = function() {
+    this.enabled = !this.enabled;
+  };
+
+  this.isEnabled = function() {
+    return this.enabled;
+  };
+
+  this.debug = function(message) {
+    console.log(message);
+  };
+
+  return this;
+
+});
 
 function AceEditor(target) {
   // ace editor

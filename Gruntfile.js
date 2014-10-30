@@ -90,6 +90,7 @@ module.exports = function(grunt) {
           'src/kopf/services/host_history.js',
           'src/kopf/services/external_settings.js',
           'src/kopf/services/cluster_service.js',
+          'src/kopf/services/debug.js',
           // MODELS
           'src/kopf/models/ace_editor.js',
           'src/kopf/models/gist.js',
@@ -183,6 +184,7 @@ module.exports = function(grunt) {
           'src/kopf/services/host_history.js',
           'src/kopf/services/external_settings.js',
           'src/kopf/services/cluster_service.js',
+          'src/kopf/services/debug.js',
           // MODELS
           'src/kopf/models/ace_editor.js',
           'src/kopf/models/gist.js',

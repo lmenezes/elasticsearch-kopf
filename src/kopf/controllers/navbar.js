@@ -1,8 +1,8 @@
 kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
   'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  'ClusterService',
+  'ClusterService', 'DebugService',
   function($scope, $location, SettingsService, ThemeService, ElasticService,
-           AlertService, HostHistoryService, ClusterService) {
+           AlertService, HostHistoryService, ClusterService, DebugService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
@@ -12,6 +12,14 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     $scope.host_history = HostHistoryService.getHostHistory();
 
     $scope.clusterStatus = '';
+
+    $scope.debugEnabled = DebugService.isEnabled();
+
+    $scope.$watch('debugEnabled',
+        function(newValue, oldValue) {
+          DebugService.toggleEnabled();
+        }
+    );
 
     $scope.$watch(
         function() {
