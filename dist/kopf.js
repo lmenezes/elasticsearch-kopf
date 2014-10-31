@@ -2840,23 +2840,20 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
 
     this.connect = function(url) {
       var root = ExternalSettingsService.getElasticsearchRootPath();
-      var withCredentials = ExternalSettingsService.withCredentials();
+      this.withCredentials = ExternalSettingsService.withCredentials();
       try {
         this.connection = null;
         if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
           url = 'http://' + url;
         }
-        this.connection = new ESConnection(url + root, withCredentials);
+        this.connection = new ESConnection(url + root, this.withCredentials);
         this.auth = this.createAuthToken(
             this.connection.username,
             this.connection.password
         );
         var version = this.fetchVersion();
         this.connected = true;
-        console.log('connected!');
       } catch (error) {
-        console.log('not connected!');
-        console.log(error);
         this.connected = false;
         throw {
           message: 'Error while connecting to [' + url + root + ']',
@@ -2867,17 +2864,23 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
 
     this.fetchVersion = function() {
       var connection = this.connection;
-      var params = {type: 'GET', url: connection.host + '/', dataType: 'json',
+      var params = {
+        type: 'GET',
+        url: connection.host + '/',
+        dataType: 'json',
+        async: false,
         beforeSend: function(xhr) {
           if (isDefined(this.auth)) {
+            DebugService.debug('XHR Authorization header [' + this.auth + ']');
             xhr.setRequestHeader('Authorization', this.auth);
           }
-          if (this.withCredentials) {
-            xhr.withCredentials = true;
-          }
-        },
-        async: false
+        }
       };
+      if (this.withCredentials) {
+        params.xhrFields = {withCredentials: true};
+      }
+      DebugService.debug('Fetching cluster version with params:');
+      DebugService.debug(params);
       var fetchVersion = $.ajax(params);
       var client = this;
       fetchVersion.done(function(response) {
@@ -3503,9 +3506,9 @@ kopf.factory('ClusterService', ['$timeout', 'ElasticService', 'SettingsService',
 
 ]);
 
-kopf.factory('DebugService', function() {
+kopf.factory('DebugService', ['$location', function($location) {
 
-  this.enabled = false;
+  this.enabled = $location.search().debug === 'true';
 
   this.toggleEnabled = function() {
     this.enabled = !this.enabled;
@@ -3523,7 +3526,7 @@ kopf.factory('DebugService', function() {
 
   return this;
 
-});
+}]);
 
 function AceEditor(target) {
   // ace editor

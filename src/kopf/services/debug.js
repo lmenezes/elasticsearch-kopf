@@ -1,6 +1,6 @@
-kopf.factory('DebugService', function() {
+kopf.factory('DebugService', ['$location', function($location) {
 
-  this.enabled = false;
+  this.enabled = $location.search().debug === 'true';
 
   this.toggleEnabled = function() {
     this.enabled = !this.enabled;
@@ -18,4 +18,4 @@ kopf.factory('DebugService', function() {
 
   return this;
 
-});
+}]);
