@@ -109,7 +109,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
       if (adds.length === 0 && deletes.length === 0) {
         AlertService.warn('No changes were made: nothing to save');
       } else {
-        ElasticService.client.updateAliases(adds, deletes,
+        ElasticService.updateAliases(adds, deletes,
             function(response) {
               AlertService.success('Aliases were successfully updated',
                   response);
@@ -123,7 +123,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
     };
 
     $scope.loadAliases = function() {
-      ElasticService.client.fetchAliases(
+      ElasticService.fetchAliases(
           function(indexAliases) {
             $scope.original = indexAliases.map(function(ia) {
               return ia.clone();

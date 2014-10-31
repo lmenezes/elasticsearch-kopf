@@ -13,7 +13,7 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
 
     $scope.save = function() {
       var settings = JSON.stringify($scope.settings, undefined, '');
-      ElasticService.client.updateClusterSettings(settings,
+      ElasticService.updateClusterSettings(settings,
           function(response) {
             AlertService.success('Cluster settings were successfully updated',
                 response);

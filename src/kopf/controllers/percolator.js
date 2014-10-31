@@ -49,10 +49,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
           query.sourceAsJSON(),
           'Delete',
           function() {
-            ElasticService.client.deletePercolatorQuery(query.index, query.id,
+            ElasticService.deletePercolatorQuery(query.index, query.id,
                 function(response) {
                   var refreshIndex = query.index;
-                  ElasticService.client.refreshIndex(refreshIndex,
+                  ElasticService.refreshIndex(refreshIndex,
                       function(response) {
                         AlertService.success('Query successfully deleted',
                             response);
@@ -88,10 +88,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
         AlertService.error('Query must be defined');
         return;
       }
-      ElasticService.client.createPercolatorQuery($scope.new_query,
+      ElasticService.createPercolatorQuery($scope.new_query,
           function(response) {
             var refreshIndex = $scope.new_query.index;
-            ElasticService.client.refreshIndex(refreshIndex,
+            ElasticService.refreshIndex(refreshIndex,
                 function(response) {
                   AlertService.success('Percolator Query successfully created',
                       response);
@@ -125,7 +125,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
         if (queries.length > 0) {
           body.query = {bool: {must: queries}};
         }
-        ElasticService.client.fetchPercolateQueries($scope.index, body,
+        ElasticService.fetchPercolateQueries($scope.index, body,
             function(percolators) {
               $scope.pagination = percolators;
             },

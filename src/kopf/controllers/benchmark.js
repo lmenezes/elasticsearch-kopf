@@ -36,7 +36,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
       $('#benchmark-result').html('');
       try {
         var json = $scope.bench.toJson();
-        ElasticService.client.executeBenchmark(json,
+        ElasticService.executeBenchmark(json,
             function(response) {
               $scope.result = JSONTree.create(response);
               $('#benchmark-result').html($scope.result);

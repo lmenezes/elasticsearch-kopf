@@ -15,7 +15,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
     };
 
     $scope.updateEditor = function() {
-      ElasticService.client.getIndexMetadata($scope.source_index,
+      ElasticService.getIndexMetadata($scope.source_index,
           function(meta) {
             var body = {settings: meta.settings, mappings: meta.mappings};
             $scope.editor.setValue(JSON.stringify(body, null, 2));
@@ -45,7 +45,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
             }
             bodyString = JSON.stringify(body);
           }
-          ElasticService.client.createIndex($scope.name, bodyString,
+          ElasticService.createIndex($scope.name, bodyString,
               function(response) {
                 ClusterService.refresh();
               },

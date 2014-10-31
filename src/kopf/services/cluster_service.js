@@ -10,7 +10,7 @@ kopf.factory('ClusterService', ['$timeout', 'ElasticService', 'SettingsService',
     this.refresh = function() {
       if (ElasticService.isConnected()) {
         $timeout(function() {
-          ElasticService.client.getClusterDetail(
+          ElasticService.getClusterDetail(
               function(cluster) {
                 cluster.computeChanges(instance.cluster);
                 instance.cluster = cluster;
@@ -21,7 +21,7 @@ kopf.factory('ClusterService', ['$timeout', 'ElasticService', 'SettingsService',
                 instance.cluster = null;
               }
           );
-          ElasticService.client.getClusterHealth(
+          ElasticService.getClusterHealth(
               function(clusterHealth) {
                 instance.clusterHealth = clusterHealth;
               },

@@ -11,8 +11,12 @@ describe('IndexSettingsController', function() {
     var mock = {search: function() {
       return {index: 'testIndex'};
     }};
+    var mockElastic = {isConnected: function() {
+      return true;
+    }};
     module(function($provide) {
       $provide.value('$location', mock);
+      $provide.value('ElasticService', mockElastic);
     });
   });
 
@@ -24,7 +28,6 @@ describe('IndexSettingsController', function() {
     this.AlertService = $injector.get('AlertService');
     this.ElasticService = $injector.get('ElasticService');
     this.ClusterService = $injector.get('ClusterService');
-    this.ElasticService.client = {};
     this.createController = function() {
       return $controller('IndexSettingsController', {$scope: this.scope},
           $location,
@@ -41,13 +44,13 @@ describe('IndexSettingsController', function() {
   });
 
   it('correctly initializes controller when created', function() {
-    var client = this.ElasticService.client;
+    var client = this.ElasticService;
     client.getIndexMetadata = function(index, successCallback, errorCallback) {
       successCallback({settings: { a: 'b'}});
     };
-    spyOn(this.ElasticService.client, 'getIndexMetadata').andCallThrough();
+    spyOn(this.ElasticService, 'getIndexMetadata').andCallThrough();
     this.scope.initializeController();
-    expect(this.ElasticService.client.getIndexMetadata).toHaveBeenCalledWith(
+    expect(this.ElasticService.getIndexMetadata).toHaveBeenCalledWith(
         'testIndex', jasmine.any(Function), jasmine.any(Function)
     );
     expect(this.scope.index).toEqual('testIndex');
@@ -59,18 +62,18 @@ describe('IndexSettingsController', function() {
   });
 
   it('alerts if there is a problem loading the index settings', function() {
-    var client = this.ElasticService.client;
+    var client = this.ElasticService;
     client.getIndexMetadata = function(index, successCallback, errorCallback) {
       errorCallback('pff');
     };
-    spyOn(this.ElasticService.client, 'getIndexMetadata').andCallThrough();
+    spyOn(this.ElasticService, 'getIndexMetadata').andCallThrough();
     spyOn(this.AlertService, 'error');
     this.scope.initializeController();
-    expect(this.ElasticService.client.getIndexMetadata).toHaveBeenCalledWith(
+    expect(this.ElasticService.getIndexMetadata).toHaveBeenCalledWith(
         'testIndex', jasmine.any(Function), jasmine.any(Function)
     );
     expect(this.AlertService.error).toHaveBeenCalledWith(
-            'Error while loading index settings for [testIndex]',
+        'Error while loading index settings for [testIndex]',
         'pff'
     );
   });
@@ -80,18 +83,22 @@ describe('IndexSettingsController', function() {
     this.scope.settings = {'index.codec': 'fakeCodec', 'nonValidSetting': 'useless'};
     this.scope.editable_settings = new EditableIndexSettings({'index.codec': 'fakeCodec'});
 
-    var client = this.ElasticService.client;
-    client.updateIndexSettings = function(index, body, successCallback, errorCallback) {
+    var client = this.ElasticService;
+    client.updateIndexSettings = function(index, body, successCallback,
+                                          errorCallback) {
       successCallback({greatSuccess: '!!'});
     };
     spyOn(this.AlertService, 'success');
     spyOn(this.ClusterService, 'refresh');
-    spyOn(this.ElasticService.client, 'updateIndexSettings').andCallThrough();
+    spyOn(this.ElasticService, 'updateIndexSettings').andCallThrough();
     this.scope.save();
-    expect(this.ElasticService.client.updateIndexSettings).toHaveBeenCalledWith(
-        'editedIndex', JSON.stringify({'index.codec': 'fakeCodec'}, undefined, ''), jasmine.any(Function), jasmine.any(Function)
+    expect(this.ElasticService.updateIndexSettings).toHaveBeenCalledWith(
+        'editedIndex',
+        JSON.stringify({'index.codec': 'fakeCodec'}, undefined, ''),
+        jasmine.any(Function), jasmine.any(Function)
     );
-    expect(this.AlertService.success).toHaveBeenCalledWith('Index settings were successfully updated', {greatSuccess: '!!'});
+    expect(this.AlertService.success).toHaveBeenCalledWith('Index settings were successfully updated',
+        {greatSuccess: '!!'});
     expect(this.ClusterService.refresh).toHaveBeenCalled();
   });
 
@@ -106,7 +113,7 @@ describe('IndexSettingsController', function() {
 //      newSettings[setting] = editableSettings[setting];
 //    }
 //  });
-//  ElasticService.client.updateIndexSettings(index,
+//  ElasticService.updateIndexSettings(index,
 //      JSON.stringify(newSettings, undefined, ''),
 //      function(response) {
 //        AlertService.success('Index settings were successfully updated',
@@ -117,7 +124,6 @@ describe('IndexSettingsController', function() {
 //        AlertService.error('Error while updating index settings', error);
 //      }
 //  );
-
 
 
 });

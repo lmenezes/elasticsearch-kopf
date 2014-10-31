@@ -32,7 +32,7 @@ kopf.controller('WarmupController', [
         $scope.editor.format();
         if (!isDefined($scope.editor.error)) {
           $scope.warmer.source = $scope.editor.getValue();
-          ElasticService.client.registerWarmupQuery($scope.warmer,
+          ElasticService.registerWarmupQuery($scope.warmer,
               function(response) {
                 $scope.loadIndexWarmers();
                 AlertService.success('Warmup query successfully registered',
@@ -55,7 +55,7 @@ kopf.controller('WarmupController', [
           warmer.source,
           'Delete',
           function() {
-            ElasticService.client.deleteWarmupQuery(warmer,
+            ElasticService.deleteWarmupQuery(warmer,
                 function(response) {
                   AlertService.success('Warmup query successfully deleted',
                       response);
@@ -72,7 +72,7 @@ kopf.controller('WarmupController', [
 
     $scope.loadIndexWarmers = function() {
       if (isDefined($scope.index)) {
-        ElasticService.client.getIndexWarmers($scope.index, '',
+        ElasticService.getIndexWarmers($scope.index, '',
             function(warmers) {
               $scope.paginator.setCollection(warmers);
               $scope.page = $scope.paginator.getPage();

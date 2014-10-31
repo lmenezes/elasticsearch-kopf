@@ -45,7 +45,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.executeDeleteRepository = function(repository) {
-      ElasticService.client.deleteRepository(repository.name,
+      ElasticService.deleteRepository(repository.name,
           function(response) {
             AlertService.success('Repository successfully deleted', response);
             if (notEmpty($scope.snapshot_repository) &&
@@ -87,7 +87,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
       $scope.optionalParam(body, $scope.restore_snap, 'rename_replacement');
       $scope.optionalParam(body, $scope.restore_snap, 'rename_pattern');
 
-      ElasticService.client.restoreSnapshot($scope.snapshot_repository,
+      ElasticService.restoreSnapshot($scope.snapshot_repository,
           $scope.snapshot.name, JSON.stringify(body),
           function(response) {
             AlertService.success('Snapshot Restored Started');
@@ -103,7 +103,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     $scope.createRepository = function() {
       try {
         $scope.repository_form.validate();
-        ElasticService.client.createRepository($scope.repository_form.name,
+        ElasticService.createRepository($scope.repository_form.name,
             $scope.repository_form.asJson(),
             function(response) {
               AlertService.success('Repository created');
@@ -119,7 +119,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.loadRepositories = function() {
-      ElasticService.client.getRepositories(
+      ElasticService.getRepositories(
           function(response) {
             $scope.repositories = response;
           },
@@ -156,7 +156,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
 
       $scope.optionalParam(body, $scope.new_snap, 'ignore_unavailable');
 
-      ElasticService.client.createSnapshot($scope.new_snap.repository.name,
+      ElasticService.createSnapshot($scope.new_snap.repository.name,
           $scope.new_snap.name, JSON.stringify(body),
           function(response) {
             AlertService.success('Snapshot created');
@@ -174,7 +174,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
           snapshot,
           'Delete',
           function() {
-            ElasticService.client.deleteSnapshot(
+            ElasticService.deleteSnapshot(
                 $scope.snapshot_repository,
                 snapshot.name,
                 function(response) {
@@ -191,7 +191,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.fetchSnapshots = function(repository) {
-      ElasticService.client.getSnapshots(repository,
+      ElasticService.getSnapshots(repository,
           function(response) {
             $scope.paginator.setCollection(response);
             $scope.page = $scope.paginator.getPage();

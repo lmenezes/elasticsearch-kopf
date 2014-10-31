@@ -5,6 +5,16 @@ describe('RestController', function() {
 
   beforeEach(angular.mock.module('kopf'));
 
+  beforeEach(function() {
+    module('kopf');
+    var mock = {isConnected: function() {
+      return true;
+    }};
+    module(function($provide) {
+      $provide.value('ElasticService', mock);
+    });
+  });
+
   beforeEach(angular.mock.inject(function($rootScope, $controller, $injector) {
     this.scope = $rootScope.$new();
     var $timeout = $injector.get('$timeout');
@@ -12,7 +22,6 @@ describe('RestController', function() {
     this.AlertService = $injector.get('AlertService');
     this.AceEditorService = $injector.get('AceEditorService');
     this.ElasticService = $injector.get('ElasticService');
-    this.ElasticService.client = {};
     this.createController = function() {
       return $controller('RestController', {$scope: this.scope}, $location,
           $timeout, this.AlertService, this.AceEditorService,
@@ -119,13 +128,13 @@ describe('RestController', function() {
 
   it('executes a correct request', function() {
     this.scope.request = new Request("/test_rest/_search", "POST", "{'uno': 'dos'}");
-    this.ElasticService.client.clusterRequest = function() {};
+    this.ElasticService.clusterRequest = function() {};
     this.scope.editor = { format: function() { return "{'uno': 'dos'}"; } };
     spyOn(this.AlertService, 'warn').andReturn(true);
     spyOn(this.scope.editor, 'format').andCallThrough();
-    spyOn(this.ElasticService.client, 'clusterRequest').andReturn(true);
+    spyOn(this.ElasticService, 'clusterRequest').andReturn(true);
     this.scope.sendRequest();
-    expect(this.ElasticService.client.clusterRequest).toHaveBeenCalledWith("POST", "/test_rest/_search", "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
+    expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("POST", "/test_rest/_search", "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
     expect(this.AlertService.warn).not.toHaveBeenCalled();
   });
 
@@ -138,13 +147,13 @@ describe('RestController', function() {
 
   it('executes a GET request with non empty body', function() {
     this.scope.request = new Request("/test_rest/_search", "GET", "{'uno': 'dos'}");
-    this.ElasticService.client.clusterRequest = function() {};
+    this.ElasticService.clusterRequest = function() {};
     this.scope.editor = { format: function() { return "{'uno': 'dos'}"; } };
     spyOn(this.AlertService, 'info').andReturn(true);
     spyOn(this.scope.editor, 'format').andCallThrough();
-    spyOn(this.ElasticService.client, 'clusterRequest').andReturn(true);
+    spyOn(this.ElasticService, 'clusterRequest').andReturn(true);
     this.scope.sendRequest();
-    expect(this.ElasticService.client.clusterRequest).toHaveBeenCalledWith("GET", "/test_rest/_search", "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
+    expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("GET", "/test_rest/_search", "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
     expect(this.AlertService.info).toHaveBeenCalledWith('You are executing a GET request with body ' +
         'content. Maybe you meant to use POST or PUT?');
   });

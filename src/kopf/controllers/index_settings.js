@@ -17,7 +17,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
           newSettings[setting] = editableSettings[setting];
         }
       });
-      ElasticService.client.updateIndexSettings(index,
+      ElasticService.updateIndexSettings(index,
           JSON.stringify(newSettings, undefined, ''),
           function(response) {
             AlertService.success('Index settings were successfully updated',
@@ -32,7 +32,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
 
     $scope.initializeController = function() {
       var index = $location.search().index;
-      ElasticService.client.getIndexMetadata(index,
+      ElasticService.getIndexMetadata(index,
           function(metadata) {
             $scope.index = index;
             $scope.settings = metadata.settings;

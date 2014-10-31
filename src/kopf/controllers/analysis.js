@@ -30,7 +30,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
       $scope.field_type = '';
       $scope.field_field = '';
       if (notEmpty(index)) {
-        ElasticService.client.getIndexMetadata(index,
+        ElasticService.getIndexMetadata(index,
             function(metadata) {
               $scope.field_index_metadata = metadata;
             },
@@ -51,7 +51,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     $scope.loadIndexAnalyzers = function(index) {
       $scope.analyzer_analyzer = '';
       if (notEmpty(index)) {
-        ElasticService.client.getIndexMetadata(index,
+        ElasticService.getIndexMetadata(index,
             function(metadata) {
               $scope.analyzer_index_metadata = metadata;
             },
@@ -66,7 +66,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     $scope.analyzeByField = function() {
       if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
         $scope.field_tokens = null;
-        ElasticService.client.analyzeByField($scope.field_index.name,
+        ElasticService.analyzeByField($scope.field_index.name,
             $scope.field_type, $scope.field_field, $scope.field_text,
             function(response) {
               $scope.field_tokens = response;
@@ -83,7 +83,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
       if (notEmpty($scope.analyzer_analyzer) &&
           notEmpty($scope.analyzer_text)) {
         $scope.analyzer_tokens = null;
-        ElasticService.client.analyzeByAnalyzer($scope.analyzer_index.name,
+        ElasticService.analyzeByAnalyzer($scope.analyzer_index.name,
             $scope.analyzer_analyzer, $scope.analyzer_text,
             function(response) {
               $scope.analyzer_tokens = response;

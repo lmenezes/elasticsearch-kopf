@@ -96,7 +96,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.shutdownNode = function(nodeId) {
-      ElasticService.client.shutdownNode(nodeId,
+      ElasticService.shutdownNode(nodeId,
           function(response) {
             AlertService.success('Node [' + nodeId + '] successfully shutdown',
                 response);
@@ -123,7 +123,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.optimizeIndex = function(index) {
-      ElasticService.client.optimizeIndex(index,
+      ElasticService.optimizeIndex(index,
           function(response) {
             AlertService.success('Index was successfully optimized', response);
           },
@@ -147,7 +147,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.deleteIndex = function(index) {
-      ElasticService.client.deleteIndex(index,
+      ElasticService.deleteIndex(index,
           function(response) {
             ClusterService.refresh();
           },
@@ -170,7 +170,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.clearCache = function(index) {
-      ElasticService.client.clearCache(index,
+      ElasticService.clearCache(index,
           function(response) {
             AlertService.success('Index cache was successfully cleared',
                 response);
@@ -194,7 +194,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.refreshIndex = function(index) {
-      ElasticService.client.refreshIndex(index,
+      ElasticService.refreshIndex(index,
           function(response) {
             AlertService.success('Index was successfully refreshed', response);
           },
@@ -217,7 +217,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.enableAllocation = function() {
-      ElasticService.client.enableShardAllocation(
+      ElasticService.enableShardAllocation(
           function(response) {
             AlertService.success('Shard allocation was successfully enabled',
                 response);
@@ -230,7 +230,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.disableAllocation = function() {
-      ElasticService.client.disableShardAllocation(
+      ElasticService.disableShardAllocation(
           function(response) {
             AlertService.success('Shard allocation was successfully disabled',
                 response);
@@ -243,7 +243,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.closeIndex = function(index) {
-      ElasticService.client.closeIndex(index,
+      ElasticService.closeIndex(index,
           function(response) {
             AlertService.success('Index was successfully closed', response);
             ClusterService.refresh();
@@ -268,7 +268,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.openIndex = function(index) {
-      ElasticService.client.openIndex(index,
+      ElasticService.openIndex(index,
           function(response) {
             AlertService.success('Index was successfully opened', response);
             ClusterService.refresh();
@@ -292,7 +292,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.showIndexSettings = function(index) {
-      ElasticService.client.getIndexMetadata(index,
+      ElasticService.getIndexMetadata(index,
           function(metadata) {
             $scope.displayInfo('settings for index ' + index,
                 metadata.settings);
@@ -304,7 +304,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.showIndexMappings = function(index) {
-      ElasticService.client.getIndexMetadata(index,
+      ElasticService.getIndexMetadata(index,
           function(metadata) {
             $scope.displayInfo('mappings for index ' + index,
                 metadata.mappings);
@@ -316,7 +316,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     };
 
     $scope.showNodeStats = function(nodeId) {
-      ElasticService.client.getNodeStats(nodeId,
+      ElasticService.getNodeStats(nodeId,
           function(nodeStats) {
             $scope.displayInfo('stats for node ' + nodeStats.name,
                 nodeStats.stats);

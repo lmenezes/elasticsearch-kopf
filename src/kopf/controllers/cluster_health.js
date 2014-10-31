@@ -37,7 +37,7 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
       $scope.results = null;
       var infoId = AlertService.info('Loading cluster health state. ' +
           'This could take a few moments.', {}, 30000);
-      ElasticService.client.getClusterDiagnosis($scope.retrieveHealth,
+      ElasticService.getClusterDiagnosis($scope.retrieveHealth,
           $scope.retrieveState, $scope.retrieveStats, $scope.retrieveHotThreads,
           function(responses) {
             $scope.state = '';

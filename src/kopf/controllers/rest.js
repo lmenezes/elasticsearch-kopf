@@ -59,7 +59,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
           AlertService.info('You are executing a GET request with body ' +
               'content. Maybe you meant to use POST or PUT?');
         }
-        ElasticService.client.clusterRequest($scope.request.method,
+        ElasticService.clusterRequest($scope.request.method,
             $scope.request.path, $scope.request.body,
             function(response) {
               var content = response;
