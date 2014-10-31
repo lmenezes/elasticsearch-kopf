@@ -11,7 +11,9 @@ kopf.factory('DebugService', function() {
   };
 
   this.debug = function(message) {
-    console.log(message);
+    if (this.isEnabled()) {
+      console.log(message);
+    }
   };
 
   return this;
