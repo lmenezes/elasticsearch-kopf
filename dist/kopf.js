@@ -1392,9 +1392,9 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
 
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
   'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService',
-  'ClusterService',
+  'ClusterService', 'OverviewFilter',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
-           SettingsService, ClusterService) {
+           SettingsService, ClusterService, OverviewFilter) {
 
     $scope.cluster = null;
     $scope.cluster_health = null;
@@ -1417,18 +1417,23 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       return auto ? columns : 5;
     };
 
-    $scope.index_paginator = new Paginator(1, $scope.getPageSize(), [],
-        new IndexFilter('', '', true, 0));
+    $scope.index_paginator = new Paginator(
+        OverviewFilter.page,
+        $scope.getPageSize(),
+        [],
+        OverviewFilter.index
+    );
 
     $scope.page = $scope.index_paginator.getPage();
 
-    $scope.node_filter = new NodeFilter('', true, true, true, 0);
+    $scope.node_filter = OverviewFilter.node;
 
     $scope.nodes = [];
 
-    $scope.$watch(function() {
-      return ClusterService.clusterHealth;
-    },
+    $scope.$watch(
+        function() {
+          return ClusterService.clusterHealth;
+        },
         function(newValue, oldValue) {
           if (isDefined(ClusterService.clusterHealth)) {
             $scope.cluster_health = ClusterService.clusterHealth;
@@ -1438,9 +1443,10 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
         }
     );
 
-    $scope.$watch(function() {
-      return ClusterService.cluster;
-    },
+    $scope.$watch(
+        function() {
+          return ClusterService.cluster;
+        },
         function(newValue, oldValue) {
           if (isDefined(ClusterService.cluster)) {
             $scope.cluster = ClusterService.cluster;
@@ -1462,13 +1468,15 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       }
     }, true);
 
-    $scope.$watch('node_filter', function(filter, previous) {
-      if (isDefined(ClusterService.cluster)) {
-        $scope.setNodes(ClusterService.cluster.nodes);
-      } else {
-        $scope.setNodes([]);
-      }
-    }, true);
+    $scope.$watch('node_filter',
+        function(filter, previous) {
+          if (isDefined(ClusterService.cluster)) {
+            $scope.setNodes(ClusterService.cluster.nodes);
+          } else {
+            $scope.setNodes([]);
+          }
+        },
+        true);
 
     $scope.setNodes = function(nodes) {
       $scope.nodes = nodes.filter(function(node) {
@@ -3527,6 +3535,18 @@ kopf.factory('DebugService', ['$location', function($location) {
   return this;
 
 }]);
+
+kopf.factory('OverviewFilter', function() {
+
+  this.node = new NodeFilter('', true, true, true, 0);
+
+  this.index = new IndexFilter('', '', true, 0);
+
+  this.page = 1;
+
+  return this;
+
+});
 
 function AceEditor(target) {
   // ace editor

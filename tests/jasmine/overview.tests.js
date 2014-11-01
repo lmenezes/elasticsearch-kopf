@@ -15,6 +15,11 @@ describe('ClusterOverviewController', function() {
       $provide.value('ElasticService', {isConnected: function() {
         return true;
       }});
+      $provide.value('OverviewFilter',{
+        node: new NodeFilter("", true, true, true, 0),
+        index: new IndexFilter('', '', true, 0),
+        page: 1
+      });
     });
   });
 
@@ -28,10 +33,13 @@ describe('ClusterOverviewController', function() {
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
     this.SettingsService = $injector.get('SettingsService');
     this.ClusterService = $injector.get('ClusterService');
+    this.OverviewFilter = $injector.get('OverviewFilter');
     this.createController = function() {
       return $controller('ClusterOverviewController',
           {$scope: this.scope, $window: $window}, this.ConfirmDialogService,
-          this.AlertService, this.SettingsService, this.ClusterService);
+          this.AlertService, this.SettingsService, this.ClusterService,
+          this.OverviewFilter
+      );
     };
     this._controller = this.createController();
   }));

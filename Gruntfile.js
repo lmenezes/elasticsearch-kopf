@@ -91,6 +91,7 @@ module.exports = function(grunt) {
           'src/kopf/services/external_settings.js',
           'src/kopf/services/cluster_service.js',
           'src/kopf/services/debug.js',
+          'src/kopf/services/overview_filter.js',
           // MODELS
           'src/kopf/models/ace_editor.js',
           'src/kopf/models/gist.js',
@@ -185,6 +186,7 @@ module.exports = function(grunt) {
           'src/kopf/services/external_settings.js',
           'src/kopf/services/cluster_service.js',
           'src/kopf/services/debug.js',
+          'src/kopf/services/overview_filter.js',
           // MODELS
           'src/kopf/models/ace_editor.js',
           'src/kopf/models/gist.js',
