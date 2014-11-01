@@ -1,7 +1,6 @@
 kopf.controller('AliasesController', ['$scope', 'AlertService',
-  'AceEditorService', 'ElasticService', 'ClusterService',
-  function($scope, AlertService, AceEditorService, ElasticService,
-           ClusterService) {
+  'AceEditorService', 'ElasticService',
+  function($scope, AlertService, AceEditorService, ElasticService) {
 
     $scope.paginator = new Paginator(1, 10, [], new AliasFilter('', ''));
     $scope.page = $scope.paginator.getPage();
@@ -138,7 +137,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ClusterService.cluster.indices;
+      $scope.indices = ElasticService.cluster.indices;
       $scope.loadAliases();
       $scope.initEditor();
     };

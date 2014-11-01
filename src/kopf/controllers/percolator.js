@@ -1,7 +1,7 @@
 kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'AceEditorService', 'ElasticService', 'ClusterService',
+  'AlertService', 'AceEditorService', 'ElasticService',
   function($scope, ConfirmDialogService, AlertService, AceEditorService,
-           ElasticService, ClusterService) {
+           ElasticService) {
     $scope.editor = undefined;
     $scope.pagination = new PercolatorsPage(0, 0, 0, []);
 
@@ -139,7 +139,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ClusterService.cluster.indices;
+      $scope.indices = ElasticService.cluster.indices;
       $scope.initEditor();
     };
 

@@ -20,12 +20,10 @@ describe('AliasesController', function() {
     var $timeout = $injector.get('$timeout');
     var $location = $injector.get('$location');
     this.AlertService = $injector.get('AlertService');
-    this.ClusterService = $injector.get('ClusterService');
     this.ElasticService = $injector.get('ElasticService');
     this.createController = function() {
       return $controller('AliasesController', {$scope: this.scope}, $location,
-          $timeout, this.AlertService, this.ElasticService,
-          this.ClusterService);
+          $timeout, this.AlertService, this.ElasticService);
     };
     this._controller = this.createController();
   }));
@@ -45,7 +43,7 @@ describe('AliasesController', function() {
   });
 
   it('on : makes calls loadAliases and initEditor', function() {
-    this.ClusterService.cluster = { indices: [ 'one', 'two'] };
+    this.ElasticService.cluster = { indices: [ 'one', 'two'] };
     spyOn(this.scope, 'loadAliases').andReturn(true);
     spyOn(this.scope, 'initEditor').andReturn(true);
     this.scope.initializeController();

@@ -1,8 +1,8 @@
 kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
   'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  'ClusterService', 'DebugService',
+  'DebugService',
   function($scope, $location, SettingsService, ThemeService, ElasticService,
-           AlertService, HostHistoryService, ClusterService, DebugService) {
+           AlertService, HostHistoryService, DebugService) {
 
     $scope.new_refresh = SettingsService.getRefreshInterval();
     $scope.theme = ThemeService.getTheme();
@@ -23,11 +23,11 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
 
     $scope.$watch(
         function() {
-          return ClusterService.clusterHealth;
+          return ElasticService.clusterHealth;
         },
         function(newValue, oldValue) {
-          if (isDefined(ClusterService.clusterHealth)) {
-            $scope.clusterStatus = ClusterService.clusterHealth.status;
+          if (isDefined(ElasticService.clusterHealth)) {
+            $scope.clusterStatus = ElasticService.clusterHealth.status;
           } else {
             $scope.clusterStatus = '';
           }
@@ -49,7 +49,7 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
         AlertService.error('Error while connecting to new target host', error);
       } finally {
         $scope.current_host = ElasticService.connection.host;
-        ClusterService.refresh();
+        ElasticService.refresh();
       }
     };
 

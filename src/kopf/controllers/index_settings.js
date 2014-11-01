@@ -1,6 +1,6 @@
 kopf.controller('IndexSettingsController', ['$scope', '$location',
-  'AlertService', 'ElasticService', 'ClusterService',
-  function($scope, $location, AlertService, ElasticService, ClusterService) {
+  'AlertService', 'ElasticService',
+  function($scope, $location, AlertService, ElasticService) {
 
     $scope.index = null;
     $scope.settings = null;
@@ -22,7 +22,7 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
           function(response) {
             AlertService.success('Index settings were successfully updated',
                 response);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while updating index settings', error);

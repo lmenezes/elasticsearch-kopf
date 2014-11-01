@@ -1,9 +1,9 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
   '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService',
-  'SettingsService', 'ThemeService', 'ElasticService', 'ClusterService',
+  'SettingsService', 'ThemeService', 'ElasticService',
   function($scope, $location, $timeout, $http, $q, $sce, $window,
            ConfirmDialogService, AlertService, SettingsService, ThemeService,
-           ElasticService, ClusterService) {
+           ElasticService) {
 
     $scope.version = '1.3.8-SNAPSHOT';
     $scope.alert_service = AlertService;
@@ -42,10 +42,10 @@ kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
 
     $scope.connect();
 
-    ClusterService.refresh();
+    ElasticService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined(ClusterService.clusterHealth);
+      return isDefined(ElasticService.clusterHealth);
     };
 
     $scope.displayInfo = function(title, info) {

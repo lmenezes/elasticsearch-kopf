@@ -27,12 +27,11 @@ describe('NavbarController', function() {
     this.SettingsService = $injector.get('SettingsService');
     this.AlertService = $injector.get('AlertService');
     this.HostHistoryService = $injector.get('HostHistoryService');
-    this.ClusterService = $injector.get('ClusterService');
 
     this.createController = function() {
       return $controller('NavbarController', {$scope: this.scope},
           this.SettingsService, this.ThemeService, this.ElasticService,
-          this.AlertService, this.HostHistoryService, this.ClusterService);
+          this.AlertService, this.HostHistoryService);
     };
     this._controller = this.createController();
   }));
@@ -41,14 +40,14 @@ describe('NavbarController', function() {
   it('should connect to a different host', function() {
     spyOn(this.ElasticService, 'connect').andReturn(true);
     this.ElasticService.connection = { host: "http://newhost:1234"};
-    this.ClusterService.refresh = function() {
+    this.ElasticService.refresh = function() {
     };
-    spyOn(this.ClusterService, 'refresh').andReturn(true);
+    spyOn(this.ElasticService, 'refresh').andReturn(true);
     spyOn(this.HostHistoryService, 'addToHistory').andReturn(true);
     spyOn(this.HostHistoryService, 'getHostHistory').andReturn(['waaasss']);
     this.scope.connectToHost("http://newhost:1234");
     expect(this.ElasticService.connect).toHaveBeenCalledWith("http://newhost:1234");
-    expect(this.ClusterService.refresh).toHaveBeenCalled();
+    expect(this.ElasticService.refresh).toHaveBeenCalled();
     expect(this.scope.current_host).toEqual("http://newhost:1234");
     expect(this.HostHistoryService.addToHistory).toHaveBeenCalledWith("http://newhost:1234");
     expect(this.scope.host_history).toEqual(['waaasss']);
@@ -57,13 +56,13 @@ describe('NavbarController', function() {
   it('should handle error when connecting to a different host', function() {
     spyOn(this.ElasticService, 'connect').andThrow('pffff');
     this.ElasticService.connection = { host: "http://newhost:1234"};
-    this.ClusterService.refresh = function() {
+    this.ElasticService.refresh = function() {
     };
-    spyOn(this.ClusterService, 'refresh').andReturn(true);
+    spyOn(this.ElasticService, 'refresh').andReturn(true);
     spyOn(this.AlertService, 'error').andReturn(true);
     this.scope.connectToHost("http://newhost:1234");
     expect(this.ElasticService.connect).toHaveBeenCalledWith("http://newhost:1234");
-    expect(this.ClusterService.refresh).toHaveBeenCalled();
+    expect(this.ElasticService.refresh).toHaveBeenCalled();
     expect(this.scope.current_host).toEqual("http://newhost:1234");
     expect(this.AlertService.error).toHaveBeenCalledWith("Error while connecting to new target host",
         "pffff");
@@ -74,47 +73,47 @@ describe('NavbarController', function() {
         this.ElasticService.connect = function() {
         };
         spyOn(this.ElasticService, 'connect').andReturn(true);
-        this.ClusterService.refresh = function() {
+        this.ElasticService.refresh = function() {
         };
-        spyOn(this.ClusterService, 'refresh').andReturn(true);
+        spyOn(this.ElasticService, 'refresh').andReturn(true);
         this.scope.new_host = "http://newhost:1234";
         expect(this.scope.current_host).toEqual("http://localhost:9200");
         this.scope.handleConnectToHost({keyCode: 13}); // 13 = enter key code
         expect(this.ElasticService.connect).toHaveBeenCalledWith("http://newhost:1234");
-        expect(this.ClusterService.refresh).toHaveBeenCalled();
+        expect(this.ElasticService.refresh).toHaveBeenCalled();
       });
 
   it('should NOT change the target for the ElasticService if enter is not pressed',
       function() {
         spyOn(this.ElasticService, 'connect').andReturn(true);
-        this.ClusterService.refresh = function() {
+        this.ElasticService.refresh = function() {
         };
-        spyOn(this.ClusterService, 'refresh').andReturn(true);
+        spyOn(this.ElasticService, 'refresh').andReturn(true);
         this.scope.new_host = "http://newhost:1234";
         this.scope.handleConnectToHost({keyCode: 12}); // 13 = enter key code
         expect(this.ElasticService.connect).not.toHaveBeenCalled();
-        expect(this.ClusterService.refresh).not.toHaveBeenCalled();
+        expect(this.ElasticService.refresh).not.toHaveBeenCalled();
       });
 
   it('should NOT change the target for the ElasticService and refresh cluster state if not value is specified',
       function() {
         spyOn(this.ElasticService, 'connect').andReturn(true);
-        this.ClusterService.refresh = function() {
+        this.ElasticService.refresh = function() {
         };
-        spyOn(this.ClusterService, 'refresh').andReturn(true);
+        spyOn(this.ElasticService, 'refresh').andReturn(true);
         this.scope.new_host = "";
         this.scope.handleConnectToHost({keyCode: 13}); // 13 = enter key code
         expect(this.ElasticService.connect).not.toHaveBeenCalled();
-        expect(this.ClusterService.refresh).not.toHaveBeenCalled();
+        expect(this.ElasticService.refresh).not.toHaveBeenCalled();
       });
 
   it('should NOT change the target for the ElasticService and refresh cluster state if not value is specified',
       function() {
         spyOn(this.ElasticService, 'connect').andThrow("Y U NO CONNECT");
         spyOn(this.AlertService, 'error').andReturn(true);
-        this.ClusterService.refresh = function() {
+        this.ElasticService.refresh = function() {
         };
-        spyOn(this.ClusterService, 'refresh').andReturn(true);
+        spyOn(this.ElasticService, 'refresh').andReturn(true);
         this.scope.new_host = "a";
         this.scope.handleConnectToHost({keyCode: 13}); // 13 = enter key code
         expect(this.ElasticService.connect).toHaveBeenCalled();

@@ -19,10 +19,9 @@ describe('CreateIndexController', function() {
     this.scope = $rootScope.$new();
     this.AlertService = $injector.get('AlertService');
     this.ElasticService = $injector.get('ElasticService');
-    this.ClusterService = $injector.get('ClusterService');
     this.createController = function() {
       return $controller('CreateIndexController', {$scope: this.scope},
-          this.AlertService, this.ElasticService, this.ClusterService);
+          this.AlertService, this.ElasticService);
     };
     this._controller = this.createController();
   }));
@@ -80,7 +79,7 @@ describe('CreateIndexController', function() {
     this.scope.editor = { format: function() {
       return {};
     }, error: "Y U NO PARSE" };
-    this.ClusterService.refresh = function() {
+    this.ElasticService.refresh = function() {
     };
     spyOn(this.AlertService, 'error').andReturn();
     this.scope.createIndex();
@@ -89,7 +88,7 @@ describe('CreateIndexController', function() {
 
   it('should correctly create an index with the given settings', function() {
     this.scope.name = 'new_index';
-    this.ClusterService.refresh = function() {
+    this.ElasticService.refresh = function() {
     };
     this.scope.editor = { format: function() {
       return JSON.stringify({ settings: { } });
@@ -98,12 +97,12 @@ describe('CreateIndexController', function() {
       success();
     };
     spyOn(this.ElasticService, 'createIndex').andCallThrough();
-    spyOn(this.ClusterService, 'refresh').andReturn();
+    spyOn(this.ElasticService, 'refresh').andReturn();
     this.scope.createIndex();
     expect(this.ElasticService.createIndex).toHaveBeenCalledWith("new_index",
         JSON.stringify({ settings: { } }), jasmine.any(Function),
         jasmine.any(Function));
-    expect(this.ClusterService.refresh).toHaveBeenCalled();
+    expect(this.ElasticService.refresh).toHaveBeenCalled();
   });
 
   it('should read shards and replicas settings and settings body is empty',
@@ -111,7 +110,7 @@ describe('CreateIndexController', function() {
         this.scope.name = 'new_index';
         this.scope.shards = '4';
         this.scope.replicas = '5';
-        this.ClusterService.refresh = function() {
+        this.ElasticService.refresh = function() {
         };
         this.scope.editor = { format: function() {
           return JSON.stringify({});
@@ -120,12 +119,12 @@ describe('CreateIndexController', function() {
           success();
         };
         spyOn(this.ElasticService, 'createIndex').andCallThrough();
-        spyOn(this.ClusterService, 'refresh').andReturn();
+        spyOn(this.ElasticService, 'refresh').andReturn();
         this.scope.createIndex();
         expect(this.ElasticService.createIndex).toHaveBeenCalledWith("new_index",
             '{"settings":{"index":{"number_of_shards":"4","number_of_replicas":"5"}}}',
             jasmine.any(Function), jasmine.any(Function));
-        expect(this.ClusterService.refresh).toHaveBeenCalled();
+        expect(this.ElasticService.refresh).toHaveBeenCalled();
       });
 
 });

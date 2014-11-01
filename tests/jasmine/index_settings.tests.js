@@ -11,9 +11,12 @@ describe('IndexSettingsController', function() {
     var mock = {search: function() {
       return {index: 'testIndex'};
     }};
-    var mockElastic = {isConnected: function() {
-      return true;
-    }};
+    var mockElastic = {
+      isConnected: function() {
+        return true;
+      },
+      refresh: function() {}
+    };
     module(function($provide) {
       $provide.value('$location', mock);
       $provide.value('ElasticService', mockElastic);
@@ -27,12 +30,10 @@ describe('IndexSettingsController', function() {
     var $location = $injector.get('$location');
     this.AlertService = $injector.get('AlertService');
     this.ElasticService = $injector.get('ElasticService');
-    this.ClusterService = $injector.get('ClusterService');
     this.createController = function() {
       return $controller('IndexSettingsController', {$scope: this.scope},
           $location,
-          $timeout, this.AlertService, this.ElasticService,
-          this.ClusterService);
+          $timeout, this.AlertService, this.ElasticService);
     };
     this._controller = this.createController();
   }));
@@ -89,7 +90,7 @@ describe('IndexSettingsController', function() {
       successCallback({greatSuccess: '!!'});
     };
     spyOn(this.AlertService, 'success');
-    spyOn(this.ClusterService, 'refresh');
+    spyOn(this.ElasticService, 'refresh');
     spyOn(this.ElasticService, 'updateIndexSettings').andCallThrough();
     this.scope.save();
     expect(this.ElasticService.updateIndexSettings).toHaveBeenCalledWith(
@@ -99,7 +100,7 @@ describe('IndexSettingsController', function() {
     );
     expect(this.AlertService.success).toHaveBeenCalledWith('Index settings were successfully updated',
         {greatSuccess: '!!'});
-    expect(this.ClusterService.refresh).toHaveBeenCalled();
+    expect(this.ElasticService.refresh).toHaveBeenCalled();
   });
 
 
@@ -118,7 +119,7 @@ describe('IndexSettingsController', function() {
 //      function(response) {
 //        AlertService.success('Index settings were successfully updated',
 //            response);
-//        ClusterService.refresh();
+//        ElasticService.refresh();
 //      },
 //      function(error) {
 //        AlertService.error('Error while updating index settings', error);

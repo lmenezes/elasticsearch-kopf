@@ -1,5 +1,9 @@
-kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
-  'DebugService', function($http, $q, ExternalSettingsService, DebugService) {
+kopf.factory('ElasticService', ['$http', '$q', '$timeout',
+  'ExternalSettingsService', 'DebugService', 'SettingsService',
+  function($http, $q, $timeout, ExternalSettingsService, DebugService,
+      SettingsService) {
+
+    var instance = this;
 
     this.connection = null;
 
@@ -8,6 +12,50 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
     this.auth = null;
 
     this.withCredentials = false;
+
+    this.cluster = null;
+
+    this.clusterHealth = null;
+
+    this.isConnected = function() {
+      return this.connected;
+    };
+
+    this.alertClusterChanges = function() {
+      if (isDefined(this.cluster)) {
+        var changes = this.cluster.changes;
+        if (changes.hasChanges()) {
+          if (changes.hasJoins()) {
+            var joins = changes.nodeJoins.map(function(node) {
+              return node.name + '[' + node.transport_address + ']';
+            });
+            AlertService.info(joins.length + ' new node(s) joined the cluster',
+                joins);
+          }
+          if (changes.hasLeaves()) {
+            var leaves = changes.nodeLeaves.map(function(node) {
+              return node.name + '[' + node.transport_address + ']';
+            });
+            AlertService.warn(changes.nodeLeaves.length +
+                ' node(s) left the cluster', leaves);
+          }
+          if (changes.hasCreatedIndices()) {
+            var created = changes.indicesCreated.map(function(index) {
+              return index.name;
+            });
+            AlertService.info(changes.indicesCreated.length +
+                ' indices created: [' + created.join(',') + ']');
+          }
+          if (changes.hasDeletedIndices()) {
+            var deleted = changes.indicesDeleted.map(function(index) {
+              return index.name;
+            });
+            AlertService.info(changes.indicesDeleted.length +
+                ' indices deleted: [' + deleted.join(',') + ']');
+          }
+        }
+      }
+    };
 
     this.createAuthToken = function(username, password) {
       var hasAuth = isDefined(username) && isDefined(password);
@@ -80,10 +128,6 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
         throw error.statusText;
       });
 
-    };
-
-    this.isConnected = function() {
-      return this.connected;
     };
 
     this.getHost = function() {
@@ -501,6 +545,46 @@ kopf.factory('ElasticService', ['$http', '$q', 'ExternalSettingsService',
           }
       );
     };
+
+    this.refresh = function() {
+      if (this.isConnected()) {
+        $timeout(function() {
+          instance.getClusterDetail(
+              function(cluster) {
+                cluster.computeChanges(instance.cluster);
+                instance.cluster = cluster;
+                instance.alertClusterChanges();
+              },
+              function(error) {
+                AlertService.error('Error refreshing cluster state', error);
+                instance.cluster = null;
+              }
+          );
+          instance.getClusterHealth(
+              function(clusterHealth) {
+                instance.clusterHealth = clusterHealth;
+              },
+              function(error) {
+                instance.clusterHealth = null;
+                AlertService.error('Error refreshing cluster health', error);
+              }
+          );
+        }, 100);
+      } else {
+        this.cluster = null;
+        this.clusterHealth = null;
+      }
+    };
+
+    this.autoRefreshCluster = function() {
+      this.refresh();
+      var nextRefresh = function() {
+        instance.autoRefreshCluster();
+      };
+      $timeout(nextRefresh, SettingsService.getRefreshInterval());
+    };
+
+    this.autoRefreshCluster();
 
     return this;
 

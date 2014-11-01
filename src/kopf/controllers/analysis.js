@@ -1,7 +1,6 @@
 kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
-  'AlertService', 'ElasticService', 'ClusterService',
-  function($scope, $location, $timeout, AlertService, ElasticService,
-           ClusterService) {
+  'AlertService', 'ElasticService',
+  function($scope, $location, $timeout, AlertService, ElasticService) {
 
     $scope.indices = null;
 
@@ -97,7 +96,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ClusterService.cluster.open_indices();
+      $scope.indices = ElasticService.cluster.open_indices();
     };
 
   }

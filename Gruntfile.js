@@ -89,7 +89,6 @@ module.exports = function(grunt) {
           'src/kopf/services/elastic.js',
           'src/kopf/services/host_history.js',
           'src/kopf/services/external_settings.js',
-          'src/kopf/services/cluster_service.js',
           'src/kopf/services/debug.js',
           'src/kopf/services/overview_filter.js',
           // MODELS
@@ -184,7 +183,6 @@ module.exports = function(grunt) {
           'src/kopf/services/elastic.js',
           'src/kopf/services/host_history.js',
           'src/kopf/services/external_settings.js',
-          'src/kopf/services/cluster_service.js',
           'src/kopf/services/debug.js',
           'src/kopf/services/overview_filter.js',
           // MODELS

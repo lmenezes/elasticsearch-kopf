@@ -23,11 +23,10 @@ describe('AnalysisController', function() {
     var $timeout = $injector.get('$timeout');
     var $location = $injector.get('$location');
     this.AlertService = $injector.get('AlertService');
-    this.ClusterService = $injector.get('ClusterService');
 
     this.createController = function() {
       return $controller('AnalysisController', {$scope: this.scope}, $location,
-          $timeout, this.AlertService, this.ClusterService);
+          $timeout, this.AlertService);
     };
     this._controller = this.createController();
   }));
@@ -55,7 +54,7 @@ describe('AnalysisController', function() {
         return indices
       }
     };
-    this.ClusterService.cluster = cluster;
+    this.ElasticService.cluster = cluster;
     this.scope.initializeController('loadAnalysisEvent');
     expect(this.scope.indices).toEqual(indices);
   });

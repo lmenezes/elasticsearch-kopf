@@ -8,9 +8,12 @@ describe('GlobalController', function() {
   beforeEach(function() {
     module('kopf');
     module(function($provide) {
-      $provide.value('ElasticService', {isConnected: function() {
-        return true;
-      }});
+      $provide.value('ElasticService', {
+        isConnected: function() {
+          return true;
+        },
+        refresh: function() {}
+      });
     });
   });
 
@@ -54,8 +57,8 @@ describe('GlobalController', function() {
         isConnected: function() {
           return true;
         },
-        connect: function() {
-        }
+        refresh: function() {},
+        connect: function() {}
       });
     });
   });

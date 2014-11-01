@@ -22,13 +22,12 @@ describe('WarmupController', function() {
     var $location = $injector.get('$location');
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
     this.AlertService = $injector.get('AlertService');
-    this.ClusterService = $injector.get('ClusterService');
     this.AceEditorService = $injector.get('AceEditorService');
 
     this.createController = function() {
       return $controller('WarmupController', {$scope: this.scope}, $location,
           $timeout, this.ConfirmDialogService, this.AlertService,
-          this.AceEditorService, this.ClusterService);
+          this.AceEditorService);
     };
 
     this._controller = this.createController();
@@ -57,7 +56,7 @@ describe('WarmupController', function() {
   });
 
   it('Loads indices from cluster', function() {
-    this.ClusterService.cluster = { 'indices': ['a', 'b', 'c']}
+    this.ElasticService.cluster = { 'indices': ['a', 'b', 'c']}
     this.scope.loadIndices();
     expect(this.scope.indices).toEqual(['a', 'b', 'c']);
   });

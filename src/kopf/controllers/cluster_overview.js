@@ -1,8 +1,8 @@
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
   'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService',
-  'ClusterService', 'OverviewFilter',
+  'OverviewFilter',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
-           SettingsService, ClusterService, OverviewFilter) {
+           SettingsService, OverviewFilter) {
 
     $scope.cluster = null;
     $scope.cluster_health = null;
@@ -40,11 +40,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.$watch(
         function() {
-          return ClusterService.clusterHealth;
+          return ElasticService.clusterHealth;
         },
         function(newValue, oldValue) {
-          if (isDefined(ClusterService.clusterHealth)) {
-            $scope.cluster_health = ClusterService.clusterHealth;
+          if (isDefined(ElasticService.clusterHealth)) {
+            $scope.cluster_health = ElasticService.clusterHealth;
           } else {
             $scope.cluster_health = null;
           }
@@ -53,13 +53,13 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.$watch(
         function() {
-          return ClusterService.cluster;
+          return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ClusterService.cluster)) {
-            $scope.cluster = ClusterService.cluster;
-            $scope.setIndices(ClusterService.cluster.indices);
-            $scope.setNodes(ClusterService.cluster.nodes);
+          if (isDefined(ElasticService.cluster)) {
+            $scope.cluster = ElasticService.cluster;
+            $scope.setIndices(ElasticService.cluster.indices);
+            $scope.setNodes(ElasticService.cluster.nodes);
           } else {
             $scope.cluster = null;
             $scope.setIndices([]);
@@ -69,8 +69,8 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     );
 
     $scope.$watch('index_paginator', function(filter, previous) {
-      if (isDefined(ClusterService.cluster)) {
-        $scope.setIndices(ClusterService.cluster.indices);
+      if (isDefined(ElasticService.cluster)) {
+        $scope.setIndices(ElasticService.cluster.indices);
       } else {
         $scope.setIndices([]); // could it even happen?
       }
@@ -78,8 +78,8 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.$watch('node_filter',
         function(filter, previous) {
-          if (isDefined(ClusterService.cluster)) {
-            $scope.setNodes(ClusterService.cluster.nodes);
+          if (isDefined(ElasticService.cluster)) {
+            $scope.setNodes(ElasticService.cluster.nodes);
           } else {
             $scope.setNodes([]);
           }
@@ -99,7 +99,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.closeModal = function(forcedRefresh) {
       if (forcedRefresh) {
-        ClusterService.refresh();
+        ElasticService.refresh();
       }
     };
 
@@ -107,7 +107,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.shutdownNode(nodeId,
           function(data) {
             AlertService.success('Node [' + nodeId + '] was shutdown', data);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while shutting down node', error);
@@ -156,7 +156,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.deleteIndex = function(index) {
       ElasticService.deleteIndex(index,
           function(response) {
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while deleting index', error);
@@ -180,7 +180,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.clearCache(index,
           function(response) {
             AlertService.success('Index cache was cleared', response);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while clearing index cache', error);
@@ -226,7 +226,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.enableShardAllocation(
           function(response) {
             AlertService.success('Shard allocation was enabled', response);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while enabling shard allocation', error);
@@ -238,7 +238,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.disableShardAllocation(
           function(response) {
             AlertService.success('Shard allocation was disabled', response);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while disabling shard allocation', error);
@@ -250,7 +250,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.closeIndex(index,
           function(response) {
             AlertService.success('Index was successfully closed', response);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while closing index', error);
@@ -275,7 +275,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       ElasticService.openIndex(index,
           function(response) {
             AlertService.success('Index was successfully opened', response);
-            ClusterService.refresh();
+            ElasticService.refresh();
           },
           function(error) {
             AlertService.error('Error while opening index', error);
