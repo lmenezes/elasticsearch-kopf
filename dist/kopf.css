@@ -458,8 +458,8 @@ a.cluster-map-node-action {
 	margin-right: 0px !important;
 }
 .navbar {
-	height: 38px !important;
-	min-height: 38px !important;
+	height: 30px !important;
+	min-height: 30px !important;
 }
 
 .navbar-logo {
@@ -495,11 +495,11 @@ a.cluster-map-node-action {
 	min-width: 300px;
 }
 .navbar-nav > li {
-	height: 38px !important;
+	height: 30px !important;
 }
 .navbar-nav > li > a {
-	height: 38px !important;
-	line-height: 36px;
+	height: 30px !important;
+	line-height: 30px;
 	padding-top: 0px;
 	padding-bottom:0px;
 	padding-left: 13px;
