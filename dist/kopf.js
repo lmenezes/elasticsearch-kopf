@@ -1497,9 +1497,8 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.shutdownNode = function(nodeId) {
       ElasticService.shutdownNode(nodeId,
-          function(response) {
-            AlertService.success('Node [' + nodeId + '] successfully shutdown',
-                response);
+          function(data) {
+            AlertService.success('Node [' + nodeId + '] was shutdown', data);
             ClusterService.refresh();
           },
           function(error) {
@@ -1572,8 +1571,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.clearCache = function(index) {
       ElasticService.clearCache(index,
           function(response) {
-            AlertService.success('Index cache was successfully cleared',
-                response);
+            AlertService.success('Index cache was cleared', response);
             ClusterService.refresh();
           },
           function(error) {
@@ -1619,8 +1617,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.enableAllocation = function() {
       ElasticService.enableShardAllocation(
           function(response) {
-            AlertService.success('Shard allocation was successfully enabled',
-                response);
+            AlertService.success('Shard allocation was enabled', response);
             ClusterService.refresh();
           },
           function(error) {
@@ -1632,8 +1629,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.disableAllocation = function() {
       ElasticService.disableShardAllocation(
           function(response) {
-            AlertService.success('Shard allocation was successfully disabled',
-                response);
+            AlertService.success('Shard allocation was disabled', response);
             ClusterService.refresh();
           },
           function(error) {
@@ -1694,8 +1690,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.showIndexSettings = function(index) {
       ElasticService.getIndexMetadata(index,
           function(metadata) {
-            $scope.displayInfo('settings for index ' + index,
-                metadata.settings);
+            $scope.displayInfo('settings for ' + index, metadata.settings);
           },
           function(error) {
             AlertService.error('Error while loading index settings', error);
@@ -1706,8 +1701,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.showIndexMappings = function(index) {
       ElasticService.getIndexMetadata(index,
           function(metadata) {
-            $scope.displayInfo('mappings for index ' + index,
-                metadata.mappings);
+            $scope.displayInfo('mappings for ' + index, metadata.mappings);
           },
           function(error) {
             AlertService.error('Error while loading index mappings', error);
@@ -1718,8 +1712,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.showNodeStats = function(nodeId) {
       ElasticService.getNodeStats(nodeId,
           function(nodeStats) {
-            $scope.displayInfo('stats for node ' + nodeStats.name,
-                nodeStats.stats);
+            $scope.displayInfo('stats for ' + nodeStats.name, nodeStats.stats);
           },
           function(error) {
             AlertService.error('Error while loading node stats', error);

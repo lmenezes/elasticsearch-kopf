@@ -467,7 +467,7 @@ describe('ClusterOverviewController', function() {
     this.scope.showIndexSettings("index_name");
     expect(this.ElasticService.getIndexMetadata).toHaveBeenCalledWith("index_name",
         jasmine.any(Function), jasmine.any(Function));
-    expect(this.scope.displayInfo).toHaveBeenCalledWith("settings for index index_name",
+    expect(this.scope.displayInfo).toHaveBeenCalledWith("settings for index_name",
         {});
   });
 
@@ -498,7 +498,7 @@ describe('ClusterOverviewController', function() {
     this.scope.showIndexMappings("index_name");
     expect(this.ElasticService.getIndexMetadata).toHaveBeenCalledWith("index_name",
         jasmine.any(Function), jasmine.any(Function));
-    expect(this.scope.displayInfo).toHaveBeenCalledWith("mappings for index index_name",
+    expect(this.scope.displayInfo).toHaveBeenCalledWith("mappings for index_name",
         {});
   });
 
@@ -557,7 +557,7 @@ describe('ClusterOverviewController', function() {
     this.scope.showNodeStats("nodeId");
     expect(this.ElasticService.getNodeStats).toHaveBeenCalledWith("nodeId",
         jasmine.any(Function), jasmine.any(Function));
-    expect(this.scope.displayInfo).toHaveBeenCalledWith("stats for node nodeName",
+    expect(this.scope.displayInfo).toHaveBeenCalledWith("stats for nodeName",
         stats.nodes['nodeId']);
   });
 
