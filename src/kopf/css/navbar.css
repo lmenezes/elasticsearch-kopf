@@ -5,7 +5,6 @@
 
 .navbar-nav {
 	margin-top: 0px;
-	font-weight: 400;
 	font-size: 13px;
 }
 
@@ -16,16 +15,15 @@
 .navbar-toggle {
 	padding: 6px 9px;
 	margin-right: 25px;
+    height: 22px;
+    width: 30px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 .navbar-toggle .icon-bar {
 	width: 10px;
 	height: 1px;
 }
-.navbar-toggle {
-	height: 22px;
-	width: 30px;
-}
-
 .navbar-fixed-top {
 	margin-right: 0px !important;
 }
