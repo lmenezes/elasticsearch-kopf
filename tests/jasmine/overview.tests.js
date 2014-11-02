@@ -530,14 +530,14 @@ describe('ClusterOverviewController', function() {
   it('Should change the page size if auto adjust is enabled', function() {
     spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(true);
     spyOn(this.scope.index_paginator, "setPageSize").andReturn(true);
-    this.scope.adjustLayout();
+    $($window).triggerHandler('resize')
     expect(this.scope.index_paginator.setPageSize).toHaveBeenCalled();
   });
 
   it('Should not change the page size if auto adjust is disabled', function() {
     spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(false);
     spyOn(this.scope.index_paginator, "setPageSize").andReturn(true);
-    this.scope.adjustLayout();
+    $($window).triggerHandler('resize')
     expect(this.scope.index_paginator.setPageSize).not.toHaveBeenCalled();
   });
 

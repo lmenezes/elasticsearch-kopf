@@ -1,8 +1,6 @@
-kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
-  '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService',
-  'SettingsService', 'ThemeService', 'ElasticService',
-  function($scope, $location, $timeout, $http, $q, $sce, $window,
-           ConfirmDialogService, AlertService, SettingsService, ThemeService,
+kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
+  'AlertService', 'ThemeService', 'ElasticService',
+  function($scope, $location, $sce, $window, AlertService, ThemeService,
            ElasticService) {
 
     $scope.version = '1.3.8-SNAPSHOT';

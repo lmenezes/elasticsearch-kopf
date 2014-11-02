@@ -1398,16 +1398,12 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.cluster_health = null;
 
     $($window).resize(function() {
-      $scope.adjustLayout();
-    });
-
-    $scope.adjustLayout = function() {
       if (SettingsService.getAutoAdjustLayout()) {
         $scope.$apply(function() {
           $scope.index_paginator.setPageSize($scope.getPageSize());
         });
       }
-    };
+    });
 
     $scope.getPageSize = function() {
       var auto = SettingsService.getAutoAdjustLayout();
@@ -1821,11 +1817,9 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
   }
 ]);
 
-kopf.controller('GlobalController', ['$scope', '$location', '$timeout',
-  '$http', '$q', '$sce', '$window', 'ConfirmDialogService', 'AlertService',
-  'SettingsService', 'ThemeService', 'ElasticService',
-  function($scope, $location, $timeout, $http, $q, $sce, $window,
-           ConfirmDialogService, AlertService, SettingsService, ThemeService,
+kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
+  'AlertService', 'ThemeService', 'ElasticService',
+  function($scope, $location, $sce, $window, AlertService, ThemeService,
            ElasticService) {
 
     $scope.version = '1.3.8-SNAPSHOT';

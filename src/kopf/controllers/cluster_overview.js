@@ -8,16 +8,12 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.cluster_health = null;
 
     $($window).resize(function() {
-      $scope.adjustLayout();
-    });
-
-    $scope.adjustLayout = function() {
       if (SettingsService.getAutoAdjustLayout()) {
         $scope.$apply(function() {
           $scope.index_paginator.setPageSize($scope.getPageSize());
         });
       }
-    };
+    });
 
     $scope.getPageSize = function() {
       var auto = SettingsService.getAutoAdjustLayout();
