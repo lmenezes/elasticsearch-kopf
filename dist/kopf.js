@@ -991,6 +991,28 @@ kopf.config(function($routeProvider, $locationProvider) {
       otherwise({redirectTo: '/cluster'});
 });
 
+kopf.controller('AlertsController', ['$scope', 'AlertService',
+  function($scope, AlertService) {
+
+    $scope.alerts = [];
+
+    $scope.$watch(
+        function() {
+          return AlertService.alerts;
+        },
+        function(newValue, oldValue) {
+          $scope.alerts = AlertService.alerts;
+        }
+    );
+
+    $scope.remove = function(id) {
+      AlertService.remove(id);
+    };
+
+  }
+
+]);
+
 kopf.controller('AliasesController', ['$scope', 'AlertService',
   'AceEditorService', 'ElasticService',
   function($scope, AlertService, AceEditorService, ElasticService) {
@@ -1823,7 +1845,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
            ElasticService) {
 
     $scope.version = '1.3.8-SNAPSHOT';
-    $scope.alert_service = AlertService;
+
     $scope.modal = new ModalControls();
 
     $scope.getTheme = function() {

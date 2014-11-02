@@ -66,6 +66,7 @@ module.exports = function(grunt) {
           'src/kopf/elastic/node_stats.js',
           // CONTROLLERS
           'src/kopf/kopf.js',
+          'src/kopf/controllers/alerts.js',
           'src/kopf/controllers/aliases.js',
           'src/kopf/controllers/analysis.js',
           'src/kopf/controllers/cluster_health.js',
@@ -160,6 +161,7 @@ module.exports = function(grunt) {
           'src/kopf/elastic/node_stats.js',
           // CONTROLLERS
           'src/kopf/kopf.js',
+          'src/kopf/controllers/alerts.js',
           'src/kopf/controllers/aliases.js',
           'src/kopf/controllers/analysis.js',
           'src/kopf/controllers/cluster_health.js',

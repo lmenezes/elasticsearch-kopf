@@ -4,7 +4,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
            ElasticService) {
 
     $scope.version = '1.3.8-SNAPSHOT';
-    $scope.alert_service = AlertService;
+
     $scope.modal = new ModalControls();
 
     $scope.getTheme = function() {
