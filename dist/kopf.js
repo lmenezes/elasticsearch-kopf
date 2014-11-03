@@ -2834,9 +2834,9 @@ kopf.factory('ThemeService', function() {
 });
 
 kopf.factory('ElasticService', ['$http', '$q', '$timeout',
-  'ExternalSettingsService', 'DebugService', 'SettingsService',
+  'ExternalSettingsService', 'DebugService', 'SettingsService', 'AlertService',
   function($http, $q, $timeout, ExternalSettingsService, DebugService,
-      SettingsService) {
+      SettingsService, AlertService) {
 
     var instance = this;
 
