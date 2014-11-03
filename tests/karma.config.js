@@ -20,7 +20,7 @@ module.exports = function(config) {
       '../src/kopf/*.js',
       '../src/kopf/**/*.js',
       'angular-mocks.js',
-      'jasmine/*.tests.js'
+      'jasmine/**/*.tests.js'
     ],
 
     // list of files to exclude

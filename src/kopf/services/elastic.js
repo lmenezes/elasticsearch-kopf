@@ -9,13 +9,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.connected = false;
 
-    this.auth = null;
-
-    this.withCredentials = false;
-
     this.cluster = null;
 
     this.clusterHealth = null;
+
+    this.autoRefreshStarted = false;
 
     this.isConnected = function() {
       return this.connected;
@@ -57,77 +55,44 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       }
     };
 
-    this.createAuthToken = function(username, password) {
-      var hasAuth = isDefined(username) && isDefined(password);
-      return hasAuth ? 'Basic ' + window.btoa(username + ':' + password) : null;
-    };
-
-    this.connect = function(url) {
+    this.connect = function(host) {
       var root = ExternalSettingsService.getElasticsearchRootPath();
       this.withCredentials = ExternalSettingsService.withCredentials();
-      try {
-        this.connection = null;
-        if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
-          url = 'http://' + url;
-        }
-        this.connection = new ESConnection(url + root, this.withCredentials);
-        this.auth = this.createAuthToken(
-            this.connection.username,
-            this.connection.password
-        );
-        var version = this.fetchVersion();
-        this.connected = true;
-      } catch (error) {
-        this.connected = false;
-        throw {
-          message: 'Error while connecting to [' + url + root + ']',
-          body: error
-        };
-      }
+      this.connection = new ESConnection(host + root, this.withCredentials);
+      this.clusterRequest('GET', '/', {},
+          function(data) {
+            try {
+              instance.setVersion(data.version);
+              instance.connected = true;
+              if (!instance.autoRefreshStarted) {
+                instance.autoRefreshCluster();
+                instance.autoRefreshStarted = true;
+              }
+            } catch (error) {
+              throw {
+                message: 'Error reading cluster version. Are you sure there ' +
+                    ' is an ElasticSearch runnning at [' +
+                    this.connection.host + ']?',
+                body: data
+              };
+            }
+          },
+          function(data) {
+            instance.connected = false;
+            throw {
+              message: 'Error connecting to [' + this.connection.host + ']',
+              body: data
+            };
+          }
+      );
     };
 
-    this.fetchVersion = function() {
-      var connection = this.connection;
-      var params = {
-        type: 'GET',
-        url: connection.host + '/',
-        dataType: 'json',
-        async: false,
-        beforeSend: function(xhr) {
-          if (isDefined(this.auth)) {
-            DebugService.debug('XHR Authorization header [' + this.auth + ']');
-            xhr.setRequestHeader('Authorization', this.auth);
-          }
-        }
-      };
-      if (this.withCredentials) {
-        params.xhrFields = {withCredentials: true};
-      }
-      DebugService.debug('Fetching cluster version with params:');
-      DebugService.debug(params);
-      var fetchVersion = $.ajax(params);
-      var client = this;
-      fetchVersion.done(function(response) {
-        try {
-          var version = response.version.number;
-          client.version = {'str': version};
-          var parts = version.split('.');
-          client.version.major = parseInt(parts[0]);
-          client.version.minor = parseInt(parts[1]);
-          client.version.build = parseInt(parts[2]);
-        } catch (error) {
-          throw {
-            message: 'Error reading cluster version. Are you sure there ' +
-                'is an ElasticSearch runnning at [' + connection.host + ']?',
-            body: response
-          };
-        }
-      });
-
-      fetchVersion.fail(function(error) {
-        throw error.statusText;
-      });
-
+    this.setVersion = function(version) {
+      this.version = {'str': version.number};
+      var parts = instance.version.str.split('.');
+      this.version.major = parseInt(parts[0]);
+      this.version.minor = parseInt(parts[1]);
+      this.version.build = parseInt(parts[2]);
     };
 
     this.getHost = function() {
@@ -434,7 +399,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                                    callbackError) {
       var url = this.connection.host;
       var params = {method: method, url: url + path, data: data};
-      if (this.auth !== null) {
+      if (isDefined(this.auth)) {
         params.withCredentials = true;
         params.headers = {Authorization: this.auth};
       }
@@ -453,8 +418,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
             callbackError(data);
           });
     };
-
-    /** ####### END OF REFACTORED AREA ####### **/
 
     this.getClusterHealth = function(callbackSuccess, callbackError) {
       var createClusterHealth = function(clusterHealth) {
@@ -583,8 +546,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       };
       $timeout(nextRefresh, SettingsService.getRefreshInterval());
     };
-
-    this.autoRefreshCluster();
 
     return this;
 
