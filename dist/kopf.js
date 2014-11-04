@@ -402,7 +402,7 @@ function ESConnection(url, withCredentials) {
   }
   var protectedUrl = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
   this.host = 'http://localhost:9200'; // default
-  this.with_credentials = withCredentials;
+  this.withCredentials = withCredentials;
   if (notEmpty(url)) {
     var connectionParts = protectedUrl.exec(url);
     if (isDefined(connectionParts)) {
@@ -2843,6 +2843,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
   function($http, $q, $timeout, ExternalSettingsService, DebugService,
       SettingsService, AlertService) {
 
+    var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
+
     var instance = this;
 
     this.connection = null;
@@ -2897,22 +2899,16 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.connect = function(host) {
       var root = ExternalSettingsService.getElasticsearchRootPath();
-      this.withCredentials = ExternalSettingsService.withCredentials();
-      this.connection = new ESConnection(host + root, this.withCredentials);
+      var withCredentials = ExternalSettingsService.withCredentials();
+      this.connection = new ESConnection(host + root, withCredentials);
       this.clusterRequest('GET', '/', {},
           function(data) {
             try {
-              instance.setVersion(data.version);
-              instance.connected = true;
-              if (!instance.autoRefreshStarted) {
-                instance.autoRefreshCluster();
-                instance.autoRefreshStarted = true;
-              }
+              instance.setVersion(data.version.number);
             } catch (error) {
+              instance.connected = false;
               throw {
-                message: 'Error reading cluster version. Are you sure there ' +
-                    ' is an ElasticSearch runnning at [' +
-                    this.connection.host + ']?',
+                message: 'Error reading cluster version',
                 body: data
               };
             }
@@ -2920,7 +2916,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           function(data) {
             instance.connected = false;
             throw {
-              message: 'Error connecting to [' + this.connection.host + ']',
+              message: 'Error connecting to [' + instance.connection.host + ']',
               body: data
             };
           }
@@ -2928,11 +2924,21 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     };
 
     this.setVersion = function(version) {
-      this.version = {'str': version.number};
-      var parts = instance.version.str.split('.');
-      this.version.major = parseInt(parts[0]);
-      this.version.minor = parseInt(parts[1]);
-      this.version.build = parseInt(parts[2]);
+      this.version = {'str': version};
+      if (checkVersion.test(version)) {
+
+      } else {
+        throw 'Invalid Elasticsearch version[' + version + ']';
+      }
+      var parts = checkVersion.exec(version);
+      this.version.major = parseInt(parts[1]);
+      this.version.minor = parseInt(parts[2]);
+      this.version.build = parseInt(parts[3]);
+      this.connected = true;
+      if (!this.autoRefreshStarted) {
+        this.autoRefreshCluster();
+        this.autoRefreshStarted = true;
+      }
     };
 
     this.getHost = function() {
@@ -2940,10 +2946,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     };
 
     this.versionCheck = function(version) {
-      var parts = version.split('.');
-      var major = parseInt(parts[0]);
-      var minor = parseInt(parts[1]);
-      var build = parseInt(parts[2]);
+      var parts = checkVersion.exec(version);
+      var major = parseInt(parts[1]);
+      var minor = parseInt(parts[2]);
+      var build = parseInt(parts[3]);
       var v = this.version;
       var higherMajor = v.major > major;
       var higherMinor = v.major == major && v.minor > minor;
@@ -3243,7 +3249,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         params.withCredentials = true;
         params.headers = {Authorization: this.auth};
       }
-      if (this.withCredentials) {
+      if (this.connection.withCredentials) {
         params.withCredentials = true;
       }
       $http(params).

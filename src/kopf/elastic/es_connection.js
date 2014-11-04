@@ -9,7 +9,7 @@ function ESConnection(url, withCredentials) {
   }
   var protectedUrl = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
   this.host = 'http://localhost:9200'; // default
-  this.with_credentials = withCredentials;
+  this.withCredentials = withCredentials;
   if (notEmpty(url)) {
     var connectionParts = protectedUrl.exec(url);
     if (isDefined(connectionParts)) {
