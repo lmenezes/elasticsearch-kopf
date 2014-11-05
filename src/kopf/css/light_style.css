@@ -152,7 +152,6 @@ h6 { color: #999; font-variant:small-caps; font-weight: 500; }
 .navbar-cluster-status- {
 	background-color: #ccc !important;
 	color: #666 !important;
-	height: 38px !important;
 }
 .navbar-cluster-status- > li.active > a {
 	background-color: #666 !important;
