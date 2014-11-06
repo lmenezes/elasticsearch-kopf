@@ -2,12 +2,7 @@
   <div ng-include src="'partials/cluster_overview/cluster_stats.html'"></div>
   <div class="row">
     <div class="col-lg-12" ng-include src="'partials/cluster_overview/filters.html'"></div>
-    <div class="col-xs-6" style="text-align: left;">
-      <div class="cluster-map-pagination" data-toggle="tooltip" data-placement="top" data-original-title="number of shards in the cluster (closed indices are not taken into account)">
-        {{cluster_health.fetched_at}} - {{cluster_health.cluster_name}}
-      </div>
-    </div>
-    <div class="col-xs-6" style="text-align: right;">
+    <div class="col-xs-12" style="text-align: right;">
       <div class="cluster-map-pagination">
 				<span ng-switch on="page.previous">
 					<i class="fa fa-angle-double-left normal-action" ng-click="index_paginator.previousPage()" ng-switch-when="true"></i>

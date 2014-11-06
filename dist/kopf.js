@@ -1971,7 +1971,9 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
     $scope.host_history = HostHistoryService.getHostHistory();
 
-    $scope.clusterStatus = '';
+    $scope.clusterStatus = undefined;
+    $scope.clusterName = undefined;
+    $scope.fetchedAt = undefined;
 
     $scope.debugEnabled = DebugService.isEnabled();
 
@@ -1988,8 +1990,12 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
         function(newValue, oldValue) {
           if (isDefined(ElasticService.clusterHealth)) {
             $scope.clusterStatus = ElasticService.clusterHealth.status;
+            $scope.clusterName = ElasticService.clusterHealth.cluster_name;
+            $scope.fetchedAt = ElasticService.clusterHealth.fetched_at;
           } else {
-            $scope.clusterStatus = '';
+            $scope.clusterStatus = undefined;
+            $scope.clusterName = undefined;
+            $scope.fetchedAt = undefined;
           }
         }
     );

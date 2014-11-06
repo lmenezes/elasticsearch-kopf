@@ -27,16 +27,28 @@ describe('NavbarController', function() {
     this.SettingsService = $injector.get('SettingsService');
     this.AlertService = $injector.get('AlertService');
     this.HostHistoryService = $injector.get('HostHistoryService');
+    this.DebugService = $injector.get('DebugService');
 
     this.createController = function() {
       return $controller('NavbarController', {$scope: this.scope},
           this.SettingsService, this.ThemeService, this.ElasticService,
-          this.AlertService, this.HostHistoryService);
+          this.AlertService, this.HostHistoryService, this.DebugService);
     };
     this._controller = this.createController();
   }));
 
-  //TESTS
+  it('init', function() {
+    expect(this.scope.host_history).toEqual([ { host : 'http://localhost11' }, { host : 'http://localhost10' }, { host : 'http://localhost9' }, { host : 'http://localhost8' }, { host : 'http://localhost7' }, { host : 'http://localhost6' }, { host : 'http://localhost5' }, { host : 'http://localhost4' }, { host : 'http://localhost3' }, { host : 'http://localhost2' } ]);
+    expect(this.scope.debugEnabled).toEqual(false);
+    expect(this.scope.auto_adjust_layout).toEqual(true);
+    expect(this.scope.theme).toEqual('dark');
+    expect(this.scope.new_host).toEqual('');
+    expect(this.scope.clusterStatus).toEqual(undefined);
+    expect(this.scope.clusterName).toEqual(undefined);
+    expect(this.scope.fetchedAt).toEqual(undefined);
+    expect(this.scope.current_host).toEqual('http://localhost:9200');
+  });
+
   it('should connect to a different host', function() {
     spyOn(this.ElasticService, 'connect').andReturn(true);
     this.ElasticService.connection = { host: "http://newhost:1234"};

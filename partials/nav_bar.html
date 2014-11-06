@@ -1,138 +1,145 @@
 <div class="navbar navbar-fixed-top navbar-cluster-status-{{clusterStatus}}" ng-controller="NavbarController">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle dropdown-toggle navbar-toggle-{{clusterStatus}}" data-toggle="collapse" data-target=".navbar-collapse">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand dropdown-toggle navbar-cluster-status-{{clusterStatus}}" href="#" target="_self" data-toggle="dropdown">kopf
-				<i class="fa fa-fw fa-caret-down navbar-logo-action"></i>
-			</a>
-			<ul class="dropdown-menu form-horizontal navbar-app-settings">
-				<li class="navbar-menu-section">
-					<div class="row">
-						<div class="col-lg-12">
-							<h5>refresh rate</h5>
-						</div>
-						<div class="col-lg-12">
-							<select ng-model="new_refresh" class="form-control ng-pristine ng-valid" ng-change="changeRefresh()">
-								<option value="1000">every second</option>
-								<option value="3000">every 3 seconds</option>
-								<option value="5000">every 5 seconds</option>
-								<option value="10000">every 10 seconds</option>
-								<option value="60000">every minute</option>
-							</select>
-						</div>
-					</div>
-				</li>
-				<li class="navbar-menu-section">
-					<div class="row">
-						<div class="col-lg-12">
-							<h5>theme</h5>
-						</div>
-						<div class="col-lg-12">
-							<select ng-model="theme" class="form-control ng-pristine ng-valid" ng-change="changeTheme()">
-								<option value="light">light</option>
-								<option value="dark">dark</option>
-							</select>
-						</div>
-					</div>
-				</li>
-                <li class="navbar-menu-section">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <h5>auto adjust layout <input type="checkbox" ng-model="auto_adjust_layout" ng-change="setAutoAdjustLayout()"></h5>
-                        </div>
-                    </div>
-                </li>
-                <li class="navbar-menu-section">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <h5>debug mode <input type="checkbox" ng-model="debugEnabled"></h5>
-                        </div>
-                    </div>
-                </li>
-				<li class="divider"></li>
-				<li class="active navbar-menu-section">
-					<div class="row">
-						<div class="col-lg-12">
-							<span class="navbar-menu-item ng-binding">kopf v{{version}} - found a bug? <a href="https://github.com/lmenezes/elasticsearch-kopf/issues" target="_blank">report it!</a></span>
-						</div>
-					</div>
-				</li>
-			</ul>
-		</div>
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}}">
-				<li ng-class="{active: isActive('cluster')}">
-					<a href="#!cluster">
-                        <i class="fa fa-fw fa-sitemap"></i> cluster
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('rest')}">
-					<a href="#!rest">
-                        <i class="fa fa-fw fa-edit"></i> rest
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('aliases')}">
-					<a href="#!aliases">
-                        <i class="fa fa-fw fa-tags"></i> aliases
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('analysis')}">
-					<a href="#!analysis">
-                        <i class="fa fa-fw fa-puzzle-piece"></i> analysis
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('percolator')}">
-					<a href="#!percolator">
-                        <i class="fa fa-fw fa-bell-o"></i> percolator
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('warmup')}">
-					<a href="#!warmup">
-                        <i class="fa fa-fw fa-fire"></i> warmers
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('repository')}">
-					<a href="#!repository">
-                        <i class="fa fa-fw fa-camera"></i> snapshot
-                    </a>
-				</li>
-				<li ng-class="{active: isActive('benchmark')}"ng-show="client.versionCheck('1.4.0')">
-					<a href="#!benchmark">
-                        <i class="fa fa-fw fa-bar-chart-o"></i> benchmark
-                    </a>
-				</li>
-			</ul>
-            <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}} navbar-right visible-lg">
-                <li class="connect-menu">
-                    <a class="dropdown-toggle navbar-cluster-status-{{clusterStatus}}" target="_self" href="#" data-toggle="dropdown">
-                        {{current_host}} <i class="fa fa-fw fa-plug"></i>
-                    </a>
-                    <ul class="dropdown-menu form-horizontal navbar-app-settings">
-                        <li class="navbar-menu-section">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <input type="text" class="form-control" ng-model="new_host" ng-keypress="handleConnectToHost($event)" placeholder="connect to a different host">
-                                </div>
-                            </div>
-                        </li>
-                        <li ng-show="host_history.length > 0"><h5>previous hosts</h5></li>
-                        <li ng-show="host_history.length > 0" class="divider"></li>
-                        <li ng-show="host_history.length > 0" ng-repeat="host in host_history" ng-click="connectToHost(host.host)">
-                            <a target="_self" href class="host-history">{{host.host}}</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-		</div>
-	</div>
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle dropdown-toggle navbar-toggle-{{clusterStatus}}" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand dropdown-toggle navbar-cluster-status-{{clusterStatus}}" href="#" target="_self" data-toggle="dropdown">kopf
+        <i class="fa fa-fw fa-caret-down navbar-logo-action"></i>
+      </a>
+      <ul class="dropdown-menu form-horizontal navbar-app-settings">
+        <li class="navbar-menu-section">
+          <div class="row">
+            <div class="col-lg-12">
+              <h5>refresh rate</h5>
+            </div>
+            <div class="col-lg-12">
+              <select ng-model="new_refresh" class="form-control ng-pristine ng-valid" ng-change="changeRefresh()">
+                <option value="1000">every second</option>
+                <option value="3000">every 3 seconds</option>
+                <option value="5000">every 5 seconds</option>
+                <option value="10000">every 10 seconds</option>
+                <option value="60000">every minute</option>
+              </select>
+            </div>
+          </div>
+        </li>
+        <li class="navbar-menu-section">
+          <div class="row">
+            <div class="col-lg-12">
+              <h5>theme</h5>
+            </div>
+            <div class="col-lg-12">
+              <select ng-model="theme" class="form-control ng-pristine ng-valid" ng-change="changeTheme()">
+                <option value="light">light</option>
+                <option value="dark">dark</option>
+              </select>
+            </div>
+          </div>
+        </li>
+        <li class="navbar-menu-section">
+          <div class="row">
+            <div class="col-lg-12">
+              <h5>auto adjust layout <input type="checkbox" ng-model="auto_adjust_layout" ng-change="setAutoAdjustLayout()"></h5>
+            </div>
+          </div>
+        </li>
+        <li class="navbar-menu-section">
+          <div class="row">
+            <div class="col-lg-12">
+              <h5>debug mode <input type="checkbox" ng-model="debugEnabled"></h5>
+            </div>
+          </div>
+        </li>
+        <li class="divider"></li>
+        <li class="active navbar-menu-section">
+          <div class="row">
+            <div class="col-lg-12">
+              <span class="navbar-menu-item ng-binding">kopf v{{version}} - found a bug? <a href="https://github.com/lmenezes/elasticsearch-kopf/issues" target="_blank">report it!</a></span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}}">
+        <li ng-class="{active: isActive('cluster')}">
+          <a href="#!cluster">
+            <i class="fa fa-fw fa-sitemap"></i> cluster
+          </a>
+        </li>
+        <li ng-class="{active: isActive('rest')}">
+          <a href="#!rest">
+            <i class="fa fa-fw fa-edit"></i> rest
+          </a>
+        </li>
+        <li ng-class="{active: isActive('aliases')}">
+          <a href="#!aliases">
+            <i class="fa fa-fw fa-tags"></i> aliases
+          </a>
+        </li>
+        <li ng-class="{active: isActive('analysis')}">
+          <a href="#!analysis">
+            <i class="fa fa-fw fa-puzzle-piece"></i> analysis
+          </a>
+        </li>
+        <li ng-class="{active: isActive('percolator')}">
+          <a href="#!percolator">
+            <i class="fa fa-fw fa-bell-o"></i> percolator
+          </a>
+        </li>
+        <li ng-class="{active: isActive('warmup')}">
+          <a href="#!warmup">
+            <i class="fa fa-fw fa-fire"></i> warmers
+          </a>
+        </li>
+        <li ng-class="{active: isActive('repository')}">
+          <a href="#!repository">
+            <i class="fa fa-fw fa-camera"></i> snapshot
+          </a>
+        </li>
+        <li ng-class="{active: isActive('benchmark')}" ng-show="client.versionCheck('1.4.0')">
+          <a href="#!benchmark">
+            <i class="fa fa-fw fa-bar-chart-o"></i> benchmark
+          </a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}} navbar-right visible-lg">
+        <li class="connection-info" ng-show="clusterName">
+          <b>{{clusterName}}</b> @ <b>{{current_host}}</b>
+        </li>
+        <li class="connect-menu">
+          <a class="dropdown-toggle navbar-cluster-status-{{clusterStatus}}" target="_self" href="#" data-toggle="dropdown">
+            <i class="fa fa-fw fa-plug" title="connect to a different host"></i>
+          </a>
+          <ul class="dropdown-menu form-horizontal navbar-app-settings">
+            <li class="navbar-menu-section">
+              <div class="row">
+                <div class="col-lg-12">
+                  <input type="text" class="form-control" ng-model="new_host" ng-keypress="handleConnectToHost($event)" placeholder="connect to a different host">
+                </div>
+              </div>
+            </li>
+            <li ng-show="host_history.length > 0"><h5>previous hosts</h5></li>
+            <li ng-show="host_history.length > 0" class="divider"></li>
+            <li ng-show="host_history.length > 0" ng-repeat="host in host_history" ng-click="connectToHost(host.host)">
+              <a target="_self" href class="host-history">{{host.host}}</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
 <script>
-$(function() {
-  $('.dropdown-menu input').click(function(e) { e.stopPropagation(); });
-  $('.dropdown-menu select').click(function(e) { e.stopPropagation(); });
-});
+  $(function() {
+    $('.dropdown-menu input').click(function(e) {
+      e.stopPropagation();
+    });
+    $('.dropdown-menu select').click(function(e) {
+      e.stopPropagation();
+    });
+  });
 </script>

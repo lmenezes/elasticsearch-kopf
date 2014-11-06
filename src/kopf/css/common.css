@@ -114,8 +114,12 @@ a.setting-info:hover {
 textarea {
     resize: none;
 }
+.connection-info {
+    line-height: 30px;
+    padding-right: 10px;
+}
 .connect-menu {
-    line-height: 38px;
+    line-height: 30px;
     padding-right: 10px;
 }
 .dropdown-menu > li > a {
