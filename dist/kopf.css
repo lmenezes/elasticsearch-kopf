@@ -1,3 +1,11 @@
+.node-badges {
+    width: 20px;
+    display: inline-block;
+    float: left;
+}
+.node-info {
+    overflow: hidden
+}
 .content-panel {
 	padding-top: 10px;
 }
@@ -92,11 +100,6 @@ a.setting-info:hover {
 
 .table-nonfluid {
    width: auto;
-}
-.node-info {
-	display: inline-block;
-	vertical-align: top;
-	margin-left: 5px;
 }
 .table-actions > a:hover {
 	text-decoration: none;	
