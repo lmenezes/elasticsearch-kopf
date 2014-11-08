@@ -412,6 +412,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       if (this.connection.withCredentials) {
         params.withCredentials = true;
       }
+      DebugService.debug('Requesting [' + url + '] with params:');
+      DebugService.debug(params);
       $http(params).
           success(function(data, status, headers, config) {
             try {
@@ -444,10 +446,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         params.withCredentials = true;
         params.headers = {Authorization: this.auth};
       }
-      if (this.withCredentials) {
+      if (this.connection.withCredentials) {
         params.withCredentials = true;
       }
-
+      DebugService.debug('Requesting cluster information with params:');
+      DebugService.debug(params);
       $q.all([
         $http.get(host +
             '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
@@ -483,7 +486,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         params.withCredentials = true;
         params.headers = {Authorization: this.auth};
       }
-      if (this.withCredentials) {
+      if (this.connection.withCredentials) {
         params.withCredentials = true;
       }
       var requests = [];

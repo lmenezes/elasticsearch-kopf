@@ -19,7 +19,9 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
 
     $scope.$watch('debugEnabled',
         function(newValue, oldValue) {
-          DebugService.toggleEnabled();
+          if (newValue != oldValue) {
+            DebugService.toggleEnabled();
+          }
         }
     );
 
