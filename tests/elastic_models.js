@@ -37,7 +37,7 @@ test("cluster creating", function() {
 		ok(index.name.length > 0, "Checking index name: [" + index.name + "]");
 		ok(number_pattern.test(index.num_of_shards), "Checking number of shards: [" + index.num_of_shards + "]");
 		ok(number_pattern.test(index.num_of_replicas), "Checking number of replicas: [" + index.num_of_replicas + "]");
-		var node_ids = cluster.nodes.map(function(node) { return node.id; });
+		var node_ids = cluster.getNodes(true).map(function(node) { return node.id; });
 		node_ids.forEach(function(node_id) {
 			if (index.getShards(node_id) != null) {
 				index.getShards(node_id).forEach(function(shard) {

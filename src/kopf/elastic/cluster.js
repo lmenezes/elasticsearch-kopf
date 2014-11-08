@@ -32,9 +32,13 @@ function Cluster(state, status, nodes, settings, aliases) {
       node.setCurrentMaster();
     }
     return node;
-  }).sort(function(a, b) {
-    return a.compare(b);
   });
+
+  this.getNodes = function(considerType) {
+    return this.nodes.sort(function(a, b) {
+      return a.compare(b, considerType);
+    });
+  };
 
   this.number_of_nodes = this.nodes.length;
 

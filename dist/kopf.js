@@ -264,9 +264,13 @@ function Cluster(state, status, nodes, settings, aliases) {
       node.setCurrentMaster();
     }
     return node;
-  }).sort(function(a, b) {
-    return a.compare(b);
   });
+
+  this.getNodes = function(considerType) {
+    return this.nodes.sort(function(a, b) {
+      return a.compare(b, considerType);
+    });
+  };
 
   this.number_of_nodes = this.nodes.length;
 
@@ -630,13 +634,15 @@ function Node(nodeId, nodeInfo, nodeStats) {
     return node.id === this.id;
   };
 
-  this.compare = function(other) {
-    if (other.current_master) { return 1; } // current master comes first
-    if (this.current_master) { return -1; } // current master comes first
-    if (other.master && !this.master) { return 1; } // master eligible comes first
-    if (this.master && !other.master) { return -1; } // master eligible comes first
-    if (other.data && !this.data) { return 1; } // data node comes first
-    if (this.data && !other.data) { return -1; } // data node comes first
+  this.compare = function(other, considerType) {
+    if (considerType) {
+      if (other.current_master) { return 1; } // current master comes first
+      if (this.current_master) { return -1; } // current master comes first
+      if (other.master && !this.master) { return 1; } // master eligible comes first
+      if (this.master && !other.master) { return -1; } // master eligible comes first
+      if (other.data && !this.data) { return 1; } // data node comes first
+      if (this.data && !other.data) { return -1; } // data node comes first
+    }
     return this.name.localeCompare(other.name); // if all the same, lex. sort
   };
 
@@ -1472,7 +1478,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           if (isDefined(ElasticService.cluster)) {
             $scope.cluster = ElasticService.cluster;
             $scope.setIndices(ElasticService.cluster.indices);
-            $scope.setNodes(ElasticService.cluster.nodes);
+            $scope.setNodes(ElasticService.cluster.getNodes(true));
           } else {
             $scope.cluster = null;
             $scope.setIndices([]);
@@ -1492,7 +1498,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.$watch('node_filter',
         function(filter, previous) {
           if (isDefined(ElasticService.cluster)) {
-            $scope.setNodes(ElasticService.cluster.nodes);
+            $scope.setNodes(ElasticService.cluster.getNodes(true));
           } else {
             $scope.setNodes([]);
           }

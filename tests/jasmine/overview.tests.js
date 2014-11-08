@@ -70,8 +70,9 @@ describe('ClusterOverviewController', function() {
   it('should detect when cluster changes and update indices and nodes',
       function() {
         // paginator
-        this.ElasticService.cluster = { indices: [ 1, 2, 3 ], nodes: [ 3, 2,
-          1] };
+        this.ElasticService.cluster = { indices: [ 1, 2, 3 ], getNodes: function(considerType) {
+          return [3, 2, 1]
+        }};
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
         this.scope.$digest();
