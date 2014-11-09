@@ -226,14 +226,15 @@ table.overview {
 	margin: 5px 0px;
 }
 .cluster-map-header-cluster-actions {
-	font-size: 32px;
+	font-size: 30px;
 	vertical-align: middle !important;
 	text-align: center;
 	border-bottom: 0px !important;
-	background: inherit;
+    padding-bottom: 0px !important;
+    padding-top: 0px !important;
 }
 .cluster-map-header-cluster-action {
-	font-size: 32px;
+	font-size: 28px;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
