@@ -74,11 +74,6 @@
                 <div ng-show="node.client" >
                   <i class="fa fa-fw fa-search" title="client node"></i>
                 </div>
-                <div>
-                  <a data-toggle="modal" target="_self" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-node-action">
-                    <i class="fa fa-fw fa-power-off normal-action danger-action" title="shutdown node" ng-click="promptShutdownNode(node.id,node.name)"></i>
-                  </a>
-                </div>
               </div>
               <div class="node-info">
                 <div class="normal-action" ng-click="showNodeStats(node.id)" title="view node stats">
