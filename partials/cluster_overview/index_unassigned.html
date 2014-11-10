@@ -1,4 +1,4 @@
-<div class="cluster-map-shards" ng-show="index != null">
+<div ng-show="index != null">
     <span ng-repeat="shard in index.unassigned track by $index">
         <span class="shard shard-unallocated">{{shard.shard}}</span>
     </span>

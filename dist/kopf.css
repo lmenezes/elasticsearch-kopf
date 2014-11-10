@@ -321,8 +321,8 @@ a.cluster-map-header-index-action:hover {
 	padding-right: 0px;
 	text-align: left;
 }
-.cluster-map-shards {
-	padding-top: 3px;
+.shards-cell {
+	padding-top: 8px !important;
 }
 .cluster-map-pagination {
 	padding-top: 5px;
@@ -411,6 +411,10 @@ a.cluster-map-node-action {
 .index-dropdown {
     right: 0;
     left: inherit;
+}
+
+.unassigned-row {
+	vertical-align: middle !important;
 }
 .json-content {
 	font-size: 10px;
