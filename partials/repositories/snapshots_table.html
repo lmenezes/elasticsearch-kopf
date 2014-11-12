@@ -76,17 +76,7 @@
 				</div>
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="pagination-block">
-							<span ng-switch on="page.previous">
-								<i class="fa fa-angle-double-left normal-action" ng-click="paginator.previousPage()" ng-switch-when="true"></i>
-								<i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
-							</span>
-							{{page.first}}-{{page.last}} of {{page.total}}
-							<span ng-switch on="page.next">
-								<i class="fa fa-angle-double-right normal-action" ng-click="paginator.nextPage()" ng-switch-when="true"></i>
-								<i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
-							</span>
-						</div>
+						<ng-pagination page="page" paginator="paginator"></ng-pagination>
 					</div>
 				</div>
 				<div class="row">

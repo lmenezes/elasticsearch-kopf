@@ -1,0 +1,13 @@
+<div class="page-ctrl">
+  <span ng-switch on="page.previous" class="page-btn pull-left bordered">
+    <i class="fa fa-fw fa-angle-double-left normal-action" ng-click="paginator.previousPage()" ng-switch-when="true"></i>
+    <i class="fa fa-fw fa-angle-double-left inactive-action" ng-switch-when="false"></i>
+  </span>
+  <span ng-switch on="page.next" class="page-btn pull-right bordered">
+    <i class="fa fa-fw fa-angle-double-right normal-action" ng-click="paginator.nextPage()" ng-switch-when="true"></i>
+    <i class="fa fa-fw fa-angle-double-right inactive-action" ng-switch-when="false"></i>
+  </span>
+  <span class="page-info">
+    {{page.first}}-{{page.last}} of {{page.total}}
+  </span>
+</div>

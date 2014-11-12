@@ -3,17 +3,7 @@
   <div class="row">
     <div class="col-xs-12" ng-include src="'partials/cluster_overview/filters.html'"></div>
     <div class="col-lg-2 col-lg-offset-10 col-md-3 col-md-offset-9 col-sm-4 col-sm-offset-8 col-xs-12">
-      <div class="overview-ctrl">
-      <span ng-switch on="page.previous" class="page-btn pull-left bordered">
-        <i class="fa fa-fw fa-angle-double-left normal-action" ng-click="index_paginator.previousPage()" ng-switch-when="true"></i>
-        <i class="fa fa-fw fa-angle-double-left inactive-action" ng-switch-when="false"></i>
-      </span>
-      <span ng-switch on="page.next" class="page-btn pull-right bordered">
-        <i class="fa fa-fw fa-angle-double-right normal-action" ng-click="index_paginator.nextPage()" ng-switch-when="true"></i>
-        <i class="fa fa-fw fa-angle-double-right inactive-action" ng-switch-when="false"></i>
-      </span>
-        <span class="page-info">{{page.first}}-{{page.last}} of {{page.total}}</span>
-      </div>
+      <ng-pagination page="page" paginator="index_paginator"></ng-pagination>
     </div>
   </div>
   <table class="table table-bordered table-condensed table-rounded overview">

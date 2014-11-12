@@ -139,6 +139,10 @@ textarea {
 .section-title {
     padding-bottom: 20px;
 }
+.page-ctrl {
+	margin-top: 10px;
+	margin-bottom: 6px;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
@@ -419,10 +423,6 @@ a.cluster-map-node-action {
 	vertical-align: middle !important;
 }
 .overview-filters {
-	margin-top: 10px;
-	margin-bottom: 6px;
-}
-.overview-ctrl {
 	margin-top: 10px;
 	margin-bottom: 6px;
 }

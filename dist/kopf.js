@@ -1,925 +1,3 @@
-function IndexAliases(index, aliases) {
-  this.index = index;
-  this.aliases = aliases;
-
-  this.clone = function() {
-    var cloned = new IndexAliases(this.index, []);
-    cloned.aliases = this.aliases.map(function(alias) {
-      return alias.clone();
-    });
-    return cloned;
-  };
-}
-
-IndexAliases.diff = function(original, modified) {
-  var differences = [];
-  modified.forEach(function(ia) {
-    var isNew = true;
-    original.forEach(function(origIA) {
-      if (ia.index == origIA.index) {
-        isNew = false;
-        ia.aliases.forEach(function(alias) {
-          var originalAliases = origIA.aliases.filter(function(originalAlias) {
-            return alias.equals(originalAlias);
-          });
-          if (originalAliases.length === 0) {
-            differences.push(alias);
-          }
-        });
-      }
-    });
-    if (isNew) {
-      ia.aliases.forEach(function(alias) {
-        differences.push(alias);
-      });
-    }
-  });
-  return differences;
-};
-
-function Alias(alias, index, filter, indexRouting, searchRouting) {
-  this.alias = isDefined(alias) ? alias.toLowerCase() : '';
-  this.index = isDefined(index) ? index.toLowerCase() : '';
-  this.filter = isDefined(filter) ? filter : '';
-  this.index_routing = isDefined(indexRouting) ? indexRouting : '';
-  this.search_routing = isDefined(searchRouting) ? searchRouting : '';
-
-  this.validate = function() {
-    if (!notEmpty(this.alias)) {
-      throw 'Alias must have a non empty name';
-    }
-    if (!notEmpty(this.index)) {
-      throw 'Alias must have a valid index name';
-    }
-  };
-
-  this.equals = function(otherAlias) {
-    var equal =
-        (this.alias === otherAlias.alias) &&
-        (this.index === otherAlias.index) &&
-        (this.filter === otherAlias.filter) &&
-        (this.index_routing === otherAlias.index_routing) &&
-        (this.search_routing === otherAlias.search_routing);
-    return equal;
-  };
-
-  this.info = function() {
-    var info = {};
-    info.index = this.index;
-    info.alias = this.alias;
-
-    if (isDefined(this.filter)) {
-      if (typeof this.filter == 'string' && notEmpty(this.filter)) {
-        info.filter = JSON.parse(this.filter);
-      } else {
-        info.filter = this.filter;
-      }
-    }
-    if (notEmpty(this.index_routing)) {
-      info.index_routing = this.index_routing;
-    }
-    if (notEmpty(this.search_routing)) {
-      info.search_routing = this.search_routing;
-    }
-    return info;
-  };
-
-  this.clone = function() {
-    return new Alias(this.alias, this.index, this.filter, this.index_routing,
-        this.search_routing);
-  };
-}
-
-function ClusterChanges() {
-
-  this.nodeJoins = null;
-  this.nodeLeaves = null;
-  this.indicesCreated = null;
-  this.indicesDeleted = null;
-
-  this.docDelta = 0;
-  this.dataDelta = 0;
-
-  this.setDocDelta = function(delta) {
-    this.docDelta = delta;
-  };
-
-  this.getDocDelta = function() {
-    return this.docDelta;
-  };
-
-  this.absDocDelta = function() {
-    return Math.abs(this.docDelta);
-  };
-
-  this.absDataDelta = function() {
-    return readablizeBytes(Math.abs(this.dataDelta));
-  };
-
-  this.getDataDelta = function() {
-    return this.dataDelta;
-  };
-
-  this.setDataDelta = function(delta) {
-    this.dataDelta = delta;
-  };
-
-  this.hasChanges = function() {
-    return (
-      isDefined(this.nodeJoins) ||
-      isDefined(this.nodeLeaves) ||
-      isDefined(this.indicesCreated) ||
-      isDefined(this.indicesDeleted)
-      );
-  };
-
-  this.addJoiningNode = function(node) {
-    this.changes = true;
-    if (!isDefined(this.nodeJoins)) {
-      this.nodeJoins = [];
-    }
-    this.nodeJoins.push(node);
-  };
-
-  this.addLeavingNode = function(node) {
-    this.changes = true;
-    if (!isDefined(this.nodeLeaves)) {
-      this.nodeLeaves = [];
-    }
-    this.nodeLeaves.push(node);
-  };
-
-  this.hasJoins = function() {
-    return isDefined(this.nodeJoins);
-  };
-
-  this.hasLeaves = function() {
-    return isDefined(this.nodeLeaves);
-  };
-
-  this.hasCreatedIndices = function() {
-    return isDefined(this.indicesCreated);
-  };
-
-  this.hasDeletedIndices = function() {
-    return isDefined(this.indicesDeleted);
-  };
-
-  this.addCreatedIndex = function(index) {
-    if (!isDefined(this.indicesCreated)) {
-      this.indicesCreated = [];
-    }
-    this.indicesCreated.push(index);
-  };
-
-  this.addDeletedIndex = function(index) {
-    if (!isDefined(this.indicesDeleted)) {
-      this.indicesDeleted = [];
-    }
-    this.indicesDeleted.push(index);
-  };
-
-}
-
-function ClusterHealth(health) {
-  this.status = health.status;
-  this.cluster_name = health.cluster_name;
-  this.initializing_shards = health.initializing_shards;
-  this.active_primary_shards = health.active_primary_shards;
-  this.active_shards = health.active_shards;
-  this.relocating_shards = health.relocating_shards;
-  this.unassigned_shards = health.unassigned_shards;
-  this.number_of_nodes = health.number_of_nodes;
-  this.number_of_data_nodes = health.number_of_data_nodes;
-  this.timed_out = health.timed_out;
-  this.shards = this.active_shards + this.relocating_shards +
-      this.unassigned_shards + this.initializing_shards;
-  this.fetched_at = getTimeString(new Date());
-}
-
-function ClusterSettings(settings) {
-  // FIXME: 0.90/1.0 check
-  var valid = [
-    // cluster
-    'cluster.blocks.read_only',
-    'indices.ttl.interval',
-    'indices.cache.filter.size',
-    'discovery.zen.minimum_master_nodes',
-    // recovery
-    'indices.recovery.concurrent_streams',
-    'indices.recovery.compress',
-    'indices.recovery.file_chunk_size',
-    'indices.recovery.translog_ops',
-    'indices.recovery.translog_size',
-    'indices.recovery.max_bytes_per_sec',
-    // routing
-    'cluster.routing.allocation.node_initial_primaries_recoveries',
-    'cluster.routing.allocation.cluster_concurrent_rebalance',
-    'cluster.routing.allocation.awareness.attributes',
-    'cluster.routing.allocation.node_concurrent_recoveries',
-    'cluster.routing.allocation.disable_allocation',
-    'cluster.routing.allocation.disable_replica_allocation'
-  ];
-  var instance = this;
-  ['persistent', 'transient'].forEach(function(type) {
-    instance[type] = {};
-    var currentSettings = settings[type];
-    valid.forEach(function(setting) {
-      instance[type][setting] = getProperty(currentSettings, setting);
-    });
-  });
-}
-
-function Cluster(state, status, nodes, settings, aliases) {
-  this.created_at = new Date().getTime();
-
-  this.name = state.cluster_name;
-  this.master_node = state.master_node;
-
-  this.disableAllocation = 'false';
-  var persistentAllocation = getProperty(settings,
-      'persistent.cluster.routing.allocation.enable', 'all');
-
-  var transientAllocation = getProperty(settings,
-      'transient.cluster.routing.allocation.enable', '');
-
-  if (transientAllocation !== '') {
-    this.disableAllocation = transientAllocation == 'all' ? 'false' : 'true';
-  } else {
-    if (persistentAllocation != 'all') {
-      this.disableAllocation = 'true';
-    }
-  }
-
-  this.settings = settings;
-
-  var totalSize = 0;
-  var numDocs = 0;
-
-  this.nodes = Object.keys(state.nodes).map(function(nodeId) {
-    var nodeState = state.nodes[nodeId];
-    var nodeStats = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats);
-    if (nodeId === state.master_node) {
-      node.setCurrentMaster();
-    }
-    return node;
-  });
-
-  this.getNodes = function(considerType) {
-    return this.nodes.sort(function(a, b) {
-      return a.compare(b, considerType);
-    });
-  };
-
-  this.number_of_nodes = this.nodes.length;
-
-  var iRoutingTable = state.routing_table.indices;
-  var iStatus = status.indices;
-  var specialIndices = 0;
-  this.indices = Object.keys(iRoutingTable).map(function(indexName) {
-    var indexInfo = iRoutingTable[indexName];
-    var indexStatus = iStatus[indexName];
-    var indexAliases = aliases[indexName];
-    var index = new Index(indexName, state, indexInfo, indexStatus,
-        indexAliases);
-    if (index.special) {
-      specialIndices++;
-    }
-    totalSize += parseInt(index.total_size);
-    numDocs += index.num_docs;
-    return index;
-  });
-
-  if (isDefined(state.blocks.indices)) {
-    var indices = this.indices;
-    Object.keys(state.blocks.indices).forEach(function(indexName) {
-      indices.push(new Index(indexName));
-    });
-  }
-  this.indices = this.indices.sort(function(a, b) {
-    return a.compare(b);
-  });
-
-  this.special_indices = specialIndices;
-  this.num_docs = numDocs;
-  this.total_indices = this.indices.length;
-
-  this.shards = status._shards.total;
-  this.failed_shards = status._shards.failed;
-  this.successful_shards = status._shards.successful;
-  this.unassigned_shards = state.routing_nodes.unassigned.length;
-
-  this.total_size = readablizeBytes(totalSize);
-  this.total_size_in_bytes = totalSize;
-  this.changes = null;
-
-  this.computeChanges = function(oldCluster) {
-    var nodes = this.nodes;
-    var indices = this.indices;
-    var changes = new ClusterChanges();
-    if (isDefined(oldCluster) && this.name === oldCluster.name) {
-      // checks for node differences
-      oldCluster.nodes.forEach(function(node) {
-        for (var i = 0; i < nodes.length; i++) {
-          if (nodes[i].equals(node)) {
-            node = null;
-            break;
-          }
-        }
-        if (isDefined(node)) {
-          changes.addLeavingNode(node);
-        }
-      });
-
-      if (oldCluster.nodes.length != nodes.length || !changes.hasJoins()) {
-        nodes.forEach(function(node) {
-          for (var i = 0; i < oldCluster.nodes.length; i++) {
-            if (oldCluster.nodes[i].equals(node)) {
-              node = null;
-              break;
-            }
-          }
-          if (isDefined(node)) {
-            changes.addJoiningNode(node);
-          }
-        });
-      }
-
-      // checks for indices differences
-      oldCluster.indices.forEach(function(index) {
-        for (var i = 0; i < indices.length; i++) {
-          if (indices[i].equals(index)) {
-            index = null;
-            break;
-          }
-        }
-        if (isDefined(index)) {
-          changes.addDeletedIndex(index);
-        }
-      });
-
-      var equalNumberOfIndices = oldCluster.indices.length != indices.length;
-      if (equalNumberOfIndices || !changes.hasCreatedIndices()) {
-        indices.forEach(function(index) {
-          for (var i = 0; i < oldCluster.indices.length; i++) {
-            if (oldCluster.indices[i].equals(index)) {
-              index = null;
-              break;
-            }
-          }
-          if (isDefined(index)) {
-            changes.addCreatedIndex(index);
-          }
-        });
-      }
-      var docDelta = this.num_docs - oldCluster.num_docs;
-      // var docRate = docDelta / ((this.created_at - old_cluster.created_at) / 1000);
-      changes.setDocDelta(docDelta);
-      var dataDelta = this.total_size_in_bytes - oldCluster.total_size_in_bytes;
-      changes.setDataDelta(dataDelta);
-    }
-    this.changes = changes;
-  };
-
-  this.open_indices = function() {
-    return $.map(this.indices, function(index) {
-      if (index.state == 'open') {
-        return index;
-      } else {
-        return null;
-      }
-    });
-  };
-
-}
-
-
-// Expects URL according to /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
-// Examples:
-// http://localhost:9200
-// http://user:password@localhost:9200
-// https://localhost:9200
-function ESConnection(url, withCredentials) {
-  if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
-    url = 'http://' + url;
-  }
-  var protectedUrl = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
-  this.host = 'http://localhost:9200'; // default
-  this.withCredentials = withCredentials;
-  if (notEmpty(url)) {
-    var connectionParts = protectedUrl.exec(url);
-    if (isDefined(connectionParts)) {
-      this.host = connectionParts[1] + '://' + connectionParts[4];
-      this.username = connectionParts[2];
-      this.password = connectionParts[3];
-      this.auth = 'Basic ' + window.btoa(this.username + ':' + this.password);
-    } else {
-      this.host = url;
-    }
-  }
-
-}
-
-function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
-  this.name = indexName;
-  this.shards = null;
-  this.metadata = {};
-  this.state = 'close';
-  this.num_of_shards = 0;
-  this.num_of_replicas = 0;
-  this.aliases = [];
-  if (isDefined(aliases)) {
-    var indexAliases = aliases.aliases;
-    if (isDefined(indexAliases)) {
-      this.aliases = Object.keys(aliases.aliases);
-    }
-  }
-
-  this.visibleAliases = function() {
-    return this.aliases.length > 5 ? this.aliases.slice(0, 5) : this.aliases;
-  };
-
-  if (isDefined(clusterState)) {
-    var routing = getProperty(clusterState, 'routing_table.indices');
-    this.state = 'open';
-    if (isDefined(routing)) {
-      var shards = Object.keys(routing[indexName].shards);
-      this.num_of_shards = shards.length;
-      var shardMap = routing[indexName].shards;
-      this.num_of_replicas = shardMap[0].length - 1;
-    }
-  }
-  this.num_docs = getProperty(indexStatus, 'docs.num_docs', 0);
-  this.max_doc = getProperty(indexStatus, 'docs.max_doc', 0);
-  this.deleted_docs = getProperty(indexStatus, 'docs.deleted_docs', 0);
-  this.size = getProperty(indexStatus, 'index.primary_size_in_bytes', 0);
-  this.total_size = getProperty(indexStatus, 'index.size_in_bytes', 0);
-  this.size_in_bytes = readablizeBytes(this.size);
-  this.total_size_in_bytes = readablizeBytes(this.total_size);
-
-  this.unassigned = [];
-  this.unhealthy = false;
-
-  this.getShards = function(nodeId) {
-    if (isDefined(indexInfo)) {
-      if (this.shards === null) {
-        var indexShards = {};
-        var unassigned = [];
-        this.unassigned = unassigned;
-        $.map(indexInfo.shards, function(shards, shardNum) {
-          $.map(shards, function(shardRouting, shardCopy) {
-            if (shardRouting.node === null) {
-              unassigned.push(new UnassignedShard(shardRouting));
-            } else {
-              if (!isDefined(indexShards[shardRouting.node])) {
-                indexShards[shardRouting.node] = [];
-              }
-              var shardStatus = null;
-              if (isDefined(indexStatus) &&
-                  isDefined(indexStatus.shards[shardRouting.shard])) {
-                indexStatus.shards[shardRouting.shard].forEach(
-                    function(status) {
-                      if (status.routing.node == shardRouting.node &&
-                          status.routing.shard == shardRouting.shard) {
-                        shardStatus = status;
-                      }
-                    });
-              }
-              var newShard = new Shard(shardRouting, shardStatus);
-              indexShards[shardRouting.node].push(newShard);
-            }
-          });
-        });
-        this.shards = indexShards;
-      }
-    } else {
-      this.shards = {};
-    }
-    return this.shards[nodeId];
-  };
-
-  if (isDefined(clusterState) && isDefined(clusterState.routing_table)) {
-    var instance = this;
-    var shardsMap = clusterState.routing_table.indices[this.name].shards;
-    Object.keys(shardsMap).forEach(function(shardNum) {
-      shardsMap[shardNum].forEach(function(shard) {
-        if (shard.state != 'STARTED') {
-          instance.unhealthy = true;
-        }
-      });
-    });
-  }
-
-  this.special = this.name.indexOf('.') === 0 || this.name.indexOf('_') === 0;
-
-  this.compare = function(b) { // TODO: take into account index properties?
-    return this.name.localeCompare(b.name);
-  };
-
-  this.equals = function(index) {
-    return index !== null && index.name == this.name;
-  };
-
-  this.closed = function() {
-    return this.state === 'close';
-  };
-
-  this.open = function() {
-    return this.state === 'open';
-  };
-}
-
-function EditableIndexSettings(settings) {
-  // FIXME: 0.90/1.0 check
-  this.valid_settings = [
-    // blocks
-    'index.blocks.read_only',
-    'index.blocks.read',
-    'index.blocks.write',
-    'index.blocks.metadata',
-    // cache
-    'index.cache.filter.max_size',
-    'index.cache.filter.expire',
-    // index
-    'index.number_of_replicas',
-    'index.index_concurrency',
-    'index.warmer.enabled',
-    'index.refresh_interval',
-    'index.term_index_divisor',
-    'index.ttl.disable_purge',
-    'index.fail_on_merge_failure',
-    'index.gc_deletes',
-    'index.codec',
-    'index.compound_on_flush',
-    'index.term_index_interval',
-    'index.auto_expand_replicas',
-    'index.recovery.initial_shards',
-    'index.compound_format',
-    // routing
-    'index.routing.allocation.disable_allocation',
-    'index.routing.allocation.disable_new_allocation',
-    'index.routing.allocation.disable_replica_allocation',
-    'index.routing.allocation.total_shards_per_node',
-    // slowlog
-    'index.search.slowlog.threshold.query.warn',
-    'index.search.slowlog.threshold.query.info',
-    'index.search.slowlog.threshold.query.debug',
-    'index.search.slowlog.threshold.query.trace',
-    'index.search.slowlog.threshold.fetch.warn',
-    'index.search.slowlog.threshold.fetch.info',
-    'index.search.slowlog.threshold.fetch.debug',
-    'index.search.slowlog.threshold.fetch.trace',
-    'index.indexing.slowlog.threshold.index.warn',
-    'index.indexing.slowlog.threshold.index.info',
-    'index.indexing.slowlog.threshold.index.debug',
-    'index.indexing.slowlog.threshold.index.trace',
-    // translog
-    'index.translog.flush_threshold_ops',
-    'index.translog.flush_threshold_size',
-    'index.translog.flush_threshold_period',
-    'index.translog.disable_flush',
-    'index.translog.fs.type'
-  ];
-  var instance = this;
-  this.valid_settings.forEach(function(setting) {
-    instance[setting] = getProperty(settings, setting);
-  });
-}
-
-function Node(nodeId, nodeInfo, nodeStats) {
-  this.id = nodeId;
-  this.name = nodeInfo.name;
-  this.metadata = {};
-  this.metadata.info = nodeInfo;
-  this.metadata.stats = nodeStats;
-  this.transport_address = nodeInfo.transport_address;
-  this.host = nodeStats.host;
-  var master = nodeInfo.attributes.master === 'false' ? false : true;
-  var data = nodeInfo.attributes.data === 'false' ? false : true;
-  var client = nodeInfo.attributes.client === 'true' ? true : false;
-  this.master = master && !client;
-  this.data = data && !client;
-  this.client = client || !master && !data;
-  this.current_master = false;
-  this.stats = nodeStats;
-
-  this.heap_used = readablizeBytes(getProperty(this.stats,
-    'jvm.mem.heap_used_in_bytes'));
-
-  this.heap_committed = readablizeBytes(getProperty(this.stats,
-    'jvm.mem.heap_committed_in_bytes'));
-
-  this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
-
-  this.heap_max = readablizeBytes(getProperty(this.stats,
-    'jvm.mem.heap_max_in_bytes'));
-
-  var totalInBytes = getProperty(this.stats, 'fs.total.total_in_bytes');
-  var freeInBytes = getProperty(this.stats, 'fs.total.free_in_bytes');
-
-  this.disk_total = readablizeBytes(totalInBytes);
-  this.disk_free = readablizeBytes(freeInBytes);
-  var usedRatio = (totalInBytes - freeInBytes) / totalInBytes;
-  this.disk_used_percent = Math.round(100 * usedRatio);
-
-  this.cpu_user = getProperty(this.stats, 'os.cpu.user');
-  this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
-
-  this.setCurrentMaster = function() {
-    this.current_master = true;
-  };
-
-  this.equals = function(node) {
-    return node.id === this.id;
-  };
-
-  this.compare = function(other, considerType) {
-    if (considerType) {
-      if (other.current_master) { return 1; } // current master comes first
-      if (this.current_master) { return -1; } // current master comes first
-      if (other.master && !this.master) { return 1; } // master eligible comes first
-      if (this.master && !other.master) { return -1; } // master eligible comes first
-      if (other.data && !this.data) { return 1; } // data node comes first
-      if (this.data && !other.data) { return -1; } // data node comes first
-    }
-    return this.name.localeCompare(other.name); // if all the same, lex. sort
-  };
-
-}
-
-function Shard(routing, info) {
-  this.info = isDefined(info) ? info : routing;
-  this.primary = routing.primary;
-  this.shard = routing.shard;
-  this.state = routing.state;
-  this.node = routing.node;
-  this.index = routing.index;
-  this.id = this.node + '_' + this.shard + '_' + this.index;
-}
-
-function UnassignedShard(info) {
-  this.primary = info.primary;
-  this.shard = info.shard;
-  this.state = info.state;
-  this.node = info.node;
-  this.index = info.index;
-  this.id = this.node + '_' + this.shard + '_' + this.index;
-}
-
-/** TYPES **/
-function Token(token, startOffset, endOffset, position) {
-  this.token = token;
-  this.start_offset = startOffset;
-  this.end_offset = endOffset;
-  this.position = position;
-}
-
-function Repository(name, info) {
-  this.name = name;
-  this.type = info.type;
-  this.settings = info.settings;
-
-  this.asJson = function() {
-    var json = {type: this.type};
-    if (this.type === 'fs') {
-      var fsSettings = ['location', 'chunk_size', 'max_restore_bytes_per_sec',
-        'max_snapshot_bytes_per_sec', 'compress'];
-      json.settings = this.getSettings(fsSettings);
-    }
-    if (this.type === 'url') {
-      var urlSettings = ['url'];
-      json.settings = this.getSettings(urlSettings);
-    }
-    if (this.type === 's3') {
-      var s3Settings = ['region', 'bucket', 'base_path', 'access_key',
-        'secret_key', 'chunk_size', 'max_retries', 'compress',
-        'server_side_encryption'
-      ];
-      json.settings = this.getSettings(s3Settings);
-    }
-    if (this.type === 'hdfs') {
-      var hdfsSettings = ['uri', 'path', 'load_defaults', 'conf_location',
-        'concurrent_streams', 'compress', 'chunk_size'];
-      json.settings = this.getSettings(hdfsSettings);
-    }
-    if (this.type === 'azure') {
-      var azureSettings = ['container', 'base_path', 'concurrent_streams',
-        'chunk_size', 'compress'];
-      json.settings = this.getSettings(azureSettings);
-    }
-    return JSON.stringify(json);
-  };
-
-  this.validate = function() {
-    if (!notEmpty(this.name)) {
-      throw 'Repository name is required';
-    }
-    if (!notEmpty(this.type)) {
-      throw 'Repository type is required';
-    }
-    if (this.type === 'fs') {
-      var fsRequired = ['location'];
-      this.validateSettings(fsRequired);
-    }
-    if (this.type === 'url') {
-      var urlRequired = ['url'];
-      this.validateSettings(urlRequired);
-    }
-    if (this.type === 's3') {
-      var s3Required = ['bucket'];
-      this.validateSettings(s3Required);
-    }
-    if (this.type === 'hdfs') {
-      var hdfsRequired = ['path'];
-      this.validateSettings(hdfsRequired);
-    }
-  };
-
-  this.validateSettings = function(required) {
-    var repository = this;
-    required.forEach(function(setting) {
-      if (!notEmpty(repository.settings[setting])) {
-        var type = repository.type;
-        throw(setting + ' is required for repositories of type ' + type);
-      }
-    });
-  };
-
-  this.getSettings = function(availableSettings) {
-    var settings = {};
-    var currentSettings = this.settings;
-    availableSettings.forEach(function(setting) {
-      if (notEmpty(currentSettings[setting])) {
-        settings[setting] = currentSettings[setting];
-      }
-    });
-    return settings;
-  };
-}
-
-function Snapshot(info) {
-  this.name = info.snapshot;
-  this.indices = info.indices;
-  this.state = info.state;
-  this.start_time = info.start_time;
-  this.start_time_in_millis = info.start_time_in_millis;
-  this.end_time = info.end_time;
-  this.end_time_in_millis = info.end_time_in_millis;
-  this.duration_in_millis = info.duration_in_millis;
-  this.failures = info.failures;
-  this.shards = info.shards;
-}
-
-function Warmer(id, index, body) {
-  this.id = id;
-  this.index = index;
-  this.source = body.source;
-  this.types = body.types;
-}
-
-function PercolateQuery(queryInfo) {
-  this.index = queryInfo._index;
-  this.id = queryInfo._id;
-  this.source = queryInfo._source;
-  this.filter = {};
-
-  this.sourceAsJSON = function() {
-    try {
-      return JSON.stringify(this.source, undefined, 2);
-    } catch (error) {
-
-    }
-  };
-
-  this.equals = function(other) {
-    return (other instanceof PercolateQuery &&
-      this.index == other.index &&
-      this.id == other.id &&
-      this.source == other.source);
-  };
-}
-
-function PercolatorsPage(from, size, total, percolators) {
-  this.from = from;
-  this.size = size;
-  this.total = total;
-  this.percolators = percolators;
-
-  this.hasNextPage = function() {
-    return from + size < total;
-  };
-
-  this.hasPreviousPage = function() {
-    return from > 0;
-  };
-
-  this.firstResult = function() {
-    return total > 0 ? from + 1 : 0;
-  };
-
-  this.lastResult = function() {
-    return this.hasNextPage() ? from + size : total;
-  };
-
-  this.nextOffset = function() {
-    return this.hasNextPage() ? from + size : from;
-  };
-
-  this.previousOffset = function() {
-    return this.hasPreviousPage() ? from - size : from;
-  };
-
-  this.getPage = function() {
-    return percolators;
-  };
-
-  this.total = function() {
-    return total;
-  };
-}
-
-function IndexMetadata(index, metadata) {
-  this.index = index;
-  this.mappings = metadata.mappings;
-  this.settings = metadata.settings;
-
-  this.getTypes = function() {
-    return Object.keys(this.mappings).sort(function(a, b) {
-      return a.localeCompare(b);
-    });
-  };
-
-  this.getAnalyzers = function() {
-    var analyzers = Object.keys(getProperty(this.settings,
-        'index.analysis.analyzer', {}));
-    if (analyzers.length === 0) {
-      Object.keys(this.settings).forEach(function(setting) {
-        if (setting.indexOf('index.analysis.analyzer') === 0) {
-          var analyzer = setting.substring('index.analysis.analyzer.'.length);
-          analyzer = analyzer.substring(0, analyzer.indexOf('.'));
-          if ($.inArray(analyzer, analyzers) == -1) {
-            analyzers.push(analyzer);
-          }
-        }
-      });
-    }
-    return analyzers.sort(function(a, b) {
-      return a.localeCompare(b);
-    });
-  };
-
-  function isAnalyzable(type) {
-    var analyzableTypes = ['float', 'double', 'byte', 'short', 'integer',
-      'long', 'nested', 'object'
-    ];
-    return analyzableTypes.indexOf(type) == -1;
-  }
-
-  this.getFields = function(type) {
-    var fields = [];
-    if (isDefined(this.mappings[type])) {
-      fields = this.getProperties('', this.mappings[type].properties);
-    }
-    return fields.sort(function(a, b) {
-      return a.localeCompare(b);
-    });
-  };
-
-  this.getProperties = function(parent, fields) {
-    var prefix = parent !== '' ? parent + '.' : '';
-    var validFields = [];
-    for (var field in fields) {
-      // multi field
-      if (isDefined(fields[field].fields)) {
-        var addPrefix = fields[field].path != 'just_name';
-        var multiPrefix = addPrefix ? prefix + field : prefix;
-        var multiProps = this.getProperties(multiPrefix, fields[field].fields);
-        validFields = validFields.concat(multiProps);
-      }
-      // nested and object types
-      var nestedType = fields[field].type == 'nested';
-      var objectType = fields[field].type == 'object';
-      if (nestedType || objectType || !isDefined(fields[field].type)) {
-        var nestedProperties = this.getProperties(prefix + field,
-            fields[field].properties);
-        validFields = validFields.concat(nestedProperties);
-      }
-      // normal fields
-      if (isDefined(fields[field].type) && isAnalyzable(fields[field].type)) {
-        validFields.push(prefix + field);
-      }
-    }
-    return validFields;
-  };
-}
-
-function NodeStats(id, stats) {
-  this.id = id;
-  this.name = stats.name;
-  this.stats = stats;
-}
-
 var kopf = angular.module('kopf', ['ngRoute']);
 
 // manages behavior of confirmation dialog
@@ -1270,6 +348,66 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
 
     $scope.initializeController = function() {
       $scope.indices = ElasticService.cluster.open_indices();
+    };
+
+  }
+]);
+
+kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
+  'AlertService', 'ElasticService',
+  function($scope, $location, $timeout, AlertService, ElasticService) {
+
+    $scope.bench = new Benchmark();
+    $scope.competitor = new Competitor();
+    $scope.indices = [];
+    $scope.types = [];
+
+    $scope.initializeController = function() {
+      if (isDefined(ElasticService.cluster)) {
+        $scope.indices = ElasticService.cluster.indices || [];
+      }
+    };
+
+    $scope.addCompetitor = function() {
+      if (notEmpty($scope.competitor.name)) {
+        this.bench.addCompetitor($scope.competitor);
+        $scope.competitor = new Competitor();
+      } else {
+        AlertService.error('Competitor needs a name');
+      }
+    };
+
+    $scope.removeCompetitor = function(index) {
+      $scope.bench.competitors.splice(index, 1);
+    };
+
+    $scope.editCompetitor = function(index) {
+      var edit = $scope.bench.competitors.splice(index, 1);
+      $scope.competitor = edit[0];
+    };
+
+    $scope.runBenchmark = function() {
+      $('#benchmark-result').html('');
+      try {
+        var json = $scope.bench.toJson();
+        ElasticService.executeBenchmark(json,
+            function(response) {
+              $scope.result = JSONTree.create(response);
+              $('#benchmark-result').html($scope.result);
+            },
+            function(error, status) {
+              if (status == 503) {
+                AlertService.info('No available nodes for benchmarking. ' +
+                    'At least one node must be started with ' +
+                    '\'--node.bench true\' option.');
+              } else {
+                AlertService.error(error.error);
+              }
+            }
+        );
+      } catch (error) {
+        AlertService.error(error);
+      }
     };
 
   }
@@ -1778,6 +916,22 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
   }
 ]);
 
+kopf.controller('ConfirmDialogController', ['$scope', 'ConfirmDialogService',
+  function($scope, ConfirmDialogService) {
+
+    $scope.dialog_service = ConfirmDialogService;
+
+    $scope.close = function() {
+      $scope.dialog_service.close();
+    };
+
+    $scope.confirm = function() {
+      $scope.dialog_service.confirm();
+    };
+
+  }
+]);
+
 kopf.controller('CreateIndexController', ['$scope', 'AlertService',
   'ElasticService', 'AceEditorService',
   function($scope, AlertService, ElasticService, AceEditorService) {
@@ -2044,115 +1198,6 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     };
 
   }
-]);
-
-kopf.controller('RestController', ['$scope', '$location', '$timeout',
-  'AlertService', 'AceEditorService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, AceEditorService,
-           ElasticService) {
-
-    $scope.request = new Request('/_search', 'GET', '{}');
-
-    $scope.validation_error = null;
-
-    $scope.history = [];
-
-    $scope.editor = null;
-
-    $scope.loadHistory = function() {
-      var history = [];
-      var rawHistory = localStorage.getItem('kopf_request_history');
-      if (isDefined(rawHistory)) {
-        try {
-          JSON.parse(rawHistory).forEach(function(h) {
-            history.push(new Request().loadFromJSON(h));
-          });
-        } catch (error) {
-          localStorage.setItem('kopf_request_history', null);
-        }
-      }
-      return history;
-    };
-
-    $scope.loadFromHistory = function(request) {
-      $scope.request.path = request.path;
-      $scope.request.body = request.body;
-      $scope.request.method = request.method;
-      $scope.editor.setValue(request.body);
-    };
-
-    $scope.addToHistory = function(request) {
-      var exists = false;
-      for (var i = 0; i < $scope.history.length; i++) {
-        if ($scope.history[i].equals(request)) {
-          exists = true;
-          break;
-        }
-      }
-      if (!exists) {
-        $scope.history.unshift(request);
-        if ($scope.history.length > 30) {
-          $scope.history.length = 30;
-        }
-        var historyRaw = JSON.stringify($scope.history);
-        localStorage.setItem('kopf_request_history', historyRaw);
-      }
-    };
-
-    $scope.sendRequest = function() {
-      if (notEmpty($scope.request.path)) {
-        $scope.request.body = $scope.editor.format();
-        $('#rest-client-response').html('');
-        if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
-          AlertService.info('You are executing a GET request with body ' +
-              'content. Maybe you meant to use POST or PUT?');
-        }
-        ElasticService.clusterRequest($scope.request.method,
-            $scope.request.path, $scope.request.body,
-            function(response) {
-              var content = response;
-              try {
-                content = JSONTree.create(response);
-              } catch (error) {
-                // nothing to do
-              }
-              $('#rest-client-response').html(content);
-              $scope.addToHistory(new Request($scope.request.path,
-                  $scope.request.method, $scope.request.body));
-            },
-            function(error, status) {
-              if (status !== 0) {
-                AlertService.error('Request was not successful');
-                try {
-                  $('#rest-client-response').html(JSONTree.create(error));
-                } catch (invalidJsonError) {
-                  $('#rest-client-response').html(error);
-                }
-              } else {
-                var url = ElasticService.connection.host + $scope.request.path;
-                AlertService.error(url + ' is unreachable');
-              }
-            }
-        );
-      } else {
-        AlertService.warn('Path is empty');
-      }
-    };
-
-    $scope.initEditor = function() {
-      if (!isDefined($scope.editor)) {
-        $scope.editor = AceEditorService.init('rest-client-editor');
-        $scope.editor.setValue($scope.request.body);
-      }
-    };
-
-    $scope.initializeController = function() {
-      $scope.initEditor();
-      $scope.history = $scope.loadHistory();
-    };
-
-  }
-
 ]);
 
 kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
@@ -2529,20 +1574,113 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
   }
 ]);
 
-kopf.controller('ConfirmDialogController', ['$scope', 'ConfirmDialogService',
-  function($scope, ConfirmDialogService) {
+kopf.controller('RestController', ['$scope', '$location', '$timeout',
+  'AlertService', 'AceEditorService', 'ElasticService',
+  function($scope, $location, $timeout, AlertService, AceEditorService,
+           ElasticService) {
 
-    $scope.dialog_service = ConfirmDialogService;
+    $scope.request = new Request('/_search', 'GET', '{}');
 
-    $scope.close = function() {
-      $scope.dialog_service.close();
+    $scope.validation_error = null;
+
+    $scope.history = [];
+
+    $scope.editor = null;
+
+    $scope.loadHistory = function() {
+      var history = [];
+      var rawHistory = localStorage.getItem('kopf_request_history');
+      if (isDefined(rawHistory)) {
+        try {
+          JSON.parse(rawHistory).forEach(function(h) {
+            history.push(new Request().loadFromJSON(h));
+          });
+        } catch (error) {
+          localStorage.setItem('kopf_request_history', null);
+        }
+      }
+      return history;
     };
 
-    $scope.confirm = function() {
-      $scope.dialog_service.confirm();
+    $scope.loadFromHistory = function(request) {
+      $scope.request.path = request.path;
+      $scope.request.body = request.body;
+      $scope.request.method = request.method;
+      $scope.editor.setValue(request.body);
+    };
+
+    $scope.addToHistory = function(request) {
+      var exists = false;
+      for (var i = 0; i < $scope.history.length; i++) {
+        if ($scope.history[i].equals(request)) {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        $scope.history.unshift(request);
+        if ($scope.history.length > 30) {
+          $scope.history.length = 30;
+        }
+        var historyRaw = JSON.stringify($scope.history);
+        localStorage.setItem('kopf_request_history', historyRaw);
+      }
+    };
+
+    $scope.sendRequest = function() {
+      if (notEmpty($scope.request.path)) {
+        $scope.request.body = $scope.editor.format();
+        $('#rest-client-response').html('');
+        if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
+          AlertService.info('You are executing a GET request with body ' +
+              'content. Maybe you meant to use POST or PUT?');
+        }
+        ElasticService.clusterRequest($scope.request.method,
+            $scope.request.path, $scope.request.body,
+            function(response) {
+              var content = response;
+              try {
+                content = JSONTree.create(response);
+              } catch (error) {
+                // nothing to do
+              }
+              $('#rest-client-response').html(content);
+              $scope.addToHistory(new Request($scope.request.path,
+                  $scope.request.method, $scope.request.body));
+            },
+            function(error, status) {
+              if (status !== 0) {
+                AlertService.error('Request was not successful');
+                try {
+                  $('#rest-client-response').html(JSONTree.create(error));
+                } catch (invalidJsonError) {
+                  $('#rest-client-response').html(error);
+                }
+              } else {
+                var url = ElasticService.connection.host + $scope.request.path;
+                AlertService.error(url + ' is unreachable');
+              }
+            }
+        );
+      } else {
+        AlertService.warn('Path is empty');
+      }
+    };
+
+    $scope.initEditor = function() {
+      if (!isDefined($scope.editor)) {
+        $scope.editor = AceEditorService.init('rest-client-editor');
+        $scope.editor.setValue($scope.request.body);
+      }
+    };
+
+    $scope.initializeController = function() {
+      $scope.initEditor();
+      $scope.history = $scope.loadHistory();
     };
 
   }
+
 ]);
 
 kopf.controller('WarmupController', [
@@ -2644,65 +1782,1468 @@ kopf.controller('WarmupController', [
   }
 ]);
 
-kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
-  'AlertService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, ElasticService) {
+kopf.directive('ngPagination', function() {
+  return {
+    scope: {
+      paginator: '=paginator',
+      page: '=page'
+    },
+    templateUrl: './partials/pagination.html'
+  };
+});
 
-    $scope.bench = new Benchmark();
-    $scope.competitor = new Competitor();
-    $scope.indices = [];
-    $scope.types = [];
+function IndexAliases(index, aliases) {
+  this.index = index;
+  this.aliases = aliases;
 
-    $scope.initializeController = function() {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.indices = ElasticService.cluster.indices || [];
+  this.clone = function() {
+    var cloned = new IndexAliases(this.index, []);
+    cloned.aliases = this.aliases.map(function(alias) {
+      return alias.clone();
+    });
+    return cloned;
+  };
+}
+
+IndexAliases.diff = function(original, modified) {
+  var differences = [];
+  modified.forEach(function(ia) {
+    var isNew = true;
+    original.forEach(function(origIA) {
+      if (ia.index == origIA.index) {
+        isNew = false;
+        ia.aliases.forEach(function(alias) {
+          var originalAliases = origIA.aliases.filter(function(originalAlias) {
+            return alias.equals(originalAlias);
+          });
+          if (originalAliases.length === 0) {
+            differences.push(alias);
+          }
+        });
       }
-    };
+    });
+    if (isNew) {
+      ia.aliases.forEach(function(alias) {
+        differences.push(alias);
+      });
+    }
+  });
+  return differences;
+};
 
-    $scope.addCompetitor = function() {
-      if (notEmpty($scope.competitor.name)) {
-        this.bench.addCompetitor($scope.competitor);
-        $scope.competitor = new Competitor();
+function Alias(alias, index, filter, indexRouting, searchRouting) {
+  this.alias = isDefined(alias) ? alias.toLowerCase() : '';
+  this.index = isDefined(index) ? index.toLowerCase() : '';
+  this.filter = isDefined(filter) ? filter : '';
+  this.index_routing = isDefined(indexRouting) ? indexRouting : '';
+  this.search_routing = isDefined(searchRouting) ? searchRouting : '';
+
+  this.validate = function() {
+    if (!notEmpty(this.alias)) {
+      throw 'Alias must have a non empty name';
+    }
+    if (!notEmpty(this.index)) {
+      throw 'Alias must have a valid index name';
+    }
+  };
+
+  this.equals = function(otherAlias) {
+    var equal =
+        (this.alias === otherAlias.alias) &&
+        (this.index === otherAlias.index) &&
+        (this.filter === otherAlias.filter) &&
+        (this.index_routing === otherAlias.index_routing) &&
+        (this.search_routing === otherAlias.search_routing);
+    return equal;
+  };
+
+  this.info = function() {
+    var info = {};
+    info.index = this.index;
+    info.alias = this.alias;
+
+    if (isDefined(this.filter)) {
+      if (typeof this.filter == 'string' && notEmpty(this.filter)) {
+        info.filter = JSON.parse(this.filter);
       } else {
-        AlertService.error('Competitor needs a name');
+        info.filter = this.filter;
       }
-    };
+    }
+    if (notEmpty(this.index_routing)) {
+      info.index_routing = this.index_routing;
+    }
+    if (notEmpty(this.search_routing)) {
+      info.search_routing = this.search_routing;
+    }
+    return info;
+  };
 
-    $scope.removeCompetitor = function(index) {
-      $scope.bench.competitors.splice(index, 1);
-    };
+  this.clone = function() {
+    return new Alias(this.alias, this.index, this.filter, this.index_routing,
+        this.search_routing);
+  };
+}
 
-    $scope.editCompetitor = function(index) {
-      var edit = $scope.bench.competitors.splice(index, 1);
-      $scope.competitor = edit[0];
-    };
+function Cluster(state, status, nodes, settings, aliases) {
+  this.created_at = new Date().getTime();
 
-    $scope.runBenchmark = function() {
-      $('#benchmark-result').html('');
-      try {
-        var json = $scope.bench.toJson();
-        ElasticService.executeBenchmark(json,
-            function(response) {
-              $scope.result = JSONTree.create(response);
-              $('#benchmark-result').html($scope.result);
-            },
-            function(error, status) {
-              if (status == 503) {
-                AlertService.info('No available nodes for benchmarking. ' +
-                    'At least one node must be started with ' +
-                    '\'--node.bench true\' option.');
-              } else {
-                AlertService.error(error.error);
-              }
-            }
-        );
-      } catch (error) {
-        AlertService.error(error);
-      }
-    };
+  this.name = state.cluster_name;
+  this.master_node = state.master_node;
 
+  this.disableAllocation = 'false';
+  var persistentAllocation = getProperty(settings,
+      'persistent.cluster.routing.allocation.enable', 'all');
+
+  var transientAllocation = getProperty(settings,
+      'transient.cluster.routing.allocation.enable', '');
+
+  if (transientAllocation !== '') {
+    this.disableAllocation = transientAllocation == 'all' ? 'false' : 'true';
+  } else {
+    if (persistentAllocation != 'all') {
+      this.disableAllocation = 'true';
+    }
   }
-]);
+
+  this.settings = settings;
+
+  var totalSize = 0;
+  var numDocs = 0;
+
+  this.nodes = Object.keys(state.nodes).map(function(nodeId) {
+    var nodeState = state.nodes[nodeId];
+    var nodeStats = nodes.nodes[nodeId];
+    var node = new Node(nodeId, nodeState, nodeStats);
+    if (nodeId === state.master_node) {
+      node.setCurrentMaster();
+    }
+    return node;
+  });
+
+  this.getNodes = function(considerType) {
+    return this.nodes.sort(function(a, b) {
+      return a.compare(b, considerType);
+    });
+  };
+
+  this.number_of_nodes = this.nodes.length;
+
+  var iRoutingTable = state.routing_table.indices;
+  var iStatus = status.indices;
+  var specialIndices = 0;
+  this.indices = Object.keys(iRoutingTable).map(function(indexName) {
+    var indexInfo = iRoutingTable[indexName];
+    var indexStatus = iStatus[indexName];
+    var indexAliases = aliases[indexName];
+    var index = new Index(indexName, state, indexInfo, indexStatus,
+        indexAliases);
+    if (index.special) {
+      specialIndices++;
+    }
+    totalSize += parseInt(index.total_size);
+    numDocs += index.num_docs;
+    return index;
+  });
+
+  if (isDefined(state.blocks.indices)) {
+    var indices = this.indices;
+    Object.keys(state.blocks.indices).forEach(function(indexName) {
+      indices.push(new Index(indexName));
+    });
+  }
+  this.indices = this.indices.sort(function(a, b) {
+    return a.compare(b);
+  });
+
+  this.special_indices = specialIndices;
+  this.num_docs = numDocs;
+  this.total_indices = this.indices.length;
+
+  this.shards = status._shards.total;
+  this.failed_shards = status._shards.failed;
+  this.successful_shards = status._shards.successful;
+  this.unassigned_shards = state.routing_nodes.unassigned.length;
+
+  this.total_size = readablizeBytes(totalSize);
+  this.total_size_in_bytes = totalSize;
+  this.changes = null;
+
+  this.computeChanges = function(oldCluster) {
+    var nodes = this.nodes;
+    var indices = this.indices;
+    var changes = new ClusterChanges();
+    if (isDefined(oldCluster) && this.name === oldCluster.name) {
+      // checks for node differences
+      oldCluster.nodes.forEach(function(node) {
+        for (var i = 0; i < nodes.length; i++) {
+          if (nodes[i].equals(node)) {
+            node = null;
+            break;
+          }
+        }
+        if (isDefined(node)) {
+          changes.addLeavingNode(node);
+        }
+      });
+
+      if (oldCluster.nodes.length != nodes.length || !changes.hasJoins()) {
+        nodes.forEach(function(node) {
+          for (var i = 0; i < oldCluster.nodes.length; i++) {
+            if (oldCluster.nodes[i].equals(node)) {
+              node = null;
+              break;
+            }
+          }
+          if (isDefined(node)) {
+            changes.addJoiningNode(node);
+          }
+        });
+      }
+
+      // checks for indices differences
+      oldCluster.indices.forEach(function(index) {
+        for (var i = 0; i < indices.length; i++) {
+          if (indices[i].equals(index)) {
+            index = null;
+            break;
+          }
+        }
+        if (isDefined(index)) {
+          changes.addDeletedIndex(index);
+        }
+      });
+
+      var equalNumberOfIndices = oldCluster.indices.length != indices.length;
+      if (equalNumberOfIndices || !changes.hasCreatedIndices()) {
+        indices.forEach(function(index) {
+          for (var i = 0; i < oldCluster.indices.length; i++) {
+            if (oldCluster.indices[i].equals(index)) {
+              index = null;
+              break;
+            }
+          }
+          if (isDefined(index)) {
+            changes.addCreatedIndex(index);
+          }
+        });
+      }
+      var docDelta = this.num_docs - oldCluster.num_docs;
+      // var docRate = docDelta / ((this.created_at - old_cluster.created_at) / 1000);
+      changes.setDocDelta(docDelta);
+      var dataDelta = this.total_size_in_bytes - oldCluster.total_size_in_bytes;
+      changes.setDataDelta(dataDelta);
+    }
+    this.changes = changes;
+  };
+
+  this.open_indices = function() {
+    return $.map(this.indices, function(index) {
+      if (index.state == 'open') {
+        return index;
+      } else {
+        return null;
+      }
+    });
+  };
+
+}
+
+function ClusterChanges() {
+
+  this.nodeJoins = null;
+  this.nodeLeaves = null;
+  this.indicesCreated = null;
+  this.indicesDeleted = null;
+
+  this.docDelta = 0;
+  this.dataDelta = 0;
+
+  this.setDocDelta = function(delta) {
+    this.docDelta = delta;
+  };
+
+  this.getDocDelta = function() {
+    return this.docDelta;
+  };
+
+  this.absDocDelta = function() {
+    return Math.abs(this.docDelta);
+  };
+
+  this.absDataDelta = function() {
+    return readablizeBytes(Math.abs(this.dataDelta));
+  };
+
+  this.getDataDelta = function() {
+    return this.dataDelta;
+  };
+
+  this.setDataDelta = function(delta) {
+    this.dataDelta = delta;
+  };
+
+  this.hasChanges = function() {
+    return (
+      isDefined(this.nodeJoins) ||
+      isDefined(this.nodeLeaves) ||
+      isDefined(this.indicesCreated) ||
+      isDefined(this.indicesDeleted)
+      );
+  };
+
+  this.addJoiningNode = function(node) {
+    this.changes = true;
+    if (!isDefined(this.nodeJoins)) {
+      this.nodeJoins = [];
+    }
+    this.nodeJoins.push(node);
+  };
+
+  this.addLeavingNode = function(node) {
+    this.changes = true;
+    if (!isDefined(this.nodeLeaves)) {
+      this.nodeLeaves = [];
+    }
+    this.nodeLeaves.push(node);
+  };
+
+  this.hasJoins = function() {
+    return isDefined(this.nodeJoins);
+  };
+
+  this.hasLeaves = function() {
+    return isDefined(this.nodeLeaves);
+  };
+
+  this.hasCreatedIndices = function() {
+    return isDefined(this.indicesCreated);
+  };
+
+  this.hasDeletedIndices = function() {
+    return isDefined(this.indicesDeleted);
+  };
+
+  this.addCreatedIndex = function(index) {
+    if (!isDefined(this.indicesCreated)) {
+      this.indicesCreated = [];
+    }
+    this.indicesCreated.push(index);
+  };
+
+  this.addDeletedIndex = function(index) {
+    if (!isDefined(this.indicesDeleted)) {
+      this.indicesDeleted = [];
+    }
+    this.indicesDeleted.push(index);
+  };
+
+}
+
+function ClusterHealth(health) {
+  this.status = health.status;
+  this.cluster_name = health.cluster_name;
+  this.initializing_shards = health.initializing_shards;
+  this.active_primary_shards = health.active_primary_shards;
+  this.active_shards = health.active_shards;
+  this.relocating_shards = health.relocating_shards;
+  this.unassigned_shards = health.unassigned_shards;
+  this.number_of_nodes = health.number_of_nodes;
+  this.number_of_data_nodes = health.number_of_data_nodes;
+  this.timed_out = health.timed_out;
+  this.shards = this.active_shards + this.relocating_shards +
+      this.unassigned_shards + this.initializing_shards;
+  this.fetched_at = getTimeString(new Date());
+}
+
+function ClusterSettings(settings) {
+  // FIXME: 0.90/1.0 check
+  var valid = [
+    // cluster
+    'cluster.blocks.read_only',
+    'indices.ttl.interval',
+    'indices.cache.filter.size',
+    'discovery.zen.minimum_master_nodes',
+    // recovery
+    'indices.recovery.concurrent_streams',
+    'indices.recovery.compress',
+    'indices.recovery.file_chunk_size',
+    'indices.recovery.translog_ops',
+    'indices.recovery.translog_size',
+    'indices.recovery.max_bytes_per_sec',
+    // routing
+    'cluster.routing.allocation.node_initial_primaries_recoveries',
+    'cluster.routing.allocation.cluster_concurrent_rebalance',
+    'cluster.routing.allocation.awareness.attributes',
+    'cluster.routing.allocation.node_concurrent_recoveries',
+    'cluster.routing.allocation.disable_allocation',
+    'cluster.routing.allocation.disable_replica_allocation'
+  ];
+  var instance = this;
+  ['persistent', 'transient'].forEach(function(type) {
+    instance[type] = {};
+    var currentSettings = settings[type];
+    valid.forEach(function(setting) {
+      instance[type][setting] = getProperty(currentSettings, setting);
+    });
+  });
+}
+
+function EditableIndexSettings(settings) {
+  // FIXME: 0.90/1.0 check
+  this.valid_settings = [
+    // blocks
+    'index.blocks.read_only',
+    'index.blocks.read',
+    'index.blocks.write',
+    'index.blocks.metadata',
+    // cache
+    'index.cache.filter.max_size',
+    'index.cache.filter.expire',
+    // index
+    'index.number_of_replicas',
+    'index.index_concurrency',
+    'index.warmer.enabled',
+    'index.refresh_interval',
+    'index.term_index_divisor',
+    'index.ttl.disable_purge',
+    'index.fail_on_merge_failure',
+    'index.gc_deletes',
+    'index.codec',
+    'index.compound_on_flush',
+    'index.term_index_interval',
+    'index.auto_expand_replicas',
+    'index.recovery.initial_shards',
+    'index.compound_format',
+    // routing
+    'index.routing.allocation.disable_allocation',
+    'index.routing.allocation.disable_new_allocation',
+    'index.routing.allocation.disable_replica_allocation',
+    'index.routing.allocation.total_shards_per_node',
+    // slowlog
+    'index.search.slowlog.threshold.query.warn',
+    'index.search.slowlog.threshold.query.info',
+    'index.search.slowlog.threshold.query.debug',
+    'index.search.slowlog.threshold.query.trace',
+    'index.search.slowlog.threshold.fetch.warn',
+    'index.search.slowlog.threshold.fetch.info',
+    'index.search.slowlog.threshold.fetch.debug',
+    'index.search.slowlog.threshold.fetch.trace',
+    'index.indexing.slowlog.threshold.index.warn',
+    'index.indexing.slowlog.threshold.index.info',
+    'index.indexing.slowlog.threshold.index.debug',
+    'index.indexing.slowlog.threshold.index.trace',
+    // translog
+    'index.translog.flush_threshold_ops',
+    'index.translog.flush_threshold_size',
+    'index.translog.flush_threshold_period',
+    'index.translog.disable_flush',
+    'index.translog.fs.type'
+  ];
+  var instance = this;
+  this.valid_settings.forEach(function(setting) {
+    instance[setting] = getProperty(settings, setting);
+  });
+}
+
+
+// Expects URL according to /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
+// Examples:
+// http://localhost:9200
+// http://user:password@localhost:9200
+// https://localhost:9200
+function ESConnection(url, withCredentials) {
+  if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+    url = 'http://' + url;
+  }
+  var protectedUrl = /^(https|http):\/\/(\w+):(\w+)@(.*)/i;
+  this.host = 'http://localhost:9200'; // default
+  this.withCredentials = withCredentials;
+  if (notEmpty(url)) {
+    var connectionParts = protectedUrl.exec(url);
+    if (isDefined(connectionParts)) {
+      this.host = connectionParts[1] + '://' + connectionParts[4];
+      this.username = connectionParts[2];
+      this.password = connectionParts[3];
+      this.auth = 'Basic ' + window.btoa(this.username + ':' + this.password);
+    } else {
+      this.host = url;
+    }
+  }
+
+}
+
+function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
+  this.name = indexName;
+  this.shards = null;
+  this.metadata = {};
+  this.state = 'close';
+  this.num_of_shards = 0;
+  this.num_of_replicas = 0;
+  this.aliases = [];
+  if (isDefined(aliases)) {
+    var indexAliases = aliases.aliases;
+    if (isDefined(indexAliases)) {
+      this.aliases = Object.keys(aliases.aliases);
+    }
+  }
+
+  this.visibleAliases = function() {
+    return this.aliases.length > 5 ? this.aliases.slice(0, 5) : this.aliases;
+  };
+
+  if (isDefined(clusterState)) {
+    var routing = getProperty(clusterState, 'routing_table.indices');
+    this.state = 'open';
+    if (isDefined(routing)) {
+      var shards = Object.keys(routing[indexName].shards);
+      this.num_of_shards = shards.length;
+      var shardMap = routing[indexName].shards;
+      this.num_of_replicas = shardMap[0].length - 1;
+    }
+  }
+  this.num_docs = getProperty(indexStatus, 'docs.num_docs', 0);
+  this.max_doc = getProperty(indexStatus, 'docs.max_doc', 0);
+  this.deleted_docs = getProperty(indexStatus, 'docs.deleted_docs', 0);
+  this.size = getProperty(indexStatus, 'index.primary_size_in_bytes', 0);
+  this.total_size = getProperty(indexStatus, 'index.size_in_bytes', 0);
+  this.size_in_bytes = readablizeBytes(this.size);
+  this.total_size_in_bytes = readablizeBytes(this.total_size);
+
+  this.unassigned = [];
+  this.unhealthy = false;
+
+  this.getShards = function(nodeId) {
+    if (isDefined(indexInfo)) {
+      if (this.shards === null) {
+        var indexShards = {};
+        var unassigned = [];
+        this.unassigned = unassigned;
+        $.map(indexInfo.shards, function(shards, shardNum) {
+          $.map(shards, function(shardRouting, shardCopy) {
+            if (shardRouting.node === null) {
+              unassigned.push(new UnassignedShard(shardRouting));
+            } else {
+              if (!isDefined(indexShards[shardRouting.node])) {
+                indexShards[shardRouting.node] = [];
+              }
+              var shardStatus = null;
+              if (isDefined(indexStatus) &&
+                  isDefined(indexStatus.shards[shardRouting.shard])) {
+                indexStatus.shards[shardRouting.shard].forEach(
+                    function(status) {
+                      if (status.routing.node == shardRouting.node &&
+                          status.routing.shard == shardRouting.shard) {
+                        shardStatus = status;
+                      }
+                    });
+              }
+              var newShard = new Shard(shardRouting, shardStatus);
+              indexShards[shardRouting.node].push(newShard);
+            }
+          });
+        });
+        this.shards = indexShards;
+      }
+    } else {
+      this.shards = {};
+    }
+    return this.shards[nodeId];
+  };
+
+  if (isDefined(clusterState) && isDefined(clusterState.routing_table)) {
+    var instance = this;
+    var shardsMap = clusterState.routing_table.indices[this.name].shards;
+    Object.keys(shardsMap).forEach(function(shardNum) {
+      shardsMap[shardNum].forEach(function(shard) {
+        if (shard.state != 'STARTED') {
+          instance.unhealthy = true;
+        }
+      });
+    });
+  }
+
+  this.special = this.name.indexOf('.') === 0 || this.name.indexOf('_') === 0;
+
+  this.compare = function(b) { // TODO: take into account index properties?
+    return this.name.localeCompare(b.name);
+  };
+
+  this.equals = function(index) {
+    return index !== null && index.name == this.name;
+  };
+
+  this.closed = function() {
+    return this.state === 'close';
+  };
+
+  this.open = function() {
+    return this.state === 'open';
+  };
+}
+
+function IndexMetadata(index, metadata) {
+  this.index = index;
+  this.mappings = metadata.mappings;
+  this.settings = metadata.settings;
+
+  this.getTypes = function() {
+    return Object.keys(this.mappings).sort(function(a, b) {
+      return a.localeCompare(b);
+    });
+  };
+
+  this.getAnalyzers = function() {
+    var analyzers = Object.keys(getProperty(this.settings,
+        'index.analysis.analyzer', {}));
+    if (analyzers.length === 0) {
+      Object.keys(this.settings).forEach(function(setting) {
+        if (setting.indexOf('index.analysis.analyzer') === 0) {
+          var analyzer = setting.substring('index.analysis.analyzer.'.length);
+          analyzer = analyzer.substring(0, analyzer.indexOf('.'));
+          if ($.inArray(analyzer, analyzers) == -1) {
+            analyzers.push(analyzer);
+          }
+        }
+      });
+    }
+    return analyzers.sort(function(a, b) {
+      return a.localeCompare(b);
+    });
+  };
+
+  function isAnalyzable(type) {
+    var analyzableTypes = ['float', 'double', 'byte', 'short', 'integer',
+      'long', 'nested', 'object'
+    ];
+    return analyzableTypes.indexOf(type) == -1;
+  }
+
+  this.getFields = function(type) {
+    var fields = [];
+    if (isDefined(this.mappings[type])) {
+      fields = this.getProperties('', this.mappings[type].properties);
+    }
+    return fields.sort(function(a, b) {
+      return a.localeCompare(b);
+    });
+  };
+
+  this.getProperties = function(parent, fields) {
+    var prefix = parent !== '' ? parent + '.' : '';
+    var validFields = [];
+    for (var field in fields) {
+      // multi field
+      if (isDefined(fields[field].fields)) {
+        var addPrefix = fields[field].path != 'just_name';
+        var multiPrefix = addPrefix ? prefix + field : prefix;
+        var multiProps = this.getProperties(multiPrefix, fields[field].fields);
+        validFields = validFields.concat(multiProps);
+      }
+      // nested and object types
+      var nestedType = fields[field].type == 'nested';
+      var objectType = fields[field].type == 'object';
+      if (nestedType || objectType || !isDefined(fields[field].type)) {
+        var nestedProperties = this.getProperties(prefix + field,
+            fields[field].properties);
+        validFields = validFields.concat(nestedProperties);
+      }
+      // normal fields
+      if (isDefined(fields[field].type) && isAnalyzable(fields[field].type)) {
+        validFields.push(prefix + field);
+      }
+    }
+    return validFields;
+  };
+}
+
+function Node(nodeId, nodeInfo, nodeStats) {
+  this.id = nodeId;
+  this.name = nodeInfo.name;
+  this.metadata = {};
+  this.metadata.info = nodeInfo;
+  this.metadata.stats = nodeStats;
+  this.transport_address = nodeInfo.transport_address;
+  this.host = nodeStats.host;
+  var master = nodeInfo.attributes.master === 'false' ? false : true;
+  var data = nodeInfo.attributes.data === 'false' ? false : true;
+  var client = nodeInfo.attributes.client === 'true' ? true : false;
+  this.master = master && !client;
+  this.data = data && !client;
+  this.client = client || !master && !data;
+  this.current_master = false;
+  this.stats = nodeStats;
+
+  this.heap_used = readablizeBytes(getProperty(this.stats,
+    'jvm.mem.heap_used_in_bytes'));
+
+  this.heap_committed = readablizeBytes(getProperty(this.stats,
+    'jvm.mem.heap_committed_in_bytes'));
+
+  this.heap_used_percent = getProperty(this.stats, 'jvm.mem.heap_used_percent');
+
+  this.heap_max = readablizeBytes(getProperty(this.stats,
+    'jvm.mem.heap_max_in_bytes'));
+
+  var totalInBytes = getProperty(this.stats, 'fs.total.total_in_bytes');
+  var freeInBytes = getProperty(this.stats, 'fs.total.free_in_bytes');
+
+  this.disk_total = readablizeBytes(totalInBytes);
+  this.disk_free = readablizeBytes(freeInBytes);
+  var usedRatio = (totalInBytes - freeInBytes) / totalInBytes;
+  this.disk_used_percent = Math.round(100 * usedRatio);
+
+  this.cpu_user = getProperty(this.stats, 'os.cpu.user');
+  this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
+
+  this.setCurrentMaster = function() {
+    this.current_master = true;
+  };
+
+  this.equals = function(node) {
+    return node.id === this.id;
+  };
+
+  this.compare = function(other, considerType) {
+    if (considerType) {
+      if (other.current_master) { return 1; } // current master comes first
+      if (this.current_master) { return -1; } // current master comes first
+      if (other.master && !this.master) { return 1; } // master eligible comes first
+      if (this.master && !other.master) { return -1; } // master eligible comes first
+      if (other.data && !this.data) { return 1; } // data node comes first
+      if (this.data && !other.data) { return -1; } // data node comes first
+    }
+    return this.name.localeCompare(other.name); // if all the same, lex. sort
+  };
+
+}
+
+function NodeStats(id, stats) {
+  this.id = id;
+  this.name = stats.name;
+  this.stats = stats;
+}
+
+function PercolateQuery(queryInfo) {
+  this.index = queryInfo._index;
+  this.id = queryInfo._id;
+  this.source = queryInfo._source;
+  this.filter = {};
+
+  this.sourceAsJSON = function() {
+    try {
+      return JSON.stringify(this.source, undefined, 2);
+    } catch (error) {
+
+    }
+  };
+
+  this.equals = function(other) {
+    return (other instanceof PercolateQuery &&
+      this.index == other.index &&
+      this.id == other.id &&
+      this.source == other.source);
+  };
+}
+
+function PercolatorsPage(from, size, total, percolators) {
+  this.from = from;
+  this.size = size;
+  this.total = total;
+  this.percolators = percolators;
+
+  this.hasNextPage = function() {
+    return from + size < total;
+  };
+
+  this.hasPreviousPage = function() {
+    return from > 0;
+  };
+
+  this.firstResult = function() {
+    return total > 0 ? from + 1 : 0;
+  };
+
+  this.lastResult = function() {
+    return this.hasNextPage() ? from + size : total;
+  };
+
+  this.nextOffset = function() {
+    return this.hasNextPage() ? from + size : from;
+  };
+
+  this.previousOffset = function() {
+    return this.hasPreviousPage() ? from - size : from;
+  };
+
+  this.getPage = function() {
+    return percolators;
+  };
+
+  this.total = function() {
+    return total;
+  };
+}
+
+function Repository(name, info) {
+  this.name = name;
+  this.type = info.type;
+  this.settings = info.settings;
+
+  this.asJson = function() {
+    var json = {type: this.type};
+    if (this.type === 'fs') {
+      var fsSettings = ['location', 'chunk_size', 'max_restore_bytes_per_sec',
+        'max_snapshot_bytes_per_sec', 'compress'];
+      json.settings = this.getSettings(fsSettings);
+    }
+    if (this.type === 'url') {
+      var urlSettings = ['url'];
+      json.settings = this.getSettings(urlSettings);
+    }
+    if (this.type === 's3') {
+      var s3Settings = ['region', 'bucket', 'base_path', 'access_key',
+        'secret_key', 'chunk_size', 'max_retries', 'compress',
+        'server_side_encryption'
+      ];
+      json.settings = this.getSettings(s3Settings);
+    }
+    if (this.type === 'hdfs') {
+      var hdfsSettings = ['uri', 'path', 'load_defaults', 'conf_location',
+        'concurrent_streams', 'compress', 'chunk_size'];
+      json.settings = this.getSettings(hdfsSettings);
+    }
+    if (this.type === 'azure') {
+      var azureSettings = ['container', 'base_path', 'concurrent_streams',
+        'chunk_size', 'compress'];
+      json.settings = this.getSettings(azureSettings);
+    }
+    return JSON.stringify(json);
+  };
+
+  this.validate = function() {
+    if (!notEmpty(this.name)) {
+      throw 'Repository name is required';
+    }
+    if (!notEmpty(this.type)) {
+      throw 'Repository type is required';
+    }
+    if (this.type === 'fs') {
+      var fsRequired = ['location'];
+      this.validateSettings(fsRequired);
+    }
+    if (this.type === 'url') {
+      var urlRequired = ['url'];
+      this.validateSettings(urlRequired);
+    }
+    if (this.type === 's3') {
+      var s3Required = ['bucket'];
+      this.validateSettings(s3Required);
+    }
+    if (this.type === 'hdfs') {
+      var hdfsRequired = ['path'];
+      this.validateSettings(hdfsRequired);
+    }
+  };
+
+  this.validateSettings = function(required) {
+    var repository = this;
+    required.forEach(function(setting) {
+      if (!notEmpty(repository.settings[setting])) {
+        var type = repository.type;
+        throw(setting + ' is required for repositories of type ' + type);
+      }
+    });
+  };
+
+  this.getSettings = function(availableSettings) {
+    var settings = {};
+    var currentSettings = this.settings;
+    availableSettings.forEach(function(setting) {
+      if (notEmpty(currentSettings[setting])) {
+        settings[setting] = currentSettings[setting];
+      }
+    });
+    return settings;
+  };
+}
+
+function Shard(routing, info) {
+  this.info = isDefined(info) ? info : routing;
+  this.primary = routing.primary;
+  this.shard = routing.shard;
+  this.state = routing.state;
+  this.node = routing.node;
+  this.index = routing.index;
+  this.id = this.node + '_' + this.shard + '_' + this.index;
+}
+
+function UnassignedShard(info) {
+  this.primary = info.primary;
+  this.shard = info.shard;
+  this.state = info.state;
+  this.node = info.node;
+  this.index = info.index;
+  this.id = this.node + '_' + this.shard + '_' + this.index;
+}
+
+function Snapshot(info) {
+  this.name = info.snapshot;
+  this.indices = info.indices;
+  this.state = info.state;
+  this.start_time = info.start_time;
+  this.start_time_in_millis = info.start_time_in_millis;
+  this.end_time = info.end_time;
+  this.end_time_in_millis = info.end_time_in_millis;
+  this.duration_in_millis = info.duration_in_millis;
+  this.failures = info.failures;
+  this.shards = info.shards;
+}
+
+/** TYPES **/
+function Token(token, startOffset, endOffset, position) {
+  this.token = token;
+  this.start_offset = startOffset;
+  this.end_offset = endOffset;
+  this.position = position;
+}
+
+function Warmer(id, index, body) {
+  this.id = id;
+  this.index = index;
+  this.source = body.source;
+  this.types = body.types;
+}
+
+function AceEditor(target) {
+  // ace editor
+  ace.config.set('basePath', 'dist/');
+  this.editor = ace.edit(target);
+  this.editor.setFontSize('10px');
+  this.editor.setTheme('ace/theme/kopf');
+  this.editor.getSession().setMode('ace/mode/json');
+
+  // validation error
+  this.error = null;
+
+  // sets value and moves cursor to beggining
+  this.setValue = function(value) {
+    this.editor.setValue(value, 1);
+    this.editor.gotoLine(0, 0, false);
+  };
+
+  this.getValue = function() {
+    return this.editor.getValue();
+  };
+
+  // formats the json content
+  this.format = function() {
+    var content = this.editor.getValue();
+    try {
+      if (isDefined(content) && content.trim().length > 0) {
+        this.error = null;
+        content = JSON.stringify(JSON.parse(content), undefined, 4);
+        this.editor.setValue(content, 0);
+        this.editor.gotoLine(0, 0, false);
+      }
+    } catch (error) {
+      this.error = error.toString();
+    }
+    return content;
+  };
+
+  this.hasContent = function() {
+    return this.editor.getValue().trim().length > 0;
+  };
+}
+
+function AliasFilter(index, alias) {
+
+  this.index = index;
+  this.alias = alias;
+
+  this.clone = function() {
+    return new AliasFilter(this.index, this.alias);
+  };
+
+  this.equals = function(other) {
+    return (other !== null &&
+      this.index == other.index &&
+      this.alias == other.alias);
+  };
+
+  this.isBlank = function() {
+    return !notEmpty(this.index) && !notEmpty(this.alias);
+  };
+
+  this.matches = function(indexAlias) {
+    if (this.isBlank()) {
+      return true;
+    } else {
+      var matches = true;
+      if (notEmpty(this.index)) {
+        matches = indexAlias.index.indexOf(this.index) != -1;
+      }
+      if (matches && notEmpty(this.alias)) {
+        matches = false;
+        var aliases = indexAlias.aliases;
+        for (var i = 0; !matches && i < aliases.length; i++) {
+          var alias = aliases[i];
+          matches = alias.alias.indexOf(this.alias) != -1;
+        }
+      }
+      return matches;
+    }
+  };
+
+}
+
+function Benchmark() {
+  this.name = '';
+  this.num_executor = 1;
+  this.percentiles = '[10, 25, 50, 75, 90, 99]';
+  this.competitors = [];
+
+  this.addCompetitor = function(competitor) {
+    this.competitors.push(competitor);
+  };
+
+  this.toJson = function() {
+    var body = {};
+    body.name = this.name;
+    if (notEmpty(this.num_executor)) {
+      body.num_executor_nodes = this.num_executor;
+    }
+    if (notEmpty(this.percentiles)) {
+      body.percentiles = JSON.parse(this.percentiles);
+    }
+    if (this.competitors.length > 0) {
+      body.competitors = this.competitors.map(function(c) {
+        return c.toJson();
+      });
+    }
+    if (notEmpty(this.iterations)) {
+      body.iterations = this.iterations;
+    }
+    if (notEmpty(this.concurrency)) {
+      body.concurrency = this.concurrency;
+    }
+    if (notEmpty(this.multiplier)) {
+      body.multiplier = this.multiplier;
+    }
+    if (notEmpty(this.num_slowest)) {
+      body.num_slowest = this.num_slowest;
+    }
+    return JSON.stringify(body, null, 4);
+  };
+
+}
+
+function Competitor() {
+  this.name = '';
+
+  // override benchmark options
+  this.iterations = '';
+  this.concurrency = '';
+  this.multiplier = '';
+  this.num_slowest = '';
+  this.warmup = true;
+  this.requests = [];
+
+  // defined only by competitor
+  this.search_type = 'query_then_fetch';
+  this.indices = '';
+  this.types = '';
+
+  // cache
+  this.filter_cache = false;
+  this.field_data = false;
+  this.recycler_cache = false;
+  this.id_cache = false;
+
+  this.cache_fields = '';
+  this.cache_keys = '';
+
+  this.toJson = function() {
+    var body = {};
+    body.name = this.name;
+    if (notEmpty(this.requests)) {
+      body.requests = JSON.parse(this.requests);
+    }
+    if (notEmpty(this.iterations)) {
+      if (isNumber(this.iterations)) {
+        body.iterations = parseInt(this.iterations);
+      } else {
+        throw 'Iterations must be a valid number';
+      }
+    }
+    if (notEmpty(this.concurrency)) {
+      if (isNumber(this.concurrency)) {
+        body.concurrency = parseInt(this.concurrency);
+      } else {
+        throw 'Concurrency must be a valid number';
+      }
+    }
+    if (notEmpty(this.multiplier)) {
+      if (isNumber(this.multiplier)) {
+        body.multiplier = parseInt(this.multiplier);
+      } else {
+        throw 'Multiplier must be a valid number';
+      }
+    }
+    if (notEmpty(this.num_slowest)) {
+      if (isNumber(this.num_slowest)) {
+        body.num_slowest = parseInt(this.num_slowest);
+      } else {
+        throw 'Num slowest must be a valid number';
+      }
+    }
+    if (notEmpty(this.indices)) {
+      body.indices = this.indices.split(',').map(function(index) {
+        return index.trim();
+      });
+    }
+    if (notEmpty(this.types)) {
+      body.types = this.types.split(',').map(function(type) {
+        return type.trim();
+      });
+    }
+
+    body.search_type = this.search_type;
+
+    body.clear_caches = {};
+    body.clear_caches.filter = this.filter_cache;
+    body.clear_caches.field_data = this.field_data;
+    body.clear_caches.id = this.id_cache;
+    body.clear_caches.recycler = this.recycler_cache;
+    if (notEmpty(this.cache_fields)) {
+      body.clear_caches.fields = this.cache_fields.split(',').map(
+        function(field) {
+          return field.trim();
+        });
+    }
+    if (notEmpty(this.cache_keys)) {
+      body.clear_caches.filter_keys = this.cache_keys.split(',').map(
+        function(key) {
+          return key.trim();
+        });
+    }
+
+    return body;
+  };
+
+}
+
+function Gist(title, url) {
+  this.timestamp = getTimeString(new Date());
+  this.title = title;
+  this.url = url;
+
+  this.loadFromJSON = function(json) {
+    this.title = json.title;
+    this.url = json.url;
+    this.timestamp = json.timestamp;
+    return this;
+  };
+
+}
+
+function IndexFilter(name, state, hideSpecial, timestamp) {
+  this.name = name;
+  this.state = state;
+  this.hide_special = hideSpecial;
+  this.timestamp = timestamp;
+
+  this.clone = function() {
+    return new IndexFilter(this.name, this.state, this.hide_special,
+      this.timestamp);
+  };
+
+  this.equals = function(other) {
+    return (
+      other !== null &&
+      this.name == other.name &&
+      this.state == other.state &&
+      this.hide_special === other.hide_special &&
+      this.timestamp == other.timestamp
+      );
+  };
+
+  this.isBlank = function() {
+    var emptyNameFilter = !notEmpty(this.name);
+    var emptyStateFilter = !notEmpty(this.state);
+    var disabledHideSpecial = !notEmpty(this.hide_special);
+    return emptyNameFilter && emptyStateFilter && disabledHideSpecial;
+  };
+
+  this.matches = function(index) {
+    if (this.isBlank()) {
+      return true;
+    } else {
+      var matches = true;
+      if (this.hide_special) {
+        matches = !index.special;
+      }
+      if (matches && notEmpty(this.state)) {
+        if (this.state == 'unhealthy' && !index.unhealthy) {
+          matches = false;
+        } else {
+          var open = this.state == 'open';
+          var closed = this.state == 'close';
+          if ((open || closed) && this.state != index.state) {
+            matches = false;
+          }
+        }
+      }
+      if (matches && notEmpty(this.name)) {
+        try {
+          var reg = new RegExp(this.name.trim(), 'i');
+          matches = reg.test(index.name);
+        }
+        catch (err) { // if not valid regexp, still try normal matching
+          matches = index.name.indexOf(this.name.toLowerCase()) != -1;
+        }
+      }
+      return matches;
+    }
+  };
+
+}
+
+function ModalControls() {
+  this.alert = null;
+  this.active = false;
+  this.title = '';
+  this.info = '';
+}
+
+function NodeFilter(name, data, master, client, timestamp) {
+  this.name = name;
+  this.data = data;
+  this.master = master;
+  this.client = client;
+  this.timestamp = timestamp;
+
+  this.clone = function() {
+    return new NodeFilter(this.name, this.data, this.master, this.client);
+  };
+
+  this.equals = function(other) {
+    return (
+      other !== null &&
+      this.name == other.name &&
+      this.data == other.data &&
+      this.master == other.master &&
+      this.client == other.client &&
+      this.timestamp == other.timestamp
+      );
+  };
+
+  this.isBlank = function() {
+    return !notEmpty(this.name) && (this.data && this.master && this.client);
+  };
+
+  this.matches = function(node) {
+    if (this.isBlank()) {
+      return true;
+    } else {
+      return this.matchesName(node.name) && this.matchesType(node);
+    }
+  };
+
+  this.matchesType = function(node) {
+    return (
+      node.data && this.data ||
+      node.master && this.master ||
+      node.client && this.client
+      );
+  };
+
+  this.matchesName = function(name) {
+    if (notEmpty(this.name)) {
+      return name.toLowerCase().indexOf(this.name.toLowerCase()) != -1;
+    } else {
+      return true;
+    }
+  };
+
+}
+
+function Paginator(page, pageSize, collection, filter) {
+
+  this.filter = filter;
+
+  this.page = page;
+
+  this.pageSize = pageSize;
+
+  this.$collection = isDefined(collection) ? collection : [];
+
+  this.nextPage = function() {
+    this.page += 1;
+  };
+
+  this.previousPage = function() {
+    this.page -= 1;
+  };
+
+  this.setPageSize = function(newSize) {
+    this.pageSize = newSize;
+  };
+
+  this.getPageSize = function() {
+    return this.pageSize;
+  };
+
+  this.getCurrentPage = function() {
+    return this.page;
+  };
+
+  this.getPage = function() {
+    var results = this.getResults();
+    var total = results.length;
+
+    var first = total > 0 ? ((this.page - 1) * this.pageSize) + 1 : 0;
+    while (total < first) {
+      this.previousPage();
+      first = (this.page - 1) * this.pageSize + 1;
+    }
+    var lastPage = this.page * this.pageSize > total;
+    var last = lastPage ? total : this.page * this.pageSize;
+
+    var elements = total > 0 ? results.slice(first - 1, last) : [];
+
+    var next = this.pageSize * this.page < total;
+    var previous = this.page > 1;
+    while (elements.length < this.pageSize) {
+      elements.push(null);
+    }
+    return new Page(elements, total, first, last, next, previous);
+  };
+
+  this.setCollection = function(collection) {
+    this.$collection = collection;
+  };
+
+  this.getResults = function() {
+    var filter = this.filter;
+    var collection = this.$collection;
+    if (filter.isBlank()) {
+      return collection;
+    } else {
+      var filtered = [];
+      collection.forEach(function(item) {
+        if (filter.matches(item)) {
+          filtered.push(item);
+        }
+      });
+      return filtered;
+    }
+  };
+
+  this.getCollection = function() {
+    return this.$collection;
+  };
+
+}
+
+function Page(elements, total, first, last, next, previous) {
+  this.elements = elements;
+  this.total = total;
+  this.first = first;
+  this.last = last;
+  this.next = next;
+  this.previous = previous;
+}
+
+function Request(path, method, body) {
+  this.timestamp = getTimeString(new Date());
+  this.path = path;
+  this.method = method;
+  this.body = body;
+
+  this.clear = function() {
+    this.path = '';
+    this.method = '';
+    this.body = '';
+  };
+
+  this.loadFromJSON = function(json) {
+    if (isDefined(json.url)) {
+      var url = json.url.substring(7);
+      var path = url.substring(url.indexOf('/'));
+      this.path = path;
+    } else {
+      this.path = json.path;
+    }
+    this.method = json.method;
+    this.body = json.body;
+    this.timestamp = json.timestamp;
+    return this;
+  };
+
+  this.equals = function(request) {
+    return (
+      this.path === request.path &&
+      this.method.toUpperCase() === request.method.toUpperCase() &&
+      this.body === request.body
+      );
+  };
+}
+
+function SnapshotFilter() {
+
+  this.clone = function() {
+    return new SnapshotFilter();
+  };
+
+  this.equals = function(other) {
+    return other !== null;
+  };
+
+  this.isBlank = function() {
+    return true;
+  };
+
+  this.matches = function(snapshot) {
+    return true;
+  };
+
+}
+
+function WarmerFilter(id) {
+
+  this.id = id;
+
+  this.clone = function() {
+    return new WarmerFilter(this.id);
+  };
+
+  this.equals = function(other) {
+    return other !== null && this.id == other.id;
+  };
+
+  this.isBlank = function() {
+    return !notEmpty(this.id);
+  };
+
+  this.matches = function(warmer) {
+    if (this.isBlank()) {
+      return true;
+    } else {
+      return warmer.id.indexOf(this.id) != -1;
+    }
+  };
+
+}
+
+kopf.factory('AceEditorService', function() {
+
+  this.init = function(name) {
+    return new AceEditor(name);
+  };
+
+  return this;
+});
 
 var Alert = function(message, response, level, _class, icon) {
   var currentDate = new Date();
@@ -2788,69 +3329,27 @@ kopf.factory('AlertService', function() {
   return this;
 });
 
-kopf.factory('SettingsService', function() {
+kopf.factory('DebugService', ['$location', function($location) {
 
-  this.refreshInterval = 3000;
+  this.enabled = $location.search().debug === 'true';
 
-  this.autoAdjustLayout = 'true'; // enabled by default
-
-  this.setRefreshInterval = function(interval) {
-    this.refreshInterval = interval;
-    localStorage.kopfRefreshInterval = interval;
+  this.toggleEnabled = function() {
+    this.enabled = !this.enabled;
   };
 
-  this.getRefreshInterval = function() {
-    if (isDefined(localStorage.kopfRefreshInterval)) {
-      return localStorage.kopfRefreshInterval;
-    } else {
-      return this.refreshInterval;
-    }
+  this.isEnabled = function() {
+    return this.enabled;
   };
 
-  this.setAutoAdjustLayout = function(enabled) {
-    this.autoAdjustLayout = '' + enabled;
-    localStorage.kopfAutoAdjustLayout = this.autoAdjustLayout;
-  };
-
-  this.getAutoAdjustLayout = function() {
-    if (isDefined(localStorage.kopfAutoAdjustLayout)) {
-      return localStorage.kopfAutoAdjustLayout === 'true';
-    } else {
-      return this.autoAdjustLayout === 'true';
+  this.debug = function(message) {
+    if (this.isEnabled()) {
+      console.log(message);
     }
   };
 
   return this;
-});
 
-kopf.factory('AceEditorService', function() {
-
-  this.init = function(name) {
-    return new AceEditor(name);
-  };
-
-  return this;
-});
-
-kopf.factory('ThemeService', function() {
-
-  this.theme = 'dark';
-
-  this.setTheme = function(theme) {
-    this.theme = theme;
-    localStorage.kopfTheme = theme;
-  };
-
-  this.getTheme = function() {
-    if (isDefined(localStorage.kopfTheme)) {
-      return localStorage.kopfTheme;
-    } else {
-      return this.theme;
-    }
-  };
-
-  return this;
-});
+}]);
 
 kopf.factory('ElasticService', ['$http', '$q', '$timeout',
   'ExternalSettingsService', 'DebugService', 'SettingsService', 'AlertService',
@@ -3414,39 +3913,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
   }]);
 
-kopf.factory('HostHistoryService', function() {
-
-  this.getHostHistory = function() {
-    var history = localStorage.getItem('kopfHostHistory');
-    history = isDefined(history) ? history : '[]';
-    return JSON.parse(history);
-  };
-
-  this.addToHistory = function(host) {
-    host = host.toLowerCase();
-    var hostEntry = {host: host};
-    var history = this.getHostHistory();
-    for (var i = 0; i < history.length; i++) {
-      if (history[i].host === host) {
-        history.splice(i, 1);
-        break;
-      }
-    }
-    history.splice(0, 0, hostEntry);
-    if (history.length > 10) {
-      history.length = 10;
-    }
-    localStorage.setItem('kopfHostHistory', JSON.stringify(history));
-  };
-
-  this.clearHistory = function() {
-    localStorage.removeItem('kopfHostHistory');
-  };
-
-  return this;
-
-});
-
 kopf.factory('ExternalSettingsService', function($http, $q) {
 
   var ES_ROOT_PATH = 'elasticsearch_root_path';
@@ -3500,27 +3966,38 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
 
 });
 
-kopf.factory('DebugService', ['$location', function($location) {
+kopf.factory('HostHistoryService', function() {
 
-  this.enabled = $location.search().debug === 'true';
-
-  this.toggleEnabled = function() {
-    this.enabled = !this.enabled;
+  this.getHostHistory = function() {
+    var history = localStorage.getItem('kopfHostHistory');
+    history = isDefined(history) ? history : '[]';
+    return JSON.parse(history);
   };
 
-  this.isEnabled = function() {
-    return this.enabled;
-  };
-
-  this.debug = function(message) {
-    if (this.isEnabled()) {
-      console.log(message);
+  this.addToHistory = function(host) {
+    host = host.toLowerCase();
+    var hostEntry = {host: host};
+    var history = this.getHostHistory();
+    for (var i = 0; i < history.length; i++) {
+      if (history[i].host === host) {
+        history.splice(i, 1);
+        break;
+      }
     }
+    history.splice(0, 0, hostEntry);
+    if (history.length > 10) {
+      history.length = 10;
+    }
+    localStorage.setItem('kopfHostHistory', JSON.stringify(history));
+  };
+
+  this.clearHistory = function() {
+    localStorage.removeItem('kopfHostHistory');
   };
 
   return this;
 
-}]);
+});
 
 kopf.factory('OverviewFilter', function() {
 
@@ -3534,527 +4011,60 @@ kopf.factory('OverviewFilter', function() {
 
 });
 
-function AceEditor(target) {
-  // ace editor
-  ace.config.set('basePath', 'dist/');
-  this.editor = ace.edit(target);
-  this.editor.setFontSize('10px');
-  this.editor.setTheme('ace/theme/kopf');
-  this.editor.getSession().setMode('ace/mode/json');
+kopf.factory('SettingsService', function() {
 
-  // validation error
-  this.error = null;
+  this.refreshInterval = 3000;
 
-  // sets value and moves cursor to beggining
-  this.setValue = function(value) {
-    this.editor.setValue(value, 1);
-    this.editor.gotoLine(0, 0, false);
+  this.autoAdjustLayout = 'true'; // enabled by default
+
+  this.setRefreshInterval = function(interval) {
+    this.refreshInterval = interval;
+    localStorage.kopfRefreshInterval = interval;
   };
 
-  this.getValue = function() {
-    return this.editor.getValue();
-  };
-
-  // formats the json content
-  this.format = function() {
-    var content = this.editor.getValue();
-    try {
-      if (isDefined(content) && content.trim().length > 0) {
-        this.error = null;
-        content = JSON.stringify(JSON.parse(content), undefined, 4);
-        this.editor.setValue(content, 0);
-        this.editor.gotoLine(0, 0, false);
-      }
-    } catch (error) {
-      this.error = error.toString();
-    }
-    return content;
-  };
-
-  this.hasContent = function() {
-    return this.editor.getValue().trim().length > 0;
-  };
-}
-
-function Gist(title, url) {
-  this.timestamp = getTimeString(new Date());
-  this.title = title;
-  this.url = url;
-
-  this.loadFromJSON = function(json) {
-    this.title = json.title;
-    this.url = json.url;
-    this.timestamp = json.timestamp;
-    return this;
-  };
-
-}
-
-function Benchmark() {
-  this.name = '';
-  this.num_executor = 1;
-  this.percentiles = '[10, 25, 50, 75, 90, 99]';
-  this.competitors = [];
-
-  this.addCompetitor = function(competitor) {
-    this.competitors.push(competitor);
-  };
-
-  this.toJson = function() {
-    var body = {};
-    body.name = this.name;
-    if (notEmpty(this.num_executor)) {
-      body.num_executor_nodes = this.num_executor;
-    }
-    if (notEmpty(this.percentiles)) {
-      body.percentiles = JSON.parse(this.percentiles);
-    }
-    if (this.competitors.length > 0) {
-      body.competitors = this.competitors.map(function(c) {
-        return c.toJson();
-      });
-    }
-    if (notEmpty(this.iterations)) {
-      body.iterations = this.iterations;
-    }
-    if (notEmpty(this.concurrency)) {
-      body.concurrency = this.concurrency;
-    }
-    if (notEmpty(this.multiplier)) {
-      body.multiplier = this.multiplier;
-    }
-    if (notEmpty(this.num_slowest)) {
-      body.num_slowest = this.num_slowest;
-    }
-    return JSON.stringify(body, null, 4);
-  };
-
-}
-
-function Competitor() {
-  this.name = '';
-
-  // override benchmark options
-  this.iterations = '';
-  this.concurrency = '';
-  this.multiplier = '';
-  this.num_slowest = '';
-  this.warmup = true;
-  this.requests = [];
-
-  // defined only by competitor
-  this.search_type = 'query_then_fetch';
-  this.indices = '';
-  this.types = '';
-
-  // cache
-  this.filter_cache = false;
-  this.field_data = false;
-  this.recycler_cache = false;
-  this.id_cache = false;
-
-  this.cache_fields = '';
-  this.cache_keys = '';
-
-  this.toJson = function() {
-    var body = {};
-    body.name = this.name;
-    if (notEmpty(this.requests)) {
-      body.requests = JSON.parse(this.requests);
-    }
-    if (notEmpty(this.iterations)) {
-      if (isNumber(this.iterations)) {
-        body.iterations = parseInt(this.iterations);
-      } else {
-        throw 'Iterations must be a valid number';
-      }
-    }
-    if (notEmpty(this.concurrency)) {
-      if (isNumber(this.concurrency)) {
-        body.concurrency = parseInt(this.concurrency);
-      } else {
-        throw 'Concurrency must be a valid number';
-      }
-    }
-    if (notEmpty(this.multiplier)) {
-      if (isNumber(this.multiplier)) {
-        body.multiplier = parseInt(this.multiplier);
-      } else {
-        throw 'Multiplier must be a valid number';
-      }
-    }
-    if (notEmpty(this.num_slowest)) {
-      if (isNumber(this.num_slowest)) {
-        body.num_slowest = parseInt(this.num_slowest);
-      } else {
-        throw 'Num slowest must be a valid number';
-      }
-    }
-    if (notEmpty(this.indices)) {
-      body.indices = this.indices.split(',').map(function(index) {
-        return index.trim();
-      });
-    }
-    if (notEmpty(this.types)) {
-      body.types = this.types.split(',').map(function(type) {
-        return type.trim();
-      });
-    }
-
-    body.search_type = this.search_type;
-
-    body.clear_caches = {};
-    body.clear_caches.filter = this.filter_cache;
-    body.clear_caches.field_data = this.field_data;
-    body.clear_caches.id = this.id_cache;
-    body.clear_caches.recycler = this.recycler_cache;
-    if (notEmpty(this.cache_fields)) {
-      body.clear_caches.fields = this.cache_fields.split(',').map(
-        function(field) {
-          return field.trim();
-        });
-    }
-    if (notEmpty(this.cache_keys)) {
-      body.clear_caches.filter_keys = this.cache_keys.split(',').map(
-        function(key) {
-          return key.trim();
-        });
-    }
-
-    return body;
-  };
-
-}
-
-function Request(path, method, body) {
-  this.timestamp = getTimeString(new Date());
-  this.path = path;
-  this.method = method;
-  this.body = body;
-
-  this.clear = function() {
-    this.path = '';
-    this.method = '';
-    this.body = '';
-  };
-
-  this.loadFromJSON = function(json) {
-    if (isDefined(json.url)) {
-      var url = json.url.substring(7);
-      var path = url.substring(url.indexOf('/'));
-      this.path = path;
+  this.getRefreshInterval = function() {
+    if (isDefined(localStorage.kopfRefreshInterval)) {
+      return localStorage.kopfRefreshInterval;
     } else {
-      this.path = json.path;
+      return this.refreshInterval;
     }
-    this.method = json.method;
-    this.body = json.body;
-    this.timestamp = json.timestamp;
-    return this;
   };
 
-  this.equals = function(request) {
-    return (
-      this.path === request.path &&
-      this.method.toUpperCase() === request.method.toUpperCase() &&
-      this.body === request.body
-      );
-  };
-}
-
-function ModalControls() {
-  this.alert = null;
-  this.active = false;
-  this.title = '';
-  this.info = '';
-}
-
-function Paginator(page, pageSize, collection, filter) {
-
-  this.filter = filter;
-
-  this.page = page;
-
-  this.pageSize = pageSize;
-
-  this.$collection = isDefined(collection) ? collection : [];
-
-  this.nextPage = function() {
-    this.page += 1;
+  this.setAutoAdjustLayout = function(enabled) {
+    this.autoAdjustLayout = '' + enabled;
+    localStorage.kopfAutoAdjustLayout = this.autoAdjustLayout;
   };
 
-  this.previousPage = function() {
-    this.page -= 1;
-  };
-
-  this.setPageSize = function(newSize) {
-    this.pageSize = newSize;
-  };
-
-  this.getPageSize = function() {
-    return this.pageSize;
-  };
-
-  this.getCurrentPage = function() {
-    return this.page;
-  };
-
-  this.getPage = function() {
-    var results = this.getResults();
-    var total = results.length;
-
-    var first = total > 0 ? ((this.page - 1) * this.pageSize) + 1 : 0;
-    while (total < first) {
-      this.previousPage();
-      first = (this.page - 1) * this.pageSize + 1;
-    }
-    var lastPage = this.page * this.pageSize > total;
-    var last = lastPage ? total : this.page * this.pageSize;
-
-    var elements = total > 0 ? results.slice(first - 1, last) : [];
-
-    var next = this.pageSize * this.page < total;
-    var previous = this.page > 1;
-    while (elements.length < this.pageSize) {
-      elements.push(null);
-    }
-    return new Page(elements, total, first, last, next, previous);
-  };
-
-  this.setCollection = function(collection) {
-    this.$collection = collection;
-  };
-
-  this.getResults = function() {
-    var filter = this.filter;
-    var collection = this.$collection;
-    if (filter.isBlank()) {
-      return collection;
+  this.getAutoAdjustLayout = function() {
+    if (isDefined(localStorage.kopfAutoAdjustLayout)) {
+      return localStorage.kopfAutoAdjustLayout === 'true';
     } else {
-      var filtered = [];
-      collection.forEach(function(item) {
-        if (filter.matches(item)) {
-          filtered.push(item);
-        }
-      });
-      return filtered;
+      return this.autoAdjustLayout === 'true';
     }
   };
 
-  this.getCollection = function() {
-    return this.$collection;
+  return this;
+});
+
+kopf.factory('ThemeService', function() {
+
+  this.theme = 'dark';
+
+  this.setTheme = function(theme) {
+    this.theme = theme;
+    localStorage.kopfTheme = theme;
   };
 
-}
-
-function Page(elements, total, first, last, next, previous) {
-  this.elements = elements;
-  this.total = total;
-  this.first = first;
-  this.last = last;
-  this.next = next;
-  this.previous = previous;
-}
-
-function AliasFilter(index, alias) {
-
-  this.index = index;
-  this.alias = alias;
-
-  this.clone = function() {
-    return new AliasFilter(this.index, this.alias);
-  };
-
-  this.equals = function(other) {
-    return (other !== null &&
-      this.index == other.index &&
-      this.alias == other.alias);
-  };
-
-  this.isBlank = function() {
-    return !notEmpty(this.index) && !notEmpty(this.alias);
-  };
-
-  this.matches = function(indexAlias) {
-    if (this.isBlank()) {
-      return true;
+  this.getTheme = function() {
+    if (isDefined(localStorage.kopfTheme)) {
+      return localStorage.kopfTheme;
     } else {
-      var matches = true;
-      if (notEmpty(this.index)) {
-        matches = indexAlias.index.indexOf(this.index) != -1;
-      }
-      if (matches && notEmpty(this.alias)) {
-        matches = false;
-        var aliases = indexAlias.aliases;
-        for (var i = 0; !matches && i < aliases.length; i++) {
-          var alias = aliases[i];
-          matches = alias.alias.indexOf(this.alias) != -1;
-        }
-      }
-      return matches;
+      return this.theme;
     }
   };
 
-}
-
-function SnapshotFilter() {
-
-  this.clone = function() {
-    return new SnapshotFilter();
-  };
-
-  this.equals = function(other) {
-    return other !== null;
-  };
-
-  this.isBlank = function() {
-    return true;
-  };
-
-  this.matches = function(snapshot) {
-    return true;
-  };
-
-}
-
-function WarmerFilter(id) {
-
-  this.id = id;
-
-  this.clone = function() {
-    return new WarmerFilter(this.id);
-  };
-
-  this.equals = function(other) {
-    return other !== null && this.id == other.id;
-  };
-
-  this.isBlank = function() {
-    return !notEmpty(this.id);
-  };
-
-  this.matches = function(warmer) {
-    if (this.isBlank()) {
-      return true;
-    } else {
-      return warmer.id.indexOf(this.id) != -1;
-    }
-  };
-
-}
-
-function IndexFilter(name, state, hideSpecial, timestamp) {
-  this.name = name;
-  this.state = state;
-  this.hide_special = hideSpecial;
-  this.timestamp = timestamp;
-
-  this.clone = function() {
-    return new IndexFilter(this.name, this.state, this.hide_special,
-      this.timestamp);
-  };
-
-  this.equals = function(other) {
-    return (
-      other !== null &&
-      this.name == other.name &&
-      this.state == other.state &&
-      this.hide_special === other.hide_special &&
-      this.timestamp == other.timestamp
-      );
-  };
-
-  this.isBlank = function() {
-    var emptyNameFilter = !notEmpty(this.name);
-    var emptyStateFilter = !notEmpty(this.state);
-    var disabledHideSpecial = !notEmpty(this.hide_special);
-    return emptyNameFilter && emptyStateFilter && disabledHideSpecial;
-  };
-
-  this.matches = function(index) {
-    if (this.isBlank()) {
-      return true;
-    } else {
-      var matches = true;
-      if (this.hide_special) {
-        matches = !index.special;
-      }
-      if (matches && notEmpty(this.state)) {
-        if (this.state == 'unhealthy' && !index.unhealthy) {
-          matches = false;
-        } else {
-          var open = this.state == 'open';
-          var closed = this.state == 'close';
-          if ((open || closed) && this.state != index.state) {
-            matches = false;
-          }
-        }
-      }
-      if (matches && notEmpty(this.name)) {
-        try {
-          var reg = new RegExp(this.name.trim(), 'i');
-          matches = reg.test(index.name);
-        }
-        catch (err) { // if not valid regexp, still try normal matching
-          matches = index.name.indexOf(this.name.toLowerCase()) != -1;
-        }
-      }
-      return matches;
-    }
-  };
-
-}
-
-function NodeFilter(name, data, master, client, timestamp) {
-  this.name = name;
-  this.data = data;
-  this.master = master;
-  this.client = client;
-  this.timestamp = timestamp;
-
-  this.clone = function() {
-    return new NodeFilter(this.name, this.data, this.master, this.client);
-  };
-
-  this.equals = function(other) {
-    return (
-      other !== null &&
-      this.name == other.name &&
-      this.data == other.data &&
-      this.master == other.master &&
-      this.client == other.client &&
-      this.timestamp == other.timestamp
-      );
-  };
-
-  this.isBlank = function() {
-    return !notEmpty(this.name) && (this.data && this.master && this.client);
-  };
-
-  this.matches = function(node) {
-    if (this.isBlank()) {
-      return true;
-    } else {
-      return this.matchesName(node.name) && this.matchesType(node);
-    }
-  };
-
-  this.matchesType = function(node) {
-    return (
-      node.data && this.data ||
-      node.master && this.master ||
-      node.client && this.client
-      );
-  };
-
-  this.matchesName = function(name) {
-    if (notEmpty(this.name)) {
-      return name.toLowerCase().indexOf(this.name.toLowerCase()) != -1;
-    } else {
-      return true;
-    }
-  };
-
-}
+  return this;
+});
 
 function readablizeBytes(bytes) {
   if (bytes > 0) {
