@@ -1,18 +1,18 @@
 <div ng-controller="ClusterOverviewController" ng-show="hasConnection() && cluster != null">
   <div ng-include src="'partials/cluster_overview/cluster_stats.html'"></div>
   <div class="row">
-    <div class="col-lg-12" ng-include src="'partials/cluster_overview/filters.html'"></div>
-    <div class="col-xs-12" style="text-align: right;">
-      <div class="cluster-map-pagination">
-        <span ng-switch on="page.previous">
-          <i class="fa fa-angle-double-left normal-action" ng-click="index_paginator.previousPage()" ng-switch-when="true"></i>
-          <i class="fa fa-angle-double-left inactive-action" ng-switch-when="false"></i>
-        </span>
-        {{page.first}}-{{page.last}} of {{page.total}}
-        <span ng-switch on="page.next">
-          <i class="fa fa-angle-double-right normal-action" ng-click="index_paginator.nextPage()" ng-switch-when="true"></i>
-          <i class="fa fa-angle-double-right inactive-action" ng-switch-when="false"></i>
-        </span>
+    <div class="col-xs-12" ng-include src="'partials/cluster_overview/filters.html'"></div>
+    <div class="col-lg-2 col-lg-offset-10 col-md-3 col-md-offset-9 col-sm-4 col-sm-offset-8 col-xs-12">
+      <div class="overview-ctrl">
+      <span ng-switch on="page.previous" class="page-btn pull-left bordered">
+        <i class="fa fa-fw fa-angle-double-left normal-action" ng-click="index_paginator.previousPage()" ng-switch-when="true"></i>
+        <i class="fa fa-fw fa-angle-double-left inactive-action" ng-switch-when="false"></i>
+      </span>
+      <span ng-switch on="page.next" class="page-btn pull-right bordered">
+        <i class="fa fa-fw fa-angle-double-right normal-action" ng-click="index_paginator.nextPage()" ng-switch-when="true"></i>
+        <i class="fa fa-fw fa-angle-double-right inactive-action" ng-switch-when="false"></i>
+      </span>
+        <span class="page-info">{{page.first}}-{{page.last}} of {{page.total}}</span>
       </div>
     </div>
   </div>
@@ -51,10 +51,20 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-show="cluster_health.unassigned_shards > 0">
+      <tr ng-show="cluster_health.unassigned_shards > 0 || cluster_health.unassigned_shards > 0 || cluster_health.initializing_shards > 0">
         <td class="box unassigned-row">
+          <div ng-show="cluster_health.unassigned_shards > 0">
             <i class="fa fa-fw fa-warning danger-action"> </i>
-            <span> {{cluster_health.unassigned_shards}} unassigned shards</span>
+            <span>{{cluster_health.unassigned_shards}} unassigned shards</span>
+          </div>
+          <div ng-show="cluster_health.relocating_shards > 0">
+            <i class="fa fa-fw fa-refresh fa-spin"> </i>
+            <span>{{cluster_health.relocating_shards}} relocating shards</span>
+          </div>
+          <div ng-show="cluster_health.initializing_shards > 0">
+            <i class="fa fa-fw fa-spinner fa-spin"> </i>
+            <span>{{cluster_health.initializing_shards}} initializing shards</span>
+          </div>
         </td>
         <td class="shards-cell shards box" ng-repeat="index in page.elements track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">
         </td>
@@ -71,7 +81,7 @@
                 <div ng-show="node.data">
                   <i class="fa fa-fw fa-hdd-o" title="data node"></i>
                 </div>
-                <div ng-show="node.client" >
+                <div ng-show="node.client">
                   <i class="fa fa-fw fa-search" title="client node"></i>
                 </div>
               </div>

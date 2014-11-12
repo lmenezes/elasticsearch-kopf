@@ -135,7 +135,6 @@ a.cluster-map-node-action {
 }
 .cluster-map-stats-section {
 	margin-top: 10px;
-	border-radius: 4px 4px 4px 4px;
 	margin-bottom: 30px;
 }
 .cluster-map-stat-block {
@@ -145,19 +144,22 @@ a.cluster-map-node-action {
 	width: 100%;
 	text-align: center;
 	display: inline-block;
+	margin-top: 6px;
+	margin-bottom: 6px;
 }
 .cluster-map-stats-section:after {
 	content: "";
 	width: 100%;
 }
 .cluster-map-stat-number {
-	font-size: 20px;
-	text-align: center;
-	font-weight: 500;
+	font-size: 16px;
+	text-align: left;
+	font-weight: 400;
+	line-height: 30px;
 }
 .cluster-map-stat-description {
 	font-size: 12px;
-	text-align: center;
+	text-align: left;
 	font-weight: 300;
 }
 .big-icon {
@@ -206,4 +208,27 @@ a.cluster-map-node-action {
 
 .unassigned-row {
 	vertical-align: middle !important;
+}
+.overview-filters {
+	margin-top: 10px;
+	margin-bottom: 6px;
+}
+.overview-ctrl {
+	margin-top: 10px;
+	margin-bottom: 6px;
+}
+.page-btn {
+	width: 29px;
+	font-size: 12px;
+	height: 20px;
+	line-height: 18px;
+	text-align: center;
+}
+.page-info {
+	text-align: center;
+	width: 100%;
+	display: block;
+	line-height: 20px;
+	vertical-align: middle;
+	height: 20px;
 }
