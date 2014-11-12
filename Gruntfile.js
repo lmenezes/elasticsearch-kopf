@@ -18,12 +18,42 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [
-          {expand: true, flatten: true, src: ['src/lib/ace/mode-json.js'], dest: './dist/'},
-          {expand: true, flatten: true, src: ['src/lib/ace/worker-json.js'], dest: './dist/'},
-          {expand: true, flatten: true, src: ['src/lib/angularjs/*.map'], dest: './dist/'},
-          {expand: true, flatten: true, src: ['src/kopf/theme-kopf.js'], dest: './dist/'},
-          {expand: true, flatten: true, src: ['src/kopf/css/dark_style.css'], dest: './dist/'},
-          {expand: true, flatten: true, src: ['src/kopf/css/light_style.css'], dest: './dist/'}
+          {
+            expand: true,
+            flatten: true,
+            src: ['src/lib/ace/mode-json.js'],
+            dest: './dist/'
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: ['src/lib/ace/worker-json.js'],
+            dest: './dist/'
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: ['src/lib/angularjs/*.map'],
+            dest: './dist/'
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: ['src/kopf/theme-kopf.js'],
+            dest: './dist/'
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: ['src/kopf/css/dark_style.css'],
+            dest: './dist/'
+          },
+          {
+            expand: true,
+            flatten: true,
+            src: ['src/kopf/css/light_style.css'],
+            dest: './dist/'
+          }
         ]
       }
     },
@@ -47,66 +77,9 @@ module.exports = function(grunt) {
       },
       appjs: {
         src: [
-          'src/kopf/elastic/alias.js',
-          'src/kopf/elastic/cluster_changes.js',
-          'src/kopf/elastic/cluster_health.js',
-          'src/kopf/elastic/cluster_settings.js',
-          'src/kopf/elastic/cluster.js',
-          'src/kopf/elastic/elastic_client.js',
-          'src/kopf/elastic/es_connection.js',
-          'src/kopf/elastic/index.js',
-          'src/kopf/elastic/editable_index_settings.js',
-          'src/kopf/elastic/node.js',
-          'src/kopf/elastic/shard.js',
-          'src/kopf/elastic/token.js',
-          'src/kopf/elastic/repository.js',
-          'src/kopf/elastic/snapshot.js',
-          'src/kopf/elastic/warmer.js',
-          'src/kopf/elastic/percolator.js',
-          'src/kopf/elastic/index_metadata.js',
-          'src/kopf/elastic/node_stats.js',
-          // CONTROLLERS
           'src/kopf/kopf.js',
-          'src/kopf/controllers/alerts.js',
-          'src/kopf/controllers/aliases.js',
-          'src/kopf/controllers/analysis.js',
-          'src/kopf/controllers/cluster_health.js',
-          'src/kopf/controllers/cluster_overview.js',
-          'src/kopf/controllers/cluster_settings.js',
-          'src/kopf/controllers/create_index.js',
-          'src/kopf/controllers/global.js',
-          'src/kopf/controllers/index_settings.js',
-          'src/kopf/controllers/navbar.js',
-          'src/kopf/controllers/rest.js',
-          'src/kopf/controllers/percolator.js',
-          'src/kopf/controllers/repository.js',
-          'src/kopf/controllers/confirm_dialog.js',
-          'src/kopf/controllers/warmup.js',
-          'src/kopf/controllers/benchmark.js',
-          // SERVICES
-          'src/kopf/services/alerts.js',
-          'src/kopf/services/settings.js',
-          'src/kopf/services/aceeditor.js',
-          'src/kopf/services/theme.js',
-          'src/kopf/services/elastic.js',
-          'src/kopf/services/host_history.js',
-          'src/kopf/services/external_settings.js',
-          'src/kopf/services/debug.js',
-          'src/kopf/services/overview_filter.js',
-          // MODELS
-          'src/kopf/models/ace_editor.js',
-          'src/kopf/models/gist.js',
-          'src/kopf/models/benchmark.js',
-          'src/kopf/models/request.js',
-          'src/kopf/models/modal_controls.js',
-          'src/kopf/models/paginator.js',
-          'src/kopf/models/alias_filter.js',
-          'src/kopf/models/snapshot_filter.js',
-          'src/kopf/models/warmer_filter.js',
-          'src/kopf/models/index_filter.js',
-          'src/kopf/models/node_filter.js',
-          // UTIL
-          'src/kopf/util.js'
+          'src/kopf/*/*.js',
+          'src/kopf/util.js',
         ],
         dest: 'dist/kopf.js'
       },
@@ -142,66 +115,9 @@ module.exports = function(grunt) {
     jshint: {
       kopf: {
         src: [
-          'src/kopf/elastic/alias.js',
-          'src/kopf/elastic/cluster_changes.js',
-          'src/kopf/elastic/cluster_health.js',
-          'src/kopf/elastic/cluster_settings.js',
-          'src/kopf/elastic/cluster.js',
-          'src/kopf/elastic/elastic_client.js',
-          'src/kopf/elastic/es_connection.js',
-          'src/kopf/elastic/index.js',
-          'src/kopf/elastic/editable_index_settings.js',
-          'src/kopf/elastic/node.js',
-          'src/kopf/elastic/shard.js',
-          'src/kopf/elastic/token.js',
-          'src/kopf/elastic/repository.js',
-          'src/kopf/elastic/snapshot.js',
-          'src/kopf/elastic/warmer.js',
-          'src/kopf/elastic/percolator.js',
-          'src/kopf/elastic/index_metadata.js',
-          'src/kopf/elastic/node_stats.js',
-          // CONTROLLERS
           'src/kopf/kopf.js',
-          'src/kopf/controllers/alerts.js',
-          'src/kopf/controllers/aliases.js',
-          'src/kopf/controllers/analysis.js',
-          'src/kopf/controllers/cluster_health.js',
-          'src/kopf/controllers/cluster_overview.js',
-          'src/kopf/controllers/cluster_settings.js',
-          'src/kopf/controllers/create_index.js',
-          'src/kopf/controllers/global.js',
-          'src/kopf/controllers/index_settings.js',
-          'src/kopf/controllers/navbar.js',
-          'src/kopf/controllers/rest.js',
-          'src/kopf/controllers/percolator.js',
-          'src/kopf/controllers/repository.js',
-          'src/kopf/controllers/confirm_dialog.js',
-          'src/kopf/controllers/warmup.js',
-          'src/kopf/controllers/benchmark.js',
-          // SERVICES
-          'src/kopf/services/alerts.js',
-          'src/kopf/services/settings.js',
-          'src/kopf/services/aceeditor.js',
-          'src/kopf/services/theme.js',
-          'src/kopf/services/elastic.js',
-          'src/kopf/services/host_history.js',
-          'src/kopf/services/external_settings.js',
-          'src/kopf/services/debug.js',
-          'src/kopf/services/overview_filter.js',
-          // MODELS
-          'src/kopf/models/ace_editor.js',
-          'src/kopf/models/gist.js',
-          'src/kopf/models/benchmark.js',
-          'src/kopf/models/request.js',
-          'src/kopf/models/modal_controls.js',
-          'src/kopf/models/paginator.js',
-          'src/kopf/models/alias_filter.js',
-          'src/kopf/models/snapshot_filter.js',
-          'src/kopf/models/warmer_filter.js',
-          'src/kopf/models/index_filter.js',
-          'src/kopf/models/node_filter.js',
-          // UTIL
-          'src/kopf/util.js'
+          'src/kopf/*/*.js',
+          'src/kopf/util.js',
         ]
       }
     },
@@ -209,13 +125,13 @@ module.exports = function(grunt) {
       all: ['tests/all.html']
     },
     karma: {
-      unit: { configFile: 'tests/karma.config.js', keepalive: true }
+      unit: {configFile: 'tests/karma.config.js', keepalive: true}
     },
     jscs: {
-      src: [ 'src/kopf/**/*.js' ],
+      src: ['src/kopf/**/*.js'],
       options: {
         preset: 'google',
-        excludeFiles: [ 'src/kopf/theme-kopf.js' ],
+        excludeFiles: ['src/kopf/theme-kopf.js'],
         requireCamelCaseOrUpperCaseIdentifiers: "ignoreProperties"
       }
     }
