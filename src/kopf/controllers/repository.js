@@ -18,21 +18,25 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     $scope.restore_snap = {};
     $scope.editor = undefined;
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
 
     $scope.reload = function() {
-      $scope.loadIndices();
+      $scope.indices = ElasticService.getIndices();
       $scope.loadRepositories();
       if (notEmpty($scope.snapshot_repository)) {
         $scope.fetchSnapshots($scope.snapshot_repository);
-      }
-    };
-
-    $scope.loadIndices = function() {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.indices = ElasticService.cluster.indices || [];
       }
     };
 

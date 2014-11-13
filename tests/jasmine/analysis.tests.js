@@ -49,12 +49,9 @@ describe('AnalysisController', function() {
       new Index('a', undefined, {}, {}),
       new Index('b', undefined, {}, {})
     ];
-    var cluster = {
-      open_indices: function() {
-        return indices
-      }
+    this.ElasticService.getOpenIndices = function() {
+      return indices;
     };
-    this.ElasticService.cluster = cluster;
     this.scope.initializeController('loadAnalysisEvent');
     expect(this.scope.indices).toEqual(indices);
   });
@@ -127,6 +124,9 @@ describe('AnalysisController', function() {
   it('load index metadata whenever an index is selected on analysis by field',
       function() {
         this.scope.field_index = new Index('heyhey');
+        this.ElasticService.getOpenIndices = function() {
+          return [];
+        };
         this.ElasticService.getIndexMetadata = function(name, success,
                                                         failure) {
           success(new IndexMetadata(name, {mappings: { wat: "wat"}}));
@@ -134,11 +134,13 @@ describe('AnalysisController', function() {
         spyOn(this.ElasticService, "getIndexMetadata").andCallThrough();
         this.scope.field_index = new Index('heyhey');
         spyOn(this.scope, "loadIndexTypes").andCallThrough();
+        spyOn(this.ElasticService, 'getOpenIndices');
         this.scope.$digest();
         expect(this.scope.loadIndexTypes).toHaveBeenCalledWith("heyhey");
         expect(this.ElasticService.getIndexMetadata).toHaveBeenCalledWith("heyhey",
             jasmine.any(Function), jasmine.any(Function));
         expect(this.scope.field_index_metadata.mappings).toEqual({ wat: "wat"});
+        expect(this.ElasticService.getOpenIndices).toHaveBeenCalled();
       });
 
   it('load index metadata whenever an index is selected on analysis by analyzer',
@@ -147,15 +149,20 @@ describe('AnalysisController', function() {
                                                         failure) {
           success(new IndexMetadata(name, {mappings: { wat: "wat"}}));
         };
+        this.ElasticService.getOpenIndices = function() {
+          return [];
+        };
         spyOn(this.ElasticService, "getIndexMetadata").andCallThrough();
         this.scope.field_index = new Index('heyhey');
         this.scope.analyzer_index = new Index('heyhey');
         spyOn(this.scope, "loadIndexAnalyzers").andCallThrough();
+        spyOn(this.ElasticService, 'getOpenIndices');
         this.scope.$digest();
         expect(this.scope.loadIndexAnalyzers).toHaveBeenCalledWith("heyhey");
         expect(this.ElasticService.getIndexMetadata).toHaveBeenCalledWith("heyhey",
             jasmine.any(Function), jasmine.any(Function));
         expect(this.scope.analyzer_index_metadata.mappings).toEqual({ wat: "wat"});
+        expect(this.ElasticService.getOpenIndices).toHaveBeenCalled();
       });
 
 });

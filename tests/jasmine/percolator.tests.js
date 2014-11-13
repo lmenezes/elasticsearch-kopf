@@ -48,10 +48,9 @@ describe('PercolatorController', function() {
       new Index('a', undefined, {}, {}),
       new Index('b', undefined, {}, {})
     ];
-    var cluster = {
-      indices: indices
-    };
-    this.ElasticService.cluster = cluster;
+    this.ElasticService.getIndices = function() {
+      return indices;
+    }
     spyOn(this.scope, 'initEditor').andReturn(true);
     this.scope.initializeController();
     expect(this.scope.initEditor).toHaveBeenCalled();

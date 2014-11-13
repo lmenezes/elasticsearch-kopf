@@ -48,17 +48,12 @@ describe('WarmupController', function() {
   });
 
   it('Initializes data when warmup tab is selected', function() {
-    spyOn(this.scope, 'loadIndices').andReturn(true);
+    this.ElasticService.getIndices = function() {};
+    spyOn(this.ElasticService, 'getIndices').andReturn(true);
     spyOn(this.scope, 'initEditor').andReturn(true);
     this.scope.initializeController("loadWarmupEvent");
-    expect(this.scope.loadIndices).toHaveBeenCalled();
+    expect(this.ElasticService.getIndices).toHaveBeenCalled();
     expect(this.scope.initEditor).toHaveBeenCalled();
-  });
-
-  it('Loads indices from cluster', function() {
-    this.ElasticService.cluster = { 'indices': ['a', 'b', 'c']}
-    this.scope.loadIndices();
-    expect(this.scope.indices).toEqual(['a', 'b', 'c']);
   });
 
   it('Returns total number of warmers', function() {

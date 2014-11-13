@@ -8,9 +8,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
     $scope.types = [];
 
     $scope.initializeController = function() {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.indices = ElasticService.cluster.indices || [];
-      }
+      $scope.indices = ElasticService.getIndices();
     };
 
     $scope.addCompetitor = function() {

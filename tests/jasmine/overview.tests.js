@@ -12,9 +12,14 @@ describe('ClusterOverviewController', function() {
 
     module(function($provide) {
       $provide.value('$window', { innerWidth: 1400 });
-      $provide.value('ElasticService', {isConnected: function() {
-        return true;
-      }});
+      $provide.value('ElasticService', {
+        isConnected: function() {
+          return true;
+        },
+        getIndices: function() {
+          return [];
+        }
+      });
       $provide.value('OverviewFilter',{
         node: new NodeFilter("", true, true, true, 0),
         index: new IndexFilter('', '', true, 0),
@@ -70,7 +75,10 @@ describe('ClusterOverviewController', function() {
   it('should detect when cluster changes and update indices and nodes',
       function() {
         // paginator
-        this.ElasticService.cluster = { indices: [ 1, 2, 3 ], getNodes: function(considerType) {
+        this.ElasticService.getIndices = function() {
+          return [ 1, 2, 3 ];
+        };
+        this.ElasticService.cluster = { getNodes: function(considerType) {
           return [3, 2, 1]
         }};
         spyOn(this.scope, 'setIndices').andReturn(true);

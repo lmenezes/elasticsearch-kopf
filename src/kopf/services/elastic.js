@@ -17,6 +17,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.autoRefreshStarted = false;
 
+    this.getIndices = function() {
+      return isDefined(this.cluster) ? this.cluster.indices : [];
+    };
+
+    this.getOpenIndices = function() {
+      return isDefined(this.cluster) ? this.cluster.open_indices() : [];
+    };
+
     this.isConnected = function() {
       return this.connected;
     };

@@ -12,6 +12,16 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     $scope.indices = [];
     $scope.new_query = new PercolateQuery({});
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('percolator-query-editor');
@@ -139,7 +149,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ElasticService.cluster.indices;
+      $scope.indices = ElasticService.getIndices();
       $scope.initEditor();
     };
 

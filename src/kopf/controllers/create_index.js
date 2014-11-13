@@ -60,7 +60,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
       if (!isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('index-settings-editor');
       }
-      $scope.indices = ElasticService.cluster.indices;
+      $scope.indices = ElasticService.getIndices();
       $scope.source_index = null;
       $scope.editor.setValue('{}');
       $scope.shards = '';

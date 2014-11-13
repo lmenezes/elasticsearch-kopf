@@ -19,6 +19,16 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     $scope.analyzer_text = '';
     $scope.analyzer_tokens = [];
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getOpenIndices();
+        },
+        true
+    );
+
     $scope.$watch('field_index', function(current, previous) {
       if (isDefined(current)) {
         $scope.loadIndexTypes(current.name);
@@ -96,7 +106,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ElasticService.cluster.open_indices();
+      $scope.indices = ElasticService.getOpenIndices();
     };
 
   }

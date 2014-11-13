@@ -114,6 +114,16 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
 
     $scope.aliases = [];
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
@@ -241,7 +251,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ElasticService.cluster.indices;
+      $scope.indices = ElasticService.getIndices();
       $scope.loadAliases();
       $scope.initEditor();
     };
@@ -269,6 +279,16 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     $scope.analyzer_analyzer = '';
     $scope.analyzer_text = '';
     $scope.analyzer_tokens = [];
+
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getOpenIndices();
+        },
+        true
+    );
 
     $scope.$watch('field_index', function(current, previous) {
       if (isDefined(current)) {
@@ -347,7 +367,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ElasticService.cluster.open_indices();
+      $scope.indices = ElasticService.getOpenIndices();
     };
 
   }
@@ -363,9 +383,7 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
     $scope.types = [];
 
     $scope.initializeController = function() {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.indices = ElasticService.cluster.indices || [];
-      }
+      $scope.indices = ElasticService.getIndices();
     };
 
     $scope.addCompetitor = function() {
@@ -615,7 +633,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
         function(newValue, oldValue) {
           if (isDefined(ElasticService.cluster)) {
             $scope.cluster = ElasticService.cluster;
-            $scope.setIndices(ElasticService.cluster.indices);
+            $scope.setIndices(ElasticService.getIndices());
             $scope.setNodes(ElasticService.cluster.getNodes(true));
           } else {
             $scope.cluster = null;
@@ -626,11 +644,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     );
 
     $scope.$watch('index_paginator', function(filter, previous) {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.setIndices(ElasticService.cluster.indices);
-      } else {
-        $scope.setIndices([]); // could it even happen?
-      }
+      $scope.setIndices(ElasticService.getIndices());
     }, true);
 
     $scope.$watch('node_filter',
@@ -994,7 +1008,7 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
       if (!isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('index-settings-editor');
       }
-      $scope.indices = ElasticService.cluster.indices;
+      $scope.indices = ElasticService.getIndices();
       $scope.source_index = null;
       $scope.editor.setValue('{}');
       $scope.shards = '';
@@ -1214,6 +1228,16 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     $scope.indices = [];
     $scope.new_query = new PercolateQuery({});
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('percolator-query-editor');
@@ -1341,7 +1365,7 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
     };
 
     $scope.initializeController = function() {
-      $scope.indices = ElasticService.cluster.indices;
+      $scope.indices = ElasticService.getIndices();
       $scope.initEditor();
     };
 
@@ -1368,21 +1392,25 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
     $scope.restore_snap = {};
     $scope.editor = undefined;
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
 
     $scope.reload = function() {
-      $scope.loadIndices();
+      $scope.indices = ElasticService.getIndices();
       $scope.loadRepositories();
       if (notEmpty($scope.snapshot_repository)) {
         $scope.fetchSnapshots($scope.snapshot_repository);
-      }
-    };
-
-    $scope.loadIndices = function() {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.indices = ElasticService.cluster.indices || [];
       }
     };
 
@@ -1698,6 +1726,16 @@ kopf.controller('WarmupController', [
 
     $scope.warmers = [];
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
@@ -1706,10 +1744,6 @@ kopf.controller('WarmupController', [
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('warmup-query-editor');
       }
-    };
-
-    $scope.loadIndices = function() {
-      $scope.indices = ElasticService.cluster.indices;
     };
 
     $scope.createWarmerQuery = function() {
@@ -1775,7 +1809,7 @@ kopf.controller('WarmupController', [
     };
 
     $scope.initializeController = function() {
-      $scope.loadIndices();
+      $scope.indices = ElasticService.getIndices();
       $scope.initEditor();
     };
 
@@ -3369,6 +3403,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.clusterHealth = null;
 
     this.autoRefreshStarted = false;
+
+    this.getIndices = function() {
+      return isDefined(this.cluster) ? this.cluster.indices : [];
+    };
+
+    this.getOpenIndices = function() {
+      return isDefined(this.cluster) ? this.cluster.open_indices() : [];
+    };
 
     this.isConnected = function() {
       return this.connected;

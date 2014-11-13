@@ -56,36 +56,30 @@ describe('RepositoryController', function() {
     expect(this.scope.snapshot).toEqual(null);
   });
 
-  it('loadIndices : assigns a value to indices from cluster.indices',
-      function() {
-        this.ElasticService.cluster = {indices: ["chicken", "kale",
-          "potatoes"]};
-        this.scope.loadIndices();
-        expect(this.scope.indices).toEqual(["chicken", "kale", "potatoes"]);
-      });
-
   it('reload : calls loadRepositories and loadIndices if not snapshot_repository',
       function() {
         spyOn(this.scope, 'loadRepositories').andReturn(true);
         spyOn(this.scope, 'fetchSnapshots').andReturn(true);
-        spyOn(this.scope, 'loadIndices').andReturn(true);
+        this.ElasticService.getIndices = function() {};
+        spyOn(this.ElasticService, 'getIndices').andReturn(true);
         this.scope.reload();
         this._rootScope.$apply();  //force cycle so promise gets resolved
         expect(this.scope.loadRepositories).toHaveBeenCalled();
         expect(this.scope.fetchSnapshots).not.toHaveBeenCalled();
-        expect(this.scope.loadIndices).toHaveBeenCalled();
+        expect(this.ElasticService.getIndices).toHaveBeenCalled();
       });
 
-  it('reload : calls loadRepositories and loadIndices', function() {
+  it('reload : calls loadRepositories and getIndices', function() {
     spyOn(this.scope, 'loadRepositories').andReturn(true);
     spyOn(this.scope, 'fetchSnapshots').andReturn(true);
-    spyOn(this.scope, 'loadIndices').andReturn(true);
+    this.ElasticService.getIndices = function() {};
+    spyOn(this.ElasticService, 'getIndices').andReturn(true);
     this.scope.snapshot_repository = 'whatever';
     this.scope.reload();
     this._rootScope.$apply();  //force cycle so promise gets resolved
     expect(this.scope.loadRepositories).toHaveBeenCalled();
     expect(this.scope.fetchSnapshots).toHaveBeenCalled();
-    expect(this.scope.loadIndices).toHaveBeenCalled();
+    expect(this.ElasticService.getIndices).toHaveBeenCalled();
   });
 
   it('optionalParam : sets param on body', function() {

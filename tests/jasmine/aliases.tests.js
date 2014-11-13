@@ -43,7 +43,9 @@ describe('AliasesController', function() {
   });
 
   it('on : makes calls loadAliases and initEditor', function() {
-    this.ElasticService.cluster = { indices: [ 'one', 'two'] };
+    this.ElasticService.getIndices = function() {
+      return ['one', 'two'];
+    };
     spyOn(this.scope, 'loadAliases').andReturn(true);
     spyOn(this.scope, 'initEditor').andReturn(true);
     this.scope.initializeController();

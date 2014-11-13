@@ -13,6 +13,16 @@ kopf.controller('WarmupController', [
 
     $scope.warmers = [];
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(filter, previous) {
+          $scope.indices = ElasticService.getIndices();
+        },
+        true
+    );
+
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
@@ -21,10 +31,6 @@ kopf.controller('WarmupController', [
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('warmup-query-editor');
       }
-    };
-
-    $scope.loadIndices = function() {
-      $scope.indices = ElasticService.cluster.indices;
     };
 
     $scope.createWarmerQuery = function() {
@@ -90,7 +96,7 @@ kopf.controller('WarmupController', [
     };
 
     $scope.initializeController = function() {
-      $scope.loadIndices();
+      $scope.indices = ElasticService.getIndices();
       $scope.initEditor();
     };
 

@@ -54,7 +54,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
         function(newValue, oldValue) {
           if (isDefined(ElasticService.cluster)) {
             $scope.cluster = ElasticService.cluster;
-            $scope.setIndices(ElasticService.cluster.indices);
+            $scope.setIndices(ElasticService.getIndices());
             $scope.setNodes(ElasticService.cluster.getNodes(true));
           } else {
             $scope.cluster = null;
@@ -65,11 +65,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     );
 
     $scope.$watch('index_paginator', function(filter, previous) {
-      if (isDefined(ElasticService.cluster)) {
-        $scope.setIndices(ElasticService.cluster.indices);
-      } else {
-        $scope.setIndices([]); // could it even happen?
-      }
+      $scope.setIndices(ElasticService.getIndices());
     }, true);
 
     $scope.$watch('node_filter',
