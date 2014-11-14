@@ -149,4 +149,12 @@ describe('NavbarController', function() {
     expect(this.ThemeService.setTheme).toHaveBeenCalledWith("dark");
   });
 
+  it('should update current host when connecting to a new host', function() {
+    spyOn(this.ElasticService, 'getHost').andReturn('http://newhost:9200');
+    expect(this.scope.current_host).toEqual('http://localhost:9200');
+    this.scope.$digest();
+    expect(this.ElasticService.getHost).toHaveBeenCalled();
+    expect(this.scope.current_host).toEqual('http://newhost:9200');
+  });
+
 });

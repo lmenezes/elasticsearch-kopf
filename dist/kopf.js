@@ -1161,6 +1161,15 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
 
     $scope.$watch(
         function() {
+          return ElasticService.getHost();
+        },
+        function(newValue, oldValue) {
+          $scope.current_host = ElasticService.getHost();
+        }
+    );
+
+    $scope.$watch(
+        function() {
           return ElasticService.clusterHealth;
         },
         function(newValue, oldValue) {
