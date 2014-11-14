@@ -4,6 +4,6 @@ kopf.directive('ngPagination', function() {
       paginator: '=paginator',
       page: '=page'
     },
-    templateUrl: './partials/pagination.html'
+    templateUrl: './partials/directives/pagination.html'
   };
 });
