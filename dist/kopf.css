@@ -143,6 +143,36 @@ textarea {
 	margin-top: 10px;
 	margin-bottom: 6px;
 }
+.pgnt-info {
+    text-align: center;
+    width: 100%;
+    display: block;
+    line-height: 20px;
+    vertical-align: middle;
+    height: 20px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.pgnt-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display: block;
+    font-size: 12px;
+    font-weight: 300;
+    height: 20px;
+    line-height: 18px;
+    text-align: center;
+    width: 29px;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
@@ -433,14 +463,7 @@ a.cluster-map-node-action {
 	line-height: 18px;
 	text-align: center;
 }
-.page-info {
-	text-align: center;
-	width: 100%;
-	display: block;
-	line-height: 20px;
-	vertical-align: middle;
-	height: 20px;
-}
+
 .json-content {
 	font-size: 10px;
 	font-weight: 400;
