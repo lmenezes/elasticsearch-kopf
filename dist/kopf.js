@@ -3613,7 +3613,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         callbackSuccess(new IndexMetadata(name,
             response.metadata.indices[name]));
       };
-      var path = '/_cluster/state/metadata/' + name;
+      var path = '/_cluster/state/metadata/' + name + '?human';
       this.clusterRequest('GET', path, {}, transformed, callbackError);
     };
 
@@ -3621,7 +3621,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       var transformed = function(response) {
         callbackSuccess(new NodeStats(name, response.nodes[nodeId]));
       };
-      var path = '/_nodes/' + nodeId + '/stats/';
+      var path = '/_nodes/' + nodeId + '/stats?human';
       this.clusterRequest('GET', path, {}, transformed, callbackError);
     };
 
