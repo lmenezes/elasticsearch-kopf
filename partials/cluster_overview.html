@@ -45,15 +45,15 @@
         <td class="box unassigned-row">
           <div ng-show="cluster_health.unassigned_shards > 0">
             <i class="fa fa-fw fa-warning danger-action"> </i>
-            <span>{{cluster_health.unassigned_shards}} unassigned shards</span>
+            <span>{{cluster_health.unassigned_shards | number:0}} unassigned shards</span>
           </div>
           <div ng-show="cluster_health.relocating_shards > 0">
             <i class="fa fa-fw fa-refresh fa-spin"> </i>
-            <span>{{cluster_health.relocating_shards}} relocating shards</span>
+            <span>{{cluster_health.relocating_shards | number:0}} relocating shards</span>
           </div>
           <div ng-show="cluster_health.initializing_shards > 0">
             <i class="fa fa-fw fa-spinner fa-spin"> </i>
-            <span>{{cluster_health.initializing_shards}} initializing shards</span>
+            <span>{{cluster_health.initializing_shards | number:0}} initializing shards</span>
           </div>
         </td>
         <td class="shards-cell shards box" ng-repeat="index in page.elements track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">
