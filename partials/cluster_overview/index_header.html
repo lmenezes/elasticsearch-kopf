@@ -65,18 +65,14 @@
         </div>
     </div>
     <!-- index info -->
-    <div ng-show="index.aliases.length <= 5" class="row" ng-repeat="alias in index.visibleAliases()">
-        <div class="col-lg-12">
-            <div class="cluster-map-header-index-alias" ng-class="{'closed-index': index.closed()}">
-                <i class="fa fa-fw fa-tag"></i> {{alias}}
-            </div>
+    <div class="row" ng-show="index.visibleAliases().length > 0">
+      <div class="col-lg-12">
+        <div class="idx-alias" ng-class="{'closed-index': index.closed()}">
+          <i class="fa fa-tag"></i> {{index.visibleAliases()[0]}}
+          <span ng-show="index.visibleAliases().length > 1">
+            (+{{index.visibleAliases().length - 1}})
+          </span>
         </div>
-    </div>
-    <div ng-show="index.aliases.length > 5" class="row">
-        <div class="col-lg-12">
-            <div class="cluster-map-header-index-alias" ng-class="{'closed-index': index.closed()}">
-                <i class="fa fa-fw fa-tags"></i> {{index.aliases.length}} total aliases
-            </div>
-        </div>
+      </div>
     </div>
 </span>

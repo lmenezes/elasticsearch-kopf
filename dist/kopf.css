@@ -463,6 +463,22 @@ a.cluster-map-node-action {
 	line-height: 18px;
 	text-align: center;
 }
+.idx-alias {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+	font-size: 10px;
+	font-weight: 300;
+	line-height: 14px;
+    height: 14px;
+}
+.idx-stats {
+    font-size: 10px;
+    font-weight: 300;
+    line-height: 14px;
+    height: 14px;
+}
 
 .json-content {
 	font-size: 10px;
