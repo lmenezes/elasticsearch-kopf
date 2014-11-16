@@ -306,12 +306,12 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('GET', path, {}, parseWarmers, callbackError);
     };
 
-    this.deleteWarmupQuery = function(warmer, callbackSuccess, callbackError) {
+    this.deleteWarmer = function(warmer, callbackSuccess, callbackError) {
       var path = '/' + warmer.index + '/_warmer/' + warmer.id;
       this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
     };
 
-    this.registerWarmupQuery = function(warmer, callbackSuccess,
+    this.registerWarmer = function(warmer, callbackSuccess,
                                         callbackError) {
       var path = '/' + warmer.index + '/';
       if (notEmpty(warmer.types)) {

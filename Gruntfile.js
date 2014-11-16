@@ -96,7 +96,7 @@ module.exports = function(grunt) {
           'src/kopf/css/json_tree.css',
           'src/kopf/css/navbar.css',
           'src/kopf/css/rest_client.css',
-          'src/kopf/css/warmup.css',
+          'src/kopf/css/warmers.css',
           'src/kopf/css/repository.css'
         ],
         dest: 'dist/kopf.css'

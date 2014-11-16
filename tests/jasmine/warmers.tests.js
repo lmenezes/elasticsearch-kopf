@@ -1,6 +1,6 @@
 'use strict';
 
-describe('WarmupController', function() {
+describe('WarmersController', function() {
   var scope, createController;
 
   beforeEach(angular.mock.module('kopf'));
@@ -25,7 +25,7 @@ describe('WarmupController', function() {
     this.AceEditorService = $injector.get('AceEditorService');
 
     this.createController = function() {
-      return $controller('WarmupController', {$scope: this.scope}, $location,
+      return $controller('WarmersController', {$scope: this.scope}, $location,
           $timeout, this.ConfirmDialogService, this.AlertService,
           this.AceEditorService);
     };
@@ -47,11 +47,11 @@ describe('WarmupController', function() {
     expect(this.scope.warmer.types).toEqual([]);
   });
 
-  it('Initializes data when warmup tab is selected', function() {
+  it('Initializes data when warmer tab is selected', function() {
     this.ElasticService.getIndices = function() {};
     spyOn(this.ElasticService, 'getIndices').andReturn(true);
     spyOn(this.scope, 'initEditor').andReturn(true);
-    this.scope.initializeController("loadWarmupEvent");
+    this.scope.initializeController();
     expect(this.ElasticService.getIndices).toHaveBeenCalled();
     expect(this.scope.initEditor).toHaveBeenCalled();
   });
@@ -63,7 +63,7 @@ describe('WarmupController', function() {
     expect(this.scope.paginator.getPage().total).toEqual(2);
   });
 
-  it('Prevent warmup with empty body to be created', function() {
+  it('Prevent warmer with empty body to be created', function() {
     var editor = {
       error: undefined,
       format: function() {
@@ -75,11 +75,11 @@ describe('WarmupController', function() {
     };
     spyOn(this.AlertService, "error");
     this.scope.editor = editor;
-    this.scope.createWarmerQuery();
+    this.scope.createWarmer();
     expect(this.AlertService.error).toHaveBeenCalled();
   });
 
-  it('Prevent warmup with invalid body to be created', function() {
+  it('Prevent warmer with invalid body to be created', function() {
     var editor = {
       error: 'Invalid JSON',
       format: function() {
@@ -93,10 +93,10 @@ describe('WarmupController', function() {
       }
     };
     this.scope.editor = editor;
-    this.scope.createWarmerQuery();
+    this.scope.createWarmer();
   });
 
-  it('Attempts creating a valid Warmup query', function() {
+  it('Attempts creating a valid Warmer', function() {
     var editor = {
       error: undefined,
       format: function() {
@@ -113,12 +113,12 @@ describe('WarmupController', function() {
         { types: "type", source: {} });
     this.scope.warmer = warmer;
     this.scope.editor = editor;
-    this.ElasticService.registerWarmupQuery = function() {
+    this.ElasticService.registerWarmer = function() {
     };
-    spyOn(this.ElasticService, "registerWarmupQuery").andReturn(true);
-    this.scope.createWarmerQuery();
+    spyOn(this.ElasticService, "registerWarmer").andReturn(true);
+    this.scope.createWarmer();
     expect(this.scope.warmer.source).toEqual(editor.getValue());
-    expect(this.ElasticService.registerWarmupQuery).toHaveBeenCalledWith(warmer,
+    expect(this.ElasticService.registerWarmer).toHaveBeenCalledWith(warmer,
         jasmine.any(Function),
         jasmine.any(Function));
   });
@@ -147,15 +147,15 @@ describe('WarmupController', function() {
   });
 
   // TODO: how to make this work with the call that happens once user confirms?
-  it('Deletes an existing Warmup query', function() {
+  it('Deletes an existing Warmer', function() {
     this.scope.index = { 'name': "index_name" };
-    this.ElasticService.deleteWarmupQuery = function() {
+    this.ElasticService.deleteWarmer = function() {
     };
-    spyOn(this.ElasticService, "deleteWarmupQuery").andReturn(true);
+    spyOn(this.ElasticService, "deleteWarmer").andReturn(true);
     spyOn(this.ConfirmDialogService, "open").andReturn(true);
-    this.scope.deleteWarmupQuery(new Warmer("warmer_id", "index",
+    this.scope.deleteWarmer(new Warmer("warmer_id", "index",
         { types: [], source: {}}));
-    expect(this.ConfirmDialogService.open).toHaveBeenCalledWith("are you sure you want to delete query warmer_id?",
+    expect(this.ConfirmDialogService.open).toHaveBeenCalledWith("are you sure you want to delete warmer warmer_id?",
         {}, "Delete", jasmine.any(Function));
   });
 

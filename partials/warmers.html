@@ -2,16 +2,16 @@
 	<div class="row">
 		<div class="col-md-6">
 			<div class="content-panel">
-				<div class="panel-group" id="#newWarmupAccordion">
+				<div class="panel-group" id="#newWarmerAccordion">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#newWarmupAccordion" target="_self" href="#newWarmupQuery">
+								<a data-toggle="collapse" data-parent="#newWarmerAccordion" target="_self" href="#newWarmer">
 									create warmer
 								</a>
 							</h4>
 						</div>
-						<div id="newWarmupQuery" class="panel-collapse collapse in">
+						<div id="newWarmer" class="panel-collapse collapse in">
 							<div class="panel-body">
 								<div class="row">
 									<div class="form-group col-md-4">
@@ -33,7 +33,7 @@
 									<div class="col-xs-12">
 										<div class="form-group">
 											<label class="form-label">query</label>
-											<div id="warmup-query-editor" style="min-height: 400px" class="kopf-ace-editor"></div>
+											<div id="warmer-editor" style="min-height: 400px" class="kopf-ace-editor"></div>
 										</div>
 									</div>
 									<div class="col-lg-12 action-buttons">
@@ -41,7 +41,7 @@
 										<button type="submit" class="btn btn-default input-sm" ng-click="editor.format()">
 											<i class="fa fa-align-left"></i> format
 										</button>
-										<button type="submit" class="btn btn-danger input-sm" ng-click="createWarmerQuery()">
+										<button type="submit" class="btn btn-danger input-sm" ng-click="createWarmer()">
 											<i class="fa fa-save"></i> create
 										</button>
 									</div>
@@ -54,16 +54,16 @@
 		</div>
 		<div class="col-md-6">
 			<div class="content-panel">
-				<div class="panel-group" id="#warmupListAccordion">
+				<div class="panel-group" id="#warmersListAccordion">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h4 class="panel-title">
-								<a data-toggle="collapse" data-parent="#warmupListAccordion" target="_self" href="#warmupQueries">
+								<a data-toggle="collapse" data-parent="#warmersListAccordion" target="_self" href="#warmers">
 									registered warmers
 								</a>
 							</h4>
 						</div>
-						<div id="warmupQueries" class="panel-collapse collapse in">
+						<div id="warmers" class="panel-collapse collapse in">
 							<div class="panel-body" style="min-height: 565px">
 								<div class="row">
 									<div class="form-group col-md-6">
@@ -96,11 +96,11 @@
                                                 <td class="table-actions">{{warmer.source}}
 													<a data-toggle="modal" target="_self" href="#confirm_dialog"
 													class="remove-icon" data-backdrop="static">
-														<i class="fa fa-times remove-icon" title="remove query" ng-click="deleteWarmupQuery(warmer)"></i>
+														<i class="fa fa-times remove-icon" title="remove query" ng-click="deleteWarmer(warmer)"></i>
 													</a>
 													<a data-toggle="modal" target="_self" href="#"
 													class="details-icon" data-backdrop="static">
-														<i class="fa fa-info-circle details-icon" title="view details" ng-click="displayInfo('warmup query ' + warmer.id,warmer.source)"></i>
+														<i class="fa fa-info-circle details-icon" title="view details" ng-click="displayInfo('warmer ' + warmer.id,warmer.source)"></i>
 													</a>
 												</td>
 											</tr>

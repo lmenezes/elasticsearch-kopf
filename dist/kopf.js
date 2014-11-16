@@ -53,9 +53,9 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/percolator.html',
         controller: 'PercolatorController'
       }).
-      when('/warmup', {
-        templateUrl: 'partials/warmup.html',
-        controller: 'WarmupController'
+      when('/warmers', {
+        templateUrl: 'partials/warmers.html',
+        controller: 'WarmersController'
       }).
       when('/repository', {
         templateUrl: 'partials/repository.html',
@@ -1720,7 +1720,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
 ]);
 
-kopf.controller('WarmupController', [
+kopf.controller('WarmersController', [
   '$scope', 'ConfirmDialogService', 'AlertService', 'AceEditorService',
   'ElasticService',
   function($scope, ConfirmDialogService, AlertService, AceEditorService,
@@ -1751,47 +1751,43 @@ kopf.controller('WarmupController', [
 
     $scope.initEditor = function() {
       if (!angular.isDefined($scope.editor)) {
-        $scope.editor = AceEditorService.init('warmup-query-editor');
+        $scope.editor = AceEditorService.init('warmer-editor');
       }
     };
 
-    $scope.createWarmerQuery = function() {
+    $scope.createWarmer = function() {
       if ($scope.editor.hasContent()) {
         $scope.editor.format();
         if (!isDefined($scope.editor.error)) {
           $scope.warmer.source = $scope.editor.getValue();
-          ElasticService.registerWarmupQuery($scope.warmer,
+          ElasticService.registerWarmer($scope.warmer,
               function(response) {
                 $scope.loadIndexWarmers();
-                AlertService.success('Warmup query successfully registered',
-                    response);
+                AlertService.success('Warmer successfully created', response);
               },
               function(error) {
-                AlertService.error('Request did not return a valid JSON',
-                    error);
+                AlertService.error('Request returned invalid JSON', error);
               }
           );
         }
       } else {
-        AlertService.error('Warmup query body can\'t be empty');
+        AlertService.error('Warmer query can\'t be empty');
       }
     };
 
-    $scope.deleteWarmupQuery = function(warmer) {
+    $scope.deleteWarmer = function(warmer) {
       ConfirmDialogService.open(
-              'are you sure you want to delete query ' + warmer.id + '?',
+          'are you sure you want to delete warmer ' + warmer.id + '?',
           warmer.source,
           'Delete',
           function() {
-            ElasticService.deleteWarmupQuery(warmer,
+            ElasticService.deleteWarmer(warmer,
                 function(response) {
-                  AlertService.success('Warmup query successfully deleted',
-                      response);
+                  AlertService.success('Warmer successfully deleted', response);
                   $scope.loadIndexWarmers();
                 },
                 function(error) {
-                  AlertService.error('Error while deleting warmup query',
-                      error);
+                  AlertService.error('Error while deleting warmer', error);
                 }
             );
           }
@@ -1808,7 +1804,7 @@ kopf.controller('WarmupController', [
             function(error) {
               $scope.paginator.setCollection([]);
               $scope.page = $scope.paginator.getPage();
-              AlertService.error('Error while fetching warmup queries', error);
+              AlertService.error('Error while fetching warmers', error);
             }
         );
       } else {
@@ -3702,12 +3698,12 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('GET', path, {}, parseWarmers, callbackError);
     };
 
-    this.deleteWarmupQuery = function(warmer, callbackSuccess, callbackError) {
+    this.deleteWarmer = function(warmer, callbackSuccess, callbackError) {
       var path = '/' + warmer.index + '/_warmer/' + warmer.id;
       this.clusterRequest('DELETE', path, {}, callbackSuccess, callbackError);
     };
 
-    this.registerWarmupQuery = function(warmer, callbackSuccess,
+    this.registerWarmer = function(warmer, callbackSuccess,
                                         callbackError) {
       var path = '/' + warmer.index + '/';
       if (notEmpty(warmer.types)) {
