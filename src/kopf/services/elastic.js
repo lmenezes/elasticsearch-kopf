@@ -235,7 +235,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         var allAliases = [];
         indices.forEach(function(index) {
           var indexAliases = response[index].aliases;
-          if (Object.keys(indexAliases).length > 0) {
+          if (indexAliases && Object.keys(indexAliases).length > 0) {
             var aliases = Object.keys(indexAliases).map(function(alias) {
               var info = indexAliases[alias];
               return new Alias(alias, index, info.filter, info.index_routing,
