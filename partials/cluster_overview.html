@@ -1,8 +1,8 @@
 <div ng-controller="ClusterOverviewController" ng-show="hasConnection() && cluster != null">
-  <div ng-include src="'partials/cluster_overview/cluster_stats.html'"></div>
+  <div ng-include src="'partials/cluster_overview/cluster_stats.html'" style="margin-bottom: 20px"></div>
   <div class="row">
-    <div class="col-xs-12" ng-include src="'partials/cluster_overview/filters.html'"></div>
-    <div class="col-lg-2 col-lg-offset-10 col-md-3 col-md-offset-9 col-sm-4 col-sm-offset-8 col-xs-12">
+    <div class="col-lg-10" ng-include src="'partials/cluster_overview/filters.html'"></div>
+    <div class="col-lg-2">
       <ng-pagination page="page" paginator="index_paginator"></ng-pagination>
     </div>
   </div>
@@ -29,8 +29,8 @@
               </a>
             </div>
             <div class="col-lg-3 col-xs-6">
-              <a data-toggle="collapse" data-parent="#cluster_overview_filters_accordion" data-target="#cluster_overview_filters" class="cluster-map-header-cluster-action">
-                <i class="fa fa-filter" title="filter nodes and indices"></i>
+              <a href="#!clusterHealth" class="cluster-map-header-cluster-action">
+                <i class="fa fa-stethoscope" title="cluster health information"></i>
               </a>
             </div>
           </div>

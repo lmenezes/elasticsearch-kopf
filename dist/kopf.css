@@ -141,7 +141,7 @@ textarea {
 }
 .page-ctrl {
 	margin-top: 10px;
-	margin-bottom: 6px;
+	margin-bottom: 5px;
 }
 .pgnt-info {
     text-align: center;
@@ -331,7 +331,8 @@ a.cluster-map-header-index-action:hover {
 	font-size: 12px;
 }
 .cluster-overview-filter {
-	padding-bottom: 10px;
+	margin-bottom: 5px;
+	margin-top: 5px;
 }
 .node-type-icon {
 	padding-left: 2px;
@@ -376,9 +377,8 @@ a.cluster-map-node-action {
 	border-bottom: 0px !important;
 	border-top: 0px !important;
 }
-.cluster-map-stats-section {
-	margin-top: 10px;
-	margin-bottom: 30px;
+.overview-stats {
+	margin-bottom: 20px;
 }
 .cluster-map-stat-block {
 	display: inline-block;
@@ -389,10 +389,6 @@ a.cluster-map-node-action {
 	display: inline-block;
 	margin-top: 6px;
 	margin-bottom: 6px;
-}
-.cluster-map-stats-section:after {
-	content: "";
-	width: 100%;
 }
 .cluster-map-stat-number {
 	font-size: 16px;
