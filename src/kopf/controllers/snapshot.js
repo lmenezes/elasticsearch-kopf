@@ -1,7 +1,7 @@
-kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
+kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
   'AlertService', 'ElasticService',
   function($scope, ConfirmDialogService, AlertService, ElasticService) {
-    // registered repositories
+    // registered snapshot
     $scope.repositories = [];
     $scope.indices = [];
 
@@ -128,7 +128,7 @@ kopf.controller('RepositoryController', ['$scope', 'ConfirmDialogService',
           },
           function(error) {
             $scope.repositories = [];
-            AlertService.error('Error while reading repositories', error);
+            AlertService.error('Error while reading snapshot', error);
           }
       );
     };

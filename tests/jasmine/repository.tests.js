@@ -1,6 +1,6 @@
 'use strict';
 
-describe('RepositoryController', function() {
+describe('SnapshotController', function() {
   var scope, createController, _q, _rootScope;
 
   beforeEach(angular.mock.module('kopf'));
@@ -24,7 +24,7 @@ describe('RepositoryController', function() {
     this.AlertService = $injector.get('AlertService');
     $httpBackend.whenGET('./kopf_external_settings.json').respond(200, {});
     this.createController = function() {
-      return $controller('RepositoryController', {$scope: this.scope},
+      return $controller('SnapshotController', {$scope: this.scope},
           this.ConfirmDialogService, this.AlertService);
     };
 
@@ -194,7 +194,7 @@ describe('RepositoryController', function() {
     expect(this.AlertService.error).toHaveBeenCalled();
   });
 
-  it('createRepository : if success calls client.createRepository and reload repositories',
+  it('createRepository : if success calls client.createRepository and reload snapshot',
       function() {
         this.ElasticService.createRepository = function(name, body, success,
                                                         failure) {
@@ -216,7 +216,7 @@ describe('RepositoryController', function() {
 
       });
 
-  it('createRepository : if fails calls client.createRepository and reload repositories',
+  it('createRepository : if fails calls client.createRepository and reload snapshot',
       function() {
         this.ElasticService.createRepository = function(name, body, success,
                                                         failure) {
@@ -245,7 +245,7 @@ describe('RepositoryController', function() {
         expect(this.AlertService.error).toHaveBeenCalled();
       });
 
-  it('loadRepositories : if success calls client.getRepositories and sets repositories',
+  it('loadRepositories : if success calls client.getRepositories and sets snapshot',
       function() {
         var repos = [ new Repository('a', { 'type': 'test', 'settings': {} }) ];
         this.ElasticService.getRepositories = function(success, failure) {
@@ -256,7 +256,7 @@ describe('RepositoryController', function() {
         expect(this.scope.repositories).toEqual(repos);
       });
 
-  it('loadRepositories : if fails calls Alert service and sets repositories to ][]',
+  it('loadRepositories : if fails calls Alert service and sets snapshot to ][]',
       function() {
         this.ElasticService.getRepositories = function(success, failure) {
           failure("error message");

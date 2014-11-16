@@ -19,11 +19,11 @@
                         <select class="form-control input-sm" ng-model="repository_form.type" ng-options="t for t in ['fs', 'url', 's3', 'hdfs', 'azure']"></select>
                     </div>
                 </div>
-                <div class="row" ng-include src="'partials/repositories/fs_repository.html'" ng-show="repository_form.type == 'fs'"></div>
-                <div class="row" ng-include src="'partials/repositories/url_repository.html'" ng-show="repository_form.type == 'url'"></div>
-                <div class="row" ng-include src="'partials/repositories/s3_repository.html'" ng-show="repository_form.type == 's3'"></div>
-                <div class="row" ng-include src="'partials/repositories/azure_repository.html'" ng-show="repository_form.type == 'azure'"></div>
-                <div class="row" ng-include src="'partials/repositories/hdfs_repository.html'" ng-show="repository_form.type == 'hdfs'"></div>
+                <div class="row" ng-include src="'partials/snapshot/fs_repository.html'" ng-show="repository_form.type == 'fs'"></div>
+                <div class="row" ng-include src="'partials/snapshot/url_repository.html'" ng-show="repository_form.type == 'url'"></div>
+                <div class="row" ng-include src="'partials/snapshot/s3_repository.html'" ng-show="repository_form.type == 's3'"></div>
+                <div class="row" ng-include src="'partials/snapshot/azure_repository.html'" ng-show="repository_form.type == 'azure'"></div>
+                <div class="row" ng-include src="'partials/snapshot/hdfs_repository.html'" ng-show="repository_form.type == 'hdfs'"></div>
                 <div class="row">
                     <div class="col-lg-12 action-buttons">
                         <span class="validation-error">{{validation_error}}</span>

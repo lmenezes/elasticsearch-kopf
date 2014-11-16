@@ -64,7 +64,7 @@ function Repository(name, info) {
     required.forEach(function(setting) {
       if (!notEmpty(repository.settings[setting])) {
         var type = repository.type;
-        throw(setting + ' is required for repositories of type ' + type);
+        throw(setting + ' is required for snapshot of type ' + type);
       }
     });
   };

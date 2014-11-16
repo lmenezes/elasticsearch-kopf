@@ -57,9 +57,9 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/warmers.html',
         controller: 'WarmersController'
       }).
-      when('/repository', {
-        templateUrl: 'partials/repository.html',
-        controller: 'RepositoryController'
+      when('/snapshot', {
+        templateUrl: 'partials/snapshot.html',
+        controller: 'SnapshotController'
       }).
       when('/createIndex', {
         templateUrl: 'partials/create_index.html',
