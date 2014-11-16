@@ -65,46 +65,14 @@
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}}">
-        <li ng-class="{active: isActive('cluster')}">
-          <a href="#!cluster">
-            <i class="fa fa-fw fa-sitemap"></i> cluster
-          </a>
-        </li>
-        <li ng-class="{active: isActive('rest')}">
-          <a href="#!rest">
-            <i class="fa fa-fw fa-edit"></i> rest
-          </a>
-        </li>
-        <li ng-class="{active: isActive('aliases')}">
-          <a href="#!aliases">
-            <i class="fa fa-fw fa-tags"></i> aliases
-          </a>
-        </li>
-        <li ng-class="{active: isActive('analysis')}">
-          <a href="#!analysis">
-            <i class="fa fa-fw fa-puzzle-piece"></i> analysis
-          </a>
-        </li>
-        <li ng-class="{active: isActive('percolator')}">
-          <a href="#!percolator">
-            <i class="fa fa-fw fa-bell-o"></i> percolator
-          </a>
-        </li>
-        <li ng-class="{active: isActive('warmers')}">
-          <a href="#!warmers">
-            <i class="fa fa-fw fa-fire"></i> warmers
-          </a>
-        </li>
-        <li ng-class="{active: isActive('snapshot')}">
-          <a href="#!snapshot">
-            <i class="fa fa-fw fa-camera"></i> snapshot
-          </a>
-        </li>
-        <li ng-class="{active: isActive('benchmark')}" ng-show="client.versionCheck('1.4.0')">
-          <a href="#!benchmark">
-            <i class="fa fa-fw fa-bar-chart-o"></i> benchmark
-          </a>
-        </li>
+        <li ng-navbar-section name="cluster" icon="fa-sitemap"></li>
+        <li ng-navbar-section name="rest" icon="fa-edit"></li>
+        <li ng-navbar-section name="aliases" icon="fa-tags"></li>
+        <li ng-navbar-section name="analysis" icon="fa-puzzle-piece"></li>
+        <li ng-navbar-section name="percolator" icon="fa-bell-o"></li>
+        <li ng-navbar-section name="warmers" icon="fa-fire"></li>
+        <li ng-navbar-section name="snapshot" icon="fa-camera"></li>
+        <!--li ng-navbar-section name="benchmark" icon="fa-bar-chart-o"></li-->
       </ul>
       <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}} navbar-right visible-lg">
         <li class="connection-info" ng-show="clusterName">
