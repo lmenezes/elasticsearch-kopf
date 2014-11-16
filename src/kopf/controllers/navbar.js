@@ -82,9 +82,5 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
       SettingsService.setAutoAdjustLayout($scope.auto_adjust_layout);
     };
 
-    $scope.isActive = function(name) {
-      return name === $location.path().substring(1);
-    };
-
   }
 ]);

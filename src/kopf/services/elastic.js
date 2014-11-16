@@ -114,19 +114,24 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     };
 
     this.versionCheck = function(version) {
-      var parts = checkVersion.exec(version);
-      var major = parseInt(parts[1]);
-      var minor = parseInt(parts[2]);
-      var build = parseInt(parts[3]);
-      var v = this.version;
-      var higherMajor = v.major > major;
-      var higherMinor = v.major == major && v.minor > minor;
-      var higherBuild = (
-          v.major == major &&
-          v.minor == minor &&
-          v.build >= build
-          );
-      return (higherMajor || higherMinor || higherBuild);
+      if (isDefined(version)) {
+        var parts = checkVersion.exec(version);
+        var major = parseInt(parts[1]);
+        var minor = parseInt(parts[2]);
+        var build = parseInt(parts[3]);
+        var v = this.version;
+        var higherMajor = v.major > major;
+        var higherMinor = v.major == major && v.minor > minor;
+        var higherBuild = (
+        v.major == major &&
+        v.minor == minor &&
+        v.build >= build
+        );
+        return (higherMajor || higherMinor || higherBuild);
+      } else {
+        return true;
+      }
+
     };
 
     this.createIndex = function(name, settings, callbackSuccess,
