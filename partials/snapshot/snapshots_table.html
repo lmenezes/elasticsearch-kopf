@@ -52,7 +52,12 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-xs-12">
-                        <label class="form-label">indices (default is all)</label>
+                        <label class="form-label">
+                            indices (default is all)
+                            <label class="cluster-map-node-type">
+                                <input type="checkbox" ng-model="showSpecialIndices" ng-true-value="true"> show special indices
+                            </label>
+                        </label>
                         <select multiple="multiple" ng-model="new_snap.indices" ng-options="i.name as i.name for i in indices" class="form-control input-sm-twoxheight">
                             <option value="">Default is All</option>
                         </select>

@@ -7,9 +7,11 @@ describe('SnapshotController', function() {
 
   beforeEach(function() {
     module('kopf');
-    var mock = {isConnected: function() {
-      return true;
-    }};
+    var mock = {
+      isConnected: function() {
+        return true;
+      }
+    };
     module(function($provide) {
       $provide.value('ElasticService', mock);
     });
@@ -33,6 +35,7 @@ describe('SnapshotController', function() {
 
   //TESTS
   it('init : values are set', function() {
+    expect(this.scope.showSpecialIndices).toEqual(false);
     expect(this.scope.repositories).toEqual([]);
     expect(this.scope.snapshots).toEqual([]);
     expect(this.scope.indices).toEqual([]);
@@ -60,26 +63,27 @@ describe('SnapshotController', function() {
       function() {
         spyOn(this.scope, 'loadRepositories').andReturn(true);
         spyOn(this.scope, 'fetchSnapshots').andReturn(true);
-        this.ElasticService.getIndices = function() {};
-        spyOn(this.ElasticService, 'getIndices').andReturn(true);
+        spyOn(this.scope, 'loadIndices').andReturn(true);
         this.scope.reload();
         this._rootScope.$apply();  //force cycle so promise gets resolved
         expect(this.scope.loadRepositories).toHaveBeenCalled();
         expect(this.scope.fetchSnapshots).not.toHaveBeenCalled();
-        expect(this.ElasticService.getIndices).toHaveBeenCalled();
+        expect(this.scope.loadIndices).toHaveBeenCalled();
       });
 
   it('reload : calls loadRepositories and getIndices', function() {
     spyOn(this.scope, 'loadRepositories').andReturn(true);
     spyOn(this.scope, 'fetchSnapshots').andReturn(true);
-    this.ElasticService.getIndices = function() {};
+    spyOn(this.scope, 'loadIndices').andReturn(true);
+    this.ElasticService.getIndices = function() {
+    };
     spyOn(this.ElasticService, 'getIndices').andReturn(true);
     this.scope.snapshot_repository = 'whatever';
     this.scope.reload();
     this._rootScope.$apply();  //force cycle so promise gets resolved
     expect(this.scope.loadRepositories).toHaveBeenCalled();
     expect(this.scope.fetchSnapshots).toHaveBeenCalled();
-    expect(this.ElasticService.getIndices).toHaveBeenCalled();
+    expect(this.scope.loadIndices).toHaveBeenCalled();
   });
 
   it('optionalParam : sets param on body', function() {
@@ -106,7 +110,7 @@ describe('SnapshotController', function() {
         this.ElasticService.restoreSnapshot = function() {
         };
         this.scope.snapshot_repository = 'my_repo';
-        this.scope.snapshot = { "name": "my_snap" };
+        this.scope.snapshot = {"name": "my_snap"};
         this.scope.restore_snap = {
           "snapshot": {
             "snapshot": "my_snap",
@@ -130,14 +134,14 @@ describe('SnapshotController', function() {
       success();
     };
     this.scope.snapshot_repository = 'my_repo';
-    this.scope.snapshot = { "name": "my_snap" };
+    this.scope.snapshot = {"name": "my_snap"};
     this.scope.restore_snap = {
       "indices": ["idx-20140107", "idx-20140108"],
       "ignore_unavailable": false,
       "include_global_state": false,
       "rename_replacement": "-chicken-",
       "rename_pattern": "-",
-      "snapshot": { "snapshot": "my_snap", "repository": "my_repo" }
+      "snapshot": {"snapshot": "my_snap", "repository": "my_repo"}
     };
 
     var expected = {
@@ -166,14 +170,14 @@ describe('SnapshotController', function() {
       failure();
     };
     this.scope.snapshot_repository = 'my_repo';
-    this.scope.snapshot = { "name": "my_snap" };
+    this.scope.snapshot = {"name": "my_snap"};
     this.scope.restore_snap = {
       "indices": ["idx-20140107", "idx-20140108"],
       "ignore_unavailable": false,
       "include_global_state": false,
       "rename_replacement": "-chicken-",
       "rename_pattern": "-",
-      "snapshot": { "snapshot": "my_snap", "repository": "my_repo" }
+      "snapshot": {"snapshot": "my_snap", "repository": "my_repo"}
     };
 
     var expected = {
@@ -204,8 +208,8 @@ describe('SnapshotController', function() {
         spyOn(this.scope, "loadRepositories").andReturn(true);
         spyOn(this.AlertService, "success");
         this.scope.repository_form = new Repository("url_repo",
-            {type: "url", settings: {url: "settings_value"} });
-        var expected = { type: "url", settings: { url: "settings_value"}};
+            {type: "url", settings: {url: "settings_value"}});
+        var expected = {type: "url", settings: {url: "settings_value"}};
         this.scope.createRepository();
         expect(this.ElasticService.createRepository).toHaveBeenCalledWith("url_repo",
             JSON.stringify(expected),
@@ -225,8 +229,8 @@ describe('SnapshotController', function() {
         spyOn(this.ElasticService, "createRepository").andCallThrough();
         spyOn(this.AlertService, "error");
         this.scope.repository_form = new Repository("fs_repo",
-            { "type": "fs", "settings": { "location": "setting_value"} });
-        var expected = {type: "fs", settings: { location: "setting_value"} };
+            {"type": "fs", "settings": {"location": "setting_value"}});
+        var expected = {type: "fs", settings: {location: "setting_value"}};
         this.scope.createRepository();
         expect(this.ElasticService.createRepository).toHaveBeenCalledWith("fs_repo",
             JSON.stringify(expected), jasmine.any(Function),
@@ -247,7 +251,7 @@ describe('SnapshotController', function() {
 
   it('loadRepositories : if success calls client.getRepositories and sets snapshot',
       function() {
-        var repos = [ new Repository('a', { 'type': 'test', 'settings': {} }) ];
+        var repos = [new Repository('a', {'type': 'test', 'settings': {}})];
         this.ElasticService.getRepositories = function(success, failure) {
           success(repos);
         };
@@ -291,7 +295,8 @@ describe('SnapshotController', function() {
     this.ElasticService.createSnapshot = function() {
     };
     spyOn(this.ElasticService, "createSnapshot").andReturn(true);
-    this.scope.new_snap = {"repository": new Repository("my_repo", {}),
+    this.scope.new_snap = {
+      "repository": new Repository("my_repo", {}),
       "name": "my_snap"
     };
 
@@ -308,7 +313,8 @@ describe('SnapshotController', function() {
         this.ElasticService.createSnapshot = function() {
         };
         spyOn(this.ElasticService, "createSnapshot").andReturn(true);
-        this.scope.new_snap = {"repository": new Repository("my_repo", {}),
+        this.scope.new_snap = {
+          "repository": new Repository("my_repo", {}),
           "name": "my_snap",
           "indices": ["one", "two"],
           "include_global_state": true,
@@ -348,7 +354,7 @@ describe('SnapshotController', function() {
 
   it('fetchSnapshots : when successful sets snapshots to fetched values',
       function() {
-        var snapshots = [ new Snapshot({ "name": "fetched_snapshot"}) ];
+        var snapshots = [new Snapshot({"name": "fetched_snapshot"})];
         this.ElasticService.getSnapshots = function(repo, success, failed) {
           success(snapshots);
         };
@@ -390,7 +396,7 @@ describe('SnapshotController', function() {
       function() {
         this.scope.snapshot_repository = "will_be_deleted";
         var repository = new Repository("will_be_deleted",
-            { "type": "fs", "settings": { "location": "setting_value"} });
+            {"type": "fs", "settings": {"location": "setting_value"}});
         this.ElasticService.deleteRepository = function(repo, success, failed) {
           success("")
         };
@@ -404,7 +410,7 @@ describe('SnapshotController', function() {
       function() {
         this.scope.snapshot_repository = "wont_be_deleted";
         var repository = new Repository("will_be_deleted",
-            { "type": "fs", "settings": { "location": "setting_value"} });
+            {"type": "fs", "settings": {"location": "setting_value"}});
         this.ElasticService.deleteRepository = function(repo, success, failed) {
           success("")
         };
@@ -413,6 +419,41 @@ describe('SnapshotController', function() {
         expect(this.scope.snapshot_repository).toEqual('wont_be_deleted');
         expect(this.scope.reload).toHaveBeenCalled();
       });
+
+  it('refreshes the list of available indices', function() {
+    expect(this.scope.showSpecialIndices).toEqual(false);
+    spyOn(this.scope, 'loadIndices').andReturn();
+    this.scope.showSpecialIndices = true;
+    this.scope.$digest();
+    expect(this.scope.showSpecialIndices).toEqual(true);
+    expect(this.scope.loadIndices).toHaveBeenCalled();
+  });
+
+  it('should only load non special indices', function() {
+    expect(this.scope.indices).toEqual([]);
+    expect(this.scope.showSpecialIndices).toEqual(false);
+    this.ElasticService.getIndices = function() {};
+    spyOn(this.ElasticService, 'getIndices').andReturn(
+        [{ special: true}, { special: true}, { special: false}]
+    );
+    this.scope.loadIndices();
+    expect(this.scope.indices.length).toEqual(1);
+  });
+
+
+  it('should only load non special indices', function() {
+    this.scope.showSpecialIndices = true;
+    expect(this.scope.indices).toEqual([]);
+    expect(this.scope.showSpecialIndices).toEqual(true);
+    this.ElasticService.getIndices = function() {};
+    spyOn(this.ElasticService, 'getIndices').andReturn(
+        [{ special: true}, { special: true}, { special: false}]
+    );
+    this.scope.loadIndices();
+    expect(this.scope.indices.length).toEqual(3);
+  });
+
+
 
 
 });

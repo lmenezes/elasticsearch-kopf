@@ -1490,6 +1490,7 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
   'AlertService', 'ElasticService',
   function($scope, ConfirmDialogService, AlertService, ElasticService) {
     // registered snapshot
+    $scope.showSpecialIndices = false;
     $scope.repositories = [];
     $scope.indices = [];
 
@@ -1506,22 +1507,34 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
     $scope.restore_snap = {};
     $scope.editor = undefined;
 
+    $scope.$watch('showSpecialIndices', function(current, previous) {
+      $scope.loadIndices();
+    });
+
     $scope.$watch(
         function() {
           return ElasticService.cluster;
         },
         function(filter, previous) {
-          $scope.indices = ElasticService.getIndices();
+          $scope.loadIndices();
         },
         true
     );
+
+    $scope.loadIndices = function() {
+      var indices = $scope.indices = ElasticService.getIndices();
+      if (!$scope.showSpecialIndices) {
+        indices = indices.filter(function(idx) { return !idx.special; });
+      }
+      $scope.indices = indices;
+    };
 
     $scope.$watch('paginator', function(filter, previous) {
       $scope.page = $scope.paginator.getPage();
     }, true);
 
     $scope.reload = function() {
-      $scope.indices = ElasticService.getIndices();
+      $scope.loadIndices();
       $scope.loadRepositories();
       if (notEmpty($scope.snapshot_repository)) {
         $scope.fetchSnapshots($scope.snapshot_repository);
@@ -1847,6 +1860,12 @@ kopf.directive('ngPagination', function() {
       page: '=page'
     },
     templateUrl: './partials/directives/pagination.html'
+  };
+});
+
+kopf.directive('ngSnapshotsTable', function() {
+  return {
+    templateUrl: './partials/snapshot/snapshots_table.html'
   };
 });
 
