@@ -540,7 +540,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
               function(cluster) {
                 var end = new Date().getTime();
                 var took = end - start;
-                if (true || took >= threshold) {
+                if (took >= threshold) {
                   AlertService.warn('Loading cluster information is taking ' +
                   'too long. Try increasing the refresh interval');
                 }
