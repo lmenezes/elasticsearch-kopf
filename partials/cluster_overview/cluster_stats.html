@@ -1,17 +1,17 @@
 <div class="row" class="overview-stats">
-  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="number of nodes in the cluster">
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 tooltiped" data-placement="bottom" title="number of nodes in the cluster">
     <div class="stat-block bordered">
       <span class="cluster-map-stat-number">{{cluster_health.number_of_nodes | number:0}}</span>
       <span class="cluster-map-stat-description">nodes</span>
     </div>
   </div>
-  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" data-toggle="tooltip" data-placement="bottom" data-original-title="number of shards in the cluster (closed indices are not taken into account)">
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 tooltiped" data-placement="bottom" title="number of shards in the cluster (closed indices are not taken into account)">
     <div class="stat-block bordered">
       <span class="cluster-map-stat-number">{{cluster_health.shards | number:0}}</span>
       <span class="cluster-map-stat-description">shards</span>
     </div>
   </div>
-  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" data-toggle="tooltip" data-placement="bottom" data-original-title="number of documents (replicas are not taken into account)">
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 tooltiped" data-placement="bottom" title="number of documents (replicas are not taken into account)">
     <div class="stat-block bordered">
       <div class="cluster-stat-detail">
         <span class="cluster-map-stat-number">{{cluster.num_docs | number:0}}</span>
@@ -24,7 +24,7 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="total data in the cluster(replicas are taken into account)">
+  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 tooltiped" data-placement="bottom" title="total data in the cluster(replicas are taken into account)">
     <div class="stat-block bordered">
       <div class="cluster-stat-detail">
         <span class="cluster-map-stat-number">{{cluster.total_size}}</span>
@@ -40,6 +40,6 @@
 
 <script>
   $(function() {
-    $(".cluster-map-stat-block").tooltip();
+    $(".tooltiped").tooltip();
   });
 </script>
