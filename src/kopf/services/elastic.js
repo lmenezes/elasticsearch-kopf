@@ -418,9 +418,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                                    callbackError) {
       var url = this.connection.host;
       var params = {method: method, url: url + path, data: data};
-      if (isDefined(this.auth)) {
-        params.withCredentials = true;
-        params.headers = {Authorization: this.auth};
+      if (isDefined(this.connection.auth)) {
+        params.headers = {Authorization: this.connection.auth};
       }
       if (this.connection.withCredentials) {
         params.withCredentials = true;
@@ -455,9 +454,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.getClusterDetail = function(callbackSuccess, callbackError) {
       var host = this.connection.host;
       var params = {};
-      if (isDefined(this.auth)) {
-        params.withCredentials = true;
-        params.headers = {Authorization: this.auth};
+      if (isDefined(this.connection.auth)) {
+        params.headers = {Authorization: this.connection.auth};
       }
       if (this.connection.withCredentials) {
         params.withCredentials = true;
@@ -495,9 +493,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                                         callbackSuccess, callbackError) {
       var host = this.connection.host;
       var params = {};
-      if (isDefined(this.auth)) {
-        params.withCredentials = true;
-        params.headers = {Authorization: this.auth};
+      if (isDefined(this.connection.auth)) {
+        params.headers = {Authorization: this.connection.auth};
       }
       if (this.connection.withCredentials) {
         params.withCredentials = true;

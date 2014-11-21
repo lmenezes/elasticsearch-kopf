@@ -1,7 +1,7 @@
 "use strict";
 
 describe("ElasticService", function () {
-  var elasticService, $http;
+  var elasticService, $http, $httpBackend;
 
   beforeEach(module("kopf"));
 
@@ -19,7 +19,13 @@ describe("ElasticService", function () {
     elasticService = $injector.get('ElasticService');
     this.ExternalSettingsService = $injector.get('ExternalSettingsService');
     $http = $injector.get('$http');
+    $httpBackend = $injector.get('$httpBackend');
   }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
 
   it("should fetch cluster version and set connection info if request is successfull", function () {
     expect(elasticService.connection).toEqual(null);
@@ -120,5 +126,32 @@ describe("ElasticService", function () {
     expect(elasticService.versionCheck('1.3.1')).toEqual(false);
     expect(elasticService.versionCheck('2.1.1')).toEqual(false);
   });
+
+  it("correctly sets auth information on connection", function () {
+    spyOn(this.ExternalSettingsService, 'getElasticsearchRootPath').andReturn('/');
+    spyOn(elasticService, 'clusterRequest').andReturn();
+    elasticService.connect('http://leo:pwd@localhost:9876');
+    expect(elasticService.connection.host).toEqual('http://localhost:9876/');
+    expect(elasticService.connection.auth).toEqual('Basic bGVvOnB3ZA==');
+    expect(elasticService.clusterRequest).toHaveBeenCalledWith('GET', '/', {}, jasmine.any(Function), jasmine.any(Function));
+  });
+
+  it("correctly sends request without auth information", function () {
+    var connection = new ESConnection("http://localhost:9876/", false);
+    elasticService.connection = connection;
+    $httpBackend.expectGET('http://localhost:9876//', {"Accept":"application/json, text/plain, */*"}).respond(200, {});
+    elasticService.clusterRequest('GET', '/', {}, function() {}, function() {});
+    $httpBackend.flush();
+  });
+
+  it("correctly sets auth information on connection", function () {
+    var connection = new ESConnection("http://leo:pwd@localhost:9876/", false);
+    elasticService.connection = connection;
+    $httpBackend.expectGET('http://localhost:9876//', {"Authorization":"Basic bGVvOnB3ZA==","Accept":"application/json, text/plain, */*"}).respond(200, {});
+    elasticService.clusterRequest('GET', '/', {}, function() {}, function() {});
+    $httpBackend.flush();
+  });
+
+
 
 });
