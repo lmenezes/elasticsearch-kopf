@@ -158,9 +158,6 @@ a.cluster-map-node-action {
 	text-align: left;
 	font-weight: 300;
 }
-.big-icon {
-	font-size: 18px;
-}
 .shards {
 	max-height: 40px !important;
 	vertical-align: top !important;

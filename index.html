@@ -16,8 +16,8 @@
   <body>
     <div id="page-wrap">
       <div ng-include src="'partials/nav_bar.html'"></div>
+      <div ng-include src="'partials/main_alerts.html'" ng-controller="AlertsController"  class="alerts-container"></div>
       <div class="container-fluid">
-        <div ng-include src="'partials/main_alerts.html'" ng-controller="AlertsController"></div>
         <div class="tab-content custom-tab-content">
           <ng-view onload="initializeController()"></ng-view>
         </div>

@@ -41,28 +41,28 @@ kopf.factory('AlertService', function() {
 
   // creates an error alert
   this.error = function(msg, resp, timeout) {
-    timeout = isDefined(timeout) ? timeout : 15000;
+    timeout = isDefined(timeout) ? timeout : 7500;
     var alert = new Alert(msg, resp, 'error', 'alert-danger', 'fa fa-warning');
     return this.addAlert(alert, timeout);
   };
 
   // creates an info alert
   this.info = function(msg, resp, timeout) {
-    timeout = isDefined(timeout) ? timeout : 5000;
+    timeout = isDefined(timeout) ? timeout : 2500;
     var alert = new Alert(msg, resp, 'info', 'alert-info', 'fa fa-info');
     return this.addAlert(alert, timeout);
   };
 
   // creates success alert
   this.success = function(msg, resp, timeout) {
-    timeout = isDefined(timeout) ? timeout : 5000;
+    timeout = isDefined(timeout) ? timeout : 2500;
     var alert = new Alert(msg, resp, 'success', 'alert-success', 'fa fa-check');
     return this.addAlert(alert, timeout);
   };
 
   // creates a warn alert
   this.warn = function(msg, resp, timeout) {
-    timeout = isDefined(timeout) ? timeout : 10000;
+    timeout = isDefined(timeout) ? timeout : 5000;
     var alert = new Alert(msg, resp, 'warn', 'alert-warning', 'fa fa-info');
     return this.addAlert(alert, timeout);
   };

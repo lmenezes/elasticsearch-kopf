@@ -79,16 +79,28 @@ a.setting-info:hover {
 .create-index-editor {
 	height: 424px;
 }
+.alerts-container {
+    position: fixed;
+    padding-left: 50px;
+    right: 25px;
+    width: 50%;
+    top: 30px;
+    z-index: 1000000;
+    min-width: 400px;
+}
 .alert-block {
 	font-size: 12px;
 	font-weight: 300;
 	padding-top: 10px;
 	padding-bottom: 0px;
 	text-align: left;
+    opacity: 0.85;
 }
 
 .alert {
 	margin-bottom: 0px;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 .settings-area {
 	font-size: 9px;
