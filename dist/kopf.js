@@ -1883,9 +1883,11 @@ kopf.directive('ngPagination', function() {
   };
 });
 
-kopf.directive('ngSnapshotsTable', function() {
+kopf.directive('ngStaticInclude', function() {
   return {
-    templateUrl: './partials/snapshot/snapshots_table.html'
+    templateUrl: function(elem, attr) {
+      return './partials/' + attr.file + '.html';
+    }
   };
 });
 
