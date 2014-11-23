@@ -185,6 +185,10 @@ textarea {
     text-align: center;
     width: 29px;
 }
+.tooltip {
+    font-size: 11px;
+    opacity: 1.0 !important;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
@@ -400,7 +404,6 @@ a.cluster-map-node-action {
 	text-align: center;
 	display: inline-block;
 	margin-top: 6px;
-	margin-bottom: 6px;
 }
 .cluster-map-stat-number {
 	font-size: 16px;

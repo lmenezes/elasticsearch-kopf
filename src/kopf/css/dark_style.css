@@ -42,12 +42,6 @@ h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 	text-align: left;
 	background: #333 !important;
 }
-
-.tooltip {
-  font-size: 13px;
-  opacity: 1.0 !important;
-}
-
 .tooltip-inner {
 	background: #222;
     color: #999;

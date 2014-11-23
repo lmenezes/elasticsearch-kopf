@@ -185,3 +185,7 @@ textarea {
     text-align: center;
     width: 29px;
 }
+.tooltip {
+    font-size: 11px;
+    opacity: 1.0 !important;
+}
