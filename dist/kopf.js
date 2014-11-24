@@ -3588,8 +3588,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.createIndex = function(name, settings, success, error) {
       var path = '/' + name;
-      this.clusterRequest('POST', path, settings, success,
-          error);
+      this.clusterRequest('POST', path, settings, success, error);
     };
 
     this.enableShardAllocation = function(success, error) {
@@ -3666,8 +3665,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
-        success(new IndexMetadata(name,
-            response.metadata.indices[name]));
+        success(new IndexMetadata(name, response.metadata.indices[name]));
       };
       var path = '/_cluster/state/metadata/' + name + '?human';
       this.clusterRequest('GET', path, {}, transformed, error);
@@ -3703,9 +3701,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.analyzeByField = function(index, type, field, text, success, error) {
       var buildTokens = function(response) {
-        var tokens = response.tokens.map(function(token) {
-          return new Token(token.token, token.start_offset, token.end_offset,
-              token.position);
+        var tokens = response.tokens.map(function(t) {
+          return new Token(t.token, t.start_offset, t.end_offset, t.position);
         });
         success(tokens);
       };
@@ -3715,9 +3712,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.analyzeByAnalyzer = function(index, analyzer, text, success, error) {
       var buildTokens = function(response) {
-        var tokens = response.tokens.map(function(token) {
-          return new Token(token.token, token.start_offset, token.end_offset,
-              token.position);
+        var tokens = response.tokens.map(function(t) {
+          return new Token(t.token, t.start_offset, t.end_offset, t.position);
         });
         success(tokens);
       };
@@ -3733,9 +3729,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       addAliases.forEach(function(alias) {
         data.actions.push({'add': alias.info()});
       });
-      var body = JSON.stringify(data);
       var path = '/_aliases';
-      this.clusterRequest('POST', path, body, success, error);
+      this.clusterRequest('POST', path, JSON.stringify(data), success, error);
     };
 
     this.getIndexWarmers = function(index, warmer, success, error) {
