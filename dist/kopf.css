@@ -543,7 +543,6 @@ a.cluster-map-node-action {
 	height: 30px !important;
 	min-height: 30px !important;
 }
-
 .navbar-logo {
 	font-size: 38px;
 	font-variant: small-caps;
@@ -559,22 +558,11 @@ a.cluster-map-node-action {
 	vertical-align: middle;
 	font-variant: normal;
 }
-.navbar-app-settings-select {
-	height: 25px;
-	width: 78px;
-	font-size: 10px;
-}
-.navbar-host-input {
-	padding-right: 25px;
-	width: 280px;
-	padding-top: 2px;
-	vertical-align: middle;
-}
 .navbar-menu-section {
 	vertical-align: middle;
 	padding-top: 4px;
 	padding-bottom: 4px;
-	min-width: 300px;
+	width: 220px !important;
 }
 .navbar-nav > li {
 	height: 30px !important;
@@ -587,11 +575,22 @@ a.cluster-map-node-action {
 	padding-left: 13px;
 	padding-right: 13px;
 }
-
 .nav-pills > li > a {
 	font-weight: 400;
 	font-size: 13px;
 }
+.navbar-app-settings {
+	width: auto;
+	padding-top: 6px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+.navbar-app-setting {
+	line-height: 30px;
+	font-weight: 300;
+	font-size: 12px;
+}
+
 .rest-client-request-url {
 	overflow: hidden;
 	display: block;

@@ -257,11 +257,11 @@ h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 }
 .navbar-app-settings {
 	color: #000000;
-	width: auto;
-	padding-left: 10px;
-	padding-right: 10px;
 	background: #222;
 	border: 1px solid #444;
+}
+.navbar-app-setting {
+	color: #d0d0d0;
 }
 .navbar-menu-item {
 	font-size: 13px;
