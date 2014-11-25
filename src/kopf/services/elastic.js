@@ -134,70 +134,126 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     };
 
+    /**
+     * Creates an index
+     * @param {string} name - new index name
+     * @param {Object} settings - index settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.createIndex = function(name, settings, success, error) {
       var path = '/' + name;
       this.clusterRequest('POST', path, settings, success, error);
     };
 
+    /**
+     * Enables shard allocation
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.enableShardAllocation = function(success, error) {
-      var newSettings = {
-        'transient': {
+      var body = {
+        transient: {
           'cluster.routing.allocation': {
-            'enable': 'all', 'disable_allocation': false
+            enable: 'all',
+            disable_allocation: false // FIXME: deprecated
           }
         }
       };
-      var body = JSON.stringify(newSettings, undefined, '');
-      var path = '/_cluster/settings';
-      this.clusterRequest('PUT', path, body, success, error);
+      this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
     };
 
+    /**
+     * Disables shard allocation
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.disableShardAllocation = function(success, error) {
-      var newSettings = {
-        'transient': {
+      var body = {
+        transient: {
           'cluster.routing.allocation': {
             'enable': 'none',
-            'disable_allocation': true
+            'disable_allocation': true  // FIXME: deprecated
           }
         }
       };
-      var body = JSON.stringify(newSettings, undefined, '');
-      var path = '/_cluster/settings';
-      this.clusterRequest('PUT', path, body, success, error);
+      this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
     };
 
+    /**
+     * Shutdowns node
+     * @param {string} nodeId - id of node to be shutdown
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.shutdownNode = function(nodeId, success, error) {
       var path = '/_cluster/nodes/' + nodeId + '/_shutdown';
       this.clusterRequest('POST', path, {}, success, error);
     };
 
+    /**
+     * Opens index
+     * @param {string} index - index name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.openIndex = function(index, success, error) {
       var path = '/' + index + '/_open';
       this.clusterRequest('POST', path, {}, success, error);
     };
 
+    /**
+     * Optimizes index
+     * @param {string} index - index name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.optimizeIndex = function(index, success, error) {
       var path = '/' + index + '/_optimize';
       this.clusterRequest('POST', path, {}, success, error);
     };
 
+    /**
+     * Clears index cache
+     * @param {string} index - index name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.clearCache = function(index, success, error) {
       var path = '/' + index + '/_cache/clear';
       this.clusterRequest('POST', path, {}, success, error);
     };
 
+    /**
+     * Closes index
+     * @param {string} index - index name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.closeIndex = function(index, success, error) {
       var path = '/' + index + '/_close';
       this.clusterRequest('POST', path, {}, success, error);
     };
 
+    /**
+     * Refreshes index
+     * @param {string} index - index name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.refreshIndex = function(index, success, error) {
       var path = '/' + index + '/_refresh';
       this.clusterRequest('POST', path, {}, success, error);
     };
 
-    this.deleteIndex = function(name, success, error) {
-      var path = '/' + name;
+    /**
+     * Deletes index
+     * @param {string} index - index name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deleteIndex = function(index, success, error) {
+      var path = '/' + index;
       this.clusterRequest('DELETE', path, {}, success, error);
     };
 
@@ -442,8 +498,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
               var stats = responses[2].data;
               var settings = responses[3].data;
               var aliases = responses[4].data;
-              success(new Cluster(state, status, stats, settings,
-                  aliases));
+              success(new Cluster(state, status, stats, settings, aliases));
             } catch (exception) {
               error(exception);
             }
