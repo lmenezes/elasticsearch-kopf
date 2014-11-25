@@ -3459,22 +3459,22 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     var instance = this;
 
-    this.connection = null;
+    this.connection = undefined;
 
     this.connected = false;
 
-    this.cluster = null;
+    this.cluster = undefined;
 
-    this.clusterHealth = null;
+    this.clusterHealth = undefined;
 
     this.autoRefreshStarted = false;
 
     this.getIndices = function() {
-      return isDefined(this.cluster) ? this.cluster.indices : [];
+      return this.cluster ? this.cluster.indices : [];
     };
 
     this.getOpenIndices = function() {
-      return isDefined(this.cluster) ? this.cluster.open_indices() : [];
+      return this.cluster ? this.cluster.open_indices() : [];
     };
 
     this.isConnected = function() {
@@ -3973,8 +3973,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           );
         }, 100);
       } else {
-        this.cluster = null;
-        this.clusterHealth = null;
+        this.cluster = undefined;
+        this.clusterHealth = undefined;
       }
     };
 
