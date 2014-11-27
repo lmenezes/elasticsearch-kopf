@@ -1790,7 +1790,7 @@ kopf.controller('WarmersController', [
           warmer.source,
           'Delete',
           function() {
-            ElasticService.deleteWarmer(warmer,
+            ElasticService.deleteWarmer(warmer, // FIXME: better send name + id
                 function(response) {
                   AlertService.success('Warmer successfully deleted', response);
                   $scope.loadIndexWarmers();
@@ -3588,6 +3588,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Creates an index
+     *
      * @param {string} name - new index name
      * @param {Object} settings - index settings
      * @callback success - invoked on success
@@ -3600,6 +3601,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Enables shard allocation
+     *
      * @callback success - invoked on success
      * @callback error - invoked on error
      */
@@ -3617,6 +3619,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Disables shard allocation
+     *
      * @callback success - invoked on success
      * @callback error - invoked on error
      */
@@ -3634,6 +3637,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Shutdowns node
+     *
      * @param {string} nodeId - id of node to be shutdown
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3645,6 +3649,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Opens index
+     *
      * @param {string} index - index name
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3656,6 +3661,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Optimizes index
+     *
      * @param {string} index - index name
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3667,6 +3673,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Clears index cache
+     *
      * @param {string} index - index name
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3678,6 +3685,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Closes index
+     *
      * @param {string} index - index name
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3689,6 +3697,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Refreshes index
+     *
      * @param {string} index - index name
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3700,6 +3709,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     /**
      * Deletes index
+     *
      * @param {string} index - index name
      * @callback success - invoked on success
      * @callback error - invoked on error
@@ -3709,14 +3719,144 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('DELETE', path, {}, success, error);
     };
 
+    /**
+     * Updates index settings
+     *
+     * @param {string} name - index name
+     * @param {Object} settings - index settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.updateIndexSettings = function(name, settings, success, error) {
       var path = '/' + name + '/_settings';
       this.clusterRequest('PUT', path, settings, success, error);
     };
 
+    /**
+     * Updates the cluster settings
+     *
+     * @param {Object} settings - new cluster settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
     this.updateClusterSettings = function(settings, success, error) {
       var path = '/_cluster/settings';
       this.clusterRequest('PUT', path, settings, success, error);
+    };
+
+    /**
+     * Deletes a warmer
+     *
+     * @param {Warmer} warmer - warmer to be deleted
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deleteWarmer = function(warmer, success, error) {
+      var path = '/' + warmer.index + '/_warmer/' + warmer.id;
+      this.clusterRequest('DELETE', path, {}, success, error);
+    };
+
+    /**
+     * Deletes a percolator
+     *
+     * @param {string} index - percolator target index
+     * @param {string} id - percolator id
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deletePercolatorQuery = function(index, id, success, error) {
+      var path = '/' + index + '/.percolator/' + id;
+      this.clusterRequest('DELETE', path, {}, success, error);
+    };
+
+    /**
+     * Creates a percolator query
+     *
+     * @param {Percolator} percolator - percolator to be created
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.createPercolatorQuery = function(percolator, success, error) {
+      var path = '/' + percolator.index + '/.percolator/' + percolator.id;
+      this.clusterRequest('PUT', path, percolator.source, success, error);
+    };
+
+    /**
+     * Creates a repository
+     *
+     * @param {string} repository - repository name
+     * @param {Object} body - repository settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.createRepository = function(repository, body, success, error) {
+      var path = '/_snapshot/' + repository;
+      this.clusterRequest('POST', path, body, success, error);
+    };
+
+    /**
+     * Deletes a repository
+     *
+     * @param {string} repository - repository name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deleteRepository = function(repository, success, error) {
+      var path = '/_snapshot/' + repository;
+      this.clusterRequest('DELETE', path, {}, success, error);
+    };
+
+    /**
+     * Deletes a snapshot
+     *
+     * @param {string} repository - repository name
+     * @param {string} snapshot - snapshot name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deleteSnapshot = function(repository, snapshot, success, error) {
+      var path = '/_snapshot/' + repository + '/' + snapshot;
+      this.clusterRequest('DELETE', path, {}, success, error);
+    };
+
+    /**
+     * Restores a snapshot
+     *
+     * @param {string} repository - repository name
+     * @param {string} name - snapshot name
+     * @param {Object} body - restore settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.restoreSnapshot = function(repository, name, body, success, error) {
+      var path = '/_snapshot/' + repository + '/' + name + '/_restore';
+      this.clusterRequest('POST', path, body, success, error);
+    };
+
+    /**
+     * Creates a snapshot
+     *
+     * @param {string} repository - repository name
+     * @param {string} snapshot - snapshot name
+     * @param {Object} body - snapshot settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.createSnapshot = function(repository, snapshot, body, success, error) {
+      var path = '/_snapshot/' + repository + '/' + snapshot;
+      this.clusterRequest('PUT', path, body, success, error);
+    };
+
+    /**
+     * Executes a benchmark
+     *
+     * @param {Object} body - benchmark settings
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.executeBenchmark = function(body, success, error) {
+      var path = '/_bench';
+      this.clusterRequest('PUT', path, body, success, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {
@@ -3805,11 +3945,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('GET', path, {}, parseWarmers, error);
     };
 
-    this.deleteWarmer = function(warmer, success, error) {
-      var path = '/' + warmer.index + '/_warmer/' + warmer.id;
-      this.clusterRequest('DELETE', path, {}, success, error);
-    };
-
     this.registerWarmer = function(warmer, success, error) {
       var path = '/' + warmer.index + '/';
       if (notEmpty(warmer.types)) {
@@ -3836,16 +3971,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('POST', path, body, parsePercolators, error);
     };
 
-    this.deletePercolatorQuery = function(index, id, success, error) {
-      var path = '/' + index + '/.percolator/' + id;
-      this.clusterRequest('DELETE', path, {}, success, error);
-    };
-
-    this.createPercolatorQuery = function(percolator, success, error) {
-      var path = '/' + percolator.index + '/.percolator/' + percolator.id;
-      this.clusterRequest('PUT', path, percolator.source, success, error);
-    };
-
     this.getRepositories = function(success, error) {
       var parseRepositories = function(response) {
         var repositories = Object.keys(response).map(function(repository) {
@@ -3857,16 +3982,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('GET', path, {}, parseRepositories, error);
     };
 
-    this.createRepository = function(repository, body, success, error) {
-      var path = '/_snapshot/' + repository;
-      this.clusterRequest('POST', path, body, success, error);
-    };
-
-    this.deleteRepository = function(repository, success, error) {
-      var path = '/_snapshot/' + repository;
-      this.clusterRequest('DELETE', path, {}, success, error);
-    };
-
     this.getSnapshots = function(repository, success, error) {
       var path = '/_snapshot/' + repository + '/_all';
       var parseSnapshots = function(response) {
@@ -3876,26 +3991,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         success(snapshots);
       };
       this.clusterRequest('GET', path, {}, parseSnapshots, error);
-    };
-
-    this.deleteSnapshot = function(repository, snapshot, success, error) {
-      var path = '/_snapshot/' + repository + '/' + snapshot;
-      this.clusterRequest('DELETE', path, {}, success, error);
-    };
-
-    this.restoreSnapshot = function(repository, name, body, success, error) {
-      var path = '/_snapshot/' + repository + '/' + name + '/_restore';
-      this.clusterRequest('POST', path, body, success, error);
-    };
-
-    this.createSnapshot = function(repository, snapshot, body, success, error) {
-      var path = '/_snapshot/' + repository + '/' + snapshot;
-      this.clusterRequest('PUT', path, body, success, error);
-    };
-
-    this.executeBenchmark = function(body, success, error) {
-      var path = '/_bench';
-      this.clusterRequest('PUT', path, body, success, error);
     };
 
     this.clusterRequest = function(method, path, data, success, error) {

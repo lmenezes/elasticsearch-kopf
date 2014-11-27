@@ -59,7 +59,7 @@ kopf.controller('WarmersController', [
           warmer.source,
           'Delete',
           function() {
-            ElasticService.deleteWarmer(warmer,
+            ElasticService.deleteWarmer(warmer, // FIXME: better send name + id
                 function(response) {
                   AlertService.success('Warmer successfully deleted', response);
                   $scope.loadIndexWarmers();

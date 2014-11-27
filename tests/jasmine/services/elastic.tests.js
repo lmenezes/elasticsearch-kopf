@@ -281,5 +281,110 @@ describe("ElasticService", function() {
         toHaveBeenCalledWith('DELETE', path, {}, 'success', 'error');
   });
 
+  it("updates an index settings", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.updateIndexSettings('index_name', {setting: 'settingValue'}, 'success', 'error');
+    var path = '/index_name/_settings';
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success', 'error');
+  });
+
+  it("updates the cluster settings", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.updateClusterSettings({setting: 'settingValue'}, 'success', 'error');
+    var path = '/_cluster/settings';
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success', 'error');
+  });
+
+  it("retrieves index metadata", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.updateClusterSettings({setting: 'settingValue'}, 'success', 'error');
+    var path = '/_cluster/settings';
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success', 'error');
+  });
+
+  it("deletes a warmer", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    var warmer = new Warmer("warmerId", "indexName", {});
+    elasticService.deleteWarmer(warmer, 'success', 'error');
+    var path = '/' + warmer.index + '/_warmer/' + warmer.id;
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('DELETE', path, {}, 'success', 'error');
+  });
+
+  it("deletes a percolator", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.deletePercolatorQuery('indexName', 'percolatorId', 'success', 'error');
+    var path = '/indexName/.percolator/percolatorId'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('DELETE', path, {}, 'success', 'error');
+  });
+
+  it("creates a percolator query", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    var percolator = new PercolateQuery({_index: 'indexName', _id: 'percolatorId', _source: {some: 'data'}});
+    elasticService.createPercolatorQuery(percolator, 'success', 'error');
+    var path = '/indexName/.percolator/percolatorId'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {some: 'data'}, 'success', 'error');
+  });
+
+  it("creates a repository", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.createRepository('repo', {set: 'tings'}, 'success', 'error');
+    var path = '/_snapshot/repo'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('POST', path, {set: 'tings'}, 'success', 'error');
+  });
+
+  it("deletes a repository", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.deleteRepository('repo', 'success', 'error');
+    var path = '/_snapshot/repo'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('DELETE', path, {}, 'success', 'error');
+  });
+
+  it("deletes a snapshot", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.deleteSnapshot('repo', 'snap', 'success', 'error');
+    var path = '/_snapshot/repo/snap'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('DELETE', path, {}, 'success', 'error');
+  });
+
+  it("restores a snapshot", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'}, 'success', 'error');
+    var path = '/_snapshot/repo/snap/_restore'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('POST', path, {some: 'settings'}, 'success', 'error');
+  });
+
+  it("restores a snapshot", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'}, 'success', 'error');
+    var path = '/_snapshot/repo/snap/_restore'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('POST', path, {some: 'settings'}, 'success', 'error');
+  });
+
+  it("creates a snapshot", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.createSnapshot('repo', 'snap', {some: 'settings'}, 'success', 'error');
+    var path = '/_snapshot/repo/snap'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {some: 'settings'}, 'success', 'error');
+  });
+
+  it("executes a benchmark", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.executeBenchmark({some: 'settings'}, 'success', 'error');
+    var path = '/_bench'
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {some: 'settings'}, 'success', 'error');
+  });
 
 });
