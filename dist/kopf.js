@@ -3859,6 +3859,23 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('PUT', path, body, success, error);
     };
 
+    /**
+     * Registers a warmer query
+     *
+     * @param {Warmer} warmer - Warmer query
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.registerWarmer = function(warmer, success, error) {
+      var path = '/' + warmer.index;
+      if (notEmpty(warmer.types)) {
+        path += '/' + warmer.types;
+      }
+      path += '/_warmer/' + warmer.id.trim();
+      var body = warmer.source;
+      this.clusterRequest('PUT', path, body, success, error);
+    };
+
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
         success(new IndexMetadata(name, response.metadata.indices[name]));
@@ -3945,16 +3962,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('GET', path, {}, parseWarmers, error);
     };
 
-    this.registerWarmer = function(warmer, success, error) {
-      var path = '/' + warmer.index + '/';
-      if (notEmpty(warmer.types)) {
-        path += warmer.types + '/';
-      }
-      path += '/_warmer/' + warmer.id.trim();
-      var body = warmer.source;
-      this.clusterRequest('PUT', path, body, success, error);
-    };
-
     this.fetchPercolateQueries = function(index, query, success, error) {
       var path = '/' + index + '/.percolator/_search';
       var parsePercolators = function(response) {
@@ -4012,16 +4019,23 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           });
     };
 
-    this.getClusterHealth = function(success, error) {
-      var createClusterHealth = function(clusterHealth) {
+    /**
+     * Loads cluster health
+     */
+    this.getClusterHealth = function() {
+      var error = function(response) {
+        instance.clusterHealth = null;
+        AlertService.error('Error refreshing cluster health', response);
+      };
+      var success = function(response) {
         try {
-          success(new ClusterHealth(clusterHealth));
+          instance.clusterHealth = new ClusterHealth(response);
         } catch (exception) {
           error(exception);
         }
       };
       var path = '/_cluster/health';
-      this.clusterRequest('GET', path, {}, createClusterHealth, error);
+      this.clusterRequest('GET', path, {}, success, error);
     };
 
     this.getClusterDetail = function(success, error) {
@@ -4112,15 +4126,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                 instance.cluster = null;
               }
           );
-          instance.getClusterHealth(
-              function(clusterHealth) {
-                instance.clusterHealth = clusterHealth;
-              },
-              function(response) {
-                instance.clusterHealth = null;
-                AlertService.error('Error refreshing cluster health', response);
-              }
-          );
+          instance.getClusterHealth();
         }, 100);
       } else {
         this.cluster = undefined;
@@ -4136,6 +4142,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       $timeout(nextRefresh, SettingsService.getRefreshInterval());
     };
 
+    /**
+     * Adds authentication information/cookies to request params
+     * @param {Object} params - request parameters
+     */
     this.addAuth = function(params) {
       if (isDefined(this.connection.auth)) {
         params.headers = {Authorization: this.connection.auth};

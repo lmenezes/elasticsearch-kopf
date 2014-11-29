@@ -19,6 +19,7 @@ describe("ElasticService", function() {
 
   beforeEach(inject(function($injector) {
     elasticService = $injector.get('ElasticService');
+    this.AlertService = $injector.get('AlertService');
     this.ExternalSettingsService = $injector.get('ExternalSettingsService');
     $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
@@ -176,6 +177,84 @@ describe("ElasticService", function() {
     $httpBackend.flush();
   });
 
+  it("should do nothing if no auth information is present", function() {
+    elasticService.connection = {auth: undefined};
+    var params = {};
+    elasticService.addAuth(params);
+    expect(params).toEqual(params);
+  });
+
+  it("should add withCredentials to params", function() {
+    elasticService.connection = {auth: undefined, withCredentials: true};
+    var params = {};
+    elasticService.addAuth(params);
+    expect(params).toEqual({withCredentials: true});
+  });
+
+  it("should add auth header to params", function() {
+    elasticService.connection = {auth: "pfff", withCredentials: false};
+    var params = {};
+    elasticService.addAuth(params);
+    expect(params).toEqual({headers: {Authorization: "pfff"}});
+  });
+
+  it("should add auth header and withCredentials to params", function() {
+    elasticService.connection = {auth: "pfff", withCredentials: true};
+    var params = {};
+    elasticService.addAuth(params);
+    expect(params).toEqual({
+      headers: {Authorization: "pfff"},
+      withCredentials: true
+    });
+  });
+
+  it("should request cluster health", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    elasticService.getClusterHealth();
+    expect(elasticService.clusterRequest).toHaveBeenCalledWith(
+        'GET',
+        '/_cluster/health',
+        {},
+        jasmine.any(Function),
+        jasmine.any(Function)
+    );
+  });
+
+  it("should reset cluster health if loading cluster health fails", function() {
+    elasticService.clusterHealth = "someValue";
+    spyOn(this.AlertService, 'error').andReturn(true);
+    elasticService.clusterRequest = function(m, u, b, s, error) {
+      error('failed!!!!');
+    };
+    elasticService.getClusterHealth();
+    expect(this.AlertService.error).toHaveBeenCalledWith(
+        'Error refreshing cluster health',
+        'failed!!!!'
+    );
+    expect(elasticService.clusterHealth).toEqual(undefined);
+  });
+
+  it("should reset cluster health if success throws an exception", function() {
+    elasticService.clusterHealth = "someValue";
+    spyOn(this.AlertService, 'error').andReturn(true);
+    elasticService.clusterRequest = function(m, u, b, success, e) {
+      success(undefined);
+    };
+    elasticService.getClusterHealth();
+    expect(this.AlertService.error).toHaveBeenCalled();
+    expect(elasticService.clusterHealth).toEqual(undefined);
+  });
+
+  it("should reset cluster health if loading cluster health fails", function() {
+    elasticService.clusterHealth = "someValue";
+    spyOn(this.AlertService, 'error').andReturn(true);
+    elasticService.clusterRequest = function(m, u, b, success, e) {
+      success({});
+    };
+    elasticService.getClusterHealth();
+    expect(elasticService.clusterHealth).not.toEqual(undefined);
+  });
+
   // TESTS API Methods
   it("creates index", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
@@ -283,26 +362,32 @@ describe("ElasticService", function() {
 
   it("updates an index settings", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.updateIndexSettings('index_name', {setting: 'settingValue'}, 'success', 'error');
+    elasticService.updateIndexSettings('index_name', {setting: 'settingValue'},
+        'success', 'error');
     var path = '/index_name/_settings';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success', 'error');
+        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success',
+        'error');
   });
 
   it("updates the cluster settings", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.updateClusterSettings({setting: 'settingValue'}, 'success', 'error');
+    elasticService.updateClusterSettings({setting: 'settingValue'}, 'success',
+        'error');
     var path = '/_cluster/settings';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success', 'error');
+        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success',
+        'error');
   });
 
   it("retrieves index metadata", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.updateClusterSettings({setting: 'settingValue'}, 'success', 'error');
+    elasticService.updateClusterSettings({setting: 'settingValue'}, 'success',
+        'error');
     var path = '/_cluster/settings';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success', 'error');
+        toHaveBeenCalledWith('PUT', path, {setting: 'settingValue'}, 'success',
+        'error');
   });
 
   it("deletes a warmer", function() {
@@ -316,7 +401,8 @@ describe("ElasticService", function() {
 
   it("deletes a percolator", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.deletePercolatorQuery('indexName', 'percolatorId', 'success', 'error');
+    elasticService.deletePercolatorQuery('indexName', 'percolatorId', 'success',
+        'error');
     var path = '/indexName/.percolator/percolatorId'
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('DELETE', path, {}, 'success', 'error');
@@ -324,7 +410,11 @@ describe("ElasticService", function() {
 
   it("creates a percolator query", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    var percolator = new PercolateQuery({_index: 'indexName', _id: 'percolatorId', _source: {some: 'data'}});
+    var percolator = new PercolateQuery({
+      _index: 'indexName',
+      _id: 'percolatorId',
+      _source: {some: 'data'}
+    });
     elasticService.createPercolatorQuery(percolator, 'success', 'error');
     var path = '/indexName/.percolator/percolatorId'
     expect(elasticService.clusterRequest).
@@ -357,26 +447,32 @@ describe("ElasticService", function() {
 
   it("restores a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'}, 'success', 'error');
+    elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'},
+        'success', 'error');
     var path = '/_snapshot/repo/snap/_restore'
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {some: 'settings'}, 'success', 'error');
+        toHaveBeenCalledWith('POST', path, {some: 'settings'}, 'success',
+        'error');
   });
 
   it("restores a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'}, 'success', 'error');
+    elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'},
+        'success', 'error');
     var path = '/_snapshot/repo/snap/_restore'
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {some: 'settings'}, 'success', 'error');
+        toHaveBeenCalledWith('POST', path, {some: 'settings'}, 'success',
+        'error');
   });
 
   it("creates a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.createSnapshot('repo', 'snap', {some: 'settings'}, 'success', 'error');
+    elasticService.createSnapshot('repo', 'snap', {some: 'settings'}, 'success',
+        'error');
     var path = '/_snapshot/repo/snap'
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('PUT', path, {some: 'settings'}, 'success', 'error');
+        toHaveBeenCalledWith('PUT', path, {some: 'settings'}, 'success',
+        'error');
   });
 
   it("executes a benchmark", function() {
@@ -384,7 +480,26 @@ describe("ElasticService", function() {
     elasticService.executeBenchmark({some: 'settings'}, 'success', 'error');
     var path = '/_bench'
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('PUT', path, {some: 'settings'}, 'success', 'error');
+        toHaveBeenCalledWith('PUT', path, {some: 'settings'}, 'success',
+        'error');
+  });
+
+  it("registers a warmer query without types", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    var warmer = new Warmer("wId", "idx", {source: {}});
+    elasticService.registerWarmer(warmer, 'success', 'error');
+    var path = "/idx/_warmer/wId";
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {}, 'success', 'error');
+  });
+
+  it("registers a warmer query with types", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    var warmer = new Warmer("wId", "idx", {types: 'whatever', source: {}});
+    elasticService.registerWarmer(warmer, 'success', 'error');
+    var path = "/idx/whatever/_warmer/wId";
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('PUT', path, {}, 'success', 'error');
   });
 
 });
