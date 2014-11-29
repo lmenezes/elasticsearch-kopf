@@ -235,12 +235,12 @@ describe("ElasticService", function() {
   });
 
   it("should reset cluster health if success throws an exception", function() {
+    elasticService.connection = {host: 'whatever'};
     elasticService.clusterHealth = "someValue";
     spyOn(this.AlertService, 'error').andReturn(true);
-    elasticService.clusterRequest = function(m, u, b, success, e) {
-      success(undefined);
-    };
+    $httpBackend.when('GET', 'whatever/_cluster/health', {}).respond(200, undefined);
     elasticService.getClusterHealth();
+    $httpBackend.flush();
     expect(this.AlertService.error).toHaveBeenCalled();
     expect(elasticService.clusterHealth).toEqual(undefined);
   });

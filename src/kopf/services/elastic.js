@@ -576,11 +576,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         AlertService.error('Error refreshing cluster health', response);
       };
       var success = function(response) {
-        try {
-          instance.clusterHealth = new ClusterHealth(response);
-        } catch (exception) {
-          error(exception);
-        }
+        instance.clusterHealth = new ClusterHealth(response);
       };
       var path = '/_cluster/health';
       this.clusterRequest('GET', path, {}, success, error);
