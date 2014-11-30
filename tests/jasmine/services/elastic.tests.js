@@ -32,16 +32,18 @@ describe("ElasticService", function() {
 
   it("should fetch cluster version and set connection info if request is successfull",
       function() {
-        expect(elasticService.connection).toEqual(null);
-        spyOn(this.ExternalSettingsService,
-            'getElasticsearchRootPath').andReturn('/testing');
+        spyOn(elasticService, 'reset').andCallThrough();
+        expect(elasticService.connected).toEqual(false);
+        expect(elasticService.autoRefreshStarted).toEqual(false);
+        expect(elasticService.connection).toEqual(undefined);
+        spyOn(this.ExternalSettingsService, 'getElasticsearchRootPath').andReturn('/testing');
         spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
-        elasticService.clusterRequest = function(method, path, data, success,
-                                                 fail) {
+        elasticService.clusterRequest = function(m, p, d, success, f) {
           success({version: {number: '1.9.13'}});
         };
         spyOn(elasticService, 'clusterRequest').andCallThrough();
         spyOn(elasticService, 'setVersion').andCallThrough();
+        spyOn(elasticService, 'autoRefreshCluster').andCallThrough();
         elasticService.connect('http://localhost:9200');
         expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
         expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
@@ -50,6 +52,10 @@ describe("ElasticService", function() {
         expect(elasticService.connection.host).toEqual('http://localhost:9200/testing');
         expect(elasticService.connection.withCredentials).toEqual(true);
         expect(elasticService.setVersion).toHaveBeenCalledWith('1.9.13');
+        expect(elasticService.connected).toEqual(true);
+        expect(elasticService.autoRefreshStarted).toEqual(true);
+        expect(elasticService.autoRefreshCluster).toHaveBeenCalled();
+        expect(elasticService.reset).toHaveBeenCalled();
       });
 
   it("should handle an error while requesting version", function() {
@@ -57,63 +63,43 @@ describe("ElasticService", function() {
     spyOn(this.ExternalSettingsService,
         'getElasticsearchRootPath').andReturn('/testing');
     spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
-    elasticService.clusterRequest = function(method, path, data, success,
-                                             fail) {
+    elasticService.clusterRequest = function(m, p, d, s, fail) {
       fail("whaaatt");
     };
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(elasticService, 'setVersion').andCallThrough();
-    expect(function() {
-      elasticService.connect('http://localhost:9200');
-    }).toThrow({
-      message: 'Error connecting to [http://localhost:9200/testing]',
-      body: "whaaatt"
-    });
-
+    spyOn(this.AlertService, 'error').andReturn(true);
+    elasticService.connect('http://localhost:9200');
     expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
     expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
     expect(elasticService.clusterRequest).toHaveBeenCalledWith('GET', '/', {},
         jasmine.any(Function), jasmine.any(Function));
     expect(elasticService.connection.host).toEqual('http://localhost:9200/testing');
     expect(elasticService.connection.withCredentials).toEqual(true);
+    expect(this.AlertService.error).toHaveBeenCalledWith(
+        'Error connecting to [http://localhost:9200/testing]',
+        "whaaatt"
+    );
     expect(elasticService.setVersion).not.toHaveBeenCalled();
   });
 
   it("should throw exception and register no connection if response has unexpected format",
       function() {
+        $httpBackend.when('GET', 'http://localhost:9200/testing/').respond(200, {version:{number: 'ribeye'}});
         elasticService.connected = true;
         expect(elasticService.connection).toEqual(null);
         expect(elasticService.connected).toEqual(true);
-        spyOn(this.ExternalSettingsService,
-            'getElasticsearchRootPath').andReturn('/testing');
+        spyOn(this.ExternalSettingsService, 'getElasticsearchRootPath').andReturn('/testing');
         spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
-        elasticService.clusterRequest = function(method, path, data, success,
-                                                 fail) {
-          success({});
-        };
-        spyOn(elasticService, 'clusterRequest').andCallThrough();
-        spyOn(elasticService, 'setVersion').andThrow("plof");
-        expect(function() {
-          elasticService.connect('http://localhost:9200');
-        }).toThrow({
-          message: 'Error reading cluster version',
-          body: {}
-        });
+        elasticService.connect('http://localhost:9200');
+        $httpBackend.flush();
         expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
         expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
-        expect(elasticService.clusterRequest).toHaveBeenCalledWith('GET', '/',
-            {}, jasmine.any(Function), jasmine.any(Function));
         expect(elasticService.connected).toEqual(false);
       });
 
-  it("Should set all connection data when setVersion is called", function() {
-    expect(elasticService.connected).toEqual(false);
-    expect(elasticService.autoRefreshStarted).toEqual(false);
-    spyOn(elasticService, 'autoRefreshCluster').andReturn(true);
+  it("Should set version when setVersion is called", function() {
     elasticService.setVersion('1.2.3');
-    expect(elasticService.connected).toEqual(true);
-    expect(elasticService.autoRefreshStarted).toEqual(true);
-    expect(elasticService.autoRefreshCluster).toHaveBeenCalled();
     expect(elasticService.version.major).toEqual(1);
     expect(elasticService.version.minor).toEqual(2);
     expect(elasticService.version.build).toEqual(3);
@@ -254,6 +240,20 @@ describe("ElasticService", function() {
     elasticService.getClusterHealth();
     expect(elasticService.clusterHealth).not.toEqual(undefined);
   });
+
+  it("resets service state", function() {
+    elasticService.clusterHealth = "someValue";
+    elasticService.cluster = "someValue";
+    elasticService.connection = "someValue";
+    elasticService.connected = true;
+    elasticService.reset();
+    expect(elasticService.clusterHealth).toEqual(undefined);
+    expect(elasticService.cluster).toEqual(undefined);
+    expect(elasticService.connection).toEqual(undefined);
+    expect(elasticService.connected).toEqual(false);
+  });
+
+
 
   // TESTS API Methods
   it("creates index", function() {

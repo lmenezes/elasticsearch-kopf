@@ -3469,6 +3469,16 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.autoRefreshStarted = false;
 
+    /**
+     * Resets service state
+     */
+    this.reset = function() {
+      this.connection = undefined;
+      this.connected = false;
+      this.cluster = undefined;
+      this.clusterHealth = undefined;
+    };
+
     this.getIndices = function() {
       return this.cluster ? this.cluster.indices : [];
     };
@@ -3517,48 +3527,41 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       }
     };
 
+    /**
+     * Connects to Elasticsearch instance and triggers auto polling of cluster
+     * state
+     *
+     * @param {string} host - Elasticsearch url
+     */
     this.connect = function(host) {
+      this.reset();
       var root = ExternalSettingsService.getElasticsearchRootPath();
       var withCredentials = ExternalSettingsService.withCredentials();
       this.connection = new ESConnection(host + root, withCredentials);
       this.clusterRequest('GET', '/', {},
           function(data) {
-            try {
-              instance.setVersion(data.version.number);
-            } catch (exception) {
-              instance.connected = false;
-              throw {
-                message: 'Error reading cluster version',
-                body: data
-              };
-            }
+            instance.setVersion(data.version.number);
+            instance.connected = true;
+            instance.autoRefreshCluster();
           },
           function(data) {
-            instance.connected = false;
-            throw {
-              message: 'Error connecting to [' + instance.connection.host + ']',
-              body: data
-            };
+            AlertService.error(
+                'Error connecting to [' + instance.connection.host + ']',
+                data
+            );
           }
       );
     };
 
     this.setVersion = function(version) {
       this.version = {'str': version};
-      if (checkVersion.test(version)) {
-
-      } else {
+      if (!checkVersion.test(version)) {
         throw 'Invalid Elasticsearch version[' + version + ']';
       }
       var parts = checkVersion.exec(version);
       this.version.major = parseInt(parts[1]);
       this.version.minor = parseInt(parts[2]);
       this.version.build = parseInt(parts[3]);
-      this.connected = true;
-      if (!this.autoRefreshStarted) {
-        this.autoRefreshCluster();
-        this.autoRefreshStarted = true;
-      }
     };
 
     this.getHost = function() {
@@ -4131,11 +4134,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     };
 
     this.autoRefreshCluster = function() {
-      this.refresh();
-      var nextRefresh = function() {
-        instance.autoRefreshCluster();
-      };
-      $timeout(nextRefresh, SettingsService.getRefreshInterval());
+      if (!this.autoRefreshStarted) {
+        this.autoRefreshStarted = true;
+        this.refresh();
+        var nextRefresh = function() {
+          instance.autoRefreshCluster();
+        };
+        $timeout(nextRefresh, SettingsService.getRefreshInterval());
+      }
     };
 
     /**
