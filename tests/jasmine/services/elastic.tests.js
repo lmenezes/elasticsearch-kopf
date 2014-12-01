@@ -36,7 +36,8 @@ describe("ElasticService", function() {
         expect(elasticService.connected).toEqual(false);
         expect(elasticService.autoRefreshStarted).toEqual(false);
         expect(elasticService.connection).toEqual(undefined);
-        spyOn(this.ExternalSettingsService, 'getElasticsearchRootPath').andReturn('/testing');
+        spyOn(this.ExternalSettingsService,
+            'getElasticsearchRootPath').andReturn('/testing');
         spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
         elasticService.clusterRequest = function(m, p, d, success, f) {
           success({version: {number: '1.9.13'}});
@@ -85,11 +86,13 @@ describe("ElasticService", function() {
 
   it("should throw exception and register no connection if response has unexpected format",
       function() {
-        $httpBackend.when('GET', 'http://localhost:9200/testing/').respond(200, {version:{number: 'ribeye'}});
+        $httpBackend.when('GET', 'http://localhost:9200/testing/').respond(200,
+            {version: {number: 'ribeye'}});
         elasticService.connected = true;
         expect(elasticService.connection).toEqual(null);
         expect(elasticService.connected).toEqual(true);
-        spyOn(this.ExternalSettingsService, 'getElasticsearchRootPath').andReturn('/testing');
+        spyOn(this.ExternalSettingsService,
+            'getElasticsearchRootPath').andReturn('/testing');
         spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
         elasticService.connect('http://localhost:9200');
         $httpBackend.flush();
@@ -224,7 +227,8 @@ describe("ElasticService", function() {
     elasticService.connection = {host: 'whatever'};
     elasticService.clusterHealth = "someValue";
     spyOn(this.AlertService, 'error').andReturn(true);
-    $httpBackend.when('GET', 'whatever/_cluster/health', {}).respond(200, undefined);
+    $httpBackend.when('GET', 'whatever/_cluster/health', {}).respond(200,
+        undefined);
     elasticService.getClusterHealth();
     $httpBackend.flush();
     expect(this.AlertService.error).toHaveBeenCalled();
@@ -252,8 +256,6 @@ describe("ElasticService", function() {
     expect(elasticService.connection).toEqual(undefined);
     expect(elasticService.connected).toEqual(false);
   });
-
-
 
   // TESTS API Methods
   it("creates index", function() {
@@ -500,6 +502,21 @@ describe("ElasticService", function() {
     var path = "/idx/whatever/_warmer/wId";
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, 'success', 'error');
+  });
+
+  it("updates aliases", function() {
+    spyOn(elasticService, 'clusterRequest').andReturn(true);
+    var add = [new Alias('adding_alias', 'idx', '', '', '')];
+    var rem = [new Alias('removing_alias', 'idx', '', '', '')];
+    var body = {
+      actions: [
+        {add: {index: 'idx', alias: 'adding_alias', filter: ''}},
+        {remove: {index: 'idx', alias: 'removing_alias', filter: ''}}
+      ]
+    };
+    elasticService.updateAliases(add, rem, 'success', 'error');
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('POST', '/_aliases', body, 'success', 'error');
   });
 
 });

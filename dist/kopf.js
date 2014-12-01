@@ -3879,6 +3879,21 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.clusterRequest('PUT', path, body, success, error);
     };
 
+    /**
+     * Updates indices aliases
+     *
+     * @param {Alias[]} add - aliases that should be added
+     * @param {Alias[]} remove - aliases that should be removed
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.updateAliases = function(add, remove, success, error) {
+      var data = {actions: []};
+      add.forEach(function(a) { data.actions.push({add: a.info()}); });
+      remove.forEach(function(a) { data.actions.push({remove: a.info()}); });
+      this.clusterRequest('POST', '/_aliases', data, success, error);
+    };
+
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
         success(new IndexMetadata(name, response.metadata.indices[name]));
@@ -3935,18 +3950,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       };
       var path = '/' + index + '/_analyze?analyzer=' + analyzer;
       this.clusterRequest('POST', path, text, buildTokens, error);
-    };
-
-    this.updateAliases = function(addAliases, removeAliases, success, error) {
-      var data = {actions: []};
-      removeAliases.forEach(function(alias) {
-        data.actions.push({'remove': alias.info()});
-      });
-      addAliases.forEach(function(alias) {
-        data.actions.push({'add': alias.info()});
-      });
-      var path = '/_aliases';
-      this.clusterRequest('POST', path, JSON.stringify(data), success, error);
     };
 
     this.getIndexWarmers = function(index, warmer, success, error) {
