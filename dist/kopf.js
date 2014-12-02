@@ -1023,7 +1023,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
   function($scope, $location, $sce, $window, AlertService, ThemeService,
            ElasticService) {
 
-    $scope.version = '1.4.0';
+    $scope.version = '1.4.1';
 
     $scope.modal = new ModalControls();
 
