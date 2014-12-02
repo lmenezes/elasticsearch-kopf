@@ -1,7 +1,7 @@
 "use strict";
 
 describe("ElasticService", function() {
-  var elasticService, $http, $httpBackend;
+  var elasticService, $http, $httpBackend, $timeout;
 
   beforeEach(module("kopf"));
 
@@ -22,6 +22,7 @@ describe("ElasticService", function() {
     this.AlertService = $injector.get('AlertService');
     this.ExternalSettingsService = $injector.get('ExternalSettingsService');
     $http = $injector.get('$http');
+    $timeout = $injector.get('$timeout');
     $httpBackend = $injector.get('$httpBackend');
   }));
 
@@ -255,6 +256,15 @@ describe("ElasticService", function() {
     expect(elasticService.cluster).toEqual(undefined);
     expect(elasticService.connection).toEqual(undefined);
     expect(elasticService.connected).toEqual(false);
+  });
+
+  it("auto refreshes cluster state", function() {
+    spyOn(elasticService, 'refresh').andReturn();
+    elasticService.autoRefreshCluster();
+    expect(elasticService.refresh).toHaveBeenCalled();
+    spyOn(elasticService, 'autoRefreshCluster');
+    $timeout.flush();
+    expect(elasticService.autoRefreshCluster).toHaveBeenCalled();
   });
 
   // TESTS API Methods

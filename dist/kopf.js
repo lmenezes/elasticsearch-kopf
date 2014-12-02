@@ -3542,7 +3542,12 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           function(data) {
             instance.setVersion(data.version.number);
             instance.connected = true;
-            instance.autoRefreshCluster();
+            if (!instance.autoRefreshStarted) {
+              instance.autoRefreshStarted = true;
+              instance.autoRefreshCluster();
+            } else {
+              instance.refresh();
+            }
           },
           function(data) {
             AlertService.error(
@@ -4137,14 +4142,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     };
 
     this.autoRefreshCluster = function() {
-      if (!this.autoRefreshStarted) {
-        this.autoRefreshStarted = true;
-        this.refresh();
-        var nextRefresh = function() {
-          instance.autoRefreshCluster();
-        };
-        $timeout(nextRefresh, SettingsService.getRefreshInterval());
-      }
+      this.refresh();
+      var nextRefresh = function() {
+        instance.autoRefreshCluster();
+      };
+      $timeout(nextRefresh, SettingsService.getRefreshInterval());
     };
 
     /**
