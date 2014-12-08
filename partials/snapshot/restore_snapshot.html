@@ -60,7 +60,7 @@
   <div class="row">
     <div class="form-group col-xs-12">
       <label class="form-label">indices (default is all)</label>
-      <select multiple="multiple" ng-model="restore_snap.indices" ng-options="i.name as i.name for i in indices" class="form-control input-sm-twoxheight">
+      <select multiple="multiple" ng-model="restore_snap.indices" ng-options="i as i for i in snapshot.indices" class="form-control input-sm-twoxheight">
         <option value="">Default is All</option>
       </select>
     </div>
