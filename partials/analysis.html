@@ -17,6 +17,7 @@
                   <div class="form-group">
                     <label class="form-label">index name</label>
                     <select class="form-control input-sm" ng-model="field_index" ng-options="i as i.name for i in indices">
+                      <option value="">{{ field_index.name }}</option>
                     </select>
                   </div>
                 </div>
