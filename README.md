@@ -19,19 +19,31 @@ Installation
 
 ####Run locally:
 
-    git clone git://github.com/lmenezes/elasticsearch-kopf.git
-    cd elasticsearch-kopf
-    git checkout {version}
-    open index.html
-    
+```bash
+git clone git://github.com/lmenezes/elasticsearch-kopf.git
+cd elasticsearch-kopf
+git checkout {version}
+open index.html
+```
+
 ps: local execution doesn't work with Chrome(and maybe other browsers). See more [here](http://docs.angularjs.org/api/ng.directive:ngInclude).
 
+Alternatively you can run it via `connect` which should solve the `ng-include` issue.
+
+```bash
+git clone git://github.com/lmenezes/elasticsearch-kopf.git
+cd elasticsearch-kopf
+git checkout {version}
+npm install
+grunt server
+```
 
 ####Install on a ElasticSearch instance:
 
-    ./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{version}
-    open http://localhost:9200/_plugin/kopf
-    
+```bash
+./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{version}
+open http://localhost:9200/_plugin/kopf
+```
 
 ####Try it online:
 ```
