@@ -8,17 +8,13 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.cluster_health = null;
 
     $($window).resize(function() {
-      if (SettingsService.getAutoAdjustLayout()) {
-        $scope.$apply(function() {
-          $scope.index_paginator.setPageSize($scope.getPageSize());
-        });
-      }
+      $scope.$apply(function() {
+        $scope.index_paginator.setPageSize($scope.getPageSize());
+      });
     });
 
     $scope.getPageSize = function() {
-      var auto = SettingsService.getAutoAdjustLayout();
-      var columns = Math.max(Math.round($window.innerWidth / 280), 1);
-      return auto ? columns : 5;
+      return Math.max(Math.round($window.innerWidth / 280), 1);
     };
 
     $scope.index_paginator = new Paginator(

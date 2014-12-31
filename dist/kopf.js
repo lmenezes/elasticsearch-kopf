@@ -587,17 +587,13 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.cluster_health = null;
 
     $($window).resize(function() {
-      if (SettingsService.getAutoAdjustLayout()) {
-        $scope.$apply(function() {
-          $scope.index_paginator.setPageSize($scope.getPageSize());
-        });
-      }
+      $scope.$apply(function() {
+        $scope.index_paginator.setPageSize($scope.getPageSize());
+      });
     });
 
     $scope.getPageSize = function() {
-      var auto = SettingsService.getAutoAdjustLayout();
-      var columns = Math.max(Math.round($window.innerWidth / 280), 1);
-      return auto ? columns : 5;
+      return Math.max(Math.round($window.innerWidth / 280), 1);
     };
 
     $scope.index_paginator = new Paginator(
@@ -1142,7 +1138,6 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     $scope.theme = ThemeService.getTheme();
     $scope.new_host = '';
     $scope.current_host = ElasticService.getHost();
-    $scope.auto_adjust_layout = SettingsService.getAutoAdjustLayout();
     $scope.host_history = HostHistoryService.getHostHistory();
 
     $scope.clusterStatus = undefined;
@@ -1210,10 +1205,6 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
 
     $scope.changeTheme = function() {
       ThemeService.setTheme($scope.theme);
-    };
-
-    $scope.setAutoAdjustLayout = function() {
-      SettingsService.setAutoAdjustLayout($scope.auto_adjust_layout);
     };
 
   }
@@ -4268,8 +4259,6 @@ kopf.factory('SettingsService', function() {
 
   this.refreshInterval = 3000;
 
-  this.autoAdjustLayout = 'true'; // enabled by default
-
   this.setRefreshInterval = function(interval) {
     this.refreshInterval = interval;
     localStorage.kopfRefreshInterval = interval;
@@ -4283,20 +4272,8 @@ kopf.factory('SettingsService', function() {
     }
   };
 
-  this.setAutoAdjustLayout = function(enabled) {
-    this.autoAdjustLayout = '' + enabled;
-    localStorage.kopfAutoAdjustLayout = this.autoAdjustLayout;
-  };
-
-  this.getAutoAdjustLayout = function() {
-    if (isDefined(localStorage.kopfAutoAdjustLayout)) {
-      return localStorage.kopfAutoAdjustLayout === 'true';
-    } else {
-      return this.autoAdjustLayout === 'true';
-    }
-  };
-
   return this;
+
 });
 
 kopf.factory('ThemeService', function() {

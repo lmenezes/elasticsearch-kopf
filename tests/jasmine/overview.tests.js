@@ -523,31 +523,20 @@ describe('ClusterOverviewController', function() {
         "buuuu");
   });
 
-  it('Should return the default page size of 5 if auto adjust is disabled',
+  it('Should return the page size according to the viewport size',
       function() {
-        spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(false);
-        expect(this.scope.getPageSize()).toEqual(5);
-      });
-
-  it('Should return the adjusted page size if auto adjust is enabled',
-      function() {
-        spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(true);
         $window.innerWidth = 2800;
         expect(this.scope.getPageSize()).toEqual(10);
+        $window.innerWidth = 1400;
+        expect(this.scope.getPageSize()).toEqual(5);
+        $window.innerWidth = 400;
+        expect(this.scope.getPageSize()).toEqual(1);
       });
 
-  it('Should change the page size if auto adjust is enabled', function() {
-    spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(true);
+  it('Should change the page size when viewport size changes', function() {
     spyOn(this.scope.index_paginator, "setPageSize").andReturn(true);
-    $($window).triggerHandler('resize')
+    $($window).triggerHandler('resize');
     expect(this.scope.index_paginator.setPageSize).toHaveBeenCalled();
-  });
-
-  it('Should not change the page size if auto adjust is disabled', function() {
-    spyOn(this.SettingsService, "getAutoAdjustLayout").andReturn(false);
-    spyOn(this.scope.index_paginator, "setPageSize").andReturn(true);
-    $($window).triggerHandler('resize')
-    expect(this.scope.index_paginator.setPageSize).not.toHaveBeenCalled();
   });
 
   it('show node stats', function() {
