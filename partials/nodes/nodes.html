@@ -1,0 +1,79 @@
+<table class="table table-bordered table-condensed table-rounded overview">
+  <thead>
+    <th></th>
+    <th>load average</th>
+    <th>cpu %</th>
+    <th>heap usage %</th>
+    <th>disk usage %</th>
+  </thead>
+  <tbody>
+    <tr ng-repeat="node in nodes track by $index">
+      <td>
+        <div class="node-badges">
+          <div ng-show="node.master">
+            <i ng-show="node.current_master" class="fa fa-fw fa-star" title="current master"></i>
+            <i ng-show="!node.current_master" class="fa fa-fw fa-star-o" title="master eligible"></i>
+          </div>
+          <div ng-show="node.data">
+            <i class="fa fa-fw fa-hdd-o" title="data node"></i>
+          </div>
+          <div ng-show="node.client">
+            <i class="fa fa-fw fa-search" title="client node"></i>
+          </div>
+        </div>
+        <div>
+          <div>
+            <span class="cluster-map-header-index-name">{{node.name}} </span>
+          </div>
+          <div>
+            <span class="cluster-map-node-detail">{{node.host}} - {{node.transport_address}}</span>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span class="node-stat">
+            {{node.load_average[0] | number:1}}
+          </span>
+          <span class="node-stat-detail">
+            <div>3min: {{node.load_average[1] | number:1}}</div>
+            <div>5min: {{node.load_average[2] | number:1}}</div>
+          </span>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span class="node-stat">
+            {{node.cpu_user + node.cpu_sys | number:1}}
+          </span>
+          <span class="node-stat-detail">
+            <div>user: {{node.cpu_user}}</div>
+            <div>sys: {{node.cpu_sys}}</div>
+          </span>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span class="node-stat">
+            {{node.heap_used_percent | number:1}}
+          </span>
+          <span class="node-stat-detail">
+            <div>used: {{node.heap_used}}</div>
+            <div>max: {{node.heap_max}}</div>
+          </span>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span class="node-stat">
+            {{node.disk_used_percent | number:1}}
+          </span>
+          <span class="node-stat-detail">
+            <div>free: {{node.disk_free}}</div>
+            <div>total: {{node.disk_total}}</div>
+          </span>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -33,9 +33,9 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/cluster_overview.html',
         controller: 'ClusterOverviewController'
       }).
-      when('/cluster', {
-        templateUrl: 'partials/cluster_overview.html',
-        controller: 'ClusterOverviewController'
+      when('/nodes', {
+        templateUrl: 'partials/nodes/nodes.html',
+        controller: 'NodesController'
       }).
       when('/rest', {
         templateUrl: 'partials/rest_client.html',

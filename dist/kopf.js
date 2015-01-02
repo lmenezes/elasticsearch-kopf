@@ -33,9 +33,9 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/cluster_overview.html',
         controller: 'ClusterOverviewController'
       }).
-      when('/cluster', {
-        templateUrl: 'partials/cluster_overview.html',
-        controller: 'ClusterOverviewController'
+      when('/nodes', {
+        templateUrl: 'partials/nodes/nodes.html',
+        controller: 'NodesController'
       }).
       when('/rest', {
         templateUrl: 'partials/rest_client.html',
@@ -1208,6 +1208,50 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     };
 
   }
+]);
+
+kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
+  'AlertService', 'ElasticService',
+  function($scope, ConfirmDialogService, AlertService, ElasticService) {
+
+    $scope.cluster = undefined;
+    $scope.cluster_health = undefined;
+    $scope.nodes = [];
+
+    $scope.$watch(
+        function() {
+          return ElasticService.clusterHealth;
+        },
+        function(newValue, oldValue) {
+          if (isDefined(ElasticService.clusterHealth)) {
+            $scope.cluster_health = ElasticService.clusterHealth;
+          } else {
+            $scope.cluster_health = undefined;
+          }
+        }
+    );
+
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(newValue, oldValue) {
+          if (isDefined(ElasticService.cluster)) {
+            $scope.cluster = ElasticService.cluster;
+            $scope.setNodes(ElasticService.cluster.getNodes(true));
+          } else {
+            $scope.cluster = undefined;
+            $scope.setNodes([]);
+          }
+        }
+    );
+
+    $scope.setNodes = function(nodes) {
+      $scope.nodes = nodes;
+    };
+
+  }
+
 ]);
 
 kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
@@ -2584,6 +2628,8 @@ function Node(nodeId, nodeInfo, nodeStats) {
 
   this.cpu_user = getProperty(this.stats, 'os.cpu.user');
   this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
+
+  this.load_average = getProperty(this.stats, 'os.load_average');
 
   this.setCurrentMaster = function() {
     this.current_master = true;
