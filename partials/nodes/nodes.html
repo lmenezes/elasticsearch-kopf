@@ -1,3 +1,30 @@
+<div class="row">
+  <div class="col-lg-6 col-sm-6  cluster-overview-filter">
+    <input type="text" ng-model="filter.name" class="form-control input-sm" placeholder="filter nodes by name">
+  </div>
+  <div class="col-lg-6 col-sm-6 cluster-overview-filter cluster-map-node-types">
+    <div class="row">
+      <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display master nodes">
+        <label>
+          <input type="checkbox" ng-model="filter.master">
+          <i class="fa fa-star-o node-type-icon"></i>
+        </label>
+      </div>
+      <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display data nodes">
+        <label>
+          <input type="checkbox" ng-model="filter.data">
+          <i class="fa fa-hdd-o node-type-icon"></i>
+        </label>
+      </div>
+      <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display client nodes">
+        <label>
+          <input type="checkbox" ng-model="filter.client">
+          <i class="fa fa-search node-type-icon"></i>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
 <table class="table table-bordered table-condensed table-rounded overview">
   <thead>
     <th></th>

@@ -1,23 +1,23 @@
 kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'ElasticService',
-  function($scope, ConfirmDialogService, AlertService, ElasticService) {
+  'AlertService', 'ElasticService', 'NodesFilter',
+  function($scope, ConfirmDialogService, AlertService, ElasticService,
+           NodesFilter) {
 
     $scope.cluster = undefined;
-    $scope.cluster_health = undefined;
+
+    $scope.filter = NodesFilter.filter;
+
     $scope.nodes = [];
 
-    $scope.$watch(
-        function() {
-          return ElasticService.clusterHealth;
-        },
-        function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.cluster_health = ElasticService.clusterHealth;
+    $scope.$watch('filter',
+        function(filter, previous) {
+          if (isDefined(ElasticService.cluster)) {
+            $scope.setNodes(ElasticService.cluster.getNodes(true));
           } else {
-            $scope.cluster_health = undefined;
+            $scope.setNodes([]);
           }
-        }
-    );
+        },
+        true);
 
     $scope.$watch(
         function() {
@@ -35,7 +35,9 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
     );
 
     $scope.setNodes = function(nodes) {
-      $scope.nodes = nodes;
+      $scope.nodes = nodes.filter(function(node) {
+        return $scope.filter.matches(node);
+      });
     };
 
   }
