@@ -62,7 +62,10 @@ function Cluster(state, status, nodes, settings, aliases) {
   if (isDefined(state.blocks.indices)) {
     var indices = this.indices;
     Object.keys(state.blocks.indices).forEach(function(indexName) {
-      indices.push(new Index(indexName));
+      // INDEX_CLOSED_BLOCK = new ClusterBlock(4, "index closed", ...
+      if (state.blocks.indices[indexName]['4']) {
+        indices.push(new Index(indexName));
+      }
     });
   }
   this.indices = this.indices.sort(function(a, b) {
