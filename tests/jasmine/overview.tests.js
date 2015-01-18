@@ -20,11 +20,6 @@ describe('ClusterOverviewController', function() {
           return [];
         }
       });
-      $provide.value('OverviewFilter',{
-        node: new NodeFilter("", true, true, true, 0),
-        index: new IndexFilter('', '', true, 0),
-        page: 1
-      });
     });
   });
 
@@ -36,11 +31,11 @@ describe('ClusterOverviewController', function() {
     this.ElasticService = $injector.get('ElasticService');
     this.AlertService = $injector.get('AlertService');
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
-    this.OverviewFilter = $injector.get('OverviewFilter');
+    this.AppState = $injector.get('AppState');
     this.createController = function() {
       return $controller('ClusterOverviewController',
           {$scope: this.scope, $window: $window}, this.ConfirmDialogService,
-          this.AlertService, this.OverviewFilter);
+          this.AlertService, this.AppState);
     };
     this._controller = this.createController();
   }));

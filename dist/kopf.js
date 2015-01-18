@@ -578,9 +578,9 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
 ]);
 
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
-  'ConfirmDialogService', 'AlertService', 'ElasticService', 'OverviewFilter',
+  'ConfirmDialogService', 'AlertService', 'ElasticService', 'AppState',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
-           OverviewFilter) {
+           AppState) {
 
     $scope.cluster = null;
     $scope.cluster_health = null;
@@ -595,16 +595,25 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       return Math.max(Math.round($window.innerWidth / 280), 1);
     };
 
-    $scope.index_paginator = new Paginator(
-        OverviewFilter.page,
-        $scope.getPageSize(),
-        [],
-        OverviewFilter.index
+    $scope.index_filter = AppState.getProperty(
+        'ClusterOverview',
+        'index_filter',
+        new IndexFilter('', '', true, 0)
+    );
+
+    $scope.index_paginator = AppState.getProperty(
+        'ClusterOverview',
+        'index_paginator',
+        new Paginator(1, $scope.getPageSize(), [], $scope.index_filter)
     );
 
     $scope.page = $scope.index_paginator.getPage();
 
-    $scope.node_filter = OverviewFilter.node;
+    $scope.node_filter = AppState.getProperty(
+        'ClusterOverview',
+        'node_filter',
+        new NodeFilter('', true, true, true, 0)
+    );
 
     $scope.nodes = [];
 
@@ -4321,13 +4330,19 @@ kopf.factory('NodesFilter', function() {
 
 });
 
-kopf.factory('OverviewFilter', function() {
+kopf.factory('AppState', function() {
 
-  this.node = new NodeFilter('', true, true, true, 0);
+  this.properties = {};
 
-  this.index = new IndexFilter('', '', true, 0);
-
-  this.page = 1;
+  this.getProperty = function(controller, property, defaultValue) {
+    if (this.properties[controller] === undefined) {
+      this.properties[controller] = {};
+    }
+    if (this.properties[controller][property] === undefined) {
+      this.properties[controller][property] = defaultValue;
+    }
+    return this.properties[controller][property];
+  };
 
   return this;
 
