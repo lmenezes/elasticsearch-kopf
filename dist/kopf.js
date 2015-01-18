@@ -1219,13 +1219,17 @@ kopf.controller('NavbarController', ['$scope', '$location',
 ]);
 
 kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'ElasticService', 'NodesFilter',
+  'AlertService', 'ElasticService', 'AppState',
   function($scope, ConfirmDialogService, AlertService, ElasticService,
-           NodesFilter) {
+           AppState) {
 
     $scope.cluster = undefined;
 
-    $scope.filter = NodesFilter.filter;
+    $scope.filter = AppState.getProperty(
+        'NodesController',
+        'filter',
+        new NodeFilter('', true, true, true, 0)
+    );
 
     $scope.nodes = [];
 
@@ -4317,14 +4321,6 @@ kopf.factory('HostHistoryService', function() {
   this.clearHistory = function() {
     localStorage.removeItem('kopfHostHistory');
   };
-
-  return this;
-
-});
-
-kopf.factory('NodesFilter', function() {
-
-  this.filter = new NodeFilter('', true, true, true, 0);
 
   return this;
 

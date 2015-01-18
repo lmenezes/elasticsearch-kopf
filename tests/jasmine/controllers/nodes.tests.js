@@ -18,10 +18,6 @@ describe('NodesController', function() {
           }
         }
       });
-      $provide.value(
-          'NodesFilter',
-          {filter: new NodeFilter("", true, true, true, 0)}
-      );
     });
   });
 
@@ -30,11 +26,11 @@ describe('NodesController', function() {
     this.ElasticService = $injector.get('ElasticService');
     this.AlertService = $injector.get('AlertService');
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
-    this.NodesFilter = $injector.get('NodesFilter');
+    this.AppState = $injector.get('AppState');
     this.createController = function() {
       return $controller('NodesController',
           {$scope: this.scope}, this.ConfirmDialogService,
-          this.AlertService, this.NodesFilter);
+          this.AlertService, this.AppSate);
     };
     this._controller = this.createController();
   }));

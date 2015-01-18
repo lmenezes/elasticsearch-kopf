@@ -1,11 +1,15 @@
 kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'ElasticService', 'NodesFilter',
+  'AlertService', 'ElasticService', 'AppState',
   function($scope, ConfirmDialogService, AlertService, ElasticService,
-           NodesFilter) {
+           AppState) {
 
     $scope.cluster = undefined;
 
-    $scope.filter = NodesFilter.filter;
+    $scope.filter = AppState.getProperty(
+        'NodesController',
+        'filter',
+        new NodeFilter('', true, true, true, 0)
+    );
 
     $scope.nodes = [];
 
