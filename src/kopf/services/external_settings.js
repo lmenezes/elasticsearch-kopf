@@ -4,6 +4,10 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
 
   var WITH_CREDENTIALS = 'with_credentials';
 
+  var REFRESH_RATE = 'refresh_rate';
+
+  var THEME = 'theme';
+
   this.settings = null;
 
   this.getSettings = function() {
@@ -45,6 +49,22 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
 
   this.withCredentials = function() {
     return this.getSettings()[WITH_CREDENTIALS];
+  };
+
+  this.getRefreshRate = function() {
+    return this.getSettings()[REFRESH_RATE];
+  };
+
+  this.setRefreshRate = function(rate) {
+    this.getSettings()[REFRESH_RATE] = rate;
+  };
+
+  this.getTheme = function() {
+    return this.getSettings()[THEME];
+  };
+
+  this.setTheme = function(theme) {
+    this.getSettings()[THEME] = theme;
   };
 
   return this;

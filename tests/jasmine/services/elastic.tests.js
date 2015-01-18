@@ -9,10 +9,10 @@ describe("ElasticService", function() {
     module('kopf');
     module(function($provide) {
       $provide.value('ExternalSettingsService', {
-        getElasticsearchRootPath: function() {
-        },
-        withCredentials: function() {
-        }
+        getElasticsearchRootPath: function() { },
+        withCredentials: function() { },
+        getRefreshRate: function() { return 5000; },
+        setRefreshRate: function() { }
       });
     });
   });

@@ -1,7 +1,7 @@
 kopf.factory('ElasticService', ['$http', '$q', '$timeout',
-  'ExternalSettingsService', 'DebugService', 'SettingsService', 'AlertService',
+  'ExternalSettingsService', 'DebugService', 'AlertService',
   function($http, $q, $timeout, ExternalSettingsService, DebugService,
-           SettingsService, AlertService) {
+           AlertService) {
 
     var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
 
@@ -661,7 +661,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.refresh = function() {
       if (this.isConnected()) {
-        var threshold = (SettingsService.getRefreshInterval() * 0.75);
+        var threshold = (ExternalSettingsService.getRefreshRate() * 0.75);
         $timeout(function() {
           var start = new Date().getTime();
           instance.getClusterDetail(
@@ -694,7 +694,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       var nextRefresh = function() {
         instance.autoRefreshCluster();
       };
-      $timeout(nextRefresh, SettingsService.getRefreshInterval());
+      $timeout(nextRefresh, ExternalSettingsService.getRefreshRate());
     };
 
     /**

@@ -578,10 +578,9 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
 ]);
 
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
-  'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService',
-  'OverviewFilter',
+  'ConfirmDialogService', 'AlertService', 'ElasticService', 'OverviewFilter',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
-           SettingsService, OverviewFilter) {
+           OverviewFilter) {
 
     $scope.cluster = null;
     $scope.cluster_health = null;
@@ -1015,16 +1014,16 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
 ]);
 
 kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
-  'AlertService', 'ThemeService', 'ElasticService',
-  function($scope, $location, $sce, $window, AlertService, ThemeService,
-           ElasticService) {
+  'AlertService', 'ElasticService', 'ExternalSettingsService',
+  function($scope, $location, $sce, $window, AlertService, ElasticService,
+           ExternalSettingsService) {
 
     $scope.version = '1.4.4';
 
     $scope.modal = new ModalControls();
 
     $scope.getTheme = function() {
-      return ThemeService.getTheme();
+      return ExternalSettingsService.getTheme();
     };
 
     $scope.readParameter = function(name) {
@@ -1128,14 +1127,14 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
   }
 ]);
 
-kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
-  'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  'DebugService',
-  function($scope, $location, SettingsService, ThemeService, ElasticService,
+kopf.controller('NavbarController', ['$scope', '$location',
+  'ExternalSettingsService', 'ElasticService', 'AlertService',
+  'HostHistoryService', 'DebugService',
+  function($scope, $location, ExternalSettingsService, ElasticService,
            AlertService, HostHistoryService, DebugService) {
 
-    $scope.new_refresh = SettingsService.getRefreshInterval();
-    $scope.theme = ThemeService.getTheme();
+    $scope.new_refresh = ExternalSettingsService.getRefreshRate();
+    $scope.theme = ExternalSettingsService.getTheme();
     $scope.new_host = '';
     $scope.current_host = ElasticService.getHost();
     $scope.host_history = HostHistoryService.getHostHistory();
@@ -1200,11 +1199,11 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     };
 
     $scope.changeRefresh = function() {
-      SettingsService.setRefreshInterval($scope.new_refresh);
+      ExternalSettingsService.setRefreshRate($scope.new_refresh);
     };
 
     $scope.changeTheme = function() {
-      ThemeService.setTheme($scope.theme);
+      ExternalSettingsService.setTheme($scope.theme);
     };
 
   }
@@ -3493,9 +3492,9 @@ kopf.factory('DebugService', ['$location', function($location) {
 }]);
 
 kopf.factory('ElasticService', ['$http', '$q', '$timeout',
-  'ExternalSettingsService', 'DebugService', 'SettingsService', 'AlertService',
+  'ExternalSettingsService', 'DebugService', 'AlertService',
   function($http, $q, $timeout, ExternalSettingsService, DebugService,
-           SettingsService, AlertService) {
+           AlertService) {
 
     var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
 
@@ -4155,7 +4154,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.refresh = function() {
       if (this.isConnected()) {
-        var threshold = (SettingsService.getRefreshInterval() * 0.75);
+        var threshold = (ExternalSettingsService.getRefreshRate() * 0.75);
         $timeout(function() {
           var start = new Date().getTime();
           instance.getClusterDetail(
@@ -4188,7 +4187,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       var nextRefresh = function() {
         instance.autoRefreshCluster();
       };
-      $timeout(nextRefresh, SettingsService.getRefreshInterval());
+      $timeout(nextRefresh, ExternalSettingsService.getRefreshRate());
     };
 
     /**
@@ -4213,6 +4212,10 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
   var ES_ROOT_PATH = 'elasticsearch_root_path';
 
   var WITH_CREDENTIALS = 'with_credentials';
+
+  var REFRESH_RATE = 'refresh_rate';
+
+  var THEME = 'theme';
 
   this.settings = null;
 
@@ -4255,6 +4258,22 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
 
   this.withCredentials = function() {
     return this.getSettings()[WITH_CREDENTIALS];
+  };
+
+  this.getRefreshRate = function() {
+    return this.getSettings()[REFRESH_RATE];
+  };
+
+  this.setRefreshRate = function(rate) {
+    this.getSettings()[REFRESH_RATE] = rate;
+  };
+
+  this.getTheme = function() {
+    return this.getSettings()[THEME];
+  };
+
+  this.setTheme = function(theme) {
+    this.getSettings()[THEME] = theme;
   };
 
   return this;
@@ -4312,47 +4331,6 @@ kopf.factory('OverviewFilter', function() {
 
   return this;
 
-});
-
-kopf.factory('SettingsService', function() {
-
-  this.refreshInterval = 3000;
-
-  this.setRefreshInterval = function(interval) {
-    this.refreshInterval = interval;
-    localStorage.kopfRefreshInterval = interval;
-  };
-
-  this.getRefreshInterval = function() {
-    if (isDefined(localStorage.kopfRefreshInterval)) {
-      return localStorage.kopfRefreshInterval;
-    } else {
-      return this.refreshInterval;
-    }
-  };
-
-  return this;
-
-});
-
-kopf.factory('ThemeService', function() {
-
-  this.theme = 'dark';
-
-  this.setTheme = function(theme) {
-    this.theme = theme;
-    localStorage.kopfTheme = theme;
-  };
-
-  this.getTheme = function() {
-    if (isDefined(localStorage.kopfTheme)) {
-      return localStorage.kopfTheme;
-    } else {
-      return this.theme;
-    }
-  };
-
-  return this;
 });
 
 function readablizeBytes(bytes) {

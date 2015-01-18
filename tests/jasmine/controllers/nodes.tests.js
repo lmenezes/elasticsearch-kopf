@@ -34,7 +34,7 @@ describe('NodesController', function() {
     this.createController = function() {
       return $controller('NodesController',
           {$scope: this.scope}, this.ConfirmDialogService,
-          this.AlertService, this.SettingsService, this.NodesFilter);
+          this.AlertService, this.NodesFilter);
     };
     this._controller = this.createController();
   }));

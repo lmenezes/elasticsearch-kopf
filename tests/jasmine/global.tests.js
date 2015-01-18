@@ -23,8 +23,6 @@ describe('GlobalController', function() {
     $location = $injector.get('$location');
     this.AlertService = $injector.get('AlertService');
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
-    this.SettingsService = $injector.get('SettingsService');
-    this.ThemeService = $injector.get('ThemeService');
     this.ElasticService = $injector.get('ElasticService');
     var mock = { location: { href: 'http://whateverhost:1234?location=http://anotherhost:12345' } };
     this.createController = function() {
@@ -70,8 +68,6 @@ describe('GlobalController', function() {
     $window = $injector.get('$window');
     this.AlertService = $injector.get('AlertService');
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
-    this.SettingsService = $injector.get('SettingsService');
-    this.ThemeService = $injector.get('ThemeService');
     this.ElasticService = $injector.get('ElasticService');
     this.createController = function() {
       return $controller('GlobalController',

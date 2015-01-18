@@ -1,8 +1,7 @@
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
-  'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService',
-  'OverviewFilter',
+  'ConfirmDialogService', 'AlertService', 'ElasticService', 'OverviewFilter',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
-           SettingsService, OverviewFilter) {
+           OverviewFilter) {
 
     $scope.cluster = null;
     $scope.cluster_health = null;

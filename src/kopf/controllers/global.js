@@ -1,14 +1,14 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
-  'AlertService', 'ThemeService', 'ElasticService',
-  function($scope, $location, $sce, $window, AlertService, ThemeService,
-           ElasticService) {
+  'AlertService', 'ElasticService', 'ExternalSettingsService',
+  function($scope, $location, $sce, $window, AlertService, ElasticService,
+           ExternalSettingsService) {
 
     $scope.version = '1.4.4';
 
     $scope.modal = new ModalControls();
 
     $scope.getTheme = function() {
-      return ThemeService.getTheme();
+      return ExternalSettingsService.getTheme();
     };
 
     $scope.readParameter = function(name) {

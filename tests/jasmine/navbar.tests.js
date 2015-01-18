@@ -14,24 +14,35 @@ describe('NavbarController', function() {
       getHost: function() { return 'http://localhost:9200' },
       connect: function() {}
     };
+
+    var settingsMock = {
+      getRefreshRate: function() { return 5000; },
+      setRefreshRate: function() { },
+      getTheme: function() { return 'dark'},
+      setTheme: function() { }
+    };
+
     module(function($provide) {
       $provide.value('ElasticService', mock);
+      $provide.value('ExternalSettingsService', settingsMock);
     });
+
   });
 
-  beforeEach(angular.mock.inject(function($rootScope, $controller, $injector) {
+  beforeEach(angular.mock.inject(function($rootScope, $controller, $injector,
+                                          $httpBackend) {
+    $httpBackend.whenGET('./kopf_external_settings.json').respond(200, {});
     this.scope = $rootScope.$new();
     this.ElasticService = $injector.get('ElasticService');
     this.ElasticService.connection = { host: 'http://localhost:9200'};
-    this.ThemeService = $injector.get('ThemeService');
-    this.SettingsService = $injector.get('SettingsService');
+    this.ExternalSettingsService = $injector.get('ExternalSettingsService');
     this.AlertService = $injector.get('AlertService');
     this.HostHistoryService = $injector.get('HostHistoryService');
     this.DebugService = $injector.get('DebugService');
 
     this.createController = function() {
       return $controller('NavbarController', {$scope: this.scope},
-          this.SettingsService, this.ThemeService, this.ElasticService,
+          this.ExternalSettingsService, this.ElasticService,
           this.AlertService, this.HostHistoryService, this.DebugService);
     };
     this._controller = this.createController();
@@ -135,17 +146,17 @@ describe('NavbarController', function() {
 
   it('should change the refresh interval with value of new_refresh',
       function() {
-        spyOn(this.SettingsService, 'setRefreshInterval').andReturn(true);
+        spyOn(this.ExternalSettingsService, 'setRefreshRate').andReturn(true);
         this.scope.new_refresh = 1000;
         this.scope.changeRefresh();
-        expect(this.SettingsService.setRefreshInterval).toHaveBeenCalledWith(1000);
+        expect(this.ExternalSettingsService.setRefreshRate).toHaveBeenCalledWith(1000);
       });
 
   it('should change theme with value of theme', function() {
-    spyOn(this.ThemeService, 'setTheme').andReturn(true);
+    spyOn(this.ExternalSettingsService, 'setTheme').andReturn(true);
     this.scope.theme = "dark";
     this.scope.changeTheme();
-    expect(this.ThemeService.setTheme).toHaveBeenCalledWith("dark");
+    expect(this.ExternalSettingsService.setTheme).toHaveBeenCalledWith("dark");
   });
 
   it('should update current host when connecting to a new host', function() {
