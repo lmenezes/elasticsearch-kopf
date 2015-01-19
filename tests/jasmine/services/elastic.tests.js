@@ -282,10 +282,7 @@ describe("ElasticService", function() {
     var path = '/_cluster/settings';
     var body = {
       transient: {
-        'cluster.routing.allocation': {
-          'enable': 'all',
-          'disable_allocation': false
-        }
+        'cluster.routing.allocation.enable': 'all'
       }
     };
     expect(elasticService.clusterRequest).
@@ -298,10 +295,7 @@ describe("ElasticService", function() {
     var path = '/_cluster/settings';
     var body = {
       transient: {
-        'cluster.routing.allocation': {
-          'enable': 'none',
-          'disable_allocation': true
-        }
+        'cluster.routing.allocation.enable': 'none'
       }
     };
     expect(elasticService.clusterRequest).

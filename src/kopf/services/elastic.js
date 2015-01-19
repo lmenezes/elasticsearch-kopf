@@ -164,10 +164,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.enableShardAllocation = function(success, error) {
       var body = {
         transient: {
-          'cluster.routing.allocation': {
-            enable: 'all',
-            disable_allocation: false // FIXME: deprecated
-          }
+          'cluster.routing.allocation.enable': 'all'
         }
       };
       this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
@@ -182,10 +179,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.disableShardAllocation = function(success, error) {
       var body = {
         transient: {
-          'cluster.routing.allocation': {
-            'enable': 'none',
-            'disable_allocation': true  // FIXME: deprecated
-          }
+          'cluster.routing.allocation.enable': 'none'
         }
       };
       this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
