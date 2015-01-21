@@ -3,7 +3,15 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
   function($scope, ConfirmDialogService, AlertService, ElasticService,
            AppState) {
 
-    $scope.cluster = undefined;
+    $scope.sortBy = 'name';
+    $scope.reverse = false;
+
+    $scope.setSortBy = function(field) {
+      if ($scope.sortBy === field) {
+        $scope.reverse = !$scope.reverse;
+      }
+      $scope.sortBy = field;
+    };
 
     $scope.filter = AppState.getProperty(
         'NodesController',
@@ -14,12 +22,8 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
     $scope.nodes = [];
 
     $scope.$watch('filter',
-        function(filter, previous) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.setNodes([]);
-          }
+        function(newValue, oldValue) {
+          $scope.refresh();
         },
         true);
 
@@ -28,20 +32,19 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
           return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.cluster = ElasticService.cluster;
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.cluster = undefined;
-            $scope.setNodes([]);
-          }
+          $scope.refresh();
         }
     );
 
-    $scope.setNodes = function(nodes) {
-      $scope.nodes = nodes.filter(function(node) {
-        return $scope.filter.matches(node);
-      });
+    $scope.refresh = function() {
+      if (isDefined(ElasticService.cluster)) {
+        var nodes = ElasticService.cluster.getNodes(true);
+        $scope.nodes = nodes.filter(function(node) {
+          return $scope.filter.matches(node);
+        });
+      } else {
+        $scope.nodes = [];
+      }
     };
 
   }

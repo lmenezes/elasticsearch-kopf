@@ -1223,7 +1223,15 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
   function($scope, ConfirmDialogService, AlertService, ElasticService,
            AppState) {
 
-    $scope.cluster = undefined;
+    $scope.sortBy = 'name';
+    $scope.reverse = false;
+
+    $scope.setSortBy = function(field) {
+      if ($scope.sortBy === field) {
+        $scope.reverse = !$scope.reverse;
+      }
+      $scope.sortBy = field;
+    };
 
     $scope.filter = AppState.getProperty(
         'NodesController',
@@ -1234,12 +1242,8 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
     $scope.nodes = [];
 
     $scope.$watch('filter',
-        function(filter, previous) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.setNodes([]);
-          }
+        function(newValue, oldValue) {
+          $scope.refresh();
         },
         true);
 
@@ -1248,20 +1252,19 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
           return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.cluster = ElasticService.cluster;
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.cluster = undefined;
-            $scope.setNodes([]);
-          }
+          $scope.refresh();
         }
     );
 
-    $scope.setNodes = function(nodes) {
-      $scope.nodes = nodes.filter(function(node) {
-        return $scope.filter.matches(node);
-      });
+    $scope.refresh = function() {
+      if (isDefined(ElasticService.cluster)) {
+        var nodes = ElasticService.cluster.getNodes(true);
+        $scope.nodes = nodes.filter(function(node) {
+          return $scope.filter.matches(node);
+        });
+      } else {
+        $scope.nodes = [];
+      }
     };
 
   }
@@ -1957,6 +1960,52 @@ kopf.directive('ngPagination', ['$document', function($document) {
     }
   };
 }]);
+
+kopf.directive('ngSortBy',
+    function() {
+
+      function updateSortingIcon(scope, elem, attrs) {
+        var sorts = scope.sortBy === attrs.property;
+        var sortIcon = elem.find('i');
+        sortIcon.removeClass('fa-sort-asc fa-sort-desc');
+        if (sorts) {
+          if (scope.reverse) {
+            sortIcon.addClass('fa-sort-desc');
+          } else {
+            sortIcon.addClass('fa-sort-asc');
+          }
+        }
+      }
+
+      function link(scope, elem, attrs) {
+        scope.$watch(
+            function() {
+              return scope.sortBy;
+            },
+            function() {
+              updateSortingIcon(scope, elem, attrs);
+            });
+
+        scope.$watch(
+            function() {
+              return scope.reverse;
+            },
+            function() {
+              updateSortingIcon(scope, elem, attrs);
+            }
+        );
+      }
+
+      return {
+        link: link,
+        template: function(elem, attrs) {
+          return '<a href="" target="_self" ng-click=setSortBy(\'' +
+              attrs.property + '\')>' + attrs.text +
+              '<i class="fa fa-fw fa-sort-asc"></i></a>';
+        }
+      };
+    }
+);
 
 kopf.directive('ngStaticInclude', function() {
   return {
@@ -2671,8 +2720,10 @@ function Node(nodeId, nodeInfo, nodeStats) {
 
   this.cpu_user = getProperty(this.stats, 'os.cpu.user');
   this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
+  this.cpu = this.cpu_user + this.cpu_sys;
 
   this.load_average = getProperty(this.stats, 'os.load_average');
+  this.minuteAverage = this.load_average[0];
 
   this.setCurrentMaster = function() {
     this.current_master = true;

@@ -36,8 +36,10 @@ function Node(nodeId, nodeInfo, nodeStats) {
 
   this.cpu_user = getProperty(this.stats, 'os.cpu.user');
   this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
+  this.cpu = this.cpu_user + this.cpu_sys;
 
   this.load_average = getProperty(this.stats, 'os.load_average');
+  this.minuteAverage = this.load_average[0];
 
   this.setCurrentMaster = function() {
     this.current_master = true;
