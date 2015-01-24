@@ -69,6 +69,20 @@ describe('ClusterOverviewController', function() {
         expect(this.scope.nodes).toEqual([]);
       });
 
+  it('should detect when nodes filter name changes and updates nodes',
+      function() {
+        // paginator
+        this.ElasticService.getNodes = function() {
+          return [3, 2, 1]
+        };
+        this.scope.$digest();
+        spyOn(this.scope, 'setNodes').andReturn(true);
+        this.scope.node_filter.name = "a";
+        this.scope.$digest();
+        expect(this.scope.setNodes).toHaveBeenCalledWith([3, 2, 1]);
+      });
+
+
   it('should detect when cluster changes and update indices and nodes',
       function() {
         // paginator

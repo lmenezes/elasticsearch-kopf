@@ -610,7 +610,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.page = $scope.index_paginator.getPage();
 
-    $scope.node_filter = new NodeFilter('', true, false, false, 0);
+    $scope.node_filter = AppState.getProperty(
+        'ClusterOverview',
+        'node_filter',
+        new NodeFilter('', true, false, false, 0)
+    );
 
     $scope.$watch(
         function() {
@@ -622,6 +626,12 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           $scope.setNodes(ElasticService.getNodes());
         }
     );
+
+    $scope.$watch('node_filter',
+        function(filter, previous) {
+          $scope.setNodes(ElasticService.getNodes());
+        },
+        true);
 
     $scope.$watch('index_paginator', function(filter, previous) {
       $scope.setIndices(ElasticService.getIndices());
