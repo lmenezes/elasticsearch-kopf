@@ -638,12 +638,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       $scope.page = $scope.index_paginator.getPage();
     };
 
-    $scope.closeModal = function(forcedRefresh) {
-      if (forcedRefresh) {
-        ElasticService.refresh();
-      }
-    };
-
     $scope.shutdownNode = function(nodeId) {
       ElasticService.shutdownNode(nodeId,
           function(data) {
