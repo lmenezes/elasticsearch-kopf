@@ -17,6 +17,7 @@
     <div id="page-wrap">
       <div ng-include src="'partials/nav_bar.html'"></div>
       <div ng-include src="'partials/main_alerts.html'" ng-controller="AlertsController" class="alerts-container"></div>
+      <div ng-include src="'partials/cluster_stats.html'" style="padding-bottom: 20px;"></div>
       <div class="container-fluid">
         <div class="tab-content custom-tab-content">
           <ng-view onload="initializeController()" ng-show="hasConnection()"></ng-view>
