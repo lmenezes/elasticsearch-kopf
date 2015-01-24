@@ -43,7 +43,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
     ElasticService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined(ElasticService.clusterHealth);
+      return isDefined(ElasticService.cluster);
     };
 
     $scope.displayInfo = function(title, info) {

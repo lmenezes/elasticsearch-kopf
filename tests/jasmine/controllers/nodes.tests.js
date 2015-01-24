@@ -38,7 +38,6 @@ describe('NodesController', function() {
   it('has correct data when initialized',
       function() {
         expect(this.scope.cluster).toEqual(undefined);
-        expect(this.scope.cluster_health).toEqual(undefined);
         expect(this.scope.nodes).toEqual([]);
         // node filter
         expect(this.scope.filter.name).toEqual('');

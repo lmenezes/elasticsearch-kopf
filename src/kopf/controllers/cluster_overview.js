@@ -4,7 +4,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
            AppState) {
 
     $scope.cluster = null;
-    $scope.cluster_health = null;
 
     $($window).resize(function() {
       $scope.$apply(function() {
@@ -37,19 +36,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     );
 
     $scope.nodes = [];
-
-    $scope.$watch(
-        function() {
-          return ElasticService.clusterHealth;
-        },
-        function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.cluster_health = ElasticService.clusterHealth;
-          } else {
-            $scope.cluster_health = null;
-          }
-        }
-    );
 
     $scope.$watch(
         function() {

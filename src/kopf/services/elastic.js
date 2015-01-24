@@ -13,8 +13,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.cluster = undefined;
 
-    this.clusterHealth = undefined;
-
     this.autoRefreshStarted = false;
 
     /**
@@ -24,7 +22,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
-      this.clusterHealth = undefined;
     };
 
     this.getIndices = function() {
@@ -572,21 +569,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           });
     };
 
-    /**
-     * Loads cluster health
-     */
-    this.getClusterHealth = function() {
-      var error = function(response) {
-        instance.clusterHealth = null;
-        AlertService.error('Error refreshing cluster health', response);
-      };
-      var success = function(response) {
-        instance.clusterHealth = new ClusterHealth(response);
-      };
-      var path = '/_cluster/health';
-      this.clusterRequest('GET', path, {}, success, error);
-    };
-
     this.getClusterDetail = function(success, error) {
       var host = this.connection.host;
       var params = {};
@@ -599,7 +581,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         $http.get(host + '/_status', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
-        $http.get(host + '/_aliases', params)
+        $http.get(host + '/_aliases', params),
+        $http.get(host + '/_cluster/health', params)
       ]).then(
           function(responses) {
             try {
@@ -608,7 +591,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
               var stats = responses[2].data;
               var settings = responses[3].data;
               var aliases = responses[4].data;
-              success(new Cluster(state, status, stats, settings, aliases));
+              var health = responses[5].data;
+              success(
+                  new Cluster(health, state, status, stats, settings, aliases)
+              );
             } catch (exception) {
               error(exception);
             }
@@ -675,11 +661,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                 instance.cluster = null;
               }
           );
-          instance.getClusterHealth();
         }, 100);
       } else {
         this.cluster = undefined;
-        this.clusterHealth = undefined;
       }
     };
 

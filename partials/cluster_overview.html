@@ -40,19 +40,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-show="cluster_health.unassigned_shards > 0 || cluster_health.unassigned_shards > 0 || cluster_health.initializing_shards > 0">
+    <tr ng-show="cluster.unassigned_shards > 0 || cluster.unassigned_shards > 0 || cluster.initializing_shards > 0">
       <td class="box unassigned-row">
-        <div ng-show="cluster_health.unassigned_shards > 0">
+        <div ng-show="cluster.unassigned_shards > 0">
           <i class="fa fa-fw fa-warning danger-action"> </i>
-          <span>{{cluster_health.unassigned_shards | number:0}} unassigned shards</span>
+          <span>{{cluster.unassigned_shards | number:0}} unassigned shards</span>
         </div>
-        <div ng-show="cluster_health.relocating_shards > 0">
+        <div ng-show="cluster.relocating_shards > 0">
           <i class="fa fa-fw fa-refresh fa-spin"> </i>
-          <span>{{cluster_health.relocating_shards | number:0}} relocating shards</span>
+          <span>{{cluster.relocating_shards | number:0}} relocating shards</span>
         </div>
-        <div ng-show="cluster_health.initializing_shards > 0">
+        <div ng-show="cluster.initializing_shards > 0">
           <i class="fa fa-fw fa-spinner fa-spin"> </i>
-          <span>{{cluster_health.initializing_shards | number:0}} initializing shards</span>
+          <span>{{cluster.initializing_shards | number:0}} initializing shards</span>
         </div>
       </td>
       <td class="shards-cell shards box" ng-repeat="index in page.elements track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">

@@ -35,13 +35,13 @@ kopf.controller('NavbarController', ['$scope', '$location',
 
     $scope.$watch(
         function() {
-          return ElasticService.clusterHealth;
+          return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.clusterStatus = ElasticService.clusterHealth.status;
-            $scope.clusterName = ElasticService.clusterHealth.cluster_name;
-            $scope.fetchedAt = ElasticService.clusterHealth.fetched_at;
+          if (isDefined(ElasticService.cluster)) {
+            $scope.clusterStatus = ElasticService.cluster.status;
+            $scope.clusterName = ElasticService.cluster.name;
+            $scope.fetchedAt = ElasticService.cluster.fetched_at;
           } else {
             $scope.clusterStatus = undefined;
             $scope.clusterName = undefined;

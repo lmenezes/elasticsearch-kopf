@@ -583,7 +583,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
            AppState) {
 
     $scope.cluster = null;
-    $scope.cluster_health = null;
 
     $($window).resize(function() {
       $scope.$apply(function() {
@@ -616,19 +615,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     );
 
     $scope.nodes = [];
-
-    $scope.$watch(
-        function() {
-          return ElasticService.clusterHealth;
-        },
-        function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.cluster_health = ElasticService.clusterHealth;
-          } else {
-            $scope.cluster_health = null;
-          }
-        }
-    );
 
     $scope.$watch(
         function() {
@@ -1067,7 +1053,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
     ElasticService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined(ElasticService.clusterHealth);
+      return isDefined(ElasticService.cluster);
     };
 
     $scope.displayInfo = function(title, info) {
@@ -1173,13 +1159,13 @@ kopf.controller('NavbarController', ['$scope', '$location',
 
     $scope.$watch(
         function() {
-          return ElasticService.clusterHealth;
+          return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.clusterStatus = ElasticService.clusterHealth.status;
-            $scope.clusterName = ElasticService.clusterHealth.cluster_name;
-            $scope.fetchedAt = ElasticService.clusterHealth.fetched_at;
+          if (isDefined(ElasticService.cluster)) {
+            $scope.clusterStatus = ElasticService.cluster.status;
+            $scope.clusterName = ElasticService.cluster.name;
+            $scope.fetchedAt = ElasticService.cluster.fetched_at;
           } else {
             $scope.clusterStatus = undefined;
             $scope.clusterName = undefined;
@@ -2107,8 +2093,21 @@ function Alias(alias, index, filter, indexRouting, searchRouting) {
   };
 }
 
-function Cluster(state, status, nodes, settings, aliases) {
+function Cluster(health, state, status, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
+
+  this.status = health.status;
+  this.initializing_shards = health.initializing_shards;
+  this.active_primary_shards = health.active_primary_shards;
+  this.active_shards = health.active_shards;
+  this.relocating_shards = health.relocating_shards;
+  this.unassigned_shards = health.unassigned_shards;
+  this.number_of_nodes = health.number_of_nodes;
+  this.number_of_data_nodes = health.number_of_data_nodes;
+  this.timed_out = health.timed_out;
+  this.shards = this.active_shards + this.relocating_shards +
+  this.unassigned_shards + this.initializing_shards;
+  this.fetched_at = getTimeString(new Date());
 
   this.name = state.cluster_name;
   this.master_node = state.master_node;
@@ -3596,8 +3595,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.cluster = undefined;
 
-    this.clusterHealth = undefined;
-
     this.autoRefreshStarted = false;
 
     /**
@@ -3607,7 +3604,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
-      this.clusterHealth = undefined;
     };
 
     this.getIndices = function() {
@@ -4155,21 +4151,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           });
     };
 
-    /**
-     * Loads cluster health
-     */
-    this.getClusterHealth = function() {
-      var error = function(response) {
-        instance.clusterHealth = null;
-        AlertService.error('Error refreshing cluster health', response);
-      };
-      var success = function(response) {
-        instance.clusterHealth = new ClusterHealth(response);
-      };
-      var path = '/_cluster/health';
-      this.clusterRequest('GET', path, {}, success, error);
-    };
-
     this.getClusterDetail = function(success, error) {
       var host = this.connection.host;
       var params = {};
@@ -4182,7 +4163,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         $http.get(host + '/_status', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
-        $http.get(host + '/_aliases', params)
+        $http.get(host + '/_aliases', params),
+        $http.get(host + '/_cluster/health', params)
       ]).then(
           function(responses) {
             try {
@@ -4191,7 +4173,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
               var stats = responses[2].data;
               var settings = responses[3].data;
               var aliases = responses[4].data;
-              success(new Cluster(state, status, stats, settings, aliases));
+              var health = responses[5].data;
+              success(
+                  new Cluster(health, state, status, stats, settings, aliases)
+              );
             } catch (exception) {
               error(exception);
             }
@@ -4258,11 +4243,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                 instance.cluster = null;
               }
           );
-          instance.getClusterHealth();
         }, 100);
       } else {
         this.cluster = undefined;
-        this.clusterHealth = undefined;
       }
     };
 
