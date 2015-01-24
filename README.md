@@ -3,7 +3,7 @@ elasticsearch kopf
 
 kopf is a simple web administration tool for [ElasticSearch](http://elasticsearch.org) written in JavaScript + AngularJS + jQuery + Twitter bootstrap.
 
-it offers an easy way of performing common tasks on an elasticsearch cluster. not every single API is covered by this plugin, but it does offer a rest client which allows you to explore the full potential of the ElasticSearch API.
+It offers an easy way of performing common tasks on an elasticsearch cluster. Not every single API is covered by this plugin, but it does offer a REST client which allows you to explore the full potential of the ElasticSearch API.
 
 Versions
 ------------
@@ -69,7 +69,7 @@ Screenshots
 ####header reflects cluster state
 ![cluster state](imgs/cluster_state.png)
 
-####rest Client
+####REST Client
 ![rest client](imgs/rest_client.png)
 
 ####aliases management
