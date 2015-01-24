@@ -9,10 +9,10 @@ describe("ElasticService", function() {
     module('kopf');
     module(function($provide) {
       $provide.value('ExternalSettingsService', {
-        getElasticsearchRootPath: function() {
-        },
-        withCredentials: function() {
-        }
+        getElasticsearchRootPath: function() { },
+        withCredentials: function() { },
+        getRefreshRate: function() { return 5000; },
+        setRefreshRate: function() { }
       });
     });
   });
@@ -198,61 +198,11 @@ describe("ElasticService", function() {
     });
   });
 
-  it("should request cluster health", function() {
-    spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.getClusterHealth();
-    expect(elasticService.clusterRequest).toHaveBeenCalledWith(
-        'GET',
-        '/_cluster/health',
-        {},
-        jasmine.any(Function),
-        jasmine.any(Function)
-    );
-  });
-
-  it("should reset cluster health if loading cluster health fails", function() {
-    elasticService.clusterHealth = "someValue";
-    spyOn(this.AlertService, 'error').andReturn(true);
-    elasticService.clusterRequest = function(m, u, b, s, error) {
-      error('failed!!!!');
-    };
-    elasticService.getClusterHealth();
-    expect(this.AlertService.error).toHaveBeenCalledWith(
-        'Error refreshing cluster health',
-        'failed!!!!'
-    );
-    expect(elasticService.clusterHealth).toEqual(undefined);
-  });
-
-  it("should reset cluster health if success throws an exception", function() {
-    elasticService.connection = {host: 'whatever'};
-    elasticService.clusterHealth = "someValue";
-    spyOn(this.AlertService, 'error').andReturn(true);
-    $httpBackend.when('GET', 'whatever/_cluster/health', {}).respond(200,
-        undefined);
-    elasticService.getClusterHealth();
-    $httpBackend.flush();
-    expect(this.AlertService.error).toHaveBeenCalled();
-    expect(elasticService.clusterHealth).toEqual(undefined);
-  });
-
-  it("should reset cluster health if loading cluster health fails", function() {
-    elasticService.clusterHealth = "someValue";
-    spyOn(this.AlertService, 'error').andReturn(true);
-    elasticService.clusterRequest = function(m, u, b, success, e) {
-      success({});
-    };
-    elasticService.getClusterHealth();
-    expect(elasticService.clusterHealth).not.toEqual(undefined);
-  });
-
   it("resets service state", function() {
-    elasticService.clusterHealth = "someValue";
     elasticService.cluster = "someValue";
     elasticService.connection = "someValue";
     elasticService.connected = true;
     elasticService.reset();
-    expect(elasticService.clusterHealth).toEqual(undefined);
     expect(elasticService.cluster).toEqual(undefined);
     expect(elasticService.connection).toEqual(undefined);
     expect(elasticService.connected).toEqual(false);
@@ -282,10 +232,7 @@ describe("ElasticService", function() {
     var path = '/_cluster/settings';
     var body = {
       transient: {
-        'cluster.routing.allocation': {
-          'enable': 'all',
-          'disable_allocation': false
-        }
+        'cluster.routing.allocation.enable': 'all'
       }
     };
     expect(elasticService.clusterRequest).
@@ -298,10 +245,7 @@ describe("ElasticService", function() {
     var path = '/_cluster/settings';
     var body = {
       transient: {
-        'cluster.routing.allocation': {
-          'enable': 'none',
-          'disable_allocation': true
-        }
+        'cluster.routing.allocation.enable': 'none'
       }
     };
     expect(elasticService.clusterRequest).

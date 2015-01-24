@@ -1,8 +1,8 @@
-<div class="row" class="overview-stats">
+<div class="row" class="overview-stats" ng-controller="ClusterStatsController">
   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="stat-block bordered">
       <span class="tooltiped" data-placement="bottom" title="number of nodes in the cluster">
-        <span class="cluster-map-stat-number">{{cluster_health.number_of_nodes | number:0}}</span>
+        <span class="cluster-map-stat-number">{{cluster.number_of_nodes | number:0}}</span>
         <span class="cluster-map-stat-description">nodes</span>
       </span>
     </div>
@@ -10,7 +10,7 @@
   <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
     <div class="stat-block bordered">
       <span class="tooltiped" data-placement="bottom" title="number of shards in the cluster (closed indices are not taken into account)">
-        <span class="cluster-map-stat-number">{{cluster_health.shards | number:0}}</span>
+        <span class="cluster-map-stat-number">{{cluster.shards | number:0}}</span>
         <span class="cluster-map-stat-description">shards</span>
       </span>
     </div>

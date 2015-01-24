@@ -1,14 +1,14 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
-  'AlertService', 'ThemeService', 'ElasticService',
-  function($scope, $location, $sce, $window, AlertService, ThemeService,
-           ElasticService) {
+  'AlertService', 'ElasticService', 'ExternalSettingsService',
+  function($scope, $location, $sce, $window, AlertService, ElasticService,
+           ExternalSettingsService) {
 
-    $scope.version = '1.4.4';
+    $scope.version = '1.4.5-SNAPSHOT';
 
     $scope.modal = new ModalControls();
 
     $scope.getTheme = function() {
-      return ThemeService.getTheme();
+      return ExternalSettingsService.getTheme();
     };
 
     $scope.readParameter = function(name) {
@@ -43,7 +43,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
     ElasticService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined(ElasticService.clusterHealth);
+      return isDefined(ElasticService.cluster);
     };
 
     $scope.displayInfo = function(title, info) {

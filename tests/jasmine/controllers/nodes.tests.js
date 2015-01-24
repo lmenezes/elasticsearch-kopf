@@ -18,10 +18,6 @@ describe('NodesController', function() {
           }
         }
       });
-      $provide.value(
-          'NodesFilter',
-          {filter: new NodeFilter("", true, true, true, 0)}
-      );
     });
   });
 
@@ -30,11 +26,11 @@ describe('NodesController', function() {
     this.ElasticService = $injector.get('ElasticService');
     this.AlertService = $injector.get('AlertService');
     this.ConfirmDialogService = $injector.get('ConfirmDialogService');
-    this.NodesFilter = $injector.get('NodesFilter');
+    this.AppState = $injector.get('AppState');
     this.createController = function() {
       return $controller('NodesController',
           {$scope: this.scope}, this.ConfirmDialogService,
-          this.AlertService, this.SettingsService, this.NodesFilter);
+          this.AlertService, this.AppSate);
     };
     this._controller = this.createController();
   }));
@@ -42,7 +38,6 @@ describe('NodesController', function() {
   it('has correct data when initialized',
       function() {
         expect(this.scope.cluster).toEqual(undefined);
-        expect(this.scope.cluster_health).toEqual(undefined);
         expect(this.scope.nodes).toEqual([]);
         // node filter
         expect(this.scope.filter.name).toEqual('');
@@ -51,25 +46,24 @@ describe('NodesController', function() {
         expect(this.scope.filter.client).toEqual(true);
       });
 
-  it('should detect when cluster changes and update nodes list and cluster ref',
+  it('should detect when cluster changes and update nodes list',
       function() {
         this.ElasticService.cluster = {
           getNodes: function(considerType) {
             return "new nodes list";
           }
         };
-        spyOn(this.scope, 'setNodes').andReturn(true);
+        spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith("new nodes list");
-        expect(this.scope.cluster).not.toEqual(undefined);
+        expect(this.scope.refresh).toHaveBeenCalled();
       });
 
   it('should detect when cluster is not reachable and clean data',
       function() {
         this.ElasticService.cluster = undefined;
-        spyOn(this.scope, 'setNodes').andReturn(true);
+        spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith([]);
+        expect(this.scope.refresh).toHaveBeenCalled();
         expect(this.scope.cluster).toEqual(undefined);
       });
 
@@ -80,10 +74,10 @@ describe('NodesController', function() {
             return "new node list"
           }
         };
-        spyOn(this.scope, 'setNodes').andReturn(true);
+        spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.name = 'b';
         this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith("new node list");
+        expect(this.scope.refresh).toHaveBeenCalled();
       });
 
   it('should detect when data node filter changes and update nodes list',
@@ -93,10 +87,10 @@ describe('NodesController', function() {
             return "new node list"
           }
         };
-        spyOn(this.scope, 'setNodes').andReturn(true);
+        spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.data = true;
         this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith("new node list");
+        expect(this.scope.refresh).toHaveBeenCalled();
       });
 
   it('should detect when client node filter changes and update nodes list',
@@ -106,10 +100,10 @@ describe('NodesController', function() {
             return "new node list"
           }
         };
-        spyOn(this.scope, 'setNodes').andReturn(true);
+        spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.client = true;
         this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith("new node list");
+        expect(this.scope.refresh).toHaveBeenCalled();
       });
 
   it('should detect when master node filter changes and update nodes list',
@@ -119,10 +113,10 @@ describe('NodesController', function() {
             return "new node list"
           }
         };
-        spyOn(this.scope, 'setNodes').andReturn(true);
+        spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.master = true;
         this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith("new node list");
+        expect(this.scope.refresh).toHaveBeenCalled();
       });
 
   it('should detect when master node filter changes and update nodes list',
@@ -132,17 +126,22 @@ describe('NodesController', function() {
           {name: 'b', master: false, data: true, client: false},
           {name: 'c', master: false, data: false, client: true},
         ];
+        this.ElasticService.cluster = {
+          getNodes: function(considerType) {
+            return nodes;
+          }
+        };
         // empty filter
-        this.scope.setNodes(nodes);
+        this.scope.refresh();
         expect(this.scope.nodes).toEqual(nodes);
         // filter by name
         this.scope.filter.name = 'a';
-        this.scope.setNodes(nodes);
+        this.scope.refresh(nodes);
         expect(this.scope.nodes).toEqual([nodes[0]]);
         this.scope.filter.name = '';
         // filter out client nodes
         this.scope.filter.client = false;
-        this.scope.setNodes(nodes);
+        this.scope.refresh(nodes);
         expect(this.scope.nodes).toEqual([
               nodes[0],
               nodes[1]
@@ -151,7 +150,7 @@ describe('NodesController', function() {
         // filter out client nodes and data nodes
         this.scope.filter.client = false;
         this.scope.filter.data = false;
-        this.scope.setNodes(nodes);
+        this.scope.refresh(nodes);
         expect(this.scope.nodes).toEqual([nodes[0]]);
       });
 

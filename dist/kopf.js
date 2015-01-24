@@ -578,13 +578,11 @@ kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
 ]);
 
 kopf.controller('ClusterOverviewController', ['$scope', '$window',
-  'ConfirmDialogService', 'AlertService', 'ElasticService', 'SettingsService',
-  'OverviewFilter',
+  'ConfirmDialogService', 'AlertService', 'ElasticService', 'AppState',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
-           SettingsService, OverviewFilter) {
+           AppState) {
 
     $scope.cluster = null;
-    $scope.cluster_health = null;
 
     $($window).resize(function() {
       $scope.$apply(function() {
@@ -596,31 +594,27 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       return Math.max(Math.round($window.innerWidth / 280), 1);
     };
 
-    $scope.index_paginator = new Paginator(
-        OverviewFilter.page,
-        $scope.getPageSize(),
-        [],
-        OverviewFilter.index
+    $scope.index_filter = AppState.getProperty(
+        'ClusterOverview',
+        'index_filter',
+        new IndexFilter('', '', true, 0)
+    );
+
+    $scope.index_paginator = AppState.getProperty(
+        'ClusterOverview',
+        'index_paginator',
+        new Paginator(1, $scope.getPageSize(), [], $scope.index_filter)
     );
 
     $scope.page = $scope.index_paginator.getPage();
 
-    $scope.node_filter = OverviewFilter.node;
+    $scope.node_filter = AppState.getProperty(
+        'ClusterOverview',
+        'node_filter',
+        new NodeFilter('', true, true, true, 0)
+    );
 
     $scope.nodes = [];
-
-    $scope.$watch(
-        function() {
-          return ElasticService.clusterHealth;
-        },
-        function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.cluster_health = ElasticService.clusterHealth;
-          } else {
-            $scope.cluster_health = null;
-          }
-        }
-    );
 
     $scope.$watch(
         function() {
@@ -926,6 +920,23 @@ kopf.controller('ClusterSettingsController', ['$scope', '$location', '$timeout',
   }
 ]);
 
+kopf.controller('ClusterStatsController', ['$scope', 'ElasticService',
+  function($scope, ElasticService) {
+
+    $scope.cluster = undefined;
+
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(newValue, oldValue) {
+          $scope.cluster = ElasticService.cluster;
+        }
+    );
+
+  }
+]);
+
 kopf.controller('ConfirmDialogController', ['$scope', 'ConfirmDialogService',
   function($scope, ConfirmDialogService) {
 
@@ -1015,16 +1026,16 @@ kopf.controller('CreateIndexController', ['$scope', 'AlertService',
 ]);
 
 kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
-  'AlertService', 'ThemeService', 'ElasticService',
-  function($scope, $location, $sce, $window, AlertService, ThemeService,
-           ElasticService) {
+  'AlertService', 'ElasticService', 'ExternalSettingsService',
+  function($scope, $location, $sce, $window, AlertService, ElasticService,
+           ExternalSettingsService) {
 
-    $scope.version = '1.4.4';
+    $scope.version = '1.4.5-SNAPSHOT';
 
     $scope.modal = new ModalControls();
 
     $scope.getTheme = function() {
-      return ThemeService.getTheme();
+      return ExternalSettingsService.getTheme();
     };
 
     $scope.readParameter = function(name) {
@@ -1059,7 +1070,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
     ElasticService.refresh();
 
     $scope.hasConnection = function() {
-      return isDefined(ElasticService.clusterHealth);
+      return isDefined(ElasticService.cluster);
     };
 
     $scope.displayInfo = function(title, info) {
@@ -1128,14 +1139,14 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
   }
 ]);
 
-kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
-  'ThemeService', 'ElasticService', 'AlertService', 'HostHistoryService',
-  'DebugService',
-  function($scope, $location, SettingsService, ThemeService, ElasticService,
+kopf.controller('NavbarController', ['$scope', '$location',
+  'ExternalSettingsService', 'ElasticService', 'AlertService',
+  'HostHistoryService', 'DebugService',
+  function($scope, $location, ExternalSettingsService, ElasticService,
            AlertService, HostHistoryService, DebugService) {
 
-    $scope.new_refresh = SettingsService.getRefreshInterval();
-    $scope.theme = ThemeService.getTheme();
+    $scope.new_refresh = ExternalSettingsService.getRefreshRate();
+    $scope.theme = ExternalSettingsService.getTheme();
     $scope.new_host = '';
     $scope.current_host = ElasticService.getHost();
     $scope.host_history = HostHistoryService.getHostHistory();
@@ -1165,13 +1176,13 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
 
     $scope.$watch(
         function() {
-          return ElasticService.clusterHealth;
+          return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.clusterHealth)) {
-            $scope.clusterStatus = ElasticService.clusterHealth.status;
-            $scope.clusterName = ElasticService.clusterHealth.cluster_name;
-            $scope.fetchedAt = ElasticService.clusterHealth.fetched_at;
+          if (isDefined(ElasticService.cluster)) {
+            $scope.clusterStatus = ElasticService.cluster.status;
+            $scope.clusterName = ElasticService.cluster.name;
+            $scope.fetchedAt = ElasticService.cluster.fetched_at;
           } else {
             $scope.clusterStatus = undefined;
             $scope.clusterName = undefined;
@@ -1200,34 +1211,42 @@ kopf.controller('NavbarController', ['$scope', '$location', 'SettingsService',
     };
 
     $scope.changeRefresh = function() {
-      SettingsService.setRefreshInterval($scope.new_refresh);
+      ExternalSettingsService.setRefreshRate($scope.new_refresh);
     };
 
     $scope.changeTheme = function() {
-      ThemeService.setTheme($scope.theme);
+      ExternalSettingsService.setTheme($scope.theme);
     };
 
   }
 ]);
 
 kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
-  'AlertService', 'ElasticService', 'NodesFilter',
+  'AlertService', 'ElasticService', 'AppState',
   function($scope, ConfirmDialogService, AlertService, ElasticService,
-           NodesFilter) {
+           AppState) {
 
-    $scope.cluster = undefined;
+    $scope.sortBy = 'name';
+    $scope.reverse = false;
 
-    $scope.filter = NodesFilter.filter;
+    $scope.setSortBy = function(field) {
+      if ($scope.sortBy === field) {
+        $scope.reverse = !$scope.reverse;
+      }
+      $scope.sortBy = field;
+    };
+
+    $scope.filter = AppState.getProperty(
+        'NodesController',
+        'filter',
+        new NodeFilter('', true, true, true, 0)
+    );
 
     $scope.nodes = [];
 
     $scope.$watch('filter',
-        function(filter, previous) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.setNodes([]);
-          }
+        function(newValue, oldValue) {
+          $scope.refresh();
         },
         true);
 
@@ -1236,20 +1255,19 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
           return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.cluster = ElasticService.cluster;
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.cluster = undefined;
-            $scope.setNodes([]);
-          }
+          $scope.refresh();
         }
     );
 
-    $scope.setNodes = function(nodes) {
-      $scope.nodes = nodes.filter(function(node) {
-        return $scope.filter.matches(node);
-      });
+    $scope.refresh = function() {
+      if (isDefined(ElasticService.cluster)) {
+        var nodes = ElasticService.cluster.getNodes(true);
+        $scope.nodes = nodes.filter(function(node) {
+          return $scope.filter.matches(node);
+        });
+      } else {
+        $scope.nodes = [];
+      }
     };
 
   }
@@ -1910,15 +1928,87 @@ kopf.directive('ngNavbarSection', ['$location', 'ElasticService',
 
 ]);
 
-kopf.directive('ngPagination', function() {
+kopf.directive('ngPagination', ['$document', function($document) {
+
   return {
     scope: {
       paginator: '=paginator',
       page: '=page'
     },
-    templateUrl: './partials/directives/pagination.html'
+    templateUrl: './partials/directives/pagination.html',
+    link: function(scope, element, attrs) {
+      var handler = function(event) {
+        var $target = $(event.target);
+        if ($target.is('input, textarea')) {
+          return;
+        }
+        if (event.keyCode == 39 && scope.page.next) {
+          scope.$apply(function() {
+            scope.paginator.nextPage();
+            event.preventDefault();
+          });
+        }
+        if (event.keyCode == 37 && scope.page.previous) {
+          scope.$apply(function() {
+            scope.paginator.previousPage();
+            event.preventDefault();
+          });
+        }
+      };
+
+      $document.bind('keydown', handler);
+      element.on('$destroy', function() {
+        $document.unbind('keydown', handler);
+      });
+    }
   };
-});
+}]);
+
+kopf.directive('ngSortBy',
+    function() {
+
+      function updateSortingIcon(scope, elem, attrs) {
+        var sorts = scope.sortBy === attrs.property;
+        var sortIcon = elem.find('i');
+        sortIcon.removeClass('fa-sort-asc fa-sort-desc');
+        if (sorts) {
+          if (scope.reverse) {
+            sortIcon.addClass('fa-sort-desc');
+          } else {
+            sortIcon.addClass('fa-sort-asc');
+          }
+        }
+      }
+
+      function link(scope, elem, attrs) {
+        scope.$watch(
+            function() {
+              return scope.sortBy;
+            },
+            function() {
+              updateSortingIcon(scope, elem, attrs);
+            });
+
+        scope.$watch(
+            function() {
+              return scope.reverse;
+            },
+            function() {
+              updateSortingIcon(scope, elem, attrs);
+            }
+        );
+      }
+
+      return {
+        link: link,
+        template: function(elem, attrs) {
+          return '<a href="" target="_self" ng-click=setSortBy(\'' +
+              attrs.property + '\')>' + attrs.text +
+              '<i class="fa fa-fw fa-sort-asc"></i></a>';
+        }
+      };
+    }
+);
 
 kopf.directive('ngStaticInclude', function() {
   return {
@@ -2020,8 +2110,21 @@ function Alias(alias, index, filter, indexRouting, searchRouting) {
   };
 }
 
-function Cluster(state, status, nodes, settings, aliases) {
+function Cluster(health, state, status, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
+
+  this.status = health.status;
+  this.initializing_shards = health.initializing_shards;
+  this.active_primary_shards = health.active_primary_shards;
+  this.active_shards = health.active_shards;
+  this.relocating_shards = health.relocating_shards;
+  this.unassigned_shards = health.unassigned_shards;
+  this.number_of_nodes = health.number_of_nodes;
+  this.number_of_data_nodes = health.number_of_data_nodes;
+  this.timed_out = health.timed_out;
+  this.shards = this.active_shards + this.relocating_shards +
+  this.unassigned_shards + this.initializing_shards;
+  this.fetched_at = getTimeString(new Date());
 
   this.name = state.cluster_name;
   this.master_node = state.master_node;
@@ -2633,8 +2736,10 @@ function Node(nodeId, nodeInfo, nodeStats) {
 
   this.cpu_user = getProperty(this.stats, 'os.cpu.user');
   this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
+  this.cpu = this.cpu_user + this.cpu_sys;
 
   this.load_average = getProperty(this.stats, 'os.load_average');
+  this.minuteAverage = this.load_average[0];
 
   this.setCurrentMaster = function() {
     this.current_master = true;
@@ -3493,9 +3598,9 @@ kopf.factory('DebugService', ['$location', function($location) {
 }]);
 
 kopf.factory('ElasticService', ['$http', '$q', '$timeout',
-  'ExternalSettingsService', 'DebugService', 'SettingsService', 'AlertService',
+  'ExternalSettingsService', 'DebugService', 'AlertService',
   function($http, $q, $timeout, ExternalSettingsService, DebugService,
-           SettingsService, AlertService) {
+           AlertService) {
 
     var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
 
@@ -3507,8 +3612,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.cluster = undefined;
 
-    this.clusterHealth = undefined;
-
     this.autoRefreshStarted = false;
 
     /**
@@ -3518,7 +3621,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
-      this.clusterHealth = undefined;
     };
 
     this.getIndices = function() {
@@ -3658,10 +3760,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.enableShardAllocation = function(success, error) {
       var body = {
         transient: {
-          'cluster.routing.allocation': {
-            enable: 'all',
-            disable_allocation: false // FIXME: deprecated
-          }
+          'cluster.routing.allocation.enable': 'all'
         }
       };
       this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
@@ -3676,10 +3775,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.disableShardAllocation = function(success, error) {
       var body = {
         transient: {
-          'cluster.routing.allocation': {
-            'enable': 'none',
-            'disable_allocation': true  // FIXME: deprecated
-          }
+          'cluster.routing.allocation.enable': 'none'
         }
       };
       this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
@@ -4072,21 +4168,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
           });
     };
 
-    /**
-     * Loads cluster health
-     */
-    this.getClusterHealth = function() {
-      var error = function(response) {
-        instance.clusterHealth = null;
-        AlertService.error('Error refreshing cluster health', response);
-      };
-      var success = function(response) {
-        instance.clusterHealth = new ClusterHealth(response);
-      };
-      var path = '/_cluster/health';
-      this.clusterRequest('GET', path, {}, success, error);
-    };
-
     this.getClusterDetail = function(success, error) {
       var host = this.connection.host;
       var params = {};
@@ -4099,7 +4180,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         $http.get(host + '/_status', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
-        $http.get(host + '/_aliases', params)
+        $http.get(host + '/_aliases', params),
+        $http.get(host + '/_cluster/health', params)
       ]).then(
           function(responses) {
             try {
@@ -4108,7 +4190,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
               var stats = responses[2].data;
               var settings = responses[3].data;
               var aliases = responses[4].data;
-              success(new Cluster(state, status, stats, settings, aliases));
+              var health = responses[5].data;
+              success(
+                  new Cluster(health, state, status, stats, settings, aliases)
+              );
             } catch (exception) {
               error(exception);
             }
@@ -4155,7 +4240,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.refresh = function() {
       if (this.isConnected()) {
-        var threshold = (SettingsService.getRefreshInterval() * 0.75);
+        var threshold = (ExternalSettingsService.getRefreshRate() * 0.75);
         $timeout(function() {
           var start = new Date().getTime();
           instance.getClusterDetail(
@@ -4175,11 +4260,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
                 instance.cluster = null;
               }
           );
-          instance.getClusterHealth();
         }, 100);
       } else {
         this.cluster = undefined;
-        this.clusterHealth = undefined;
       }
     };
 
@@ -4188,7 +4271,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       var nextRefresh = function() {
         instance.autoRefreshCluster();
       };
-      $timeout(nextRefresh, SettingsService.getRefreshInterval());
+      $timeout(nextRefresh, ExternalSettingsService.getRefreshRate());
     };
 
     /**
@@ -4213,6 +4296,10 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
   var ES_ROOT_PATH = 'elasticsearch_root_path';
 
   var WITH_CREDENTIALS = 'with_credentials';
+
+  var REFRESH_RATE = 'refresh_rate';
+
+  var THEME = 'theme';
 
   this.settings = null;
 
@@ -4257,6 +4344,22 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
     return this.getSettings()[WITH_CREDENTIALS];
   };
 
+  this.getRefreshRate = function() {
+    return this.getSettings()[REFRESH_RATE];
+  };
+
+  this.setRefreshRate = function(rate) {
+    this.getSettings()[REFRESH_RATE] = rate;
+  };
+
+  this.getTheme = function() {
+    return this.getSettings()[THEME];
+  };
+
+  this.setTheme = function(theme) {
+    this.getSettings()[THEME] = theme;
+  };
+
   return this;
 
 });
@@ -4294,65 +4397,22 @@ kopf.factory('HostHistoryService', function() {
 
 });
 
-kopf.factory('NodesFilter', function() {
+kopf.factory('AppState', function() {
 
-  this.filter = new NodeFilter('', true, true, true, 0);
+  this.properties = {};
 
-  return this;
-
-});
-
-kopf.factory('OverviewFilter', function() {
-
-  this.node = new NodeFilter('', true, true, true, 0);
-
-  this.index = new IndexFilter('', '', true, 0);
-
-  this.page = 1;
-
-  return this;
-
-});
-
-kopf.factory('SettingsService', function() {
-
-  this.refreshInterval = 3000;
-
-  this.setRefreshInterval = function(interval) {
-    this.refreshInterval = interval;
-    localStorage.kopfRefreshInterval = interval;
-  };
-
-  this.getRefreshInterval = function() {
-    if (isDefined(localStorage.kopfRefreshInterval)) {
-      return localStorage.kopfRefreshInterval;
-    } else {
-      return this.refreshInterval;
+  this.getProperty = function(controller, property, defaultValue) {
+    if (this.properties[controller] === undefined) {
+      this.properties[controller] = {};
     }
-  };
-
-  return this;
-
-});
-
-kopf.factory('ThemeService', function() {
-
-  this.theme = 'dark';
-
-  this.setTheme = function(theme) {
-    this.theme = theme;
-    localStorage.kopfTheme = theme;
-  };
-
-  this.getTheme = function() {
-    if (isDefined(localStorage.kopfTheme)) {
-      return localStorage.kopfTheme;
-    } else {
-      return this.theme;
+    if (this.properties[controller][property] === undefined) {
+      this.properties[controller][property] = defaultValue;
     }
+    return this.properties[controller][property];
   };
 
   return this;
+
 });
 
 function readablizeBytes(bytes) {
