@@ -11,7 +11,7 @@ describe('ClusterOverviewController', function() {
     module('kopf');
 
     module(function($provide) {
-      $provide.value('$window', { innerWidth: 1400 });
+      $provide.value('$window', {innerWidth: 1400});
       $provide.value('ElasticService', {
         isConnected: function() {
           return true;
@@ -59,9 +59,9 @@ describe('ClusterOverviewController', function() {
         expect(this.scope.page.previous).toEqual(false);
         // node filter
         expect(this.scope.node_filter.name).toEqual("");
-        expect(this.scope.node_filter.master).toEqual(true);
+        expect(this.scope.node_filter.master).toEqual(false);
         expect(this.scope.node_filter.data).toEqual(true);
-        expect(this.scope.node_filter.client).toEqual(true);
+        expect(this.scope.node_filter.client).toEqual(false);
         // node list
         expect(this.scope.nodes).toEqual([]);
       });
@@ -70,11 +70,13 @@ describe('ClusterOverviewController', function() {
       function() {
         // paginator
         this.ElasticService.getIndices = function() {
-          return [ 1, 2, 3 ];
+          return [1, 2, 3];
         };
-        this.ElasticService.cluster = { getNodes: function(considerType) {
-          return [3, 2, 1]
-        }};
+        this.ElasticService.cluster = {
+          getNodes: function(considerType) {
+            return [3, 2, 1]
+          }
+        };
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
         this.scope.$digest();
@@ -85,7 +87,7 @@ describe('ClusterOverviewController', function() {
   it('should detect when indices filter name changes and update indices',
       function() {
         // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
+        this.scope.cluster = {indices: [], nodes: []};
         this.scope.$digest();
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
@@ -98,7 +100,7 @@ describe('ClusterOverviewController', function() {
   it('should detect when indices filter state changes and update indices',
       function() {
         // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
+        this.scope.cluster = {indices: [], nodes: []};
         this.scope.$digest();
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
@@ -111,7 +113,7 @@ describe('ClusterOverviewController', function() {
   it('should detect when indices filter hide_special changes and update indices',
       function() {
         // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
+        this.scope.cluster = {indices: [], nodes: []};
         this.scope.$digest();
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
@@ -121,61 +123,16 @@ describe('ClusterOverviewController', function() {
         expect(this.scope.setNodes).not.toHaveBeenCalled();
       });
 
-  it('should detect when nodes filter name changes and updates nodes',
-      function() {
-        // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
-        this.scope.$digest();
-        spyOn(this.scope, 'setIndices').andReturn(true);
-        spyOn(this.scope, 'setNodes').andReturn(true);
-        this.scope.node_filter.name = "a";
-        this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith([]);
-        expect(this.scope.setIndices).not.toHaveBeenCalled();
-      });
-
-  it('should detect when nodes filter data node filter changes and updates nodes',
-      function() {
-        // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
-        this.scope.$digest();
-        spyOn(this.scope, 'setIndices').andReturn(true);
-        spyOn(this.scope, 'setNodes').andReturn(true);
-        this.scope.node_filter.data = false;
-        this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith([]);
-        expect(this.scope.setIndices).not.toHaveBeenCalled();
-      });
-
-  it('should detect when nodes filter master node filter changes and updates nodes',
-      function() {
-        // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
-        this.scope.$digest();
-        spyOn(this.scope, 'setIndices').andReturn(true);
-        spyOn(this.scope, 'setNodes').andReturn(true);
-        this.scope.node_filter.master = false;
-        this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith([]);
-        expect(this.scope.setIndices).not.toHaveBeenCalled();
-      });
-
-  it('should detect when nodes filter client node filter changes and updates nodes',
-      function() {
-        // paginator
-        this.scope.cluster = { indices: [], nodes: [] };
-        this.scope.$digest();
-        spyOn(this.scope, 'setIndices').andReturn(true);
-        spyOn(this.scope, 'setNodes').andReturn(true);
-        this.scope.node_filter.client = false;
-        this.scope.$digest();
-        expect(this.scope.setNodes).toHaveBeenCalledWith([]);
-        expect(this.scope.setIndices).not.toHaveBeenCalled();
-      });
-
   it('should correctly set nodes', function() {
-    this.scope.setNodes([1, 2, 3]);
-    expect(this.scope.nodes).toEqual([1, 2, 3]);
+    var nodes = [
+      {name: 'a', master: true, data: true, client: false},
+      {name: 'b', master: true, data: false, client: false},
+      {name: 'c', master: false, data: false, client: true}
+    ];
+    this.scope.setNodes(nodes);
+    expect(this.scope.nodes).toEqual([
+        {name: 'a', master: true, data: true, client: false}
+    ]);
   });
 
   it('should correctly set indices', function() {
@@ -187,7 +144,6 @@ describe('ClusterOverviewController', function() {
     expect(this.scope.page.next).toEqual(false);
     expect(this.scope.page.previous).toEqual(false);
   });
-
 
   // shutdown node
   it('shutdownNode must invoke client method, display alert and refresh model',
@@ -534,7 +490,7 @@ describe('ClusterOverviewController', function() {
   });
 
   it('show node stats', function() {
-    var stats = { nodes: {} };
+    var stats = {nodes: {}};
     stats.nodes['nodeId'] = {name: 'nodeName'};
     this.ElasticService.getNodeStats = function(nodeId, success, failed) {
       return success(new NodeStats(nodeId, stats.nodes[nodeId]));

@@ -582,7 +582,9 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
   function($scope, $window, ConfirmDialogService, AlertService, ElasticService,
            AppState) {
 
-    $scope.cluster = null;
+    $scope.cluster = undefined;
+
+    $scope.nodes = [];
 
     $($window).resize(function() {
       $scope.$apply(function() {
@@ -608,13 +610,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.page = $scope.index_paginator.getPage();
 
-    $scope.node_filter = AppState.getProperty(
-        'ClusterOverview',
-        'node_filter',
-        new NodeFilter('', true, true, true, 0)
-    );
-
-    $scope.nodes = [];
+    $scope.node_filter = new NodeFilter('', true, false, false, 0);
 
     $scope.$watch(
         function() {
@@ -626,7 +622,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
             $scope.setIndices(ElasticService.getIndices());
             $scope.setNodes(ElasticService.cluster.getNodes(true));
           } else {
-            $scope.cluster = null;
+            $scope.cluster = undefined;
             $scope.setIndices([]);
             $scope.setNodes([]);
           }
@@ -636,16 +632,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.$watch('index_paginator', function(filter, previous) {
       $scope.setIndices(ElasticService.getIndices());
     }, true);
-
-    $scope.$watch('node_filter',
-        function(filter, previous) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.setNodes([]);
-          }
-        },
-        true);
 
     $scope.setNodes = function(nodes) {
       $scope.nodes = nodes.filter(function(node) {
