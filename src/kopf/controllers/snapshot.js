@@ -71,7 +71,7 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
             $scope.reload();
           },
           function(error) {
-            AlertService.error('Error while deleting repositor', error);
+            AlertService.error('Error while deleting repository', error);
           }
       );
     };
@@ -110,7 +110,7 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
             $scope.reload();
           },
           function(error) {
-            AlertService.error('Error while started restore of snapshot',
+            AlertService.error('Error while starting restore of snapshot',
                 error);
           }
       );
