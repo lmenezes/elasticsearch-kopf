@@ -617,15 +617,9 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.cluster = ElasticService.cluster;
-            $scope.setIndices(ElasticService.getIndices());
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.cluster = undefined;
-            $scope.setIndices([]);
-            $scope.setNodes([]);
-          }
+          $scope.cluster = ElasticService.cluster;
+          $scope.setIndices(ElasticService.getIndices());
+          $scope.setNodes(ElasticService.getNodes());
         }
     );
 
@@ -1246,14 +1240,10 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
     );
 
     $scope.refresh = function() {
-      if (isDefined(ElasticService.cluster)) {
-        var nodes = ElasticService.cluster.getNodes(true);
-        $scope.nodes = nodes.filter(function(node) {
-          return $scope.filter.matches(node);
-        });
-      } else {
-        $scope.nodes = [];
-      }
+      var nodes = ElasticService.getNodes();
+      $scope.nodes = nodes.filter(function(node) {
+        return $scope.filter.matches(node);
+      });
     };
 
   }
@@ -3611,6 +3601,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
 
     this.getIndices = function() {
       return this.cluster ? this.cluster.indices : [];
+    };
+
+    this.getNodes = function() {
+      return this.cluster ? this.cluster.getNodes() : [];
     };
 
     this.getOpenIndices = function() {

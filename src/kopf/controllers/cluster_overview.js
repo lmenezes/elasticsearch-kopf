@@ -38,15 +38,9 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           return ElasticService.cluster;
         },
         function(newValue, oldValue) {
-          if (isDefined(ElasticService.cluster)) {
-            $scope.cluster = ElasticService.cluster;
-            $scope.setIndices(ElasticService.getIndices());
-            $scope.setNodes(ElasticService.cluster.getNodes(true));
-          } else {
-            $scope.cluster = undefined;
-            $scope.setIndices([]);
-            $scope.setNodes([]);
-          }
+          $scope.cluster = ElasticService.cluster;
+          $scope.setIndices(ElasticService.getIndices());
+          $scope.setNodes(ElasticService.getNodes());
         }
     );
 

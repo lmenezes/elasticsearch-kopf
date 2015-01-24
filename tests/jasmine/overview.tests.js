@@ -18,6 +18,9 @@ describe('ClusterOverviewController', function() {
         },
         getIndices: function() {
           return [];
+        },
+        getNodes: function() {
+          return [];
         }
       });
     });
@@ -72,10 +75,8 @@ describe('ClusterOverviewController', function() {
         this.ElasticService.getIndices = function() {
           return [1, 2, 3];
         };
-        this.ElasticService.cluster = {
-          getNodes: function(considerType) {
-            return [3, 2, 1]
-          }
+        this.ElasticService.getNodes = function(considerType) {
+          return [3, 2, 1]
         };
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);

@@ -37,14 +37,10 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
     );
 
     $scope.refresh = function() {
-      if (isDefined(ElasticService.cluster)) {
-        var nodes = ElasticService.cluster.getNodes(true);
-        $scope.nodes = nodes.filter(function(node) {
-          return $scope.filter.matches(node);
-        });
-      } else {
-        $scope.nodes = [];
-      }
+      var nodes = ElasticService.getNodes();
+      $scope.nodes = nodes.filter(function(node) {
+        return $scope.filter.matches(node);
+      });
     };
 
   }

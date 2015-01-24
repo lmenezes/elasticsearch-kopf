@@ -12,10 +12,8 @@ describe('NodesController', function() {
         isConnected: function() {
           return true;
         },
-        cluster: {
-          getNodes: function() {
-            return [];
-          }
+        getNodes: function() {
+          return [];
         }
       });
     });
@@ -48,10 +46,8 @@ describe('NodesController', function() {
 
   it('should detect when cluster changes and update nodes list',
       function() {
-        this.ElasticService.cluster = {
-          getNodes: function(considerType) {
+        this.ElasticService.getNodes = function() {
             return "new nodes list";
-          }
         };
         spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.$digest();
@@ -69,10 +65,8 @@ describe('NodesController', function() {
 
   it('should detect when name filter changes and update nodes list',
       function() {
-        this.ElasticService.cluster = {
-          getNodes: function() {
-            return "new node list"
-          }
+        this.ElasticService.getNodes = function() {
+          return "new nodes list";
         };
         spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.name = 'b';
@@ -82,10 +76,8 @@ describe('NodesController', function() {
 
   it('should detect when data node filter changes and update nodes list',
       function() {
-        this.ElasticService.cluster = {
-          getNodes: function() {
-            return "new node list"
-          }
+        this.ElasticService.getNodes = function() {
+          return "new nodes list";
         };
         spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.data = true;
@@ -95,10 +87,8 @@ describe('NodesController', function() {
 
   it('should detect when client node filter changes and update nodes list',
       function() {
-        this.ElasticService.cluster = {
-          getNodes: function() {
-            return "new node list"
-          }
+        this.ElasticService.getNodes = function() {
+          return "new nodes list";
         };
         spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.client = true;
@@ -108,10 +98,8 @@ describe('NodesController', function() {
 
   it('should detect when master node filter changes and update nodes list',
       function() {
-        this.ElasticService.cluster = {
-          getNodes: function() {
-            return "new node list"
-          }
+        this.ElasticService.getNodes = function() {
+          return "new nodes list";
         };
         spyOn(this.scope, 'refresh').andReturn(true);
         this.scope.filter.master = true;
@@ -126,10 +114,8 @@ describe('NodesController', function() {
           {name: 'b', master: false, data: true, client: false},
           {name: 'c', master: false, data: false, client: true},
         ];
-        this.ElasticService.cluster = {
-          getNodes: function(considerType) {
-            return nodes;
-          }
+        this.ElasticService.getNodes = function() {
+          return nodes;
         };
         // empty filter
         this.scope.refresh();

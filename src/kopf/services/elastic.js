@@ -28,6 +28,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       return this.cluster ? this.cluster.indices : [];
     };
 
+    this.getNodes = function() {
+      return this.cluster ? this.cluster.getNodes() : [];
+    };
+
     this.getOpenIndices = function() {
       return this.cluster ? this.cluster.open_indices() : [];
     };
