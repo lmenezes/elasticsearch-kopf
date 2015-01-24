@@ -62,11 +62,3 @@ test("getTimeString method", function() {
 	ok(getTimeString(new Date(79,5,24,0,0,0)) == "00:00:00", "Date with time 00:00:00");
 	ok(getTimeString(new Date(79,5,24,12,5,5)) == "12:05:05", "Date with time 12:05:05");
 });
-
-// prettyPrintObject tests
-test("getTimeString method", function() {
-	ok(prettyPrintObject({"foo":"bar"}) == "{\n    \"foo\": \"bar\"\n}", "Single property");
-	ok(prettyPrintObject({"foo.bar":"bar"}) == "{\n    \"foo\": {\n        \"bar\": \"bar\"\n    }\n}", "Single nested property");
-	ok(prettyPrintObject({"foo": ["bar","foobar"]}) == "{\n    \"foo\": [\n        \"bar\",\n        \"foobar\"\n    ]\n}", "Array property");
-	ok(prettyPrintObject({"foo": [ {"foo":"bar"},{"bar":"foo"}]}) == "{\n    \"foo\": [\n        {\n            \"foo\": \"bar\"\n        },\n        {\n            \"bar\": \"foo\"\n        }\n    ]\n}", "Array of objects");
-});

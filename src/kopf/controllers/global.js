@@ -52,9 +52,5 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
       $('#modal_info').modal({show: true, backdrop: true});
     };
 
-    $scope.getCurrentTime = function() {
-      return getTimeString(new Date());
-    };
-
   }
 ]);
