@@ -306,7 +306,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
             },
             function(error) {
               $scope.field_index = '';
-              AlertService.error('Error while loading index metadata', error);
+              AlertService.error('Error while loading index Types metadata', error);
             }
         );
       }
@@ -327,7 +327,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
             },
             function(error) {
               $scope.analyzer_index = '';
-              AlertService.error('Error while loading index metadata', error);
+              AlertService.error('Error while loading index Analyzers metadata', error);
             }
         );
       }
@@ -343,7 +343,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
             },
             function(error) {
               $scope.field_tokens = null;
-              AlertService.error('Error while analyzing text', error);
+              AlertService.error('Error while analyzing text by field', error);
             }
         );
       }
@@ -360,7 +360,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
             },
             function(error) {
               $scope.analyzer_tokens = null;
-              AlertService.error('Error while analyzing text', error);
+              AlertService.error('Error while analyzing text by analyzer', error);
             }
         );
       }
@@ -1614,7 +1614,7 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
             $scope.reload();
           },
           function(error) {
-            AlertService.error('Error while deleting repositor', error);
+            AlertService.error('Error while deleting repository', error);
           }
       );
     };
@@ -1653,7 +1653,7 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
             $scope.reload();
           },
           function(error) {
-            AlertService.error('Error while started restore of snapshot',
+            AlertService.error('Error while starting restore of snapshot',
                 error);
           }
       );
