@@ -68,7 +68,7 @@ test("cluster creating", function() {
   });
 
   // check nodes
-  var nodes = cluster.nodes;
+  var nodes = cluster.getNodes();
   equal(nodes.length, 2, "Unfiltered node list");
   var master_nodes = 0;
   nodes.forEach(function(node) {

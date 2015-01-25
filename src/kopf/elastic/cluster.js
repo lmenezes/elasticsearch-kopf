@@ -47,10 +47,8 @@ function Cluster(health, state, status, nodes, settings, aliases) {
     return node;
   });
 
-  this.getNodes = function(considerType) {
-    return this.nodes.sort(function(a, b) {
-      return a.compare(b, considerType);
-    });
+  this.getNodes = function() {
+    return this.nodes;
   };
 
   this.number_of_nodes = this.nodes.length;
