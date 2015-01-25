@@ -193,8 +193,15 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
      * @callback success - invoked on success
      * @callback error - invoked on error
      */
-    this.shutdownNode = function(nodeId, success, error) {
+    this.shutdownNode = function(nodeId) {
       var path = '/_cluster/nodes/' + nodeId + '/_shutdown';
+      var success = function(data) {
+        AlertService.success('Node [' + nodeId + '] was shutdown', data);
+        instance.refresh();
+      };
+      var error = function(error) {
+        AlertService.error('Error while shutting down node', error);
+      };
       this.clusterRequest('POST', path, {}, success, error);
     };
 
@@ -202,11 +209,16 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
      * Opens index
      *
      * @param {string} index - index name
-     * @callback success - invoked on success
-     * @callback error - invoked on error
      */
-    this.openIndex = function(index, success, error) {
+    this.openIndex = function(index) {
       var path = '/' + index + '/_open';
+      var success = function(response) {
+        AlertService.success('Index was successfully opened', response);
+        instance.refresh();
+      };
+      var error = function(response) {
+        AlertService.error('Error while opening index', response);
+      };
       this.clusterRequest('POST', path, {}, success, error);
     };
 
@@ -238,11 +250,16 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
      * Closes index
      *
      * @param {string} index - index name
-     * @callback success - invoked on success
-     * @callback error - invoked on error
      */
-    this.closeIndex = function(index, success, error) {
+    this.closeIndex = function(index) {
       var path = '/' + index + '/_close';
+      var success = function(response) {
+        AlertService.success('Index was successfully closed', response);
+        instance.refresh();
+      };
+      var error = function(error) {
+        AlertService.error('Error while closing index', error);
+      };
       this.clusterRequest('POST', path, {}, success, error);
     };
 

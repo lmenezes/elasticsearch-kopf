@@ -160,37 +160,6 @@ describe('ClusterOverviewController', function() {
     expect(this.scope.page.previous).toEqual(false);
   });
 
-  // shutdown node
-  it('shutdownNode must invoke client method, display alert and refresh model',
-      function() {
-        this.ElasticService.shutdownNode = function(node_id, success, failed) {
-          return success();
-        };
-        this.ElasticService.refresh = function() {
-        };
-        spyOn(this.ElasticService, "refresh").andReturn(true);
-        spyOn(this.ElasticService, "shutdownNode").andCallThrough();
-        spyOn(this.AlertService, "success").andReturn(true);
-        this.scope.shutdownNode("node_id");
-        expect(this.ElasticService.shutdownNode).toHaveBeenCalledWith("node_id",
-            jasmine.any(Function), jasmine.any(Function));
-        expect(this.ElasticService.refresh).toHaveBeenCalled();
-
-        expect(this.AlertService.success).toHaveBeenCalled();
-      });
-
-  it('shutdownNode must display error message if operation fails', function() {
-    this.ElasticService.shutdownNode = function(node_id, success, failed) {
-      return failed();
-    };
-    spyOn(this.ElasticService, "shutdownNode").andCallThrough();
-    spyOn(this.AlertService, "error").andReturn(true);
-    this.scope.shutdownNode("node_id");
-    expect(this.ElasticService.shutdownNode).toHaveBeenCalledWith("node_id",
-        jasmine.any(Function), jasmine.any(Function));
-    expect(this.AlertService.error).toHaveBeenCalled();
-  });
-
   // optimizeIndex
   it('optimizeIndex must invoke client method, display alert and refresh model',
       function() {
@@ -365,66 +334,6 @@ describe('ClusterOverviewController', function() {
             jasmine.any(Function));
         expect(this.AlertService.error).toHaveBeenCalled();
       });
-
-  // close index
-  it('closeIndex must invoke client method, display alert and refresh model',
-      function() {
-        this.ElasticService.closeIndex = function(index_id, success, failed) {
-          return success();
-        };
-        this.ElasticService.refresh = function() {
-        };
-        spyOn(this.ElasticService, "refresh").andReturn(true);
-        spyOn(this.ElasticService, "closeIndex").andCallThrough();
-        spyOn(this.AlertService, "success").andReturn(true);
-        this.scope.closeIndex("index_id");
-        expect(this.ElasticService.closeIndex).toHaveBeenCalledWith("index_id",
-            jasmine.any(Function), jasmine.any(Function));
-        expect(this.ElasticService.refresh).toHaveBeenCalled();
-        expect(this.AlertService.success).toHaveBeenCalled();
-      });
-
-  it('closeIndex must display error message if operation fails', function() {
-    this.ElasticService.closeIndex = function(index_id, success, failed) {
-      return failed();
-    };
-    spyOn(this.ElasticService, "closeIndex").andCallThrough();
-    spyOn(this.AlertService, "error").andReturn(true);
-    this.scope.closeIndex("index_id");
-    expect(this.ElasticService.closeIndex).toHaveBeenCalledWith("index_id",
-        jasmine.any(Function), jasmine.any(Function));
-    expect(this.AlertService.error).toHaveBeenCalled();
-  });
-
-  // open index
-  it('openIndex must invoke client method, display alert and refresh model',
-      function() {
-        this.ElasticService.openIndex = function(index_id, success, failed) {
-          return success();
-        };
-        this.ElasticService.refresh = function() {
-        };
-        spyOn(this.ElasticService, "refresh").andReturn(true);
-        spyOn(this.ElasticService, "openIndex").andCallThrough();
-        spyOn(this.AlertService, "success").andReturn(true);
-        this.scope.openIndex("index_id");
-        expect(this.ElasticService.openIndex).toHaveBeenCalledWith("index_id",
-            jasmine.any(Function), jasmine.any(Function));
-        expect(this.ElasticService.refresh).toHaveBeenCalled();
-        expect(this.AlertService.success).toHaveBeenCalled();
-      });
-
-  it('openIndex must display error message if operation fails', function() {
-    this.ElasticService.openIndex = function(index_id, success, failed) {
-      return failed();
-    };
-    spyOn(this.ElasticService, "openIndex").andCallThrough();
-    spyOn(this.AlertService, "error").andReturn(true);
-    this.scope.openIndex("index_id");
-    expect(this.ElasticService.openIndex).toHaveBeenCalledWith("index_id",
-        jasmine.any(Function), jasmine.any(Function));
-    expect(this.AlertService.error).toHaveBeenCalled();
-  });
 
   // show index settings
   it('show index settings', function() {

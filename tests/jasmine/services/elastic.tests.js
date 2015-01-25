@@ -9,10 +9,15 @@ describe("ElasticService", function() {
     module('kopf');
     module(function($provide) {
       $provide.value('ExternalSettingsService', {
-        getElasticsearchRootPath: function() { },
-        withCredentials: function() { },
-        getRefreshRate: function() { return 5000; },
-        setRefreshRate: function() { }
+        getElasticsearchRootPath: function() {
+        },
+        withCredentials: function() {
+        },
+        getRefreshRate: function() {
+          return 5000;
+        },
+        setRefreshRate: function() {
+        }
       });
     });
   });
@@ -252,28 +257,76 @@ describe("ElasticService", function() {
         toHaveBeenCalledWith('PUT', path, body, 'success', 'error');
   });
 
-  it("shuts down node", function() {
-    spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.shutdownNode('node_id', 'success', 'error');
+  it("successfully shuts down node must refresh and alert success", function() {
+    elasticService.clusterRequest = function(m, u, b, success, error) {
+      success('response');
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.AlertService, 'success').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.shutdownNode('node_id');
     var path = '/_cluster/nodes/node_id/_shutdown';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, 'success', 'error');
+        toHaveBeenCalledWith('POST', path, {}, jasmine.any(Function),
+        jasmine.any(Function));
+    expect(this.AlertService.success).toHaveBeenCalledWith(
+        'Node [node_id] was shutdown', 'response'
+    );
+    expect(elasticService.refresh).toHaveBeenCalled();
   });
 
-  it("shuts down node", function() {
-    spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.shutdownNode('node_id', 'success', 'error');
+  it("failed shuting down node must alert error", function() {
+    elasticService.clusterRequest = function(m, u, b, success, error) {
+      error('response');
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.AlertService, 'error').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.shutdownNode('node_id');
     var path = '/_cluster/nodes/node_id/_shutdown';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, 'success', 'error');
+        toHaveBeenCalledWith('POST', path, {}, jasmine.any(Function),
+        jasmine.any(Function));
+    expect(this.AlertService.error).toHaveBeenCalledWith(
+        'Error while shutting down node', 'response'
+    );
+    expect(elasticService.refresh).not.toHaveBeenCalled();
   });
 
-  it("opens an index", function() {
-    spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.openIndex('index_name', 'success', 'error');
+  it("successfuly opening an index must refresh and alert success", function() {
+    elasticService.clusterRequest = function(m, u, b, success, error) {
+      success('response');
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.AlertService, 'success').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.openIndex('index_name');
     var path = '/index_name/_open';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, 'success', 'error');
+        toHaveBeenCalledWith('POST', path, {}, jasmine.any(Function),
+        jasmine.any(Function));
+    expect(this.AlertService.success).toHaveBeenCalledWith(
+        'Index was successfully opened', 'response'
+    );
+    expect(elasticService.refresh).toHaveBeenCalled();
+  });
+
+  it("failed opening an index must alert error", function() {
+    elasticService.clusterRequest = function(m, u, b, success, error) {
+      error('response');
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.AlertService, 'error').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.openIndex('index_name');
+    var path = '/index_name/_open';
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('POST', path, {}, jasmine.any(Function),
+        jasmine.any(Function));
+    expect(this.AlertService.error).toHaveBeenCalledWith(
+        'Error while opening index', 'response'
+    );
+    expect(elasticService.refresh).not.toHaveBeenCalled();
   });
 
   it("optimizes an index", function() {
@@ -292,12 +345,40 @@ describe("ElasticService", function() {
         toHaveBeenCalledWith('POST', path, {}, 'success', 'error');
   });
 
-  it("closes an index", function() {
-    spyOn(elasticService, 'clusterRequest').andReturn(true);
-    elasticService.closeIndex('index_name', 'success', 'error');
+  it("successfuly closing an index must refresh and alert success", function() {
+    elasticService.clusterRequest = function(m, u, b, success, error) {
+      success('response');
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.AlertService, 'success').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.closeIndex('index_name');
     var path = '/index_name/_close';
     expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, 'success', 'error');
+        toHaveBeenCalledWith('POST', path, {}, jasmine.any(Function),
+        jasmine.any(Function));
+    expect(this.AlertService.success).toHaveBeenCalledWith(
+        'Index was successfully closed', 'response'
+    );
+    expect(elasticService.refresh).toHaveBeenCalled();
+  });
+
+  it("failed closing an index must alert error", function() {
+    elasticService.clusterRequest = function(m, u, b, success, error) {
+      error('response');
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.AlertService, 'error').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.closeIndex('index_name');
+    var path = '/index_name/_close';
+    expect(elasticService.clusterRequest).
+        toHaveBeenCalledWith('POST', path, {}, jasmine.any(Function),
+        jasmine.any(Function));
+    expect(this.AlertService.error).toHaveBeenCalledWith(
+        'Error while closing index', 'response'
+    );
+    expect(elasticService.refresh).not.toHaveBeenCalled();
   });
 
   it("refreshes an index", function() {
@@ -472,5 +553,6 @@ describe("ElasticService", function() {
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', '/_aliases', body, 'success', 'error');
   });
+
 
 });
