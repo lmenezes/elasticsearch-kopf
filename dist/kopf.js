@@ -2642,7 +2642,7 @@ function Node(nodeId, nodeInfo, nodeStats) {
   this.metadata = {};
   this.metadata.info = nodeInfo;
   this.metadata.stats = nodeStats;
-  this.transport_address = nodeInfo.transport_address;
+  this.transportAddress = parseAddress(nodeInfo.transport_address);
   this.host = nodeStats.host;
   var master = nodeInfo.attributes.master === 'false' ? false : true;
   var data = nodeInfo.attributes.data === 'false' ? false : true;
@@ -2686,6 +2686,10 @@ function Node(nodeId, nodeInfo, nodeStats) {
   this.equals = function(node) {
     return node.id === this.id;
   };
+
+  function parseAddress(address) {
+    return address.substring(address.indexOf('/') + 1, address.length - 1);
+  }
 
 }
 
@@ -3571,14 +3575,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         if (changes.hasChanges()) {
           if (changes.hasJoins()) {
             var joins = changes.nodeJoins.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
+              return node.name + '[' + node.transportAddress + ']';
             });
             AlertService.info(joins.length + ' new node(s) joined the cluster',
                 joins);
           }
           if (changes.hasLeaves()) {
             var leaves = changes.nodeLeaves.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
+              return node.name + '[' + node.transportAddress + ']';
             });
             AlertService.warn(changes.nodeLeaves.length +
             ' node(s) left the cluster', leaves);

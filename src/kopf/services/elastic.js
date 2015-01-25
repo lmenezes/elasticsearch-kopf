@@ -46,14 +46,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         if (changes.hasChanges()) {
           if (changes.hasJoins()) {
             var joins = changes.nodeJoins.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
+              return node.name + '[' + node.transportAddress + ']';
             });
             AlertService.info(joins.length + ' new node(s) joined the cluster',
                 joins);
           }
           if (changes.hasLeaves()) {
             var leaves = changes.nodeLeaves.map(function(node) {
-              return node.name + '[' + node.transport_address + ']';
+              return node.name + '[' + node.transportAddress + ']';
             });
             AlertService.warn(changes.nodeLeaves.length +
             ' node(s) left the cluster', leaves);
