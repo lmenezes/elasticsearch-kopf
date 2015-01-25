@@ -98,11 +98,8 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
     return index !== null && index.name == this.name;
   };
 
-  this.closed = function() {
-    return this.state === 'close';
-  };
+  this.closed = this.state === 'close';
 
-  this.open = function() {
-    return this.state === 'open';
-  };
+  this.open = this.state === 'open';
+
 }

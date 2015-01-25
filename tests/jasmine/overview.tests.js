@@ -51,8 +51,8 @@ describe('ClusterOverviewController', function() {
         expect(this.scope.index_paginator.getCurrentPage()).toEqual(1);
         expect(this.scope.index_paginator.getPageSize()).toEqual(5);
         expect(this.scope.index_paginator.filter.name).toEqual("");
-        expect(this.scope.index_paginator.filter.state).toEqual("");
-        expect(this.scope.index_paginator.filter.hide_special).toEqual(true);
+        expect(this.scope.index_paginator.filter.closed).toEqual(true);
+        expect(this.scope.index_paginator.filter.special).toEqual(false);
         expect(this.scope.index_paginator.filter.timestamp).toEqual(0);
         // page
         expect(this.scope.page.elements.length).toEqual(5);

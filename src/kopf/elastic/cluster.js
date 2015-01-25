@@ -17,6 +17,8 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   this.name = state.cluster_name;
   this.master_node = state.master_node;
 
+  this.closedIndices = 0;
+
   this.disableAllocation = 'false';
   var persistentAllocation = getProperty(settings,
       'persistent.cluster.routing.allocation.enable', 'all');
@@ -56,6 +58,7 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   var iRoutingTable = state.routing_table.indices;
   var iStatus = status.indices;
   var specialIndices = 0;
+  var closedIndices = 0;
   this.indices = Object.keys(iRoutingTable).map(function(indexName) {
     var indexInfo = iRoutingTable[indexName];
     var indexStatus = iStatus[indexName];
@@ -76,6 +79,7 @@ function Cluster(health, state, status, nodes, settings, aliases) {
       // INDEX_CLOSED_BLOCK = new ClusterBlock(4, "index closed", ...
       if (state.blocks.indices[indexName]['4']) {
         indices.push(new Index(indexName));
+        closedIndices++;
       }
     });
   }
@@ -84,6 +88,7 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   });
 
   this.special_indices = specialIndices;
+  this.closedIndices = closedIndices;
   this.num_docs = numDocs;
   this.total_indices = this.indices.length;
 

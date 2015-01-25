@@ -4,7 +4,7 @@
         <div class="dropdown">
           <a data-toggle="dropdown" href="#" target="_self" class="cluster-map-header-index-name">
             <i class="fa fa-fw fa-caret-down pull-right"></i>
-            <span ng-class="{'closed-index': index.closed()}" class="cluster-map-header-index-name">{{index.name}} </span>
+            <span ng-class="{'closed-index': index.closed}" class="cluster-map-header-index-name">{{index.name}} </span>
           </a>
           <ul class="dropdown-menu index-dropdown" role="menu">
             <li role="presentation">
@@ -18,10 +18,10 @@
               </a>
             </li>
             <li role="presentation">
-              <a ng-show="index.open()" data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptCloseIndex(index.name)">
+              <a ng-show="index.open" data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptCloseIndex(index.name)">
                 <i class="fa fa-fw fa-folder-open index-menu-icon"></i> close index
               </a>
-              <a data-toggle="modal" ng-show="index.closed()" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptOpenIndex(index.name)">
+              <a data-toggle="modal" ng-show="index.closed" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptOpenIndex(index.name)">
                 <i class="fa fa-fw fa-folder index-menu-icon" title="open index"></i> open index
               </a>
             </li>
@@ -57,7 +57,7 @@
     </div>
     <div class="row">
       <div class="col-lg-12">
-        <div class="cluster-map-header-index-alias" ng-class="{'closed-index': index.closed()}">
+        <div class="cluster-map-header-index-alias" ng-class="{'closed-index': index.closed}">
           <span title="{{index.num_of_shards}} shards and {{index.num_of_replicas}} replicas">shards: {{index.num_of_shards}} * {{index.num_of_replicas + 1}} |</span>
           <span title="{{index.num_docs | number:0}} docs, {{index.max_doc | number:0}} max docs, {{index.deleted_docs | number:0}} deleted docs">docs: {{index.num_docs | number:0}} |</span>
           <span title="size: {{index.size_in_bytes}}, total size: {{index.total_size_in_bytes}}">size: {{index.size_in_bytes}}</span>
@@ -67,7 +67,7 @@
     <!-- index info -->
     <div class="row" ng-show="index.visibleAliases().length > 0">
       <div class="col-lg-12">
-        <div class="idx-alias" ng-class="{'closed-index': index.closed()}">
+        <div class="idx-alias" ng-class="{'closed-index': index.closed}">
           <i class="fa fa-tag"></i> {{index.visibleAliases()[0]}}
           <span ng-show="index.visibleAliases().length > 1">
             (+{{index.visibleAliases().length - 1}})

@@ -599,7 +599,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.index_filter = AppState.getProperty(
         'ClusterOverview',
         'index_filter',
-        new IndexFilter('', '', true, 0)
+        new IndexFilter('', true, false, 0)
     );
 
     $scope.index_paginator = AppState.getProperty(
@@ -2069,6 +2069,8 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   this.name = state.cluster_name;
   this.master_node = state.master_node;
 
+  this.closedIndices = 0;
+
   this.disableAllocation = 'false';
   var persistentAllocation = getProperty(settings,
       'persistent.cluster.routing.allocation.enable', 'all');
@@ -2108,6 +2110,7 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   var iRoutingTable = state.routing_table.indices;
   var iStatus = status.indices;
   var specialIndices = 0;
+  var closedIndices = 0;
   this.indices = Object.keys(iRoutingTable).map(function(indexName) {
     var indexInfo = iRoutingTable[indexName];
     var indexStatus = iStatus[indexName];
@@ -2128,6 +2131,7 @@ function Cluster(health, state, status, nodes, settings, aliases) {
       // INDEX_CLOSED_BLOCK = new ClusterBlock(4, "index closed", ...
       if (state.blocks.indices[indexName]['4']) {
         indices.push(new Index(indexName));
+        closedIndices++;
       }
     });
   }
@@ -2136,6 +2140,7 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   });
 
   this.special_indices = specialIndices;
+  this.closedIndices = closedIndices;
   this.num_docs = numDocs;
   this.total_indices = this.indices.length;
 
@@ -2552,13 +2557,10 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
     return index !== null && index.name == this.name;
   };
 
-  this.closed = function() {
-    return this.state === 'close';
-  };
+  this.closed = this.state === 'close';
 
-  this.open = function() {
-    return this.state === 'open';
-  };
+  this.open = this.state === 'open';
+
 }
 
 function IndexMetadata(index, metadata) {
@@ -3123,64 +3125,49 @@ function Gist(title, url) {
 
 }
 
-function IndexFilter(name, state, hideSpecial, timestamp) {
+function IndexFilter(name, closed, special, timestamp) {
   this.name = name;
-  this.state = state;
-  this.hide_special = hideSpecial;
+  this.closed = closed;
+  this.special = special;
   this.timestamp = timestamp;
 
   this.clone = function() {
-    return new IndexFilter(this.name, this.state, this.hide_special,
-      this.timestamp);
+    return new IndexFilter(
+        this.name, this.closed, this.special, this.timestamp
+    );
   };
 
   this.equals = function(other) {
     return (
-      other !== null &&
-      this.name == other.name &&
-      this.state == other.state &&
-      this.hide_special === other.hide_special &&
-      this.timestamp == other.timestamp
-      );
+    other !== null &&
+    this.name === other.name &&
+    this.closed === other.closed &&
+    this.special === other.special &&
+    this.timestamp === other.timestamp
+    );
   };
 
   this.isBlank = function() {
-    var emptyNameFilter = !notEmpty(this.name);
-    var emptyStateFilter = !notEmpty(this.state);
-    var disabledHideSpecial = !notEmpty(this.hide_special);
-    return emptyNameFilter && emptyStateFilter && disabledHideSpecial;
+    return !notEmpty(this.name) && this.closed && this.special;
   };
 
   this.matches = function(index) {
-    if (this.isBlank()) {
-      return true;
-    } else {
-      var matches = true;
-      if (this.hide_special) {
-        matches = !index.special;
-      }
-      if (matches && notEmpty(this.state)) {
-        if (this.state == 'unhealthy' && !index.unhealthy) {
-          matches = false;
-        } else {
-          var open = this.state == 'open';
-          var closed = this.state == 'close';
-          if ((open || closed) && this.state != index.state) {
-            matches = false;
-          }
-        }
-      }
-      if (matches && notEmpty(this.name)) {
-        try {
-          var reg = new RegExp(this.name.trim(), 'i');
-          matches = reg.test(index.name);
-        }
-        catch (err) { // if not valid regexp, still try normal matching
-          matches = index.name.indexOf(this.name.toLowerCase()) != -1;
-        }
-      }
-      return matches;
+    var matches = true;
+    if (!this.special && index.special) {
+      matches = false;
     }
+    if (!this.closed && index.closed) {
+      matches = false;
+    }
+    if (matches && notEmpty(this.name)) {
+      try {
+        matches = new RegExp(this.name.trim(), 'i').test(index.name);
+      }
+      catch (err) { // if not valid regexp, still try normal matching
+        matches = index.name.indexOf(this.name.toLowerCase()) != -1;
+      }
+    }
+    return matches;
   };
 
 }

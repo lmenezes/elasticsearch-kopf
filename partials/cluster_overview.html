@@ -59,7 +59,7 @@
     </tr>
     <tr ng-repeat="node in nodes | orderBy:'name':false track by $index">
       <td class="box" ng-static-include file="cluster_overview/node_cell"></td>
-      <td ng-repeat="index in page.elements track by $index" ng-class="{'box': index.closed()}" class="shards-cell" ng-include="'partials/cluster_overview/index_body.html'">
+      <td ng-repeat="index in page.elements track by $index" ng-class="{'box': index.closed}" class="shards-cell" ng-include="'partials/cluster_overview/index_body.html'">
       </td>
     </tr>
   </tbody>
