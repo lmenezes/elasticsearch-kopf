@@ -1,37 +1,47 @@
 <div class="row">
-  <div class="col-lg-6 col-sm-6  cluster-overview-filter">
-    <input type="text" ng-model="filter.name" class="form-control input-sm" placeholder="filter nodes by name">
-  </div>
-  <div class="col-lg-6 col-sm-6 cluster-overview-filter cluster-map-node-types">
+  <div class="col-lg-10">
     <div class="row">
-      <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display master nodes">
-        <label>
-          <input type="checkbox" ng-model="filter.master">
-          <i class="fa fa-star-o node-type-icon"></i>
-        </label>
+      <div class="col-lg-3 col-sm-6  cluster-overview-filter">
+        <input type="text" ng-model="filter.name" class="form-control input-sm" placeholder="filter nodes by name">
       </div>
-      <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display data nodes">
-        <label>
-          <input type="checkbox" ng-model="filter.data">
-          <i class="fa fa-hdd-o node-type-icon"></i>
-        </label>
-      </div>
-      <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display client nodes">
-        <label>
-          <input type="checkbox" ng-model="filter.client">
-          <i class="fa fa-search node-type-icon"></i>
-        </label>
+      <div class="col-lg-4 col-sm-6 cluster-overview-filter cluster-map-node-types">
+        <div class="row">
+          <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display master nodes">
+            <input type="checkbox" ng-model="filter.master">
+            <i class="fa fa-star-o node-type-icon"></i> master
+          </div>
+          <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display data nodes">
+            <input type="checkbox" ng-model="filter.data">
+            <i class="fa fa-hdd-o node-type-icon"></i> data
+          </div>
+          <div class="col-xs-4 cluster-map-node-type" data-toggle="tooltip" data-placement="bottom" title="display client nodes">
+            <label>
+              <input type="checkbox" ng-model="filter.client">
+              <i class="fa fa-search node-type-icon"></i> client
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <table class="table table-bordered table-condensed table-rounded overview">
   <thead>
-    <th class="table-header box"><ng-sort-by property="name" text="name">name</ng-sort-by></th>
-    <th class="table-header box"><ng-sort-by property="minuteAverage" text="load average"></ng-sort-by></th>
-    <th class="table-header box"><ng-sort-by property="cpu" text="cpu %"></ng-sort-by></th>
-    <th class="table-header box"><ng-sort-by property="heap_used_percent" text="heap usage %"></ng-sort-by></th>
-    <th class="table-header box"><ng-sort-by property="disk_used_percent" text="disk usage %"></ng-sort-by></th>
+    <th class="table-header box">
+      <ng-sort-by property="name" text="name">name</ng-sort-by>
+    </th>
+    <th class="table-header box">
+      <ng-sort-by property="minuteAverage" text="load average"></ng-sort-by>
+    </th>
+    <th class="table-header box">
+      <ng-sort-by property="cpu" text="cpu %"></ng-sort-by>
+    </th>
+    <th class="table-header box">
+      <ng-sort-by property="heap_used_percent" text="heap usage %"></ng-sort-by>
+    </th>
+    <th class="table-header box">
+      <ng-sort-by property="disk_used_percent" text="disk usage %"></ng-sort-by>
+    </th>
   </thead>
   <tbody>
     <tr ng-repeat="node in nodes | orderBy:sortBy:reverse track by $index">
