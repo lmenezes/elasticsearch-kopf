@@ -27,11 +27,11 @@
 </div>
 <table class="table table-bordered table-condensed table-rounded overview">
   <thead>
-    <th><ng-sort-by property="name" text="name">name</ng-sort-by></th>
-    <th><ng-sort-by property="minuteAverage" text="load average"></ng-sort-by></th>
-    <th><ng-sort-by property="cpu" text="cpu %"></ng-sort-by></th>
-    <th><ng-sort-by property="heap_used_percent" text="heap usage %"></ng-sort-by></th>
-    <th><ng-sort-by property="disk_used_percent" text="disk usage %"></ng-sort-by></th>
+    <th class="table-header box"><ng-sort-by property="name" text="name">name</ng-sort-by></th>
+    <th class="table-header box"><ng-sort-by property="minuteAverage" text="load average"></ng-sort-by></th>
+    <th class="table-header box"><ng-sort-by property="cpu" text="cpu %"></ng-sort-by></th>
+    <th class="table-header box"><ng-sort-by property="heap_used_percent" text="heap usage %"></ng-sort-by></th>
+    <th class="table-header box"><ng-sort-by property="disk_used_percent" text="disk usage %"></ng-sort-by></th>
   </thead>
   <tbody>
     <tr ng-repeat="node in nodes | orderBy:sortBy:reverse track by $index">

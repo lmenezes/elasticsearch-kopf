@@ -278,12 +278,6 @@ table {
 thead.overview {
 	border: 1px solid #444;
 }
-.index-cell {
-	max-height: 40px !important;
-	vertical-align: top !important;
-	border-bottom: 0px !important;
-	border: 1px solid #444 !important;
-}
 .form-control {
 	background: #333;
 	border: 1px solid #444;

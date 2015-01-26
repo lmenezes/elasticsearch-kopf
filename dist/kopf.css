@@ -116,7 +116,11 @@ a.setting-info:hover {
 .table-actions > a:hover {
 	text-decoration: none;	
 }
-
+.table-header {
+    max-height: 40px !important;
+    vertical-align: top !important;
+    border-bottom: 0px !important;
+}
 .details-icon {
 	float: right;
 	line-height: 18px;
