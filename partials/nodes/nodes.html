@@ -43,7 +43,7 @@
   </thead>
   <tbody>
     <tr ng-repeat="node in nodes | orderBy:sortBy:reverse track by $index">
-      <td>
+      <td class="box">
         <div class="node-badges">
           <div ng-show="node.master">
             <i ng-show="node.current_master" class="fa fa-fw fa-star" title="current master"></i>
