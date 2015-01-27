@@ -7,6 +7,10 @@ function AliasFilter(index, alias) {
     return new AliasFilter(this.index, this.alias);
   };
 
+  this.getSorting = function() {
+    return undefined;
+  };
+
   this.equals = function(other) {
     return (other !== null &&
       this.index == other.index &&

@@ -51,7 +51,11 @@ function Paginator(page, pageSize, collection, filter) {
   };
 
   this.setCollection = function(collection) {
-    this.$collection = collection;
+    if (this.filter.getSorting()) {
+      this.$collection = collection.sort(this.filter.getSorting());
+    } else {
+      this.$collection = collection;
+    }
   };
 
   this.getResults = function() {

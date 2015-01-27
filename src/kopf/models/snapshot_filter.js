@@ -4,6 +4,10 @@ function SnapshotFilter() {
     return new SnapshotFilter();
   };
 
+  this.getSorting = function() {
+    return undefined;
+  };
+
   this.equals = function(other) {
     return other !== null;
   };

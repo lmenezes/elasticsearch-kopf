@@ -9,6 +9,10 @@ function NodeFilter(name, data, master, client, timestamp) {
     return new NodeFilter(this.name, this.data, this.master, this.client);
   };
 
+  this.getSorting = function() {
+    return undefined;
+  };
+
   this.equals = function(other) {
     return (
       other !== null &&

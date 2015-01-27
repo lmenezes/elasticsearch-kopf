@@ -90,10 +90,6 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
 
   this.special = this.name.indexOf('.') === 0 || this.name.indexOf('_') === 0;
 
-  this.compare = function(b) { // TODO: take into account index properties?
-    return this.name.localeCompare(b.name);
-  };
-
   this.equals = function(index) {
     return index !== null && index.name == this.name;
   };

@@ -599,7 +599,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.index_filter = AppState.getProperty(
         'ClusterOverview',
         'index_filter',
-        new IndexFilter('', true, false, 0)
+        new IndexFilter('', true, false, true, 0)
     );
 
     $scope.index_paginator = AppState.getProperty(
@@ -2135,10 +2135,6 @@ function Cluster(health, state, status, nodes, settings, aliases) {
       }
     });
   }
-  this.indices = this.indices.sort(function(a, b) {
-    return a.compare(b);
-  });
-
   this.special_indices = specialIndices;
   this.closedIndices = closedIndices;
   this.num_docs = numDocs;
@@ -2549,10 +2545,6 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
 
   this.special = this.name.indexOf('.') === 0 || this.name.indexOf('_') === 0;
 
-  this.compare = function(b) { // TODO: take into account index properties?
-    return this.name.localeCompare(b.name);
-  };
-
   this.equals = function(index) {
     return index !== null && index.name == this.name;
   };
@@ -2944,6 +2936,10 @@ function AliasFilter(index, alias) {
     return new AliasFilter(this.index, this.alias);
   };
 
+  this.getSorting = function() {
+    return undefined;
+  };
+
   this.equals = function(other) {
     return (other !== null &&
       this.index == other.index &&
@@ -3126,15 +3122,33 @@ function Gist(title, url) {
 
 }
 
-function IndexFilter(name, closed, special, timestamp) {
+function IndexFilter(name, closed, special, asc, timestamp) {
   this.name = name;
   this.closed = closed;
   this.special = special;
+  this.sort = 'name';
+  this.asc = asc;
   this.timestamp = timestamp;
+
+  this.getSorting = function() {
+    var asc = this.asc;
+    switch (this.sort) {
+      case 'name':
+        return function(a, b) {
+          if (asc) {
+            return a.name.localeCompare(b.name);
+          } else {
+            return b.name.localeCompare(a.name);
+          }
+        };
+      default:
+        return undefined;
+    }
+  };
 
   this.clone = function() {
     return new IndexFilter(
-        this.name, this.closed, this.special, this.timestamp
+        this.name, this.closed, this.special, this.asc, this.timestamp
     );
   };
 
@@ -3144,12 +3158,13 @@ function IndexFilter(name, closed, special, timestamp) {
     this.name === other.name &&
     this.closed === other.closed &&
     this.special === other.special &&
+    this.asc === other.asc &&
     this.timestamp === other.timestamp
     );
   };
 
   this.isBlank = function() {
-    return !notEmpty(this.name) && this.closed && this.special;
+    return !notEmpty(this.name) && this.closed && this.special && this.asc;
   };
 
   this.matches = function(index) {
@@ -3189,6 +3204,10 @@ function NodeFilter(name, data, master, client, timestamp) {
 
   this.clone = function() {
     return new NodeFilter(this.name, this.data, this.master, this.client);
+  };
+
+  this.getSorting = function() {
+    return undefined;
   };
 
   this.equals = function(other) {
@@ -3285,7 +3304,11 @@ function Paginator(page, pageSize, collection, filter) {
   };
 
   this.setCollection = function(collection) {
-    this.$collection = collection;
+    if (this.filter.getSorting()) {
+      this.$collection = collection.sort(this.filter.getSorting());
+    } else {
+      this.$collection = collection;
+    }
   };
 
   this.getResults = function() {
@@ -3360,6 +3383,10 @@ function SnapshotFilter() {
     return new SnapshotFilter();
   };
 
+  this.getSorting = function() {
+    return undefined;
+  };
+
   this.equals = function(other) {
     return other !== null;
   };
@@ -3380,6 +3407,10 @@ function WarmerFilter(id) {
 
   this.clone = function() {
     return new WarmerFilter(this.id);
+  };
+
+  this.getSorting = function() {
+    return undefined;
   };
 
   this.equals = function(other) {

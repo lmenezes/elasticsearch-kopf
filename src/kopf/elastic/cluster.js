@@ -83,10 +83,6 @@ function Cluster(health, state, status, nodes, settings, aliases) {
       }
     });
   }
-  this.indices = this.indices.sort(function(a, b) {
-    return a.compare(b);
-  });
-
   this.special_indices = specialIndices;
   this.closedIndices = closedIndices;
   this.num_docs = numDocs;

@@ -6,6 +6,10 @@ function WarmerFilter(id) {
     return new WarmerFilter(this.id);
   };
 
+  this.getSorting = function() {
+    return undefined;
+  };
+
   this.equals = function(other) {
     return other !== null && this.id == other.id;
   };

@@ -152,8 +152,10 @@ describe('ClusterOverviewController', function() {
 
   it('should correctly set indices', function() {
     this.scope.index_paginator.filter.hide_special = false;
-    this.scope.setIndices([1, 2, 3]);
-    expect(this.scope.page.elements).toEqual([1, 2, 3, null, null]);
+    this.scope.setIndices([{name: '1'}, {name: '2'}, {name: '3'}]);
+    expect(this.scope.page.elements).toEqual(
+        [{ name : '1' }, { name : '2' }, { name : '3' }, null, null]
+    );
     expect(this.scope.page.first).toEqual(1);
     expect(this.scope.page.last).toEqual(3);
     expect(this.scope.page.next).toEqual(false);

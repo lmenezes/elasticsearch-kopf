@@ -20,7 +20,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.index_filter = AppState.getProperty(
         'ClusterOverview',
         'index_filter',
-        new IndexFilter('', true, false, 0)
+        new IndexFilter('', true, false, true, 0)
     );
 
     $scope.index_paginator = AppState.getProperty(
