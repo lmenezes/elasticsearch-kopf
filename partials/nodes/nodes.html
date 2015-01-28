@@ -66,13 +66,18 @@
         </div>
       </td>
       <td>
-        <div>
+        <div ng-show="node.load_average">
           <span class="node-stat">
             {{node.load_average[0] | number:1}}
           </span>
           <span class="node-stat-detail">
             <div>3min: {{node.load_average[1] | number:1}}</div>
             <div>5min: {{node.load_average[2] | number:1}}</div>
+          </span>
+        </div>
+        <div ng-hide="node.load_average">
+          <span class="node-stat">
+            N/A
           </span>
         </div>
       </td>
