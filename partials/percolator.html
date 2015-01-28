@@ -15,7 +15,7 @@
               <div class="row">
                 <div class="col-sm-6 form-group">
                   <label class="form-label">index</label>
-                  <select class="form-control input-sm" ng-model="new_query.index" ng-options="i.name as i.name for i in indices">
+                  <select class="form-control input-sm" ng-model="new_query.index" ng-options="i.name as i.name for i in indices | orderBy:'name'">
                   </select>
                 </div>
                 <div class="col-sm-6 form-group">
@@ -63,7 +63,7 @@
               <div class="row">
                 <div class="form-group col-md-6">
                   <label class="form-label">index</label>
-                  <select class="form-control input-sm" ng-model="index" ng-options="i.name as i.name for i in indices" ng-change="loadPercolatorQueries()">
+                  <select class="form-control input-sm" ng-model="index" ng-options="i.name as i.name for i in indices | orderBy:'name'" ng-change="loadPercolatorQueries()">
                   </select>
                 </div>
                 <div class="form-group col-md-6">

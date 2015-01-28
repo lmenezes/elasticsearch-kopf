@@ -16,7 +16,7 @@
                 <div class="col-sm-4">
                   <div class="form-group">
                     <label class="form-label">index name</label>
-                    <select class="form-control input-sm" ng-model="field_index" ng-options="i as i.name for i in indices track by i.name">
+                    <select class="form-control input-sm" ng-model="field_index" ng-options="i as i.name for i in indices track by i.name | orderBy:'name'">
                     </select>
                   </div>
                 </div>

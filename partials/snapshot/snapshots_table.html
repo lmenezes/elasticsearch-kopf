@@ -60,7 +60,7 @@
                 <input type="checkbox" ng-model="showSpecialIndices" ng-true-value="true"> show special indices
               </label>
             </label>
-            <select multiple="multiple" ng-model="new_snap.indices" ng-options="i.name as i.name for i in indices" class="form-control input-sm-twoxheight">
+            <select multiple="multiple" ng-model="new_snap.indices" ng-options="i.name as i.name for i in indices | orderBy:'name'" class="form-control input-sm-twoxheight">
               <option value="">Default is All</option>
             </select>
           </div>

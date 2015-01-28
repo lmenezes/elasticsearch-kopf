@@ -15,7 +15,7 @@
               <div class="row">
                 <div class="form-group col-md-4">
                   <label class="form-label">index</label>
-                  <select class="form-control input-sm" ng-model="warmer.index" ng-options="i.name as i.name for i in indices" ng-change="loadIndexWarmers()">
+                  <select class="form-control input-sm" ng-model="warmer.index" ng-options="i.name as i.name for i in indices | orderBy:'name'" ng-change="loadIndexWarmers()">
                     <option value="">select target index</option>
                   </select>
                 </div>
@@ -68,7 +68,7 @@
               <div class="row">
                 <div class="form-group col-md-6">
                   <label class="form-label">index</label>
-                  <select class="form-control input-sm" ng-model="index" ng-options="i.name as i.name for i in indices" ng-change="loadIndexWarmers()">
+                  <select class="form-control input-sm" ng-model="index" ng-options="i.name as i.name for i in indices | orderBy:'name'" ng-change="loadIndexWarmers()">
                     <option value="">load warmers for selected index</option>
                   </select>
                 </div>

@@ -25,7 +25,7 @@
                       <div class="col-xs-6">
                         <div class="form-group">
                           <label class="form-label">target index</label>
-                          <select class="form-control input-sm" ng-model="new_alias.index" ng-options="i.name as i.name for i in indices">
+                          <select class="form-control input-sm" ng-model="new_alias.index" ng-options="i.name as i.name for i in indices | orderBy:'name'">
                             <option value="">select index</option>
                           </select>
                         </div>
