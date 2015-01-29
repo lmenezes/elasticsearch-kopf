@@ -27,8 +27,9 @@
             </a>
           </div>
           <div class="col-lg-3 col-xs-6">
-            <a href="#!clusterHealth" class="cluster-map-header-cluster-action">
-              <i class="fa fa-stethoscope" title="cluster health information"></i>
+            <a class="cluster-map-header-cluster-action">
+              <i class="fa fa-sort-alpha-asc" title="sort ascending" ng-show="index_filter.asc" ng-click="index_filter.asc = false"></i>
+              <i class="fa fa-sort-alpha-desc" title="sort descending" ng-hide="index_filter.asc" ng-click="index_filter.asc = true"></i>
             </a>
           </div>
         </div>
