@@ -40,7 +40,7 @@ An easy way to orchestrate a local docker run is fig
 Install fig by fireing up ```pip install fig```.
 After create a fig file and off you go. 
 ```
-$ cat << EOF >
+$ cat << EOF > fig.yml
 kopf:
   image: lmenezes/elasticsearch-kopf
   ports:
