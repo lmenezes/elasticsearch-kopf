@@ -1,6 +1,6 @@
 # Kopf in docker
 
-Tagged docker images for kopf, `lmenezes/kopf` on docker hub.
+Tagged docker images for kopf, `lmenezes/elasticsearch-kopf` on docker hub.
 
 ## Usage
 
@@ -25,10 +25,32 @@ if you don't want to get hacked.
 
 ### Example
 
+#### pure docker run
+
 Running kopf with elasticsearch on `es.dev:9200`,
 exposing it on `kopf.dev` with ip address `10.10.10.10`:
 
 ```
 docker run -d -p 10.10.10.10:80:80 -e KOPF_SERVER_NAME=grafana.dev \
-    -e KOPF_ES_SERVERS=es.dev:9200 --name kopf lmenezes/kopf
+    -e KOPF_ES_SERVERS=es.dev:9200 --name kopf lmenezes/elasticsearch-kopf
 ```
+#### fig
+
+An easy way to orchestrate a local docker run is fig
+Install fig by fireing up ```pip install fig```.
+After create a fig file and off you go. 
+```
+$ cat << EOF >
+kopf:
+  image: lmenezes/elasticsearch-kopf
+  ports:
+  - 8080:80
+  environment:
+  - KOPF_SERVER_NAME=dockerhost
+  - KOPF_ES_SERVERS=172.17.42.1:9200
+EOF
+$ fig up -d
+Creating docker_kopf_1...
+$
+```
+This docker container will connect to an ES instance running on the DOCKER_HOST, which exposes 9200.
