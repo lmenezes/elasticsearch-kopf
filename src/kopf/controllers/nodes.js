@@ -43,6 +43,31 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
       });
     };
 
+    $scope.showNodeStats = function(nodeId) {
+      ElasticService.getNodeStats(nodeId,
+          function(nodeStats) {
+            $scope.displayInfo('stats for ' + nodeStats.name, nodeStats.stats);
+          },
+          function(error) {
+            AlertService.error('Error while loading node stats', error);
+          }
+      );
+    };
+
+    $scope.promptShutdownNode = function(nodeId, nodeName) {
+      ConfirmDialogService.open(
+          'are you sure you want to shutdown node ' + nodeName + '?',
+          'Shutting down a node will make all data stored in this node ' +
+          'inaccessible, unless it\'s replicated across other nodes.' +
+          'Replicated shards will be promoted to primary if the primary ' +
+          'shard is no longer reachable.',
+          'Shutdown',
+          function() {
+            ElasticService.shutdownNode(nodeId);
+          }
+      );
+    };
+
   }
 
 ]);

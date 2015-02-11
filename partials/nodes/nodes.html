@@ -57,8 +57,23 @@
           </div>
         </div>
         <div>
-          <div>
-            <span class="cluster-map-header-index-name">{{node.name}} </span>
+          <div class="dropdown">
+            <a data-toggle="dropdown" href="#" target="_self" class="cluster-map-header-index-name">
+              <i class="fa fa-fw fa-caret-down pull-right"></i>
+              <span class="cluster-map-header-index-name">{{node.name}} </span>
+            </a>
+            <ul class="dropdown-menu index-dropdown" role="menu">
+              <li role="presentation">
+                <a data-toggle="modal" class="cluster-map-header-index-action" ng-click="showNodeStats(node.id)">
+                  <i class="fa fa-fw fa-info-circle index-menu-icon"></i> view node stats
+                </a>
+              </li>
+              <li role="presentation">
+                <a data-toggle="modal" target="_self" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-header-index-action" ng-click="promptShutdownNode(node.id,node.name)">
+                  <i class="fa fa-fw fa-power-off danger-action index-menu-icon"></i> shutdown node
+                </a>
+              </li>
+            </ul>
           </div>
           <div>
             <span class="cluster-map-node-detail">{{node.transportAddress}}</span>
