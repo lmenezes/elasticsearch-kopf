@@ -44,7 +44,6 @@
         <div ng-show="{{node.heap_used_percent}} > 75" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.heap_used_percent}}%;">
         </div>
       </div>
-      <div class="progress-title-top">heap</div>
     </div>
     <div class="col-xs-4 node-progress-bar">
       <div class="progress node-progress" title="Disk usage: {{node.disk_free}} available out of {{node.disk_total}}">
@@ -53,7 +52,6 @@
         <div ng-show="{{node.disk_used_percent}} > 75" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{node.disk_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.disk_used_percent}}%;">
         </div>
       </div>
-      <div class="progress-title-top">disk</div>
     </div>
     <div class="col-xs-4 node-progress-bar">
       <div class="progress node-progress" title="CPU Usage: [{{node.cpu_user}}%] user, [{{node.cpu_sys}}%] system">
@@ -62,7 +60,6 @@
         <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{node.cpu_sys}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_sys}}%">
         </div>
       </div>
-      <div class="progress-title-top">cpu</div>
     </div>
   </div>
 </div>
