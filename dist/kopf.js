@@ -1427,6 +1427,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     $scope.editor = null;
 
+    $scope.editorFontSize = parseInt(localStorage['kopf:rest-client-editor:font-size'], 10);
+
     $scope.loadHistory = function() {
       var history = [];
       var rawHistory = localStorage.getItem('kopf_request_history');
@@ -1517,6 +1519,10 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.initializeController = function() {
       $scope.initEditor();
       $scope.history = $scope.loadHistory();
+    };
+
+    $scope.updateFontSize = function() {
+      $scope.editor.setFontSize($scope.editorFontSize);
     };
 
   }
@@ -2858,7 +2864,7 @@ function Warmer(id, index, body) {
 function AceEditor(target) {
   var self = this;
   var getFontSize = function() {
-    return localStorage['kopf:' + target + ':font-size'] || '10px';
+    return localStorage['kopf:' + target + ':font-size'] + 'px' || '10px';
   };
 
   // ace editor

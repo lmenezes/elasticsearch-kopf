@@ -1,7 +1,7 @@
 function AceEditor(target) {
   var self = this;
   var getFontSize = function() {
-    return localStorage['kopf:' + target + ':font-size'] || '10px';
+    return localStorage['kopf:' + target + ':font-size'] + 'px' || '10px';
   };
 
   // ace editor
