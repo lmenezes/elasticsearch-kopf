@@ -1,5 +1,7 @@
 kopf.factory('ExternalSettingsService', function($http, $q) {
 
+  var DEFAULT_HOST = 'default_host';
+  
   var ES_ROOT_PATH = 'elasticsearch_root_path';
 
   var WITH_CREDENTIALS = 'with_credentials';
@@ -41,6 +43,10 @@ kopf.factory('ExternalSettingsService', function($http, $q) {
       });
     }
     return this.settings;
+  };
+
+  this.getDefaultHost = function() {
+    return this.getSettings()[DEFAULT_HOST];
   };
 
   this.getElasticsearchRootPath = function() {
