@@ -1,7 +1,8 @@
-function IndexFilter(name, closed, special, asc, timestamp) {
+function IndexFilter(name, closed, special, healthy, asc, timestamp) {
   this.name = name;
   this.closed = closed;
   this.special = special;
+  this.healthy = healthy;
   this.sort = 'name';
   this.asc = asc;
   this.timestamp = timestamp;
@@ -24,7 +25,12 @@ function IndexFilter(name, closed, special, asc, timestamp) {
 
   this.clone = function() {
     return new IndexFilter(
-        this.name, this.closed, this.special, this.asc, this.timestamp
+        this.name,
+        this.closed,
+        this.special,
+        this.healthy,
+        this.asc,
+        this.timestamp
     );
   };
 
@@ -34,13 +40,20 @@ function IndexFilter(name, closed, special, asc, timestamp) {
     this.name === other.name &&
     this.closed === other.closed &&
     this.special === other.special &&
+    this.healthy === other.healthy &&
     this.asc === other.asc &&
     this.timestamp === other.timestamp
     );
   };
 
   this.isBlank = function() {
-    return !notEmpty(this.name) && this.closed && this.special && this.asc;
+    return (
+    !notEmpty(this.name) &&
+    this.closed &&
+    this.special &&
+    this.healthy &&
+    this.asc
+    );
   };
 
   this.matches = function(index) {
@@ -49,6 +62,10 @@ function IndexFilter(name, closed, special, asc, timestamp) {
       matches = false;
     }
     if (!this.closed && index.closed) {
+      matches = false;
+    }
+    // Hide healthy == show unhealthy only
+    if (!this.healthy && !index.unhealthy) {
       matches = false;
     }
     if (matches && notEmpty(this.name)) {

@@ -599,7 +599,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.index_filter = AppState.getProperty(
         'ClusterOverview',
         'index_filter',
-        new IndexFilter('', true, false, true, 0)
+        new IndexFilter('', true, false, true, true, 0)
     );
 
     $scope.index_paginator = AppState.getProperty(
@@ -624,6 +624,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           $scope.cluster = ElasticService.cluster;
           $scope.setIndices(ElasticService.getIndices());
           $scope.setNodes(ElasticService.getNodes());
+          if ($scope.cluster && $scope.cluster.status == 'green') {
+            // since control is only exposed when cluster is unhealthy,
+            // return it to default value when cluster is green again
+            $scope.index_filter.healthy = true;
+          }
         }
     );
 
@@ -3147,10 +3152,11 @@ function Gist(title, url) {
 
 }
 
-function IndexFilter(name, closed, special, asc, timestamp) {
+function IndexFilter(name, closed, special, healthy, asc, timestamp) {
   this.name = name;
   this.closed = closed;
   this.special = special;
+  this.healthy = healthy;
   this.sort = 'name';
   this.asc = asc;
   this.timestamp = timestamp;
@@ -3173,7 +3179,12 @@ function IndexFilter(name, closed, special, asc, timestamp) {
 
   this.clone = function() {
     return new IndexFilter(
-        this.name, this.closed, this.special, this.asc, this.timestamp
+        this.name,
+        this.closed,
+        this.special,
+        this.healthy,
+        this.asc,
+        this.timestamp
     );
   };
 
@@ -3183,13 +3194,20 @@ function IndexFilter(name, closed, special, asc, timestamp) {
     this.name === other.name &&
     this.closed === other.closed &&
     this.special === other.special &&
+    this.healthy === other.healthy &&
     this.asc === other.asc &&
     this.timestamp === other.timestamp
     );
   };
 
   this.isBlank = function() {
-    return !notEmpty(this.name) && this.closed && this.special && this.asc;
+    return (
+    !notEmpty(this.name) &&
+    this.closed &&
+    this.special &&
+    this.healthy &&
+    this.asc
+    );
   };
 
   this.matches = function(index) {
@@ -3198,6 +3216,10 @@ function IndexFilter(name, closed, special, asc, timestamp) {
       matches = false;
     }
     if (!this.closed && index.closed) {
+      matches = false;
+    }
+    // Hide healthy == show unhealthy only
+    if (!this.healthy && !index.unhealthy) {
       matches = false;
     }
     if (matches && notEmpty(this.name)) {

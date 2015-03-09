@@ -54,6 +54,10 @@
           <i class="fa fa-fw fa-spinner fa-spin"> </i>
           <span>{{cluster.initializing_shards | number:0}} initializing shards</span>
         </div>
+        <div class="normal-action">
+          <span ng-show="index_filter.healthy" ng-click="index_filter.healthy = false"><small><i>show only unhealthy indices</i></small></span>
+          <span ng-hide="index_filter.healthy" ng-click="index_filter.healthy = true"><small><i>show all indices</i></small></span>
+        </div>
       </td>
       <td class="shards-cell shards box" ng-repeat="index in page.elements track by $index" ng-include="'partials/cluster_overview/index_unassigned.html'">
       </td>

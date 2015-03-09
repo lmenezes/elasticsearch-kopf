@@ -20,7 +20,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.index_filter = AppState.getProperty(
         'ClusterOverview',
         'index_filter',
-        new IndexFilter('', true, false, true, 0)
+        new IndexFilter('', true, false, true, true, 0)
     );
 
     $scope.index_paginator = AppState.getProperty(
@@ -45,6 +45,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           $scope.cluster = ElasticService.cluster;
           $scope.setIndices(ElasticService.getIndices());
           $scope.setNodes(ElasticService.getNodes());
+          if ($scope.cluster && $scope.cluster.status == 'green') {
+            // since control is only exposed when cluster is unhealthy,
+            // return it to default value when cluster is green again
+            $scope.index_filter.healthy = true;
+          }
         }
     );
 

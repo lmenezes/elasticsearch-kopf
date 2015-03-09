@@ -447,4 +447,26 @@ describe('ClusterOverviewController', function() {
         "buuuu");
   });
 
+  it('should reset healthy indices filter when cluster is healthy',
+      function() {
+        // paginator
+        this.scope.index_filter.healthy = false;
+        this.ElasticService.cluster = {status: 'green'};
+        spyOn(this.scope, 'setIndices').andReturn(true);
+        spyOn(this.scope, 'setNodes').andReturn(true);
+        this.scope.$digest();
+        expect(this.scope.index_filter.healthy).toEqual(true);
+      });
+
+  it('should keep healthy indices filter when cluster is unhealthy',
+      function() {
+        // paginator
+        this.scope.index_filter.healthy = false;
+        this.ElasticService.cluster = {status: 'yellow'};
+        spyOn(this.scope, 'setIndices').andReturn(true);
+        spyOn(this.scope, 'setNodes').andReturn(true);
+        this.scope.$digest();
+        expect(this.scope.index_filter.healthy).toEqual(false);
+      });
+
 });
