@@ -70,10 +70,27 @@ function IndexFilter(name, closed, special, healthy, asc, timestamp) {
     }
     if (matches && notEmpty(this.name)) {
       try {
-        matches = new RegExp(this.name.trim(), 'i').test(index.name);
+        var regExp = new RegExp(this.name.trim(), 'i');
+        matches = regExp.test(index.name);
+        if (!matches) {
+          for (var idx = 0; idx < index.aliases.length; idx++) {
+            if ((matches = regExp.test(index.aliases[idx]))) {
+              break;
+            }
+          }
+        }
       }
       catch (err) { // if not valid regexp, still try normal matching
         matches = index.name.indexOf(this.name.toLowerCase()) != -1;
+        if (!matches) {
+          for (var idx = 0; idx < index.aliases.length; idx++) {
+            var alias = index.aliases[idx].toLowerCase();
+            matches = true;
+            if ((matches = (alias.indexOf(this.name.toLowerCase()) != -1))) {
+              break;
+            }
+          }
+        }
       }
     }
     return matches;
