@@ -2080,6 +2080,62 @@ function Alias(alias, index, filter, indexRouting, searchRouting) {
   };
 }
 
+function BrokenCluster(health, state, nodes, settings) {
+
+  this.status = health.status;
+  this.initializing_shards = health.initializing_shards;
+  this.active_primary_shards = health.active_primary_shards;
+  this.active_shards = health.active_shards;
+  this.relocating_shards = health.relocating_shards;
+  this.unassigned_shards = health.unassigned_shards;
+  this.number_of_nodes = health.number_of_nodes;
+  this.number_of_data_nodes = health.number_of_data_nodes;
+  this.timed_out = health.timed_out;
+  this.shards = this.active_shards + this.relocating_shards +
+  this.unassigned_shards + this.initializing_shards;
+  this.fetched_at = getTimeString(new Date());
+
+  this.name = state.cluster_name;
+  this.master_node = state.master_node;
+
+  this.disableAllocation = 'false';
+  var persistentAllocation = getProperty(settings,
+      'persistent.cluster.routing.allocation.enable', 'all');
+
+  var transientAllocation = getProperty(settings,
+      'transient.cluster.routing.allocation.enable', '');
+
+  if (transientAllocation !== '') {
+    this.disableAllocation = transientAllocation == 'all' ? 'false' : 'true';
+  } else {
+    if (persistentAllocation != 'all') {
+      this.disableAllocation = 'true';
+    }
+  }
+
+  this.settings = settings;
+
+  var totalSize = 0;
+
+  this.nodes = Object.keys(state.nodes).map(function(nodeId) {
+    var nodeState = state.nodes[nodeId];
+    var nodeStats = nodes.nodes[nodeId];
+    var node = new Node(nodeId, nodeState, nodeStats);
+    if (nodeId === state.master_node) {
+      node.setCurrentMaster();
+    }
+    return node;
+  });
+
+  this.getNodes = function() {
+    return this.nodes;
+  };
+
+  this.total_size = readablizeBytes(totalSize);
+  this.total_size_in_bytes = totalSize;
+  this.indices = [];
+}
+
 function Cluster(health, state, status, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
 
@@ -3610,10 +3666,10 @@ kopf.factory('DebugService', ['$location', function($location) {
 
 }]);
 
-kopf.factory('ElasticService', ['$http', '$q', '$timeout',
+kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
   'ExternalSettingsService', 'DebugService', 'AlertService',
-  function($http, $q, $timeout, ExternalSettingsService, DebugService,
-           AlertService) {
+  function($http, $q, $timeout, $location, ExternalSettingsService,
+           DebugService, AlertService) {
 
     var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
 
@@ -3626,6 +3682,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
     this.cluster = undefined;
 
     this.autoRefreshStarted = false;
+
+    this.brokenCluster = false;
 
     /**
      * Resets service state
@@ -3711,10 +3769,20 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
             }
           },
           function(data) {
-            AlertService.error(
-                'Error connecting to [' + instance.connection.host + ']',
-                data
-            );
+            if (data.status == 503) {
+              instance.setVersion(data.version.number);
+              instance.connected = true;
+              instance.setBrokenCluster(true);
+              if (!instance.autoRefreshStarted) {
+                instance.autoRefreshStarted = true;
+                instance.autoRefreshCluster();
+              }
+            } else {
+              AlertService.error(
+                  'Error connecting to [' + instance.connection.host + ']',
+                  data
+              );
+            }
           }
       );
     };
@@ -4066,8 +4134,12 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
      */
     this.updateAliases = function(add, remove, success, error) {
       var data = {actions: []};
-      add.forEach(function(a) { data.actions.push({add: a.info()}); });
-      remove.forEach(function(a) { data.actions.push({remove: a.info()}); });
+      add.forEach(function(a) {
+        data.actions.push({add: a.info()});
+      });
+      remove.forEach(function(a) {
+        data.actions.push({remove: a.info()});
+      });
       this.clusterRequest('POST', '/_aliases', data, success, error);
     };
 
@@ -4238,6 +4310,38 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
       );
     };
 
+    this.getBrokenClusterDetail = function(success, error) {
+      var host = this.connection.host;
+      var params = {};
+      this.addAuth(params);
+      DebugService.debug('Requesting cluster information with params:');
+      DebugService.debug(params);
+      $q.all([
+        $http.get(host +
+            '/_cluster/state/master_node,nodes,blocks?local=true',
+            params),
+        $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
+        $http.get(host + '/_cluster/settings?local=true', params),
+        $http.get(host + '/_cluster/health?local=true', params)
+      ]).then(
+          function(responses) {
+            try {
+              var state = responses[0].data;
+              var stats = responses[1].data;
+              var settings = responses[2].data;
+              var health = responses[3].data;
+              success(new BrokenCluster(health, state, stats, settings));
+            } catch (exception) {
+              error(exception);
+            }
+          },
+          function(response) {
+            AlertService.error('Error refreshing cluster state', response);
+            instance.cluster = undefined;
+          }
+      );
+    };
+
     this.getClusterDiagnosis = function(health, state, stats, hotthreads,
                                         success, error) {
       var host = this.connection.host;
@@ -4277,27 +4381,59 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout',
         var threshold = (ExternalSettingsService.getRefreshRate() * 0.75);
         $timeout(function() {
           var start = new Date().getTime();
-          instance.getClusterDetail(
-              function(cluster) {
-                var end = new Date().getTime();
-                var took = end - start;
-                if (took >= threshold) {
-                  AlertService.warn('Loading cluster information is taking ' +
-                  'too long. Try increasing the refresh interval');
+          if (instance.brokenCluster) {
+            instance.getBrokenClusterDetail(
+                function(brokenCluster) {
+                  instance.cluster = brokenCluster;
+                  if (instance.cluster.status !== 'red') {
+                    instance.setBrokenCluster(false);
+                  }
+                },
+                function(response) {
+                  AlertService.error(
+                      'Error refreshing cluster state',
+                      response
+                  );
+                  instance.cluster = undefined;
                 }
-                cluster.computeChanges(instance.cluster);
-                instance.cluster = cluster;
-                instance.alertClusterChanges();
-              },
-              function(response) {
-                AlertService.error('Error refreshing cluster state', response);
-                instance.cluster = null;
-              }
-          );
+            );
+          } else {
+            instance.getClusterDetail(
+                function(cluster) {
+                  var end = new Date().getTime();
+                  var took = end - start;
+                  if (took >= threshold) {
+                    AlertService.warn('Loading cluster information is taking ' +
+                    'too long. Try increasing the refresh interval');
+                  }
+                  cluster.computeChanges(instance.cluster);
+                  instance.cluster = cluster;
+                  instance.alertClusterChanges();
+                },
+                function(response) {
+                  if (response.status === 503) {
+                    instance.setBrokenCluster(true);
+                  } else {
+                    AlertService.error(
+                        'Error refreshing cluster state',
+                        response
+                    );
+                    instance.cluster = undefined;
+                  }
+                }
+            );
+          }
+
         }, 100);
       } else {
         this.cluster = undefined;
       }
+    };
+
+    this.setBrokenCluster = function(broken) {
+      instance.brokenCluster = broken;
+      $location.path('nodes');
+      instance.refresh();
     };
 
     this.autoRefreshCluster = function() {
