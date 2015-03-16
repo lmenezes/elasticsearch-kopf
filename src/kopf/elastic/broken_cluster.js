@@ -16,21 +16,6 @@ function BrokenCluster(health, state, nodes, settings) {
   this.name = state.cluster_name;
   this.master_node = state.master_node;
 
-  this.disableAllocation = 'false';
-  var persistentAllocation = getProperty(settings,
-      'persistent.cluster.routing.allocation.enable', 'all');
-
-  var transientAllocation = getProperty(settings,
-      'transient.cluster.routing.allocation.enable', '');
-
-  if (transientAllocation !== '') {
-    this.disableAllocation = transientAllocation == 'all' ? 'false' : 'true';
-  } else {
-    if (persistentAllocation != 'all') {
-      this.disableAllocation = 'true';
-    }
-  }
-
   this.settings = settings;
 
   var totalSize = 0;
