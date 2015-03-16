@@ -119,13 +119,19 @@
         </div>
       </td>
       <td>
-        <div>
+        <div ng-hide="node.client">
           <span class="node-stat">
             {{node.disk_used_percent | number:1}}
           </span>
           <span class="node-stat-detail">
             <div>free: {{node.disk_free}}</div>
             <div>total: {{node.disk_total}}</div>
+          </span>
+        </div>
+        <div ng-show="node.client">
+          <span class="node-stat-detail">
+            <div>&nbsp;</div>
+            <div><i>no disk info for client nodes</i></div>
           </span>
         </div>
       </td>
