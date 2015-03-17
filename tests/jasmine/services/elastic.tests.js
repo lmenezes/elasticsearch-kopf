@@ -1,7 +1,7 @@
 "use strict";
 
 describe("ElasticService", function() {
-  var elasticService, $http, $httpBackend, $timeout;
+  var elasticService, $http, $httpBackend, $timeout, $location;
 
   beforeEach(module("kopf"));
 
@@ -29,6 +29,7 @@ describe("ElasticService", function() {
     $http = $injector.get('$http');
     $timeout = $injector.get('$timeout');
     $httpBackend = $injector.get('$httpBackend');
+    $location = $injector.get('$location');
   }));
 
   afterEach(function() {
@@ -88,6 +89,31 @@ describe("ElasticService", function() {
         "whaaatt"
     );
     expect(elasticService.setVersion).not.toHaveBeenCalled();
+  });
+
+  it("should handle connection with a cluster with no elected master", function() {
+    expect(elasticService.connection).toEqual(null);
+    spyOn(this.ExternalSettingsService,
+        'getElasticsearchRootPath').andReturn('/testing');
+    spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
+    elasticService.clusterRequest = function(m, p, d, s, fail) {
+      fail({status: 503, version: { number: "1.4.1" }});
+    };
+    spyOn(elasticService, 'clusterRequest').andCallThrough();
+    spyOn(elasticService, 'setVersion').andCallThrough();
+    spyOn(elasticService, 'setBrokenCluster').andCallThrough();
+    spyOn(this.AlertService, 'error').andReturn(true);
+    elasticService.connect('http://localhost:9200');
+    expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
+    expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
+    expect(elasticService.clusterRequest).toHaveBeenCalledWith('GET', '/', {},
+        jasmine.any(Function), jasmine.any(Function));
+    expect(elasticService.connection.host).toEqual('http://localhost:9200/testing');
+    expect(elasticService.connection.withCredentials).toEqual(true);
+    expect(elasticService.setVersion).toHaveBeenCalledWith('1.4.1');
+    expect(elasticService.connected).toEqual(true);
+    expect(elasticService.setBrokenCluster).toHaveBeenCalledWith(true);
+    expect(this.AlertService.error).toHaveBeenCalledWith('No active master node');
   });
 
   it("should throw exception and register no connection if response has unexpected format",
@@ -553,6 +579,25 @@ describe("ElasticService", function() {
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', '/_aliases', body, 'success', 'error');
   });
+
+  it("setBrokenCluster to true", function() {
+    spyOn($location, 'path').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.setBrokenCluster(true);
+    expect(elasticService.brokenCluster).toEqual(true);
+    expect($location.path).toHaveBeenCalledWith('nodes');
+    expect(elasticService.refresh).toHaveBeenCalled();
+  });
+
+  it("setBrokenCluster to false", function() {
+    spyOn($location, 'path').andReturn(true);
+    spyOn(elasticService, 'refresh').andReturn(true);
+    elasticService.setBrokenCluster(false);
+    expect(elasticService.brokenCluster).toEqual(false);
+    expect($location.path).not.toHaveBeenCalledWith('nodes');
+    expect(elasticService.refresh).toHaveBeenCalled();
+  });
+
 
 
 });

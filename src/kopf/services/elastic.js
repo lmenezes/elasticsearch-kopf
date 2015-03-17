@@ -105,6 +105,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               instance.setVersion(data.version.number);
               instance.connected = true;
               instance.setBrokenCluster(true);
+              AlertService.error('No active master node');
               if (!instance.autoRefreshStarted) {
                 instance.autoRefreshStarted = true;
                 instance.autoRefreshCluster();
@@ -744,6 +745,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                 },
                 function(response) {
                   if (response.status === 503) {
+                    AlertService.error('No active master node');
                     instance.setBrokenCluster(true);
                   } else {
                     AlertService.error(
@@ -762,9 +764,16 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       }
     };
 
+    /**
+     * Sets the cluster state as broken and refreshes cluster state.
+     * If cluster is broken, redirect view to nodes view
+     * @param {Boolean} broken - indicates if cluster is broken
+     */
     this.setBrokenCluster = function(broken) {
       instance.brokenCluster = broken;
-      $location.path('nodes');
+      if (broken) {
+        $location.path('nodes');
+      }
       instance.refresh();
     };
 
