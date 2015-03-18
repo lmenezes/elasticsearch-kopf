@@ -40,6 +40,9 @@
     <th class="table-header box">
       <ng-sort-by property="disk_used_percent" text="disk usage %"></ng-sort-by>
     </th>
+    <th class="table-header box">
+      <ng-sort-by property="uptime" text="uptime"></ng-sort-by>
+    </th>
   </thead>
   <tbody>
     <tr ng-repeat="node in nodes | orderBy:sortBy:reverse track by $index">
@@ -132,6 +135,15 @@
           <span class="node-stat-detail">
             <div>&nbsp;</div>
             <div><i>no disk info for client nodes</i></div>
+          </span>
+        </div>
+      </td>
+      <td>
+        <div>
+          <span class="node-stat">
+            {{node.uptime | timeInterval}}
+          </span>
+          <span class="node-stat-detail">
           </span>
         </div>
       </td>
