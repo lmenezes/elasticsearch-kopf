@@ -14,7 +14,7 @@ function Node(nodeId, nodeInfo, nodeStats) {
   this.client = client || !master && !data;
   this.current_master = false;
   this.stats = nodeStats;
-  this.uptime = nodeStats.os.uptime_in_millis;
+  this.uptime = nodeStats.jvm.uptime_in_millis;
 
   this.heap_used = readablizeBytes(getProperty(this.stats,
     'jvm.mem.heap_used_in_bytes'));

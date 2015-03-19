@@ -2717,7 +2717,7 @@ function Node(nodeId, nodeInfo, nodeStats) {
   this.client = client || !master && !data;
   this.current_master = false;
   this.stats = nodeStats;
-  this.uptime = nodeStats.os.uptime_in_millis;
+  this.uptime = nodeStats.jvm.uptime_in_millis;
 
   this.heap_used = readablizeBytes(getProperty(this.stats,
     'jvm.mem.heap_used_in_bytes'));
@@ -2962,12 +2962,12 @@ kopf.filter('timeInterval', function() {
   var UNITS = ['year', 'month', 'day', 'hour', 'minute'];
 
   var UNIT_MEASURE = {
-    year: 31536000,
-    month: 2678400,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60
+    year: 31536000000,
+    month: 2678400000,
+    week: 604800000,
+    day: 86400000,
+    hour: 3600000,
+    minute: 60000
   };
 
   function stringify(seconds) {

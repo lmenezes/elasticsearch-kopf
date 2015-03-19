@@ -3,12 +3,12 @@ kopf.filter('timeInterval', function() {
   var UNITS = ['year', 'month', 'day', 'hour', 'minute'];
 
   var UNIT_MEASURE = {
-    year: 31536000,
-    month: 2678400,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60
+    year: 31536000000,
+    month: 2678400000,
+    week: 604800000,
+    day: 86400000,
+    hour: 3600000,
+    minute: 60000
   };
 
   function stringify(seconds) {
