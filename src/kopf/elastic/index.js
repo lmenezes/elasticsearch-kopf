@@ -65,6 +65,24 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
               }
               var newShard = new Shard(shardRouting, shardStatus);
               indexShards[shardRouting.node].push(newShard);
+              if (newShard.state === 'RELOCATING') {
+                var routingNodes = clusterState.routing_nodes.nodes;
+                var nodeShards = routingNodes[shardRouting.relocating_node];
+                for (var idx in nodeShards) {
+                  if (nodeShards[idx].node == shardRouting.relocating_node &&
+                      nodeShards[idx].index === shardRouting.index &&
+                      nodeShards[idx].shard === shardRouting.shard
+                  ) {
+                    var relocatingShard = new Shard(nodeShards[idx]);
+                    if (!isDefined(indexShards[shardRouting.relocating_node])) {
+                      indexShards[shardRouting.relocating_node] = [];
+                    }
+                    indexShards[shardRouting.relocating_node].push(
+                        relocatingShard
+                    );
+                  }
+                }
+              }
             }
           });
         });
