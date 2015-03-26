@@ -492,6 +492,18 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('GET', path, {}, transformed, error);
     };
 
+    this.getShardStats = function(shard, indexName, nodeId, success, error) {
+      var transformed = function(response) {
+        var shards = response.indices[indexName].shards;
+        var stats = shards[shard].filter(function(shardStats) {
+          return shardStats.routing.node === nodeId;
+        })[0];
+        success(new ShardStats(shard, indexName, stats));
+      };
+      var path = '/' + indexName + '/_stats?level=shards&human=true';
+      this.clusterRequest('GET', path, {}, transformed, error);
+    };
+
     this.fetchAliases = function(success, error) {
       var createAliases = function(response) {
         var indices = Object.keys(response);

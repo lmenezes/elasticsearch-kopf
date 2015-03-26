@@ -469,4 +469,35 @@ describe('ClusterOverviewController', function() {
         expect(this.scope.index_filter.healthy).toEqual(false);
       });
 
+  it('show shard stats', function() {
+    var stats = {"stats": "value"};
+    this.ElasticService.getShardStats = function(shard, index, node, success, failed) {
+      return success(new ShardStats(shard, index, stats));
+    };
+    this.scope.displayInfo = function(header, body) {
+    };
+    spyOn(this.ElasticService, "getShardStats").andCallThrough();
+    spyOn(this.scope, "displayInfo").andReturn();
+    this.scope.showShardStats("0", "index_name", "node_id");
+    expect(this.ElasticService.getShardStats).toHaveBeenCalledWith("0",
+        "index_name", "node_id", jasmine.any(Function), jasmine.any(Function));
+    expect(this.scope.displayInfo).toHaveBeenCalledWith("stats for shard 0",
+        stats);
+  });
+
+  it('show node stats if request fails', function() {
+    this.ElasticService.getShardStats = function(shard, index, node, success, failed) {
+      return failed("buuuu");
+    };
+    this.scope.displayInfo = function(header, body) {
+    };
+    spyOn(this.ElasticService, "getShardStats").andCallThrough();
+    spyOn(this.AlertService, "error").andReturn();
+    this.scope.showShardStats("0", "index_name", "node_id");
+    expect(this.ElasticService.getShardStats).toHaveBeenCalledWith("0",
+        "index_name", "node_id", jasmine.any(Function), jasmine.any(Function));
+    expect(this.AlertService.error).toHaveBeenCalledWith("Error while loading shard stats",
+        "buuuu");
+  });
+
 });

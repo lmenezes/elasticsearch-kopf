@@ -842,6 +842,17 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
+    $scope.showShardStats = function(shard, index, nodeId) {
+      ElasticService.getShardStats(shard, index, nodeId,
+          function(stats) {
+            $scope.displayInfo('stats for shard ' + shard, stats.stats);
+          },
+          function(error) {
+            AlertService.error('Error while loading shard stats', error);
+          }
+      );
+    };
+
   }
 ]);
 
@@ -2183,11 +2194,9 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   var specialIndices = 0;
   var closedIndices = 0;
   this.indices = Object.keys(iRoutingTable).map(function(indexName) {
-    var indexInfo = iRoutingTable[indexName];
     var indexStatus = iStatus[indexName];
     var indexAliases = aliases[indexName];
-    var index = new Index(indexName, state, indexInfo, indexStatus,
-        indexAliases);
+    var index = new Index(indexName, state, indexStatus, indexAliases);
     if (index.special) {
       specialIndices++;
     }
@@ -2289,13 +2298,41 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   };
 
   this.open_indices = function() {
-    return $.map(this.indices, function(index) {
-      if (index.state == 'open') {
-        return index;
-      } else {
-        return null;
-      }
+    return this.indices.filter(function(index) {
+      return index.state === 'open';
     });
+  };
+
+  var shards = {};
+
+  for (var node in state.routing_nodes.nodes) {
+    for (var idx in state.routing_nodes.nodes[node]) {
+      var shard = new Shard(state.routing_nodes.nodes[node][idx]);
+      var key = shard.node + '_' + shard.index;
+      if (!isDefined(shards[key])) {
+        shards[key] = [];
+      }
+      shards[key].push(shard);
+    }
+  }
+
+  var unassignedShards = {};
+
+  state.routing_nodes.unassigned.forEach(function(shard) {
+    if (!isDefined(unassignedShards[shard.index])) {
+      unassignedShards[shard.index] = [];
+    }
+    unassignedShards[shard.index].push(new Shard(shard));
+  });
+
+  this.getShards = function(nodeId, indexName) {
+    var allocated = shards[nodeId + '_' + indexName];
+    return isDefined(allocated) ? allocated : [];
+  };
+
+  this.getUnassignedShards = function(indexName) {
+    var unassigned = unassignedShards[indexName];
+    return isDefined(unassigned) ? unassigned : [];
   };
 
 }
@@ -2524,7 +2561,7 @@ function ESConnection(url, withCredentials) {
 
 }
 
-function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
+function Index(indexName, clusterState, indexStatus, aliases) {
   this.name = indexName;
   this.shards = null;
   this.metadata = {};
@@ -2563,62 +2600,6 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
 
   this.unassigned = [];
   this.unhealthy = false;
-
-  this.getShards = function(nodeId) {
-    if (isDefined(indexInfo)) {
-      if (this.shards === null) {
-        var indexShards = {};
-        var unassigned = [];
-        this.unassigned = unassigned;
-        $.map(indexInfo.shards, function(shards, shardNum) {
-          $.map(shards, function(shardRouting, shardCopy) {
-            if (shardRouting.node === null) {
-              unassigned.push(new UnassignedShard(shardRouting));
-            } else {
-              if (!isDefined(indexShards[shardRouting.node])) {
-                indexShards[shardRouting.node] = [];
-              }
-              var shardStatus = null;
-              if (isDefined(indexStatus) &&
-                  isDefined(indexStatus.shards[shardRouting.shard])) {
-                indexStatus.shards[shardRouting.shard].forEach(
-                    function(status) {
-                      if (status.routing.node == shardRouting.node &&
-                          status.routing.shard == shardRouting.shard) {
-                        shardStatus = status;
-                      }
-                    });
-              }
-              var newShard = new Shard(shardRouting, shardStatus);
-              indexShards[shardRouting.node].push(newShard);
-              if (newShard.state === 'RELOCATING') {
-                var routingNodes = clusterState.routing_nodes.nodes;
-                var nodeShards = routingNodes[shardRouting.relocating_node];
-                for (var idx in nodeShards) {
-                  if (nodeShards[idx].node == shardRouting.relocating_node &&
-                      nodeShards[idx].index === shardRouting.index &&
-                      nodeShards[idx].shard === shardRouting.shard
-                  ) {
-                    var relocatingShard = new Shard(nodeShards[idx]);
-                    if (!isDefined(indexShards[shardRouting.relocating_node])) {
-                      indexShards[shardRouting.relocating_node] = [];
-                    }
-                    indexShards[shardRouting.relocating_node].push(
-                        relocatingShard
-                    );
-                  }
-                }
-              }
-            }
-          });
-        });
-        this.shards = indexShards;
-      }
-    } else {
-      this.shards = {};
-    }
-    return this.shards[nodeId];
-  };
 
   if (isDefined(clusterState) && isDefined(clusterState.routing_table)) {
     var instance = this;
@@ -2928,8 +2909,7 @@ function Repository(name, info) {
   };
 }
 
-function Shard(routing, info) {
-  this.info = isDefined(info) ? info : routing;
+function Shard(routing) {
   this.primary = routing.primary;
   this.shard = routing.shard;
   this.state = routing.state;
@@ -2938,13 +2918,10 @@ function Shard(routing, info) {
   this.id = this.node + '_' + this.shard + '_' + this.index;
 }
 
-function UnassignedShard(info) {
-  this.primary = info.primary;
-  this.shard = info.shard;
-  this.state = info.state;
-  this.node = info.node;
-  this.index = info.index;
-  this.id = this.node + '_' + this.shard + '_' + this.index;
+function ShardStats(shard, index, stats) {
+  this.shard = shard;
+  this.index = index;
+  this.stats = stats;
 }
 
 function Snapshot(info) {
@@ -4195,6 +4172,18 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(new NodeStats(name, response.nodes[nodeId]));
       };
       var path = '/_nodes/' + nodeId + '/stats?human';
+      this.clusterRequest('GET', path, {}, transformed, error);
+    };
+
+    this.getShardStats = function(shard, indexName, nodeId, success, error) {
+      var transformed = function(response) {
+        var shards = response.indices[indexName].shards;
+        var stats = shards[shard].filter(function(shardStats) {
+          return shardStats.routing.node === nodeId;
+        })[0];
+        success(new ShardStats(shard, indexName, stats));
+      };
+      var path = '/' + indexName + '/_stats?level=shards&human=true';
       this.clusterRequest('GET', path, {}, transformed, error);
     };
 

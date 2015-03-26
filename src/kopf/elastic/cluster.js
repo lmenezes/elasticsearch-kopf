@@ -60,11 +60,9 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   var specialIndices = 0;
   var closedIndices = 0;
   this.indices = Object.keys(iRoutingTable).map(function(indexName) {
-    var indexInfo = iRoutingTable[indexName];
     var indexStatus = iStatus[indexName];
     var indexAliases = aliases[indexName];
-    var index = new Index(indexName, state, indexInfo, indexStatus,
-        indexAliases);
+    var index = new Index(indexName, state, indexStatus, indexAliases);
     if (index.special) {
       specialIndices++;
     }
@@ -166,13 +164,41 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   };
 
   this.open_indices = function() {
-    return $.map(this.indices, function(index) {
-      if (index.state == 'open') {
-        return index;
-      } else {
-        return null;
-      }
+    return this.indices.filter(function(index) {
+      return index.state === 'open';
     });
+  };
+
+  var shards = {};
+
+  for (var node in state.routing_nodes.nodes) {
+    for (var idx in state.routing_nodes.nodes[node]) {
+      var shard = new Shard(state.routing_nodes.nodes[node][idx]);
+      var key = shard.node + '_' + shard.index;
+      if (!isDefined(shards[key])) {
+        shards[key] = [];
+      }
+      shards[key].push(shard);
+    }
+  }
+
+  var unassignedShards = {};
+
+  state.routing_nodes.unassigned.forEach(function(shard) {
+    if (!isDefined(unassignedShards[shard.index])) {
+      unassignedShards[shard.index] = [];
+    }
+    unassignedShards[shard.index].push(new Shard(shard));
+  });
+
+  this.getShards = function(nodeId, indexName) {
+    var allocated = shards[nodeId + '_' + indexName];
+    return isDefined(allocated) ? allocated : [];
+  };
+
+  this.getUnassignedShards = function(indexName) {
+    var unassigned = unassignedShards[indexName];
+    return isDefined(unassigned) ? unassigned : [];
   };
 
 }

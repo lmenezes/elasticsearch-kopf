@@ -53,8 +53,8 @@ test("cluster creating", function() {
       return node.id;
     });
     node_ids.forEach(function(node_id) {
-      if (index.getShards(node_id) != null) {
-        index.getShards(node_id).forEach(function(shard) {
+      if (cluster.getShards(node_id, index.id) != null) {
+        cluster.getShards(node_id, index.id).forEach(function(shard) {
           ok(shard.primary == true || shard.primary == false,
               "Checking primary status: [" + shard.primary + "]");
           equal(shard.node, node_id,

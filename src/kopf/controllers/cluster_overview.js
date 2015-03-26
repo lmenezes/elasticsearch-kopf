@@ -263,5 +263,16 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
+    $scope.showShardStats = function(shard, index, nodeId) {
+      ElasticService.getShardStats(shard, index, nodeId,
+          function(stats) {
+            $scope.displayInfo('stats for shard ' + shard, stats.stats);
+          },
+          function(error) {
+            AlertService.error('Error while loading shard stats', error);
+          }
+      );
+    };
+
   }
 ]);

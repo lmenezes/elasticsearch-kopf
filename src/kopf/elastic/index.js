@@ -1,4 +1,4 @@
-function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
+function Index(indexName, clusterState, indexStatus, aliases) {
   this.name = indexName;
   this.shards = null;
   this.metadata = {};
@@ -37,62 +37,6 @@ function Index(indexName, clusterState, indexInfo, indexStatus, aliases) {
 
   this.unassigned = [];
   this.unhealthy = false;
-
-  this.getShards = function(nodeId) {
-    if (isDefined(indexInfo)) {
-      if (this.shards === null) {
-        var indexShards = {};
-        var unassigned = [];
-        this.unassigned = unassigned;
-        $.map(indexInfo.shards, function(shards, shardNum) {
-          $.map(shards, function(shardRouting, shardCopy) {
-            if (shardRouting.node === null) {
-              unassigned.push(new UnassignedShard(shardRouting));
-            } else {
-              if (!isDefined(indexShards[shardRouting.node])) {
-                indexShards[shardRouting.node] = [];
-              }
-              var shardStatus = null;
-              if (isDefined(indexStatus) &&
-                  isDefined(indexStatus.shards[shardRouting.shard])) {
-                indexStatus.shards[shardRouting.shard].forEach(
-                    function(status) {
-                      if (status.routing.node == shardRouting.node &&
-                          status.routing.shard == shardRouting.shard) {
-                        shardStatus = status;
-                      }
-                    });
-              }
-              var newShard = new Shard(shardRouting, shardStatus);
-              indexShards[shardRouting.node].push(newShard);
-              if (newShard.state === 'RELOCATING') {
-                var routingNodes = clusterState.routing_nodes.nodes;
-                var nodeShards = routingNodes[shardRouting.relocating_node];
-                for (var idx in nodeShards) {
-                  if (nodeShards[idx].node == shardRouting.relocating_node &&
-                      nodeShards[idx].index === shardRouting.index &&
-                      nodeShards[idx].shard === shardRouting.shard
-                  ) {
-                    var relocatingShard = new Shard(nodeShards[idx]);
-                    if (!isDefined(indexShards[shardRouting.relocating_node])) {
-                      indexShards[shardRouting.relocating_node] = [];
-                    }
-                    indexShards[shardRouting.relocating_node].push(
-                        relocatingShard
-                    );
-                  }
-                }
-              }
-            }
-          });
-        });
-        this.shards = indexShards;
-      }
-    } else {
-      this.shards = {};
-    }
-    return this.shards[nodeId];
-  };
 
   if (isDefined(clusterState) && isDefined(clusterState.routing_table)) {
     var instance = this;

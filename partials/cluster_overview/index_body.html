@@ -1,5 +1,5 @@
-<div>
-    <span id="{{shard.id}}" class="normal-action" ng-click="displayInfo('shard info',shard.info)" ng-repeat="shard in index.getShards(node.id) track by $index">
+<div ng-show="index != null">
+    <span id="{{shard.id}}" class="normal-action" ng-click="showShardStats(shard.shard, shard.index, shard.node)" ng-repeat="shard in cluster.getShards(node.id, index.name) track by $index">
         <span class="shard {{shard.primary ? 'shard-primary' : ''}}" ng-class="{STARTED:'shard-started', INITIALIZING:'shard-initializing', 'RELOCATED':'shard-relocated', 'RECOVERING':'shard-recovering','CLOSED':'shard-closed'}[shard.state]">{{shard.shard}}</span>
     </span>
 </div>
