@@ -2135,6 +2135,7 @@ function BrokenCluster(health, state, nodes, settings) {
 function Cluster(health, state, status, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
 
+  // Cluster Health(/_cluster/health)
   this.status = health.status;
   this.initializing_shards = health.initializing_shards;
   this.active_primary_shards = health.active_primary_shards;
@@ -2144,8 +2145,9 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   this.number_of_nodes = health.number_of_nodes;
   this.number_of_data_nodes = health.number_of_data_nodes;
   this.timed_out = health.timed_out;
-  this.shards = this.active_shards + this.relocating_shards +
-  this.unassigned_shards + this.initializing_shards;
+  this.shards = (this.active_shards + this.relocating_shards +
+  this.unassigned_shards + this.initializing_shards);
+
   this.fetched_at = getTimeString(new Date());
 
   this.name = state.cluster_name;
@@ -2219,11 +2221,6 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   this.closedIndices = closedIndices;
   this.num_docs = numDocs;
   this.total_indices = this.indices.length;
-
-  this.shards = status._shards.total;
-  this.failed_shards = status._shards.failed;
-  this.successful_shards = status._shards.successful;
-  this.unassigned_shards = state.routing_nodes.unassigned.length;
 
   this.total_size = readablizeBytes(totalSize);
   this.total_size_in_bytes = totalSize;
