@@ -2132,7 +2132,7 @@ function BrokenCluster(health, state, nodes, settings) {
   this.indices = [];
 }
 
-function Cluster(health, state, status, nodes, settings, aliases) {
+function Cluster(health, state, stats, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
 
   // Cluster Health(/_cluster/health)
@@ -2192,13 +2192,12 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   this.number_of_nodes = this.nodes.length;
 
   var iRoutingTable = state.routing_table.indices;
-  var iStatus = status.indices;
   var specialIndices = 0;
   var closedIndices = 0;
   this.indices = Object.keys(iRoutingTable).map(function(indexName) {
-    var indexStatus = iStatus[indexName];
+    var indexStats = stats.indices[indexName];
     var indexAliases = aliases[indexName];
-    var index = new Index(indexName, state, indexStatus, indexAliases);
+    var index = new Index(indexName, state, indexStats, indexAliases);
     if (index.special) {
       specialIndices++;
     }
@@ -2558,7 +2557,7 @@ function ESConnection(url, withCredentials) {
 
 }
 
-function Index(indexName, clusterState, indexStatus, aliases) {
+function Index(indexName, clusterState, indexStats, aliases) {
   this.name = indexName;
   this.shards = null;
   this.metadata = {};
@@ -2587,11 +2586,10 @@ function Index(indexName, clusterState, indexStatus, aliases) {
       this.num_of_replicas = shardMap[0].length - 1;
     }
   }
-  this.num_docs = getProperty(indexStatus, 'docs.num_docs', 0);
-  this.max_doc = getProperty(indexStatus, 'docs.max_doc', 0);
-  this.deleted_docs = getProperty(indexStatus, 'docs.deleted_docs', 0);
-  this.size = getProperty(indexStatus, 'index.primary_size_in_bytes', 0);
-  this.total_size = getProperty(indexStatus, 'index.size_in_bytes', 0);
+  this.num_docs = getProperty(indexStats, 'primaries.docs.count', 0);
+  this.deleted_docs = getProperty(indexStats, 'primaries.docs.deleted', 0);
+  this.size = getProperty(indexStats, 'primaries.store.size_in_bytes', 0);
+  this.total_size = getProperty(indexStats, 'total.store.size_in_bytes', 0);
   this.size_in_bytes = readablizeBytes(this.size);
   this.total_size_in_bytes = readablizeBytes(this.total_size);
 
@@ -4308,7 +4306,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       $q.all([
         $http.get(host +
         '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
-        $http.get(host + '/_status', params),
+        $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
         $http.get(host + '/_aliases', params),
@@ -4317,13 +4315,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           function(responses) {
             try {
               var state = responses[0].data;
-              var status = responses[1].data;
-              var stats = responses[2].data;
+              var indexStats = responses[1].data;
+              var nodesStats = responses[2].data;
               var settings = responses[3].data;
               var aliases = responses[4].data;
               var health = responses[5].data;
               success(
-                  new Cluster(health, state, status, stats, settings, aliases)
+                  new Cluster(health, state, indexStats, nodesStats, settings,
+                      aliases)
               );
             } catch (exception) {
               error(exception);
@@ -4352,10 +4351,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           function(responses) {
             try {
               var state = responses[0].data;
-              var stats = responses[1].data;
+              var nodesStats = responses[1].data;
               var settings = responses[2].data;
               var health = responses[3].data;
-              success(new BrokenCluster(health, state, stats, settings));
+              success(new BrokenCluster(health, state, nodesStats, settings));
             } catch (exception) {
               error(exception);
             }

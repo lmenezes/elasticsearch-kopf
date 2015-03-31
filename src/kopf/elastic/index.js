@@ -1,4 +1,4 @@
-function Index(indexName, clusterState, indexStatus, aliases) {
+function Index(indexName, clusterState, indexStats, aliases) {
   this.name = indexName;
   this.shards = null;
   this.metadata = {};
@@ -27,11 +27,10 @@ function Index(indexName, clusterState, indexStatus, aliases) {
       this.num_of_replicas = shardMap[0].length - 1;
     }
   }
-  this.num_docs = getProperty(indexStatus, 'docs.num_docs', 0);
-  this.max_doc = getProperty(indexStatus, 'docs.max_doc', 0);
-  this.deleted_docs = getProperty(indexStatus, 'docs.deleted_docs', 0);
-  this.size = getProperty(indexStatus, 'index.primary_size_in_bytes', 0);
-  this.total_size = getProperty(indexStatus, 'index.size_in_bytes', 0);
+  this.num_docs = getProperty(indexStats, 'primaries.docs.count', 0);
+  this.deleted_docs = getProperty(indexStats, 'primaries.docs.deleted', 0);
+  this.size = getProperty(indexStats, 'primaries.store.size_in_bytes', 0);
+  this.total_size = getProperty(indexStats, 'total.store.size_in_bytes', 0);
   this.size_in_bytes = readablizeBytes(this.size);
   this.total_size_in_bytes = readablizeBytes(this.total_size);
 

@@ -1,4 +1,4 @@
-function Cluster(health, state, status, nodes, settings, aliases) {
+function Cluster(health, state, stats, nodes, settings, aliases) {
   this.created_at = new Date().getTime();
 
   // Cluster Health(/_cluster/health)
@@ -58,13 +58,12 @@ function Cluster(health, state, status, nodes, settings, aliases) {
   this.number_of_nodes = this.nodes.length;
 
   var iRoutingTable = state.routing_table.indices;
-  var iStatus = status.indices;
   var specialIndices = 0;
   var closedIndices = 0;
   this.indices = Object.keys(iRoutingTable).map(function(indexName) {
-    var indexStatus = iStatus[indexName];
+    var indexStats = stats.indices[indexName];
     var indexAliases = aliases[indexName];
-    var index = new Index(indexName, state, indexStatus, indexAliases);
+    var index = new Index(indexName, state, indexStats, indexAliases);
     if (index.special) {
       specialIndices++;
     }

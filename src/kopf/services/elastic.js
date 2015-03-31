@@ -628,7 +628,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       $q.all([
         $http.get(host +
         '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
-        $http.get(host + '/_status', params),
+        $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
         $http.get(host + '/_aliases', params),
@@ -637,13 +637,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           function(responses) {
             try {
               var state = responses[0].data;
-              var status = responses[1].data;
-              var stats = responses[2].data;
+              var indexStats = responses[1].data;
+              var nodesStats = responses[2].data;
               var settings = responses[3].data;
               var aliases = responses[4].data;
               var health = responses[5].data;
               success(
-                  new Cluster(health, state, status, stats, settings, aliases)
+                  new Cluster(health, state, indexStats, nodesStats, settings,
+                      aliases)
               );
             } catch (exception) {
               error(exception);
@@ -672,10 +673,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           function(responses) {
             try {
               var state = responses[0].data;
-              var stats = responses[1].data;
+              var nodesStats = responses[1].data;
               var settings = responses[2].data;
               var health = responses[3].data;
-              success(new BrokenCluster(health, state, stats, settings));
+              success(new BrokenCluster(health, state, nodesStats, settings));
             } catch (exception) {
               error(exception);
             }
