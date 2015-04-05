@@ -1,4 +1,4 @@
-function Node(nodeId, nodeAttr, nodeStats, nodeInfo) {
+function Node(nodeId, nodeStats, nodeInfo) {
   this.id = nodeId;
   this.name = nodeInfo.name;
   this.metadata = {};
@@ -6,13 +6,16 @@ function Node(nodeId, nodeAttr, nodeStats, nodeInfo) {
   this.metadata.stats = nodeStats;
   this.transportAddress = parseAddress(nodeInfo.transport_address);
   this.host = nodeStats.host;
-  var master = nodeAttr.attributes.master === 'false' ? false : true;
-  var data = nodeAttr.attributes.data === 'false' ? false : true;
-  var client = nodeAttr.attributes.client === 'true' ? true : false;
+
+  var attributes = getProperty(nodeInfo, 'attributes', {});
+  var master = attributes.master === 'false' ? false : true;
+  var data = attributes.data === 'false' ? false : true;
+  var client = attributes.client === 'true' ? true : false;
   this.master = master && !client;
   this.data = data && !client;
   this.client = client || !master && !data;
   this.current_master = false;
+
   this.stats = nodeStats;
   this.uptime = nodeStats.jvm.uptime_in_millis;
 

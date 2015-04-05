@@ -2114,10 +2114,9 @@ function BrokenCluster(health, state, nodesStats, settings, nodes) {
   var totalSize = 0;
 
   this.nodes = Object.keys(state.nodes).map(function(nodeId) {
-    var nodeState = state.nodes[nodeId];
     var nodeStats = nodesStats.nodes[nodeId];
     var nodeInfo = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
+    var node = new Node(nodeId, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }
@@ -2177,10 +2176,9 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   var numDocs = 0;
 
   this.nodes = Object.keys(nodes.nodes).map(function(nodeId) {
-    var nodeState = state.nodes[nodeId];
     var nodeStats = nodesStats.nodes[nodeId];
     var nodeInfo = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
+    var node = new Node(nodeId, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }
@@ -2697,7 +2695,7 @@ function IndexMetadata(index, metadata) {
   };
 }
 
-function Node(nodeId, nodeAttr, nodeStats, nodeInfo) {
+function Node(nodeId, nodeStats, nodeInfo) {
   this.id = nodeId;
   this.name = nodeInfo.name;
   this.metadata = {};
@@ -2705,13 +2703,16 @@ function Node(nodeId, nodeAttr, nodeStats, nodeInfo) {
   this.metadata.stats = nodeStats;
   this.transportAddress = parseAddress(nodeInfo.transport_address);
   this.host = nodeStats.host;
-  var master = nodeAttr.attributes.master === 'false' ? false : true;
-  var data = nodeAttr.attributes.data === 'false' ? false : true;
-  var client = nodeAttr.attributes.client === 'true' ? true : false;
+
+  var attributes = getProperty(nodeInfo, 'attributes', {});
+  var master = attributes.master === 'false' ? false : true;
+  var data = attributes.data === 'false' ? false : true;
+  var client = attributes.client === 'true' ? true : false;
   this.master = master && !client;
   this.data = data && !client;
   this.client = client || !master && !data;
   this.current_master = false;
+
   this.stats = nodeStats;
   this.uptime = nodeStats.jvm.uptime_in_millis;
 
@@ -4307,7 +4308,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       DebugService.debug(params);
       $q.all([
         $http.get(host +
-        '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
+        '/_cluster/state/master_node,routing_table,blocks/', params),
         $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
@@ -4346,7 +4347,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       DebugService.debug(params);
       $q.all([
         $http.get(host +
-            '/_cluster/state/master_node,nodes,blocks?local=true',
+            '/_cluster/state/master_node,blocks?local=true',
             params),
         $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
         $http.get(host + '/_cluster/settings?local=true', params),

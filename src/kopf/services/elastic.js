@@ -627,7 +627,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       DebugService.debug(params);
       $q.all([
         $http.get(host +
-        '/_cluster/state/master_node,nodes,routing_table,blocks/', params),
+        '/_cluster/state/master_node,routing_table,blocks/', params),
         $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
@@ -666,7 +666,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       DebugService.debug(params);
       $q.all([
         $http.get(host +
-            '/_cluster/state/master_node,nodes,blocks?local=true',
+            '/_cluster/state/master_node,blocks?local=true',
             params),
         $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
         $http.get(host + '/_cluster/settings?local=true', params),

@@ -42,10 +42,9 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   var numDocs = 0;
 
   this.nodes = Object.keys(nodes.nodes).map(function(nodeId) {
-    var nodeState = state.nodes[nodeId];
     var nodeStats = nodesStats.nodes[nodeId];
     var nodeInfo = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
+    var node = new Node(nodeId, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }
