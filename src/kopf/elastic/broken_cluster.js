@@ -1,4 +1,4 @@
-function BrokenCluster(health, state, nodes, settings) {
+function BrokenCluster(health, state, nodesStats, settings, nodes) {
 
   this.status = health.status;
   this.initializing_shards = health.initializing_shards;
@@ -22,8 +22,9 @@ function BrokenCluster(health, state, nodes, settings) {
 
   this.nodes = Object.keys(state.nodes).map(function(nodeId) {
     var nodeState = state.nodes[nodeId];
-    var nodeStats = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats);
+    var nodeStats = nodesStats.nodes[nodeId];
+    var nodeInfo = nodes.nodes[nodeId];
+    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }

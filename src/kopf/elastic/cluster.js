@@ -1,4 +1,4 @@
-function Cluster(health, state, stats, nodes, settings, aliases) {
+function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   this.created_at = new Date().getTime();
 
   // Cluster Health(/_cluster/health)
@@ -41,10 +41,11 @@ function Cluster(health, state, stats, nodes, settings, aliases) {
   var totalSize = 0;
   var numDocs = 0;
 
-  this.nodes = Object.keys(state.nodes).map(function(nodeId) {
+  this.nodes = Object.keys(nodes.nodes).map(function(nodeId) {
     var nodeState = state.nodes[nodeId];
-    var nodeStats = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats);
+    var nodeStats = nodesStats.nodes[nodeId];
+    var nodeInfo = nodes.nodes[nodeId];
+    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }

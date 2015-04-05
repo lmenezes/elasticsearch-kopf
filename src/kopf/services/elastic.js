@@ -632,7 +632,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
         $http.get(host + '/_aliases', params),
-        $http.get(host + '/_cluster/health', params)
+        $http.get(host + '/_cluster/health', params),
+        $http.get(host + '/_nodes/_all/os,jvm', params),
       ]).then(
           function(responses) {
             try {
@@ -642,9 +643,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var settings = responses[3].data;
               var aliases = responses[4].data;
               var health = responses[5].data;
+              var nodes = responses[6].data;
               success(
                   new Cluster(health, state, indexStats, nodesStats, settings,
-                      aliases)
+                      aliases, nodes)
               );
             } catch (exception) {
               error(exception);
@@ -668,7 +670,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
             params),
         $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
         $http.get(host + '/_cluster/settings?local=true', params),
-        $http.get(host + '/_cluster/health?local=true', params)
+        $http.get(host + '/_cluster/health?local=true', params),
+        $http.get(host + '/_nodes/_all/os,jvm?local=true', params)
       ]).then(
           function(responses) {
             try {
@@ -676,7 +679,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var nodesStats = responses[1].data;
               var settings = responses[2].data;
               var health = responses[3].data;
-              success(new BrokenCluster(health, state, nodesStats, settings));
+              var nodes = responses[4].data;
+              success(
+                  new BrokenCluster(health, state, nodesStats, settings, nodes)
+              );
             } catch (exception) {
               error(exception);
             }

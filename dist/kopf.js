@@ -2091,7 +2091,7 @@ function Alias(alias, index, filter, indexRouting, searchRouting) {
   };
 }
 
-function BrokenCluster(health, state, nodes, settings) {
+function BrokenCluster(health, state, nodesStats, settings, nodes) {
 
   this.status = health.status;
   this.initializing_shards = health.initializing_shards;
@@ -2115,8 +2115,9 @@ function BrokenCluster(health, state, nodes, settings) {
 
   this.nodes = Object.keys(state.nodes).map(function(nodeId) {
     var nodeState = state.nodes[nodeId];
-    var nodeStats = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats);
+    var nodeStats = nodesStats.nodes[nodeId];
+    var nodeInfo = nodes.nodes[nodeId];
+    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }
@@ -2132,7 +2133,7 @@ function BrokenCluster(health, state, nodes, settings) {
   this.indices = [];
 }
 
-function Cluster(health, state, stats, nodes, settings, aliases) {
+function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   this.created_at = new Date().getTime();
 
   // Cluster Health(/_cluster/health)
@@ -2175,10 +2176,11 @@ function Cluster(health, state, stats, nodes, settings, aliases) {
   var totalSize = 0;
   var numDocs = 0;
 
-  this.nodes = Object.keys(state.nodes).map(function(nodeId) {
+  this.nodes = Object.keys(nodes.nodes).map(function(nodeId) {
     var nodeState = state.nodes[nodeId];
-    var nodeStats = nodes.nodes[nodeId];
-    var node = new Node(nodeId, nodeState, nodeStats);
+    var nodeStats = nodesStats.nodes[nodeId];
+    var nodeInfo = nodes.nodes[nodeId];
+    var node = new Node(nodeId, nodeState, nodeStats, nodeInfo);
     if (nodeId === state.master_node) {
       node.setCurrentMaster();
     }
@@ -2695,7 +2697,7 @@ function IndexMetadata(index, metadata) {
   };
 }
 
-function Node(nodeId, nodeInfo, nodeStats) {
+function Node(nodeId, nodeAttr, nodeStats, nodeInfo) {
   this.id = nodeId;
   this.name = nodeInfo.name;
   this.metadata = {};
@@ -2703,9 +2705,9 @@ function Node(nodeId, nodeInfo, nodeStats) {
   this.metadata.stats = nodeStats;
   this.transportAddress = parseAddress(nodeInfo.transport_address);
   this.host = nodeStats.host;
-  var master = nodeInfo.attributes.master === 'false' ? false : true;
-  var data = nodeInfo.attributes.data === 'false' ? false : true;
-  var client = nodeInfo.attributes.client === 'true' ? true : false;
+  var master = nodeAttr.attributes.master === 'false' ? false : true;
+  var data = nodeAttr.attributes.data === 'false' ? false : true;
+  var client = nodeAttr.attributes.client === 'true' ? true : false;
   this.master = master && !client;
   this.data = data && !client;
   this.client = client || !master && !data;
@@ -4310,7 +4312,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
         $http.get(host + '/_aliases', params),
-        $http.get(host + '/_cluster/health', params)
+        $http.get(host + '/_cluster/health', params),
+        $http.get(host + '/_nodes/_all/os,jvm', params),
       ]).then(
           function(responses) {
             try {
@@ -4320,9 +4323,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var settings = responses[3].data;
               var aliases = responses[4].data;
               var health = responses[5].data;
+              var nodes = responses[6].data;
               success(
                   new Cluster(health, state, indexStats, nodesStats, settings,
-                      aliases)
+                      aliases, nodes)
               );
             } catch (exception) {
               error(exception);
@@ -4346,7 +4350,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
             params),
         $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
         $http.get(host + '/_cluster/settings?local=true', params),
-        $http.get(host + '/_cluster/health?local=true', params)
+        $http.get(host + '/_cluster/health?local=true', params),
+        $http.get(host + '/_nodes/_all/os,jvm?local=true', params)
       ]).then(
           function(responses) {
             try {
@@ -4354,7 +4359,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var nodesStats = responses[1].data;
               var settings = responses[2].data;
               var health = responses[3].data;
-              success(new BrokenCluster(health, state, nodesStats, settings));
+              var nodes = responses[4].data;
+              success(
+                  new BrokenCluster(health, state, nodesStats, settings, nodes)
+              );
             } catch (exception) {
               error(exception);
             }

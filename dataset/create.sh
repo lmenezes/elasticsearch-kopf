@@ -46,3 +46,6 @@ echo -ne "');\n"
 echo -n "var health = JSON.parse('";
 curl -XGET http://localhost:9200/_cluster/health
 echo -ne "');\n"
+echo -n "var nodes = JSON.parse('";
+curl -XGET http://localhost:9200/_nodes/_all/jvm,os
+echo -ne "');\n"
