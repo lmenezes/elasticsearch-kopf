@@ -5,12 +5,6 @@
         <i ng-show="node.current_master" class="fa fa-fw fa-star" title="current master"></i>
         <i ng-show="!node.current_master" class="fa fa-fw fa-star-o" title="master eligible"></i>
       </div>
-      <div ng-show="node.data">
-        <i class="fa fa-fw fa-hdd-o" title="data node"></i>
-      </div>
-      <div ng-show="node.client">
-        <i class="fa fa-fw fa-search" title="client node"></i>
-      </div>
     </div>
     <div>
       <div class="dropdown">
@@ -31,13 +25,11 @@
           </li>
         </ul>
       </div>
-      <div>
-        <span class="cluster-map-node-detail">{{node.transportAddress}}</span>
-      </div>
     </div>
   </div>
   <div class="col-xs-12 cluster-map-header-index-name">
     <div class="col-xs-4 node-progress-bar">
+      <span class="cluster-map-node-detail">heap</span>
       <div class="progress node-progress" title="Heap usage: {{node.heap_used}} out of {{node.heap_max}}">
         <div ng-show="{{node.heap_used_percent}} <= 75" class="progress-bar" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.heap_used_percent}}%;">
         </div>
@@ -46,6 +38,7 @@
       </div>
     </div>
     <div class="col-xs-4 node-progress-bar">
+      <span class="cluster-map-node-detail">disk</span>
       <div class="progress node-progress" title="Disk usage: {{node.disk_free}} available out of {{node.disk_total}}">
         <div ng-show="{{node.disk_used_percent}} <= 75" class="progress-bar" role="progressbar" aria-valuenow="{{node.disk_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.disk_used_percent}}%;">
         </div>
@@ -54,6 +47,7 @@
       </div>
     </div>
     <div class="col-xs-4 node-progress-bar">
+      <span class="cluster-map-node-detail">cpu</span>
       <div class="progress node-progress" title="CPU Usage: [{{node.cpu_user}}%] user, [{{node.cpu_sys}}%] system">
         <div class="progress-bar" role="progressbar" aria-valuenow="{{node.cpu_user}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_user}}%">
         </div>

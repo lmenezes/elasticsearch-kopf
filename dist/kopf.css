@@ -426,9 +426,9 @@ a.cluster-map-node-action {
 	word-wrap:break-word;
 }
 .node-progress {
-	height: 6px;
+	height: 3px;
 	margin-bottom: 0px;
-	margin-top: 2px;
+	margin-top: 0px;
 	border-radius: 0px;
 }
 .node-progress-container {
