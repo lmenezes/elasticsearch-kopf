@@ -90,6 +90,8 @@ test("cluster creating", function() {
     ok(node.cpu_sys >= 0 && number_pattern.test(node.cpu_sys),
         "Checking os sys cpu [" + node.cpu_sys + "]");
     equal(node.id.length, 22, "Checking node id length");
+    equal(node.jvmVersion, '1.8.0_40', "Checking node jvm version");
+    equal(node.elasticVersion, '1.4.1', "Checking node es version");
     if (node.current_master) {
       master_nodes += 1;
       equal(master_node, node.id, "Checking current master");

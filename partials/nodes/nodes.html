@@ -82,6 +82,10 @@
             <span class="cluster-map-node-detail">{{node.transportAddress}}</span>
           </div>
         </div>
+        <div class="node-labels">
+          <span class="node-label label-primary">JVM: {{node.jvmVersion}}</span>
+          <span class="node-label label-primary">ES: {{node.elasticVersion}}</span>
+        </div>
       </td>
       <td>
         <div ng-show="node.load_average">

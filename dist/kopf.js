@@ -2698,9 +2698,8 @@ function IndexMetadata(index, metadata) {
 function Node(nodeId, nodeStats, nodeInfo) {
   this.id = nodeId;
   this.name = nodeInfo.name;
-  this.metadata = {};
-  this.metadata.info = nodeInfo;
-  this.metadata.stats = nodeStats;
+  this.elasticVersion = nodeInfo.version;
+  this.jvmVersion = nodeInfo.jvm.version;
   this.transportAddress = parseAddress(nodeInfo.transport_address);
   this.host = nodeStats.host;
 
