@@ -2700,6 +2700,7 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.name = nodeInfo.name;
   this.elasticVersion = nodeInfo.version;
   this.jvmVersion = nodeInfo.jvm.version;
+  this.availableProcessors = nodeInfo.os.available_processors;
   this.transportAddress = parseAddress(nodeInfo.transport_address);
   this.host = nodeStats.host;
 
