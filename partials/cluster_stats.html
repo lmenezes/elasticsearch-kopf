@@ -34,7 +34,7 @@
     <div class="stat-block bordered">
       <div class="cluster-stat-detail">
         <span class="tooltiped" data-placement="bottom" title="total data in the cluster(replicas are taken into account)">
-          <span class="cluster-map-stat-number">{{cluster.total_size}}</span>
+          <span class="cluster-map-stat-number">{{cluster.total_size_in_bytes | bytes}}</span>
         </span>
         <span ng-show="cluster.changes.getDataDelta() != 0">
           <i ng-show="cluster.changes.getDataDelta() > 0" class="fa fa-arrow-up"></i>

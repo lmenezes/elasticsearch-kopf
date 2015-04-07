@@ -83,7 +83,6 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   this.total_indices = this.indices.length;
 
   this.total_size_in_bytes = stats._all.total.store.size_in_bytes;
-  this.total_size = readablizeBytes(this.total_size_in_bytes);
   this.changes = null;
 
   this.computeChanges = function(oldCluster) {
