@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-3 node-progress-bar" title="free: {{node.disk_free}}&#013;total: {{node.disk_total}}">
+    <div class="col-xs-3 node-progress-bar" title="free: {{node.disk_free_in_bytes | bytes}}&#013;total: {{node.disk_total_in_bytes | bytes}}">
       <span class="cluster-map-node-detail">disk</span>
       <div class="progress node-progress">
         <div class="progress-bar" ng-class="{'progress-bar-danger': node.disk_used_percent > 75}" role="progressbar" aria-valuenow="{{node.disk_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.disk_used_percent}}%;">

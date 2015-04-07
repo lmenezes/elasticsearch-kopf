@@ -67,10 +67,10 @@ test("cluster creating", function() {
   equal(nodes.length, 2, "Unfiltered node list");
   var master_nodes = 0;
   nodes.forEach(function(node) {
-    ok(size_pattern.test(node.disk_total),
-        "Checking disk total [" + node.disk_total + "]");
-    ok(size_pattern.test(node.disk_free),
-        "Checking free disk [" + node.disk_total + "]");
+    ok(number_pattern.test(node.disk_total_in_bytes),
+        "Checking disk total [" + node.disk_total_in_bytes + "]");
+    ok(number_pattern.test(node.disk_free_in_bytes),
+        "Checking free disk [" + node.disk_free_in_bytes + "]");
     ok(node.disk_used_percent >= 0 && node.disk_used_percent <= 100,
         "Checking disk usage in percent [" + node.disk_used_percent + "]");
     ok(size_pattern.test(node.heap_used),

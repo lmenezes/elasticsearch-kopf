@@ -131,8 +131,8 @@
             {{node.disk_used_percent | number:1}}
           </span>
           <span class="node-stat-detail">
-            <div>free: {{node.disk_free}}</div>
-            <div>total: {{node.disk_total}}</div>
+            <div>free: {{node.disk_free_in_bytes | bytes}}</div>
+            <div>total: {{node.disk_total_in_bytes | bytes}}</div>
           </span>
         </div>
         <div ng-show="node.client">

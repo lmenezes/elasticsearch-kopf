@@ -2721,12 +2721,10 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.heap_max = readablizeBytes(getProperty(this.stats,
     'jvm.mem.heap_max_in_bytes'));
 
-  var totalInBytes = getProperty(this.stats, 'fs.total.total_in_bytes');
-  var freeInBytes = getProperty(this.stats, 'fs.total.free_in_bytes');
-
-  this.disk_total = readablizeBytes(totalInBytes);
-  this.disk_free = readablizeBytes(freeInBytes);
-  var usedRatio = (totalInBytes - freeInBytes) / totalInBytes;
+  this.disk_total_in_bytes = getProperty(this.stats, 'fs.total.total_in_bytes');
+  this.disk_free_in_bytes = getProperty(this.stats, 'fs.total.free_in_bytes');
+  var diskUsedInBytes = (this.disk_total_in_bytes - this.disk_free_in_bytes);
+  var usedRatio = (diskUsedInBytes / this.disk_total_in_bytes);
   this.disk_used_percent = Math.round(100 * usedRatio);
 
   this.cpu_user = getProperty(this.stats, 'os.cpu.user');
