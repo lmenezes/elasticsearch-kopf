@@ -38,9 +38,6 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
 
   this.settings = settings;
 
-  var totalSize = 0;
-  var numDocs = 0;
-
   this.nodes = Object.keys(nodes.nodes).map(function(nodeId) {
     var nodeStats = nodesStats.nodes[nodeId];
     var nodeInfo = nodes.nodes[nodeId];
@@ -67,8 +64,6 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
     if (index.special) {
       specialIndices++;
     }
-    totalSize += parseInt(index.total_size);
-    numDocs += index.num_docs;
     return index;
   });
 
@@ -84,11 +79,11 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   }
   this.special_indices = specialIndices;
   this.closedIndices = closedIndices;
-  this.num_docs = numDocs;
+  this.num_docs = stats._all.primaries.docs.count;
   this.total_indices = this.indices.length;
 
-  this.total_size = readablizeBytes(totalSize);
-  this.total_size_in_bytes = totalSize;
+  this.total_size_in_bytes = stats._all.total.store.size_in_bytes;
+  this.total_size = readablizeBytes(this.total_size_in_bytes);
   this.changes = null;
 
   this.computeChanges = function(oldCluster) {
