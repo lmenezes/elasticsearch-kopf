@@ -29,14 +29,10 @@ test("cluster creating", function() {
   indices.forEach(function(index) {
     ok(index.state == 'open' || index.state == 'close',
         "Checking index state: [" + index.state + "]");
-    ok(number_pattern.test(index.size),
-        "Checking primary size: [" + index.size + "]");
-    ok(number_pattern.test(index.total_size),
-        "Checking total size: [" + index.total_size + "]");
     if (index.state == 'open') {
-      ok(size_pattern.test(index.size_in_bytes),
+      ok(number_pattern.test(index.size_in_bytes),
           "Checking primary size: [" + index.size_in_bytes + "]");
-      ok(size_pattern.test(index.total_size_in_bytes),
+      ok(number_pattern.test(index.total_size_in_bytes),
           "Checking total size: [" + index.total_size_in_bytes + "]");
     }
     ok(number_pattern.test(index.num_docs),

@@ -2588,10 +2588,10 @@ function Index(indexName, clusterState, indexStats, aliases) {
   }
   this.num_docs = getProperty(indexStats, 'primaries.docs.count', 0);
   this.deleted_docs = getProperty(indexStats, 'primaries.docs.deleted', 0);
-  this.size = getProperty(indexStats, 'primaries.store.size_in_bytes', 0);
-  this.total_size = getProperty(indexStats, 'total.store.size_in_bytes', 0);
-  this.size_in_bytes = readablizeBytes(this.size);
-  this.total_size_in_bytes = readablizeBytes(this.total_size);
+  this.size_in_bytes = getProperty(indexStats,
+      'primaries.store.size_in_bytes', 0);
+  this.total_size_in_bytes = getProperty(indexStats,
+      'total.store.size_in_bytes', 0);
 
   this.unassigned = [];
   this.unhealthy = false;
