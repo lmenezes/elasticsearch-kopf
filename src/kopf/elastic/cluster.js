@@ -79,10 +79,11 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   }
   this.special_indices = specialIndices;
   this.closedIndices = closedIndices;
-  this.num_docs = stats._all.primaries.docs.count;
+  var hasData = Object.keys(stats._all.primaries).length > 0;
+  this.num_docs = hasData ? stats._all.primaries.docs.count : 0;
+  this.total_size_in_bytes = hasData ? stats._all.total.store.size_in_bytes : 0;
   this.total_indices = this.indices.length;
 
-  this.total_size_in_bytes = stats._all.total.store.size_in_bytes;
   this.changes = null;
 
   this.computeChanges = function(oldCluster) {
