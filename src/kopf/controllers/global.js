@@ -1,7 +1,7 @@
 kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
-  'AlertService', 'ElasticService', 'ExternalSettingsService', 'FavIconService',
+  'AlertService', 'ElasticService', 'ExternalSettingsService', 'PageService',
   function($scope, $location, $sce, $window, AlertService, ElasticService,
-           ExternalSettingsService, FavIconService) {
+           ExternalSettingsService, PageService) {
 
     $scope.version = '1.4.7';
 

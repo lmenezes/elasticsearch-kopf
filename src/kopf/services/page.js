@@ -1,4 +1,4 @@
-kopf.factory('FavIconService', ['ElasticService', '$rootScope', '$document',
+kopf.factory('PageService', ['ElasticService', '$rootScope', '$document',
   function(ElasticService, $rootScope, $document) {
     var instance = this;
 
@@ -16,8 +16,17 @@ kopf.factory('FavIconService', ['ElasticService', '$rootScope', '$document',
         },
         function(cluster, oldValue) {
           instance.setFavIconColor(cluster ? cluster.status : undefined);
+          instance.setPageTitle(cluster ? cluster.name : undefined);
         }
     );
+
+    this.setPageTitle = function(clusterName) {
+      if (clusterName) {
+        $rootScope.title = 'kopf[' + clusterName + ']';
+      } else {
+        $rootScope.title = 'kopf - no connection';
+      }
+    };
 
     this.setFavIconColor = function(status) {
       if (link) {
