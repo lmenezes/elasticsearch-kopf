@@ -208,7 +208,6 @@ textarea {
     border-bottom: 0px;
 }
 .navbar-cluster-status--nav {
-    background-color: #666 !important;
     color: #ccc !important;
 }
 .navbar-cluster-status-green {
@@ -227,7 +226,6 @@ textarea {
     border-bottom: 0px;
 }
 .navbar-cluster-status-green-nav {
-    background-color: #dff0d8 !important;
     color: #468847 !important;
     border-bottom: 0px;
 }
@@ -247,7 +245,6 @@ textarea {
     border-bottom: 0px;
 }
 .navbar-cluster-status-yellow-nav {
-    background-color: #fcf8e3 !important;
     color: #c09853 !important;
     border-bottom: 0px;
 }
@@ -267,7 +264,6 @@ textarea {
     border-bottom: 0px;
 }
 .navbar-cluster-status-red-nav {
-    background-color: #f2dede !important;
     color: #b94a48 !important;
     border-bottom: 0px;
 }

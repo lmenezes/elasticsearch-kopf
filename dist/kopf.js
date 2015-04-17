@@ -4679,13 +4679,13 @@ kopf.factory('PageService', ['ElasticService', '$rootScope', '$document',
         var colors = {green: '#468847', yellow: '#c09853', red: '#B94A48'};
         var color = status ? colors[status] : '#333';
         var canvas = $document[0].createElement('canvas');
-        canvas.width = 16;
-        canvas.height = 16;
+        canvas.width = 32;
+        canvas.height = 32;
         var context = canvas.getContext('2d');
         context.drawImage(img, 0, 0);
         context.globalCompositeOperation = 'source-in';
         context.fillStyle = color;
-        context.fillRect(0, 0, 16, 16);
+        context.fillRect(0, 0, 32, 32);
         context.fill();
         link.type = 'image/x-icon';
         link.href = canvas.toDataURL();
