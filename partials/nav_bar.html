@@ -75,11 +75,18 @@
         <li ng-navbar-section name="cluster" icon="fa-sitemap"></li>
         <li ng-navbar-section name="nodes" icon="fa-server"></li>
         <li ng-navbar-section name="rest" icon="fa-edit"></li>
-        <li ng-navbar-section name="aliases" icon="fa-tags"></li>
-        <li ng-navbar-section name="analysis" icon="fa-puzzle-piece"></li>
-        <li ng-navbar-section name="percolator" icon="fa-bell-o"></li>
-        <li ng-navbar-section name="warmers" icon="fa-fire"></li>
-        <li ng-navbar-section name="snapshot" icon="fa-camera"></li>
+        <li class="">
+          <a target="_self" href="#" data-toggle="dropdown" class="dropdown-toggle">
+            <i class="fa fa-fw fa-magic"></i> apis <i class="fa fa-fw fa-caret-down"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li ng-navbar-section name="aliases" icon="fa-tags"></li>
+            <li ng-navbar-section name="analysis" icon="fa-puzzle-piece"></li>
+            <li ng-navbar-section name="percolator" icon="fa-bell-o"></li>
+            <li ng-navbar-section name="warmers" icon="fa-fire"></li>
+            <li ng-navbar-section name="snapshot" icon="fa-camera"></li>
+          </ul>
+        </li>
         <!-- li ng-navbar-section name="benchmark" icon="fa-bar-chart-o" version="1.4.0"></li -->
       </ul>
       <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}} navbar-right visible-lg">
