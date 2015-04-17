@@ -50,7 +50,6 @@ describe('NavbarController', function() {
 
   it('init', function() {
     expect(this.scope.host_history).toEqual([ { host : 'http://localhost11' }, { host : 'http://localhost10' }, { host : 'http://localhost9' }, { host : 'http://localhost8' }, { host : 'http://localhost7' }, { host : 'http://localhost6' }, { host : 'http://localhost5' }, { host : 'http://localhost4' }, { host : 'http://localhost3' }, { host : 'http://localhost2' } ]);
-    expect(this.scope.debugEnabled).toEqual(false);
     expect(this.scope.theme).toEqual('dark');
     expect(this.scope.new_host).toEqual('');
     expect(this.scope.clusterStatus).toEqual(undefined);

@@ -1,21 +1,16 @@
-kopf.factory('DebugService', ['$location', function($location) {
+kopf.factory('DebugService', function() {
 
-  this.enabled = $location.search().debug === 'true';
+  var MaxMessages = 1000;
 
-  this.toggleEnabled = function() {
-    this.enabled = !this.enabled;
-  };
-
-  this.isEnabled = function() {
-    return this.enabled;
-  };
+  this.messages = [];
 
   this.debug = function(message) {
-    if (this.isEnabled()) {
-      console.log(message);
+    this.messages.push(message);
+    if (this.messages.length > MaxMessages) {
+      this.messages.shift();
     }
   };
 
   return this;
 
-}]);
+});

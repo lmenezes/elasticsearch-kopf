@@ -1,8 +1,8 @@
 kopf.controller('NavbarController', ['$scope', '$location',
   'ExternalSettingsService', 'ElasticService', 'AlertService',
-  'HostHistoryService', 'DebugService',
+  'HostHistoryService',
   function($scope, $location, ExternalSettingsService, ElasticService,
-           AlertService, HostHistoryService, DebugService) {
+           AlertService, HostHistoryService) {
 
     $scope.new_refresh = ExternalSettingsService.getRefreshRate();
     $scope.theme = ExternalSettingsService.getTheme();
@@ -13,16 +13,6 @@ kopf.controller('NavbarController', ['$scope', '$location',
     $scope.clusterStatus = undefined;
     $scope.clusterName = undefined;
     $scope.fetchedAt = undefined;
-
-    $scope.debugEnabled = DebugService.isEnabled();
-
-    $scope.$watch('debugEnabled',
-        function(newValue, oldValue) {
-          if (newValue != oldValue) {
-            DebugService.toggleEnabled();
-          }
-        }
-    );
 
     $scope.$watch(
         function() {

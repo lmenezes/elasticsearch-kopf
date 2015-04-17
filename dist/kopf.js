@@ -1101,9 +1101,9 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
 
 kopf.controller('NavbarController', ['$scope', '$location',
   'ExternalSettingsService', 'ElasticService', 'AlertService',
-  'HostHistoryService', 'DebugService',
+  'HostHistoryService',
   function($scope, $location, ExternalSettingsService, ElasticService,
-           AlertService, HostHistoryService, DebugService) {
+           AlertService, HostHistoryService) {
 
     $scope.new_refresh = ExternalSettingsService.getRefreshRate();
     $scope.theme = ExternalSettingsService.getTheme();
@@ -1114,16 +1114,6 @@ kopf.controller('NavbarController', ['$scope', '$location',
     $scope.clusterStatus = undefined;
     $scope.clusterName = undefined;
     $scope.fetchedAt = undefined;
-
-    $scope.debugEnabled = DebugService.isEnabled();
-
-    $scope.$watch('debugEnabled',
-        function(newValue, oldValue) {
-          if (newValue != oldValue) {
-            DebugService.toggleEnabled();
-          }
-        }
-    );
 
     $scope.$watch(
         function() {
@@ -3647,27 +3637,22 @@ kopf.factory('AlertService', function() {
   return this;
 });
 
-kopf.factory('DebugService', ['$location', function($location) {
+kopf.factory('DebugService', function() {
 
-  this.enabled = $location.search().debug === 'true';
+  var MaxMessages = 1000;
 
-  this.toggleEnabled = function() {
-    this.enabled = !this.enabled;
-  };
-
-  this.isEnabled = function() {
-    return this.enabled;
-  };
+  this.messages = [];
 
   this.debug = function(message) {
-    if (this.isEnabled()) {
-      console.log(message);
+    this.messages.push(message);
+    if (this.messages.length > MaxMessages) {
+      this.messages.shift();
     }
   };
 
   return this;
 
-}]);
+});
 
 kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
   'ExternalSettingsService', 'DebugService', 'AlertService',
