@@ -3783,6 +3783,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var root = ExternalSettingsService.getElasticsearchRootPath();
       var withCredentials = ExternalSettingsService.withCredentials();
       this.connection = new ESConnection(host + root, withCredentials);
+      DebugService.debug('Elasticseach connection:', this.connection);
       this.clusterRequest('GET', '/', {},
           function(data) {
             instance.setVersion(data.version.number);
@@ -3796,10 +3797,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           },
           function(data) {
             if (data.status == 503) {
+              DebugService.debug('No active master, switching to basic mode');
               instance.setVersion(data.version.number);
               instance.connected = true;
               instance.setBrokenCluster(true);
-              AlertService.error('No active master node');
+              AlertService.error('No active master, switching to basic mode');
               if (!instance.autoRefreshStarted) {
                 instance.autoRefreshStarted = true;
                 instance.autoRefreshCluster();
@@ -3817,6 +3819,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     this.setVersion = function(version) {
       this.version = {'str': version};
       if (!checkVersion.test(version)) {
+        DebugService.debug('Invalid Elasticsearch version[' + version + ']');
         throw 'Invalid Elasticsearch version[' + version + ']';
       }
       var parts = checkVersion.exec(version);
@@ -4298,17 +4301,19 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var url = this.connection.host;
       var params = {method: method, url: url + path, data: data};
       this.addAuth(params);
-      DebugService.debug('Requesting [' + url + '] with params:');
-      DebugService.debug(params);
       $http(params).
           success(function(data, status, headers, config) {
             try {
               success(data);
             } catch (exception) {
+              DebugService.debug('Error parsing REST API data:', exception);
+              DebugService.debug('REST API output:', data);
               error(exception);
             }
           }).
           error(function(data, status, headers, config) {
+            DebugService.debug('Error executing request:', params);
+            DebugService.debug('REST API output:', data);
             error(data);
           });
     };
@@ -4317,8 +4322,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var host = this.connection.host;
       var params = {};
       this.addAuth(params);
-      DebugService.debug('Requesting cluster information with params:');
-      DebugService.debug(params);
       $q.all([
         $http.get(host +
         '/_cluster/state/master_node,routing_table,blocks/', params),
@@ -4343,10 +4346,13 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                       aliases, nodes)
               );
             } catch (exception) {
+              DebugService.debug('Error parsing cluster data:', exception);
+              DebugService.debug('REST APIs output:', responses);
               error(exception);
             }
           },
           function(response) {
+            DebugService.debug('Error requesting cluster data:', response);
             error(response);
           }
       );
@@ -4356,8 +4362,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var host = this.connection.host;
       var params = {};
       this.addAuth(params);
-      DebugService.debug('Requesting cluster information with params:');
-      DebugService.debug(params);
       $q.all([
         $http.get(host +
             '/_cluster/state/master_node,blocks?local=true',
@@ -4378,11 +4382,15 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                   new BrokenCluster(health, state, nodesStats, settings, nodes)
               );
             } catch (exception) {
+              DebugService.debug('Error parsing cluster data:', exception);
+              DebugService.debug('REST APIs output:', responses);
               error(exception);
             }
           },
           function(response) {
-            AlertService.error('Error refreshing cluster state', response);
+            DebugService.debug('Error requesting cluster data:', params);
+            DebugService.debug('REST API output:', response);
+            AlertService.error('Error requesting cluster data', response);
             instance.cluster = undefined;
           }
       );
@@ -4432,14 +4440,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                 function(brokenCluster) {
                   instance.cluster = brokenCluster;
                   if (instance.cluster.status !== 'red') {
+                    DebugService.debug('Switching to normal mode');
                     instance.setBrokenCluster(false);
                   }
                 },
                 function(response) {
-                  AlertService.error(
-                      'Error refreshing cluster state',
-                      response
-                  );
                   instance.cluster = undefined;
                 }
             );
@@ -4458,13 +4463,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                 },
                 function(response) {
                   if (response.status === 503) {
-                    AlertService.error('No active master node');
+                    var message = 'No active master, switching to basic mode';
+                    DebugService.debug(message);
+                    AlertService.error(message);
                     instance.setBrokenCluster(true);
                   } else {
-                    AlertService.error(
-                        'Error refreshing cluster state',
-                        response
-                    );
                     instance.cluster = undefined;
                   }
                 }

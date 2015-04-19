@@ -113,7 +113,7 @@ describe("ElasticService", function() {
     expect(elasticService.setVersion).toHaveBeenCalledWith('1.4.1');
     expect(elasticService.connected).toEqual(true);
     expect(elasticService.setBrokenCluster).toHaveBeenCalledWith(true);
-    expect(this.AlertService.error).toHaveBeenCalledWith('No active master node');
+    expect(this.AlertService.error).toHaveBeenCalledWith('No active master, switching to basic mode');
   });
 
   it("should throw exception and register no connection if response has unexpected format",
