@@ -3,7 +3,7 @@ kopf.controller('DebugController', ['$scope', 'DebugService',
 
     $scope.messages = [];
 
-    $scope.visible = true;
+    $scope.visible = false;
 
     $scope.$watch(
         function() {

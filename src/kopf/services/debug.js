@@ -1,4 +1,4 @@
-kopf.factory('DebugService', function() {
+kopf.factory('DebugService', ['$filter', function($filter) {
 
   var MaxMessages = 1000;
 
@@ -7,11 +7,12 @@ kopf.factory('DebugService', function() {
   var updatedAt = 0;
 
   var addMessage = function(message) {
-    messages.push(message);
+    var date = new Date();
+    messages.push($filter('date')(date, '[yyyy-MM-dd HH:mm:ss] ') +  message);
     if (messages.length > MaxMessages) {
       messages.shift();
     }
-    updatedAt = new Date().getTime();
+    updatedAt = date.getTime();
   };
 
   this.debug = function(message, data) {
@@ -31,4 +32,4 @@ kopf.factory('DebugService', function() {
 
   return this;
 
-});
+}]);
