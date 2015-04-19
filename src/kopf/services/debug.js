@@ -6,12 +6,19 @@ kopf.factory('DebugService', function() {
 
   var updatedAt = 0;
 
-  this.debug = function(message) {
+  var addMessage = function(message) {
     messages.push(message);
     if (messages.length > MaxMessages) {
       messages.shift();
     }
     updatedAt = new Date().getTime();
+  };
+
+  this.debug = function(message, data) {
+    addMessage(message);
+    if (data) {
+      addMessage(JSON.stringify(data));
+    }
   };
 
   this.getUpdatedAt = function() {
