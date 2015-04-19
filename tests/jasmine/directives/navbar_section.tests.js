@@ -11,9 +11,9 @@ describe('ngNavbarSection', function() {
   }));
 
   it('Creates correct HTML', function() {
-    var element = $compile('<li ng-navbar-section name="snapshot" icon="fa-camera"></li>')($rootScope);
+    var element = $compile('<li ng-navbar-section target="snapshot" text="snapshot text" icon="fa-camera"></li>')($rootScope);
     $rootScope.$digest();
-    expect(element.html()).toContain('<a href="#!snapshot"><i class="fa fa-fw fa-camera"></i> snapshot</a>');
+    expect(element.html()).toContain('<a href="#!snapshot"><i class="fa fa-fw fa-camera"></i> snapshot text</a>');
   });
 
 });
