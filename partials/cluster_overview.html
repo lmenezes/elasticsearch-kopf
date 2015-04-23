@@ -40,7 +40,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr ng-show="cluster.unassigned_shards > 0 || cluster.unassigned_shards > 0 || cluster.initializing_shards > 0">
+    <tr ng-show="cluster.unassigned_shards > 0 || cluster.relocating_shards > 0 || cluster.initializing_shards > 0">
       <td class="box unassigned-row">
         <div ng-show="cluster.unassigned_shards > 0">
           <i class="fa fa-fw fa-warning danger-action"> </i>

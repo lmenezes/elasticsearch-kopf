@@ -45,9 +45,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           $scope.cluster = ElasticService.cluster;
           $scope.setIndices(ElasticService.getIndices());
           $scope.setNodes(ElasticService.getNodes());
-          if ($scope.cluster && $scope.cluster.status == 'green') {
-            // since control is only exposed when cluster is unhealthy,
-            // return it to default value when cluster is green again
+          if ($scope.cluster &&
+              $scope.cluster.unassigned_shards === 0 &&
+              $scope.cluster.relocating_shards === 0 &&
+              $scope.cluster.initializing_shards === 0) {
+            // since control is only exposed when shards are moving
             $scope.index_filter.healthy = true;
           }
         }

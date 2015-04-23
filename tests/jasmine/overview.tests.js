@@ -451,7 +451,11 @@ describe('ClusterOverviewController', function() {
       function() {
         // paginator
         this.scope.index_filter.healthy = false;
-        this.ElasticService.cluster = {status: 'green'};
+        this.ElasticService.cluster = {
+          unassigned_shards: 0,
+          relocating_shards: 0,
+          initializing_shards: 0
+        };
         spyOn(this.scope, 'setIndices').andReturn(true);
         spyOn(this.scope, 'setNodes').andReturn(true);
         this.scope.$digest();
