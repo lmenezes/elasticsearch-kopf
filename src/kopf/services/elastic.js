@@ -479,6 +479,48 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('POST', '/_aliases', data, success, error);
     };
 
+    /**
+     * Deletes an index template
+     *
+     * @param {string} name - template name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deleteIndexTemplate = function(name, success, error) {
+      var path = '/_template/' + name;
+      this.clusterRequest('DELETE', path, {}, success, error);
+    };
+
+    /**
+     * Creates a new index template
+     *
+     * @param {IndexTemplate} template - The index template
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.createIndexTemplate = function(template, success, error) {
+      var path = '/_template/' + template.name;
+      var body = template.body;
+      this.clusterRequest('PUT', path, body, success, error);
+    };
+
+    /**
+     * Fetches all index templates
+     * @callback success
+     * @callback error
+     */
+    this.getIndexTemplates = function(success, error) {
+      var path = '/_template';
+      var parseTemplates = function(response) {
+
+        var templates = Object.keys(response).map(function(name) {
+          return new IndexTemplate(name, response[name]);
+        });
+        success(templates);
+      };
+      this.clusterRequest('GET', path, {}, parseTemplates, error);
+    };
+
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
         success(new IndexMetadata(name, response.metadata.indices[name]));

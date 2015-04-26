@@ -77,6 +77,10 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/index_settings.html',
         controller: 'IndexSettingsController'
       }).
+      when('/indexTemplates', {
+        templateUrl: 'partials/index_templates.html',
+        controller: 'IndexTemplatesController'
+      }).
       otherwise({redirectTo: '/cluster'});
 });
 
@@ -1118,6 +1122,106 @@ kopf.controller('IndexSettingsController', ['$scope', '$location',
       );
     };
 
+  }
+]);
+
+kopf.controller('IndexTemplatesController', ['$scope', 'ConfirmDialogService',
+  'AlertService', 'AceEditorService', 'ElasticService',
+  function($scope, ConfirmDialogService, AlertService, AceEditorService,
+           ElasticService) {
+
+    var TemplateBase = JSON.stringify(
+        {
+          template: 'template pattern(e.g.: index*)',
+          settings: {},
+          mappings: {},
+          aliases: {}
+        },
+        undefined,
+        2
+    );
+
+    $scope.editor = undefined;
+
+    $scope.paginator = new Paginator(1, 10, [],
+        new IndexTemplateFilter('', ''));
+
+    $scope.template = new IndexTemplate('', {});
+
+    $scope.$watch('paginator', function(filter, previous) {
+      $scope.page = $scope.paginator.getPage();
+    }, true);
+
+    $scope.initEditor = function() {
+      if (!angular.isDefined($scope.editor)) {
+        $scope.editor = AceEditorService.init('index-template-editor');
+        $scope.editor.setValue(TemplateBase);
+      }
+    };
+
+    $scope.loadTemplates = function() {
+      ElasticService.getIndexTemplates(
+          function(templates) {
+            $scope.paginator.setCollection(templates);
+            $scope.page = $scope.paginator.getPage();
+          },
+          function(error) {
+            AlertService.error('Error while loading templates', error);
+          }
+      );
+    };
+
+    $scope.createIndexTemplate = function() {
+      if ($scope.template.name) {
+        if ($scope.editor.hasContent()) {
+          $scope.editor.format();
+          if (!isDefined($scope.editor.error)) {
+            $scope.template.body = $scope.editor.getValue();
+            ElasticService.createIndexTemplate($scope.template,
+                function(response) {
+                  $scope.loadTemplates();
+                  AlertService.success(
+                      'Template successfully created',
+                      response
+                  );
+                },
+                function(error) {
+                  AlertService.error('Error while creating template', error);
+                }
+            );
+          }
+        } else {
+          AlertService.error('Template body can\'t be empty');
+        }
+      } else {
+        AlertService.error('Template name can\'t be empty');
+      }
+    };
+
+    $scope.deleteIndexTemplate = function(template) {
+      ConfirmDialogService.open(
+          'are you sure you want to delete template ' + template.name + '?',
+          template.body,
+          'Delete',
+          function() {
+            ElasticService.deleteIndexTemplate(template.name,
+                function(response) {
+                  AlertService.success('Template successfully deleted',
+                      response);
+                  $scope.loadTemplates();
+                },
+                function(error) {
+                  AlertService.error('Error while deleting template', error);
+                }
+            );
+          }
+      );
+    };
+
+    $scope.initializeController = function() {
+      $scope.loadTemplates();
+      $scope.initEditor();
+    };
   }
 ]);
 
@@ -2681,6 +2785,11 @@ function IndexMetadata(index, metadata) {
   };
 }
 
+function IndexTemplate(name, body) {
+  this.name = name;
+  this.body = body;
+}
+
 function Node(nodeId, nodeStats, nodeInfo) {
   this.id = nodeId;
   this.name = nodeInfo.name;
@@ -3320,6 +3429,48 @@ function IndexFilter(name, closed, special, healthy, asc, timestamp) {
       }
     }
     return matches;
+  };
+
+}
+
+function IndexTemplateFilter(name, template) {
+
+  this.name = name;
+  this.template = template;
+
+  this.clone = function() {
+    return new IndexTemplateFilter(name, template);
+  };
+
+  this.getSorting = function() {
+    return function(a, b) {
+      return a.name.localeCompare(b.name);
+    };
+  };
+
+  this.equals = function(other) {
+    return (other !== null &&
+    this.name === other.name &&
+    this.template === other.template);
+  };
+
+  this.isBlank = function() {
+    return !notEmpty(this.name) && !notEmpty(this.template);
+  };
+
+  this.matches = function(template) {
+    if (this.isBlank()) {
+      return true;
+    } else {
+      var matches = true;
+      if (notEmpty(this.name)) {
+        matches = template.name.indexOf(this.name) != -1;
+      }
+      if (matches && notEmpty(this.template)) {
+        matches = template.body.template.indexOf(this.template) != -1;
+      }
+      return matches;
+    }
   };
 
 }
@@ -4175,6 +4326,48 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         data.actions.push({remove: a.info()});
       });
       this.clusterRequest('POST', '/_aliases', data, success, error);
+    };
+
+    /**
+     * Deletes an index template
+     *
+     * @param {string} name - template name
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.deleteIndexTemplate = function(name, success, error) {
+      var path = '/_template/' + name;
+      this.clusterRequest('DELETE', path, {}, success, error);
+    };
+
+    /**
+     * Creates a new index template
+     *
+     * @param {IndexTemplate} template - The index template
+     * @callback success - invoked on success
+     * @callback error - invoked on error
+     */
+    this.createIndexTemplate = function(template, success, error) {
+      var path = '/_template/' + template.name;
+      var body = template.body;
+      this.clusterRequest('PUT', path, body, success, error);
+    };
+
+    /**
+     * Fetches all index templates
+     * @callback success
+     * @callback error
+     */
+    this.getIndexTemplates = function(success, error) {
+      var path = '/_template';
+      var parseTemplates = function(response) {
+
+        var templates = Object.keys(response).map(function(name) {
+          return new IndexTemplate(name, response[name]);
+        });
+        success(templates);
+      };
+      this.clusterRequest('GET', path, {}, parseTemplates, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {
