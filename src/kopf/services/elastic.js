@@ -521,6 +521,19 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('GET', path, {}, parseTemplates, error);
     };
 
+    /**
+     * Executes cat api request
+     * @callback success
+     * @callback error
+     */
+    this.executeCatRequest = function(api, success, error) {
+      var path = '/_cat/' + api + '?v';
+      var parseCat = function(response) {
+        success(new CatResult(response));
+      };
+      this.clusterRequest('GET', path, {}, parseCat, error);
+    };
+
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
         success(new IndexMetadata(name, response.metadata.indices[name]));

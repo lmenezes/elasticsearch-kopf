@@ -81,6 +81,10 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/index_templates.html',
         controller: 'IndexTemplatesController'
       }).
+      when('/cat', {
+        templateUrl: 'partials/cat.html',
+        controller: 'CatController'
+      }).
       otherwise({redirectTo: '/cluster'});
 });
 
@@ -433,6 +437,50 @@ kopf.controller('BenchmarkController', ['$scope', '$location', '$timeout',
     };
 
   }
+]);
+
+kopf.controller('CatController', ['$scope', 'ElasticService', 'AlertService',
+  function($scope, ElasticService, AlertService) {
+
+    $scope.apis = [
+      'aliases',
+      'allocation',
+      'count',
+      'fielddata',
+      'health',
+      'indices',
+      'master',
+      'nodes',
+      'pending_tasks',
+      'plugins',
+      'recovery',
+      'thread_pool',
+      'shards',
+      'segments'
+    ];
+
+    $scope.api = '';
+
+    $scope.result = undefined;
+
+    $scope.execute = function() {
+      if ($scope.api.length > 0) {
+        ElasticService.executeCatRequest(
+            $scope.api,
+            function(result) {
+              $scope.result = result;
+            },
+            function(error) {
+              AlertService.error('Error while fetching data', error);
+              $scope.result = undefined;
+            }
+        );
+      } else {
+        AlertService.error('You must select an API');
+      }
+    };
+  }
+
 ]);
 
 kopf.controller('ClusterHealthController', ['$scope', '$location', '$timeout',
@@ -2225,6 +2273,23 @@ function BrokenCluster(health, state, nodesStats, settings, nodes) {
   this.total_size = readablizeBytes(totalSize);
   this.total_size_in_bytes = totalSize;
   this.indices = [];
+}
+
+function CatResult(result) {
+  var lines = result.split('\n');
+  var header = lines[0];
+  var columns = header.match(/\S+/g);
+  var values = lines.slice(1, -1).map(function(line) {
+    return columns.map(function(column, i) {
+      var start = header.indexOf(column);
+      var lastColumn = i < columns.length - 1;
+      var end = lastColumn ? header.indexOf(columns[i + 1]) : undefined;
+      return line.substring(start, end).trim();
+    });
+  });
+
+  this.columns = columns;
+  this.lines = values;
 }
 
 function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
@@ -4368,6 +4433,19 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(templates);
       };
       this.clusterRequest('GET', path, {}, parseTemplates, error);
+    };
+
+    /**
+     * Executes cat api request
+     * @callback success
+     * @callback error
+     */
+    this.executeCatRequest = function(api, success, error) {
+      var path = '/_cat/' + api + '?v';
+      var parseCat = function(response) {
+        success(new CatResult(response));
+      };
+      this.clusterRequest('GET', path, {}, parseCat, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {
