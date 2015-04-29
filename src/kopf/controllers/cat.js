@@ -3,19 +3,19 @@ kopf.controller('CatController', ['$scope', 'ElasticService', 'AlertService',
 
     $scope.apis = [
       'aliases',
-      'allocation',
+      //'allocation',
       'count',
-      'fielddata',
-      'health',
-      'indices',
+      //'fielddata',
+      //'health',
+      //'indices',
       'master',
-      'nodes',
-      'pending_tasks',
+      //'nodes',
+      //'pending_tasks',
       'plugins',
       'recovery',
-      'thread_pool',
-      'shards',
-      'segments'
+      //'thread_pool',
+      //'shards',
+      //'segments'
     ];
 
     $scope.api = '';

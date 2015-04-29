@@ -21,19 +21,19 @@ describe('CatController', function() {
     expect(this.scope.result).toEqual(undefined);
     expect(this.scope.apis).toEqual([
       'aliases',
-      'allocation',
+      //'allocation',
       'count',
-      'fielddata',
-      'health',
-      'indices',
+      //'fielddata',
+      //'health',
+      //'indices',
       'master',
-      'nodes',
-      'pending_tasks',
+      //'nodes',
+      //'pending_tasks',
       'plugins',
       'recovery',
-      'thread_pool',
-      'shards',
-      'segments'
+      //'thread_pool',
+      //'shards',
+      //'segments'
     ]);
   });
 
