@@ -85,6 +85,10 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/cat.html',
         controller: 'CatController'
       }).
+      when('/hotthreads', {
+        templateUrl: 'partials/hotthreads.html',
+        controller: 'HotThreadsController'
+      }).
       otherwise({redirectTo: '/cluster'});
 });
 
@@ -1118,6 +1122,40 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
     };
 
   }
+]);
+
+kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
+  'AlertService',
+  function($scope, ElasticService, AlertService) {
+
+    $scope.node = undefined;
+
+    $scope.nodes = [];
+
+    $scope.threads = 3;
+
+    $scope.type = 'cpu';
+
+    $scope.types = ['cpu', 'wait', 'block'];
+
+    $scope.ignoreIdleThreads = true;
+
+    $scope.nodesHotThreads = undefined;
+
+    $scope.execute = function() {
+      ElasticService.getHotThreads($scope.node, $scope.type, $scope.threads,
+          $scope.ignoreIdleThreads,
+          function(result) {
+            $scope.nodesHotThreads = result;
+          },
+          function(error) {
+            AlertService.error('Error while fetching hot threads', error);
+            $scope.nodesHotThreads = undefined;
+          }
+      );
+    };
+  }
+
 ]);
 
 kopf.controller('IndexSettingsController', ['$scope', '$location',
@@ -2712,6 +2750,12 @@ function ESConnection(url, withCredentials) {
 
 }
 
+function HotThread(header) {
+  this.header = header;
+  this.subHeader = undefined;
+  this.stack = [];
+}
+
 function Index(indexName, clusterState, indexStats, aliases) {
   this.name = indexName;
   this.shards = null;
@@ -2912,6 +2956,33 @@ function Node(nodeId, nodeStats, nodeInfo) {
   function parseAddress(address) {
     return address.substring(address.indexOf('/') + 1, address.length - 1);
   }
+
+}
+
+function NodeHotThreads(data) {
+  var lines = data.split('\n');
+  this.header = lines[0];
+  this.subHeader = lines[1];
+  this.node = this.header.substring(
+      this.header.indexOf('[') + 1,
+      this.header.indexOf(']')
+  );
+  var threads = [];
+  var thread;
+  if (lines.length > 3) {
+    lines.slice(3).forEach(function(line) {
+      if (line.indexOf('       ') === 0) {
+        thread.stack.push(line);
+      } else if (line.indexOf('     ') === 0) {
+        thread.subHeader = line;
+      }
+      else if (line.indexOf('    ') === 0) {
+        thread = new HotThread(line);
+        threads.push(thread);
+      }
+    });
+  }
+  this.threads = threads;
 
 }
 
@@ -4446,6 +4517,23 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(new CatResult(response));
       };
       this.clusterRequest('GET', path, {}, parseCat, error);
+    };
+
+    /**
+     * Get hot threads
+     * @callback success
+     * @callback error
+     */
+    this.getHotThreads = function(node, type, threads, ignoreIdle,
+                                  success, error) {
+      var path = '/_nodes' + (node ? '/' + node : '') + '/hot_threads';
+      var parseHotThreads = function(response) {
+        var threads = response.split('::: ').slice(1).map(function(data) {
+          return new NodeHotThreads(data);
+        });
+        success(threads);
+      };
+      this.clusterRequest('GET', path, {}, parseHotThreads, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {

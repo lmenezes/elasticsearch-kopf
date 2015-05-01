@@ -534,6 +534,23 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('GET', path, {}, parseCat, error);
     };
 
+    /**
+     * Get hot threads
+     * @callback success
+     * @callback error
+     */
+    this.getHotThreads = function(node, type, threads, ignoreIdle,
+                                  success, error) {
+      var path = '/_nodes' + (node ? '/' + node : '') + '/hot_threads';
+      var parseHotThreads = function(response) {
+        var threads = response.split('::: ').slice(1).map(function(data) {
+          return new NodeHotThreads(data);
+        });
+        success(threads);
+      };
+      this.clusterRequest('GET', path, {}, parseHotThreads, error);
+    };
+
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
         success(new IndexMetadata(name, response.metadata.indices[name]));

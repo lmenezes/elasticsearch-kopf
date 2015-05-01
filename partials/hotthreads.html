@@ -1,0 +1,55 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="content-panel">
+      <div class="panel-group" id="#hotThreadsAccordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#hotThreadsAccordion" target="_self" href="#hotThreadsPanel">
+                hot threads
+              </a>
+            </h4>
+          </div>
+          <div id="hotThreadsPanel" class="panel-collapse collapse in">
+            <div class="panel-body" style="min-height: 460px;">
+              <div class="row">
+                <div class="col-xs-12">
+                  <form class="form-inline">
+                    <div class="form-group">
+                      <select class="form-control input-sm" ng-model="type" ng-options="t for t in types">
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary input-sm" ng-click="execute()">
+                      <i class="fa fa-bolt"></i> execute
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <div class="row content-panel">
+                <div class="col-xs-12">
+                  <div ng-repeat="nodeHotThreads in nodesHotThreads track by $index">
+                    <div id="#{{nodeHotThreads.node}}Accordion">
+                      <a data-toggle="collapse" data-parent="#{{nodeHotThreads.node}}Accordion" target="_self" href="#{{nodeHotThreads.node}}Panel">
+                        <div>:::&nbsp;{{nodeHotThreads.header}}</div>
+                        <div>&nbsp;&nbsp;{{nodeHotThreads.subHeader}}</div>
+                      </a>
+                      &nbsp;&nbsp;&nbsp;
+                      <div id="{{nodeHotThreads.node}}Panel" class="panel-collapse collapse in">
+                        <div ng-repeat="hotThread in nodeHotThreads.threads track by $index">
+                          <div>&nbsp;&nbsp;&nbsp;{{hotThread.header}}</div>
+                          <div>&nbsp;&nbsp;&nbsp;&nbsp;{{hotThread.subHeader}}</div>
+                          <div ng-repeat="line in hotThread.stack track by $index">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{line}}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <br>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
