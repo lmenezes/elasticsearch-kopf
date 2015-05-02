@@ -1677,7 +1677,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
               'content. Maybe you meant to use POST or PUT?');
         }
         ElasticService.clusterRequest($scope.request.method,
-            $scope.request.path, $scope.request.body,
+            $scope.request.path, {}, $scope.request.body,
             function(response) {
               var content = response;
               try {
@@ -4075,7 +4075,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var withCredentials = ExternalSettingsService.withCredentials();
       this.connection = new ESConnection(host + root, withCredentials);
       DebugService.debug('Elasticseach connection:', this.connection);
-      this.clusterRequest('GET', '/', {},
+      this.clusterRequest('GET', '/', {}, {},
           function(data) {
             instance.setVersion(data.version.number);
             instance.connected = true;
@@ -4154,7 +4154,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.createIndex = function(name, settings, success, error) {
       var path = '/' + name;
-      this.clusterRequest('POST', path, settings, success, error);
+      this.clusterRequest('POST', path, {}, settings, success, error);
     };
 
     /**
@@ -4169,7 +4169,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           'cluster.routing.allocation.enable': 'all'
         }
       };
-      this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
+      this.clusterRequest('PUT', '/_cluster/settings', {}, body, success,
+          error);
     };
 
     /**
@@ -4184,7 +4185,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
           'cluster.routing.allocation.enable': 'none'
         }
       };
-      this.clusterRequest('PUT', '/_cluster/settings', body, success, error);
+      this.clusterRequest('PUT', '/_cluster/settings', {}, body, success,
+          error);
     };
 
     /**
@@ -4203,7 +4205,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var error = function(error) {
         AlertService.error('Error while shutting down node', error);
       };
-      this.clusterRequest('POST', path, {}, success, error);
+      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**
@@ -4220,7 +4222,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var error = function(response) {
         AlertService.error('Error while opening index', response);
       };
-      this.clusterRequest('POST', path, {}, success, error);
+      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**
@@ -4232,7 +4234,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.optimizeIndex = function(index, success, error) {
       var path = '/' + index + '/_optimize';
-      this.clusterRequest('POST', path, {}, success, error);
+      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**
@@ -4244,7 +4246,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.clearCache = function(index, success, error) {
       var path = '/' + index + '/_cache/clear';
-      this.clusterRequest('POST', path, {}, success, error);
+      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**
@@ -4261,7 +4263,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var error = function(error) {
         AlertService.error('Error while closing index', error);
       };
-      this.clusterRequest('POST', path, {}, success, error);
+      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**
@@ -4273,7 +4275,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.refreshIndex = function(index, success, error) {
       var path = '/' + index + '/_refresh';
-      this.clusterRequest('POST', path, {}, success, error);
+      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**
@@ -4285,7 +4287,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.deleteIndex = function(index, success, error) {
       var path = '/' + index;
-      this.clusterRequest('DELETE', path, {}, success, error);
+      this.clusterRequest('DELETE', path, {}, {}, success, error);
     };
 
     /**
@@ -4298,7 +4300,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.updateIndexSettings = function(name, settings, success, error) {
       var path = '/' + name + '/_settings';
-      this.clusterRequest('PUT', path, settings, success, error);
+      this.clusterRequest('PUT', path, {}, settings, success, error);
     };
 
     /**
@@ -4310,7 +4312,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.updateClusterSettings = function(settings, success, error) {
       var path = '/_cluster/settings';
-      this.clusterRequest('PUT', path, settings, success, error);
+      this.clusterRequest('PUT', path, {}, settings, success, error);
     };
 
     /**
@@ -4322,7 +4324,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.deleteWarmer = function(warmer, success, error) {
       var path = '/' + warmer.index + '/_warmer/' + warmer.id;
-      this.clusterRequest('DELETE', path, {}, success, error);
+      this.clusterRequest('DELETE', path, {}, {}, success, error);
     };
 
     /**
@@ -4335,7 +4337,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.deletePercolatorQuery = function(index, id, success, error) {
       var path = '/' + index + '/.percolator/' + id;
-      this.clusterRequest('DELETE', path, {}, success, error);
+      this.clusterRequest('DELETE', path, {}, {}, success, error);
     };
 
     /**
@@ -4347,7 +4349,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.createPercolatorQuery = function(percolator, success, error) {
       var path = '/' + percolator.index + '/.percolator/' + percolator.id;
-      this.clusterRequest('PUT', path, percolator.source, success, error);
+      this.clusterRequest('PUT', path, {}, percolator.source, success, error);
     };
 
     /**
@@ -4360,7 +4362,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.createRepository = function(repository, body, success, error) {
       var path = '/_snapshot/' + repository;
-      this.clusterRequest('POST', path, body, success, error);
+      this.clusterRequest('POST', path, {}, body, success, error);
     };
 
     /**
@@ -4372,7 +4374,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.deleteRepository = function(repository, success, error) {
       var path = '/_snapshot/' + repository;
-      this.clusterRequest('DELETE', path, {}, success, error);
+      this.clusterRequest('DELETE', path, {}, {}, success, error);
     };
 
     /**
@@ -4385,7 +4387,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.deleteSnapshot = function(repository, snapshot, success, error) {
       var path = '/_snapshot/' + repository + '/' + snapshot;
-      this.clusterRequest('DELETE', path, {}, success, error);
+      this.clusterRequest('DELETE', path, {}, {}, success, error);
     };
 
     /**
@@ -4399,7 +4401,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.restoreSnapshot = function(repository, name, body, success, error) {
       var path = '/_snapshot/' + repository + '/' + name + '/_restore';
-      this.clusterRequest('POST', path, body, success, error);
+      this.clusterRequest('POST', path, {}, body, success, error);
     };
 
     /**
@@ -4413,7 +4415,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.createSnapshot = function(repository, snapshot, body, success, error) {
       var path = '/_snapshot/' + repository + '/' + snapshot;
-      this.clusterRequest('PUT', path, body, success, error);
+      this.clusterRequest('PUT', path, {}, body, success, error);
     };
 
     /**
@@ -4425,7 +4427,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.executeBenchmark = function(body, success, error) {
       var path = '/_bench';
-      this.clusterRequest('PUT', path, body, success, error);
+      this.clusterRequest('PUT', path, {}, body, success, error);
     };
 
     /**
@@ -4442,7 +4444,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       }
       path += '/_warmer/' + warmer.id.trim();
       var body = warmer.source;
-      this.clusterRequest('PUT', path, body, success, error);
+      this.clusterRequest('PUT', path, {}, body, success, error);
     };
 
     /**
@@ -4461,7 +4463,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       remove.forEach(function(a) {
         data.actions.push({remove: a.info()});
       });
-      this.clusterRequest('POST', '/_aliases', data, success, error);
+      this.clusterRequest('POST', '/_aliases', {}, data, success, error);
     };
 
     /**
@@ -4473,7 +4475,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.deleteIndexTemplate = function(name, success, error) {
       var path = '/_template/' + name;
-      this.clusterRequest('DELETE', path, {}, success, error);
+      this.clusterRequest('DELETE', path, {}, {}, success, error);
     };
 
     /**
@@ -4486,7 +4488,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     this.createIndexTemplate = function(template, success, error) {
       var path = '/_template/' + template.name;
       var body = template.body;
-      this.clusterRequest('PUT', path, body, success, error);
+      this.clusterRequest('PUT', path, {}, body, success, error);
     };
 
     /**
@@ -4503,7 +4505,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         });
         success(templates);
       };
-      this.clusterRequest('GET', path, {}, parseTemplates, error);
+      this.clusterRequest('GET', path, {}, {}, parseTemplates, error);
     };
 
     /**
@@ -4516,7 +4518,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var parseCat = function(response) {
         success(new CatResult(response));
       };
-      this.clusterRequest('GET', path, {}, parseCat, error);
+      this.clusterRequest('GET', path, {}, {}, parseCat, error);
     };
 
     /**
@@ -4533,7 +4535,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         });
         success(threads);
       };
-      this.clusterRequest('GET', path, {}, parseHotThreads, error);
+      this.clusterRequest('GET', path, {}, {}, parseHotThreads, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {
@@ -4541,7 +4543,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(new IndexMetadata(name, response.metadata.indices[name]));
       };
       var path = '/_cluster/state/metadata/' + name + '?human';
-      this.clusterRequest('GET', path, {}, transformed, error);
+      this.clusterRequest('GET', path, {}, {}, transformed, error);
     };
 
     this.getNodeStats = function(nodeId, success, error) {
@@ -4549,7 +4551,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(new NodeStats(name, response.nodes[nodeId]));
       };
       var path = '/_nodes/' + nodeId + '/stats?human';
-      this.clusterRequest('GET', path, {}, transformed, error);
+      this.clusterRequest('GET', path, {}, {}, transformed, error);
     };
 
     this.getShardStats = function(shard, indexName, nodeId, success, error) {
@@ -4561,7 +4563,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(new ShardStats(shard, indexName, stats));
       };
       var path = '/' + indexName + '/_stats?level=shards&human=true';
-      this.clusterRequest('GET', path, {}, transformed, error);
+      this.clusterRequest('GET', path, {}, {}, transformed, error);
     };
 
     this.fetchAliases = function(success, error) {
@@ -4581,7 +4583,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         });
         success(allAliases);
       };
-      this.clusterRequest('GET', '/_aliases', {}, createAliases, error);
+      this.clusterRequest('GET', '/_aliases', {}, {}, createAliases, error);
     };
 
     this.analyzeByField = function(index, type, field, text, success, error) {
@@ -4592,7 +4594,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(tokens);
       };
       var path = '/' + index + '/_analyze?field=' + type + '.' + field;
-      this.clusterRequest('POST', path, text, buildTokens, error);
+      this.clusterRequest('POST', path, {}, text, buildTokens, error);
     };
 
     this.analyzeByAnalyzer = function(index, analyzer, text, success, error) {
@@ -4603,7 +4605,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(tokens);
       };
       var path = '/' + index + '/_analyze?analyzer=' + analyzer;
-      this.clusterRequest('POST', path, text, buildTokens, error);
+      this.clusterRequest('POST', path, {}, text, buildTokens, error);
     };
 
     this.getIndexWarmers = function(index, warmer, success, error) {
@@ -4619,7 +4621,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         });
         success(warmers);
       };
-      this.clusterRequest('GET', path, {}, parseWarmers, error);
+      this.clusterRequest('GET', path, {}, {}, parseWarmers, error);
     };
 
     this.fetchPercolateQueries = function(index, query, success, error) {
@@ -4635,7 +4637,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(percolators);
       };
       var body = JSON.stringify(query);
-      this.clusterRequest('POST', path, body, parsePercolators, error);
+      this.clusterRequest('POST', path, {}, body, parsePercolators, error);
     };
 
     this.getRepositories = function(success, error) {
@@ -4646,7 +4648,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(repositories);
       };
       var path = '/_snapshot/_all';
-      this.clusterRequest('GET', path, {}, parseRepositories, error);
+      this.clusterRequest('GET', path, {}, {}, parseRepositories, error);
     };
 
     this.getSnapshots = function(repository, success, error) {
@@ -4657,14 +4659,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         });
         success(snapshots);
       };
-      this.clusterRequest('GET', path, {}, parseSnapshots, error);
+      this.clusterRequest('GET', path, {}, {}, parseSnapshots, error);
     };
 
-    this.clusterRequest = function(method, path, data, success, error) {
-      var url = this.connection.host;
-      var params = {method: method, url: url + path, data: data};
-      this.addAuth(params);
-      $http(params).
+    this.clusterRequest = function(method, path, params, data, success, error) {
+      var url = this.connection.host + path;
+      var config = {method: method, url: url, data: data, params: params};
+      this.addAuth(config);
+      $http(config).
           success(function(data, status, headers, config) {
             try {
               success(data);
@@ -4675,7 +4677,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
             }
           }).
           error(function(data, status, headers, config) {
-            DebugService.debug('Error executing request:', params);
+            DebugService.debug('Error executing request:', config);
             DebugService.debug('REST API output:', data);
             error(data);
           });
@@ -4866,14 +4868,14 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     /**
      * Adds authentication information/cookies to request params
-     * @param {Object} params - request parameters
+     * @param {Object} config - request config
      */
-    this.addAuth = function(params) {
+    this.addAuth = function(config) {
       if (isDefined(this.connection.auth)) {
-        params.headers = {Authorization: this.connection.auth};
+        config.headers = {Authorization: this.connection.auth};
       }
       if (this.connection.withCredentials) {
-        params.withCredentials = true;
+        config.withCredentials = true;
       }
     };
 

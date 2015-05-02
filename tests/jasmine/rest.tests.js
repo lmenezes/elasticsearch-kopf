@@ -134,7 +134,7 @@ describe('RestController', function() {
     spyOn(this.scope.editor, 'format').andCallThrough();
     spyOn(this.ElasticService, 'clusterRequest').andReturn(true);
     this.scope.sendRequest();
-    expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("POST", "/test_rest/_search", "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
+    expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("POST", "/test_rest/_search", {}, "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
     expect(this.AlertService.warn).not.toHaveBeenCalled();
   });
 
@@ -153,7 +153,7 @@ describe('RestController', function() {
     spyOn(this.scope.editor, 'format').andCallThrough();
     spyOn(this.ElasticService, 'clusterRequest').andReturn(true);
     this.scope.sendRequest();
-    expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("GET", "/test_rest/_search", "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
+    expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("GET", "/test_rest/_search", {}, "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
     expect(this.AlertService.info).toHaveBeenCalledWith('You are executing a GET request with body ' +
         'content. Maybe you meant to use POST or PUT?');
   });

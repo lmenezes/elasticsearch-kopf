@@ -60,7 +60,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
               'content. Maybe you meant to use POST or PUT?');
         }
         ElasticService.clusterRequest($scope.request.method,
-            $scope.request.path, $scope.request.body,
+            $scope.request.path, {}, $scope.request.body,
             function(response) {
               var content = response;
               try {
