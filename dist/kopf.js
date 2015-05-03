@@ -1132,11 +1132,13 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
 
     $scope.nodes = [];
 
-    $scope.threads = 3;
-
     $scope.type = 'cpu';
 
     $scope.types = ['cpu', 'wait', 'block'];
+
+    $scope.interval = 500;
+
+    $scope.threads = 3;
 
     $scope.ignoreIdleThreads = true;
 
@@ -1144,7 +1146,7 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
 
     $scope.execute = function() {
       ElasticService.getHotThreads($scope.node, $scope.type, $scope.threads,
-          $scope.ignoreIdleThreads,
+          $scope.interval, $scope.ignoreIdleThreads,
           function(result) {
             $scope.nodesHotThreads = result;
           },
@@ -1154,6 +1156,21 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
           }
       );
     };
+
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(current, previous) {
+          $scope.nodes = ElasticService.getNodes();
+        },
+        true
+    );
+
+    $scope.initializeController = function() {
+      $scope.nodes = ElasticService.getNodes();
+    };
+
   }
 
 ]);
@@ -4523,19 +4540,31 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     /**
      * Get hot threads
+     *
+     * @param {string} node - The target node(or empty if all)
+     * @param {string} type - the type of threads to be sampled
+     * @param {string} threads - The number of threads to be sampled
+     * @param {string} interval - The sampling interval in ms
+     * @param {boolean} ignoreIdleThreads - Ignores idle threads or not
      * @callback success
      * @callback error
      */
-    this.getHotThreads = function(node, type, threads, ignoreIdle,
-                                  success, error) {
+    this.getHotThreads = function(node, type, threads, interval,
+                                  ignoreIdleThreads, success, error) {
       var path = '/_nodes' + (node ? '/' + node : '') + '/hot_threads';
+      var params = {
+        type: type,
+        threads: threads,
+        ignore_idle_threads: ignoreIdleThreads,
+        interval: interval
+      };
       var parseHotThreads = function(response) {
         var threads = response.split('::: ').slice(1).map(function(data) {
           return new NodeHotThreads(data);
         });
         success(threads);
       };
-      this.clusterRequest('GET', path, {}, {}, parseHotThreads, error);
+      this.clusterRequest('GET', path, params, {}, parseHotThreads, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {

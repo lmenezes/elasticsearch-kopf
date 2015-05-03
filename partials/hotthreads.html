@@ -16,17 +16,40 @@
                 <div class="col-xs-12">
                   <form class="form-inline">
                     <div class="form-group">
+                      <label>number of threads</label>
+                      <select class="form-control input-sm" ng-model="threads" ng-options="t for t in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>node</label>
+                      <select class="form-control input-sm" ng-model="node" ng-options="n.id as n.name for n in nodes">
+                        <option value="">all nodes</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>type</label>
                       <select class="form-control input-sm" ng-model="type" ng-options="t for t in types">
                       </select>
                     </div>
-                    <button type="submit" class="btn btn-primary input-sm" ng-click="execute()">
-                      <i class="fa fa-bolt"></i> execute
-                    </button>
+                    <div class="form-group">
+                      <label>sampling interval</label>
+                      <input type="text" ng-model="interval"
+                             class="form-control input-sm"
+                             placeholder="sampling interval">
+                    </div>
+                    <div class="checkbox inline-checkbox">
+                      <input type="checkbox" ng-model="ignoreIdleThreads"> ignore idle threads
+                    </div>
+                    <div class="form-group inline-button">
+                      <button type="submit" class="btn btn-primary input-sm pull-right" ng-click="execute()">
+                        <i class="fa fa-bolt"></i> execute
+                      </button>
+                    </div>
                   </form>
                 </div>
               </div>
               <div class="row content-panel">
-                <div class="col-xs-12">
+                <div class="col-xs-12 content-panel">
                   <div ng-repeat="nodeHotThreads in nodesHotThreads track by $index">
                     <div id="#{{nodeHotThreads.node}}Accordion">
                       <a data-toggle="collapse" data-parent="#{{nodeHotThreads.node}}Accordion" target="_self" href="#{{nodeHotThreads.node}}Panel">

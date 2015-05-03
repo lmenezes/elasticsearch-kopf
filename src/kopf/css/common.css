@@ -301,3 +301,9 @@ textarea {
     width: 30px;
     border: 1px solid #dff0d8;
 }
+.inline-checkbox {
+    padding-top: 22px;
+}
+.inline-button {
+    padding-top: 23px;
+}

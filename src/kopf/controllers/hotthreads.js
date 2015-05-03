@@ -6,11 +6,13 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
 
     $scope.nodes = [];
 
-    $scope.threads = 3;
-
     $scope.type = 'cpu';
 
     $scope.types = ['cpu', 'wait', 'block'];
+
+    $scope.interval = 500;
+
+    $scope.threads = 3;
 
     $scope.ignoreIdleThreads = true;
 
@@ -18,7 +20,7 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
 
     $scope.execute = function() {
       ElasticService.getHotThreads($scope.node, $scope.type, $scope.threads,
-          $scope.ignoreIdleThreads,
+          $scope.interval, $scope.ignoreIdleThreads,
           function(result) {
             $scope.nodesHotThreads = result;
           },
@@ -28,6 +30,21 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
           }
       );
     };
+
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(current, previous) {
+          $scope.nodes = ElasticService.getNodes();
+        },
+        true
+    );
+
+    $scope.initializeController = function() {
+      $scope.nodes = ElasticService.getNodes();
+    };
+
   }
 
 ]);
