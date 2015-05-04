@@ -92,13 +92,19 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       DebugService.debug('Elasticseach connection:', this.connection);
       this.clusterRequest('GET', '/', {}, {},
           function(data) {
-            instance.setVersion(data.version.number);
-            instance.connected = true;
-            if (!instance.autoRefreshStarted) {
-              instance.autoRefreshStarted = true;
-              instance.autoRefreshCluster();
+            if (data.OK) { // detected https://github.com/Asquera/elasticsearch-http-basic
+              DebugService.debug('elasticsearch-http-basic plugin detected');
+              DebugService.debug('Attemping to connect with [' + host + '/]');
+              instance.connect(host + '/');
             } else {
-              instance.refresh();
+              instance.setVersion(data.version.number);
+              instance.connected = true;
+              if (!instance.autoRefreshStarted) {
+                instance.autoRefreshStarted = true;
+                instance.autoRefreshCluster();
+              } else {
+                instance.refresh();
+              }
             }
           },
           function(data) {

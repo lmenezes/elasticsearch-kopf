@@ -598,6 +598,22 @@ describe("ElasticService", function() {
     expect(elasticService.refresh).toHaveBeenCalled();
   });
 
-
+  it("handles connecting to cluster with elasticsearch-http-basic plugin", function() {
+    $httpBackend.when('GET', 'http://localhost:9200/').respond(200,
+        {OK: {}});
+    $httpBackend.when('GET', 'http://localhost:9200//').respond(200,
+        {version: {number: '1.5.1'}});
+    expect(elasticService.connection).toEqual(null);
+    expect(elasticService.connected).toEqual(false);
+    spyOn(this.ExternalSettingsService, 'getElasticsearchRootPath').andReturn('');
+    spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(false);
+    elasticService.connect('http://localhost:9200');
+    $httpBackend.flush();
+    expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
+    expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
+    expect(elasticService.connection.host).toEqual('http://localhost:9200/');
+    expect(elasticService.version.str).toEqual('1.5.1');
+    expect(elasticService.connected).toEqual(true);
+  });
 
 });
