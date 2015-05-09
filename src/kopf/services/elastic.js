@@ -587,16 +587,55 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('GET', path, {}, {}, transformed, error);
     };
 
-    this.getShardStats = function(shard, indexName, nodeId, success, error) {
-      var transformed = function(response) {
-        var shards = response.indices[indexName].shards;
-        var stats = shards[shard].filter(function(shardStats) {
-          return shardStats.routing.node === nodeId;
-        })[0];
-        success(new ShardStats(shard, indexName, stats));
-      };
-      var path = '/' + indexName + '/_stats?level=shards&human=true';
-      this.clusterRequest('GET', path, {}, {}, transformed, error);
+    /**
+     * Fetches shard information both from index/_stats and index/_recovery
+     * @param {string} shard - shard number
+     * @param {string} index - index
+     * @param {string} nodeId - node id
+     * @callback success
+     * @callback error
+     */
+    this.getShardStats = function(shard, index, nodeId, success, error) {
+      var host = this.connection.host;
+      var params = {};
+      this.addAuth(params);
+      $q.all([
+        $http.get(host + '/' + index + '/_stats?level=shards&human', params),
+        $http.get(host + '/' + index + '/_recovery?active_only=true&human',
+            params)
+      ]).then(
+          function(responses) {
+            try {
+              var indexStats = responses[0].data;
+              var shardsStats = indexStats.indices[index].shards[shard];
+              shardsStats = shardsStats ? shardsStats : [];
+              var shardStats = shardsStats.filter(
+                  function(stats) {
+                    return stats.routing.node === nodeId;
+                  }
+              );
+              if (shardStats.length == 1) { // shard is started
+                success(new ShardStats(shard, index, shardStats[0]));
+              } else { // non started shard
+                var indexRecovery = responses[1].data;
+                var shardRecoveries = indexRecovery[index].shards.filter(
+                    function(recovery) {
+                      return recovery.target.id === nodeId &&
+                        recovery.id == shard;
+                    });
+                success(new ShardStats(shard, index, shardRecoveries[0]));
+              }
+            } catch (exception) {
+              DebugService.debug('Error parsing output:', exception);
+              DebugService.debug('REST APIs output:', responses);
+              error(exception);
+            }
+          },
+          function(response) {
+            DebugService.debug('Error requesting shard stats data:', response);
+            error(response);
+          }
+      );
     };
 
     this.fetchAliases = function(success, error) {

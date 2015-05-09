@@ -616,4 +616,34 @@ describe("ElasticService", function() {
     expect(elasticService.connected).toEqual(true);
   });
 
+  it("fetches shard stats for initialized shard", function() {
+    $httpBackend.when('GET', 'http://localhost:9200/foo/_stats?level=shards&human').respond(200,
+        {indices: { foo: { shards: { 0: [{ routing: { node: 'nodeId'}}]}}}});
+    $httpBackend.when('GET', 'http://localhost:9200/foo/_recovery?active_only=true&human').respond(200,
+        {});
+    elasticService.connection = new ESConnection('http://localhost:9200', false);
+    var callbacks = { success: function(content) {} };
+    spyOn(callbacks, 'success');
+    elasticService.getShardStats('0', 'foo', 'nodeId', callbacks.success);
+    $httpBackend.flush();
+    expect(callbacks.success).toHaveBeenCalledWith(
+        new ShardStats('0', 'foo', { routing : { node : 'nodeId' } })
+    );
+  });
+
+  it("fetches shard stats for initializing shard", function() {
+    $httpBackend.when('GET', 'http://localhost:9200/foo/_stats?level=shards&human').respond(200,
+        {indices: { foo: { shards: { }}}});
+    $httpBackend.when('GET', 'http://localhost:9200/foo/_recovery?active_only=true&human').respond(200,
+        { foo: { shards: [ { target: { id: 'nodeId' }, id: '0' } ]}});
+    elasticService.connection = new ESConnection('http://localhost:9200', false);
+    var callbacks = { success: function(content) {} };
+    spyOn(callbacks, 'success');
+    elasticService.getShardStats('0', 'foo', 'nodeId', callbacks.success);
+    $httpBackend.flush();
+    expect(callbacks.success).toHaveBeenCalledWith(
+        new ShardStats('0', 'foo', { target : { id : 'nodeId' }, id : '0' })
+    );
+  });
+
 });
