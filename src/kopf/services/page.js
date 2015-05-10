@@ -3,13 +3,13 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
 
     var instance = this;
 
-    var clusterStatus;
-    var clusterName;
+    this.clusterStatus = undefined;
+    this.clusterName = undefined;
 
-    var link = $document[0].querySelector('link[rel~=\'icon\']');
+    this.link = $document[0].querySelector('link[rel~=\'icon\']');
 
-    if (link) {
-      var faviconUrl = link.href;
+    if (this.link) {
+      var faviconUrl = this.link.href;
       var img = $document[0].createElement('img');
       img.src = faviconUrl;
     }
@@ -24,19 +24,27 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
         }
     );
 
+    /**
+     * Updates page title if name is different than clusterName
+     *
+     * @param {string} name - cluster name
+     */
     this.setPageTitle = function(name) {
-      if (name && name !== clusterName) {
-        clusterName = name;
-        $rootScope.title = 'kopf[' + name + ']';
-      } else {
-        $rootScope.title = 'kopf - no connection';
+      if (name !== this.clusterName) {
+        if (name) {
+          $rootScope.title = 'kopf[' + name + ']';
+        }
+        else {
+          $rootScope.title = 'kopf - no connection';
+        }
+        this.clusterName = name;
       }
     };
 
     this.setFavIconColor = function(status) {
-      if (link && clusterStatus !== status) {
+      if (this.link && this.clusterStatus !== status) {
+        this.clusterStatus = status;
         try {
-          clusterStatus = status;
           var colors = {green: '#468847', yellow: '#c09853', red: '#B94A48'};
           var color = status ? colors[status] : '#333';
           var canvas = $document[0].createElement('canvas');
@@ -48,8 +56,8 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
           context.fillStyle = color;
           context.fillRect(0, 0, 32, 32);
           context.fill();
-          link.type = 'image/x-icon';
-          link.href = canvas.toDataURL();
+          this.link.type = 'image/x-icon';
+          this.link.href = canvas.toDataURL();
         } catch (exception) {
           DebugService.debug('Error while changing favicon', exception);
         }
