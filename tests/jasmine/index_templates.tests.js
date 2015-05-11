@@ -196,4 +196,19 @@ describe('IndexTemplatesController', function() {
     );
   });
 
+  it('loads an existing template for edition', function() {
+    var editor = {
+      setValue: function(template) {
+        return true;
+      }
+    };
+    var template = new IndexTemplate('template_name_to_load', { someProperty: 'someValue'});
+    this.scope.template = template;
+    this.scope.editor = editor;
+    spyOn(editor, 'setValue').andReturn(true);
+    this.scope.loadIndexTemplate(template);
+    expect(editor.setValue).toHaveBeenCalledWith(JSON.stringify(template.body, undefined, 2));
+    expect(this.scope.template.name).toEqual('template_name_to_load');
+  });
+
 });

@@ -91,6 +91,11 @@ kopf.controller('IndexTemplatesController', ['$scope', 'ConfirmDialogService',
       );
     };
 
+    $scope.loadIndexTemplate = function(template) {
+      $scope.template.name = template.name;
+      $scope.editor.setValue(JSON.stringify(template.body, undefined, 2));
+    };
+
     $scope.initializeController = function() {
       $scope.loadTemplates();
       $scope.initEditor();
