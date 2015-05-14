@@ -2778,6 +2778,12 @@ function HotThread(header) {
   this.stack = [];
 }
 
+function HotThreads(data) {
+  this.nodes_hot_threads = data.split(':::').slice(1).map(function(data) {
+    return new NodeHotThreads(data);
+  });
+}
+
 function Index(indexName, clusterState, indexStats, aliases) {
   this.name = indexName;
   this.shards = null;
@@ -2984,21 +2990,29 @@ function Node(nodeId, nodeStats, nodeInfo) {
 function NodeHotThreads(data) {
   var lines = data.split('\n');
   this.header = lines[0];
-  this.subHeader = lines[1];
+  // pre 4859ce5d79a786b58b1cd2fb131614677efd6b91
+  var BackwardCompatible = lines[1].indexOf('Hot threads at') == -1;
+  var HeaderLines = BackwardCompatible ? 2 : 3;
+  this.subHeader = BackwardCompatible ? undefined : lines[1];
   this.node = this.header.substring(
       this.header.indexOf('[') + 1,
       this.header.indexOf(']')
   );
   var threads = [];
   var thread;
-  if (lines.length > 3) {
-    lines.slice(3).forEach(function(line) {
-      if (line.indexOf('       ') === 0) {
-        thread.stack.push(line);
-      } else if (line.indexOf('     ') === 0) {
-        thread.subHeader = line;
-      }
-      else if (line.indexOf('    ') === 0) {
+  if (lines.length > HeaderLines) {
+    lines.slice(HeaderLines).forEach(function(line) {
+      var blankLine = line.trim().length === 0;
+      if (thread) {
+        if (thread.subHeader) {
+          thread.stack.push(line);
+          if (blankLine) {
+            thread = undefined;
+          }
+        } else {
+          thread.subHeader = line;
+        }
+      } else {
         thread = new HotThread(line);
         threads.push(thread);
       }
@@ -4570,9 +4584,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         interval: interval
       };
       var parseHotThreads = function(response) {
-        var threads = response.split('::: ').slice(1).map(function(data) {
-          return new NodeHotThreads(data);
-        });
+        var threads = new HotThreads(response).nodes_hot_threads;
         success(threads);
       };
       this.clusterRequest('GET', path, params, {}, parseHotThreads, error);

@@ -53,15 +53,15 @@
                   <div ng-repeat="nodeHotThreads in nodesHotThreads track by $index">
                     <div id="#{{nodeHotThreads.node}}Accordion">
                       <a data-toggle="collapse" data-parent="#{{nodeHotThreads.node}}Accordion" target="_self" href="#{{nodeHotThreads.node}}Panel">
-                        <div>:::&nbsp;{{nodeHotThreads.header}}</div>
-                        <div>&nbsp;&nbsp;{{nodeHotThreads.subHeader}}</div>
+                        <div class="hot-threads-output">:::{{nodeHotThreads.header}}</div>
+                        <div ng-show="nodeHotThreads.subHeader" class="hot-threads-output">{{nodeHotThreads.subHeader}}</div>
                       </a>
                       &nbsp;&nbsp;&nbsp;
                       <div id="{{nodeHotThreads.node}}Panel" class="panel-collapse collapse in">
                         <div ng-repeat="hotThread in nodeHotThreads.threads track by $index">
-                          <div>&nbsp;&nbsp;&nbsp;{{hotThread.header}}</div>
-                          <div>&nbsp;&nbsp;&nbsp;&nbsp;{{hotThread.subHeader}}</div>
-                          <div ng-repeat="line in hotThread.stack track by $index">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{line}}</div>
+                          <div class="hot-threads-output">{{hotThread.header}}</div>
+                          <div class="hot-threads-output">{{hotThread.subHeader}}</div>
+                          <div ng-repeat="line in hotThread.stack track by $index" class="hot-threads-output">{{line}}</div>
                         </div>
                       </div>
                     </div>

@@ -773,3 +773,7 @@ select.input-sm-twoxheight {
     vertical-align: baseline;
     border-radius: .25em;
 }
+
+.hot-threads-output {
+    white-space: pre;
+}
