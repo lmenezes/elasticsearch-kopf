@@ -49,7 +49,7 @@ kopf.controller('NavbarController', ['$scope', '$location',
     $scope.connectToHost = function(host) {
       try {
         ElasticService.connect(host);
-        HostHistoryService.addToHistory(ElasticService.connection.host);
+        HostHistoryService.addToHistory(ElasticService.connection);
         $scope.host_history = HostHistoryService.getHostHistory();
       } catch (error) {
         AlertService.error('Error while connecting to new target host', error);

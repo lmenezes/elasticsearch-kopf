@@ -70,7 +70,7 @@ describe('NavbarController', function() {
     expect(this.ElasticService.connect).toHaveBeenCalledWith("http://newhost:1234");
     expect(this.ElasticService.refresh).toHaveBeenCalled();
     expect(this.scope.current_host).toEqual("http://newhost:1234");
-    expect(this.HostHistoryService.addToHistory).toHaveBeenCalledWith("http://newhost:1234");
+    expect(this.HostHistoryService.addToHistory).toHaveBeenCalledWith(new ESConnection('http://newhost:1234'));
     expect(this.scope.host_history).toEqual(['waaasss']);
   });
 
