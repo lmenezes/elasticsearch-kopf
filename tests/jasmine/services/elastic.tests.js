@@ -646,4 +646,26 @@ describe("ElasticService", function() {
     );
   });
 
+  it("relocates a shard and executes success callback", function() {
+    $httpBackend.when('POST', 'http://localhost:9200/_cluster/reroute').respond(200,
+        {notreallyusingtheresponse:{}});
+    elasticService.connection = new ESConnection('http://localhost:9200', false);
+    var callbacks = { success: function(content) {} };
+    spyOn(callbacks, 'success');
+    elasticService.relocateShard('1', 'some_index', 'from_nd', 'to_nd', callbacks.success);
+    $httpBackend.flush();
+    expect(callbacks.success).toHaveBeenCalledWith({notreallyusingtheresponse:{}});
+  });
+
+  it("attempts relocating a shard and executes error callback", function() {
+    $httpBackend.when('POST', 'http://localhost:9200/_cluster/reroute').respond(400,
+        {notreallyusingtheresponse:{}});
+    elasticService.connection = new ESConnection('http://localhost:9200', false);
+    var callbacks = { error: function(content) {} };
+    spyOn(callbacks, 'error');
+    elasticService.relocateShard('1', 'some_index', 'from_nd', 'to_nd', undefined, callbacks.error);
+    $httpBackend.flush();
+    expect(callbacks.error).toHaveBeenCalledWith({notreallyusingtheresponse:{}});
+  });
+
 });

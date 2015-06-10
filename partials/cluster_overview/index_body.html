@@ -20,8 +20,8 @@
         </ul>
       </span>
     </span>
-  <a data-toggle="modal" ng-show="relocatingShard && relocatingShard.node !== node.id && relocatingShard.index === index.name" href="#confirm_dialog" target="_self" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptRelocateShard(relocatingShard, node)">
-    <span class="shard shard-relocation-target shard-closed">
+  <a data-toggle="modal" href="#confirm_dialog" target="_self" data-backdrop="static" role="menuitem" tabindex="-1" ng-show="relocatingShard && relocatingShard.node !== node.id && relocatingShard.index === index.name">
+    <span class="shard shard-relocation-target shard-closed" ng-click="promptRelocateShard(relocatingShard.shard, relocatingShard.index, relocatingShard.node, node.id)">
       <i class="fa fa-fw fa-check"></i>
     </span>
   </a>

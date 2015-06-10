@@ -282,8 +282,8 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
-    $scope.relocateShard = function(shard, node) {
-      ElasticService.relocateShard(shard, node,
+    $scope.relocateShard = function(shard, index, fromNode, toNode) {
+      ElasticService.relocateShard(shard, index, fromNode, toNode,
           function(response) {
             ElasticService.refresh();
             $scope.relocatingShard = undefined;
@@ -296,14 +296,14 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
-    $scope.promptRelocateShard = function(shard, node) {
+    $scope.promptRelocateShard = function(shard, index, fromNode, toNode) {
       ConfirmDialogService.open(
           'are you sure you want relocate the shard?',
           'Once the relocation finishes, the cluster will try to ' +
           'rebalance itself to an even state',
           'Relocate',
           function() {
-            $scope.relocateShard(shard, node);
+            $scope.relocateShard(shard, index, fromNode, toNode);
           }
       );
     };

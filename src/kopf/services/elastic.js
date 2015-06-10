@@ -531,21 +531,24 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     /**
      * Relocates a shard to a given node
-     * @param {Shard} shard - The shard to be relocated
-     * @param {Node} node- The target node
+     * @param {string} shard - The shard to be relocated
+     * @param {string} index - The index the shard belongs to
+     * @param {string} fromNode - Node where shard is currently located
+     * @param {string} toNode - Target node for shard relocation
      * @callback success
      * @callback error
      */
-    this.relocateShard = function(shard, node, success, error) {
+    this.relocateShard = function(shard, index, fromNode, toNode,
+                                  success, error) {
       var path = '/_cluster/reroute';
       var body = {
         commands: [
           {
             move: {
-              shard: shard.shard,
-              index: shard.index,
-              from_node: shard.node,
-              to_node: node.id
+              shard: shard,
+              index: index,
+              from_node: fromNode,
+              to_node: toNode
             }
           }
         ]

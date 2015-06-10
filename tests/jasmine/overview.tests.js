@@ -504,4 +504,38 @@ describe('ClusterOverviewController', function() {
         "buuuu");
   });
 
+  it('successfully relocate shard', function() {
+    this.scope.relocatingShard = 'someShard';
+    this.ElasticService.relocateShard = function(shard, index, fromNode, toNode, success, error) {
+      return success({ok:{}});
+    };
+    this.ElasticService.refresh = function() {};
+    spyOn(this.ElasticService, 'relocateShard').andCallThrough();
+    spyOn(this.ElasticService, 'refresh').andCallThrough();
+    spyOn(this.AlertService, "success").andReturn();
+    this.scope.relocateShard('0', 'index_name', 'node_id', 'node_id2');
+    expect(this.ElasticService.relocateShard).toHaveBeenCalledWith("0",
+        'index_name', 'node_id', 'node_id2', jasmine.any(Function), jasmine.any(Function));
+    expect(this.ElasticService.refresh).toHaveBeenCalled();
+    expect(this.scope.relocatingShard).toEqual(undefined);
+    expect(this.AlertService.success).toHaveBeenCalledWith('Relocation successfully executed', { ok : {  } });
+  });
+
+  it('handle shard relocation failure', function() {
+    this.scope.relocatingShard = 'someShard';
+    this.ElasticService.relocateShard = function(shard, index, fromNode, toNode, success, error) {
+      return error({ok:{}});
+    };
+    this.ElasticService.refresh = function() {};
+    spyOn(this.AlertService, "error").andReturn();
+    spyOn(this.ElasticService, 'relocateShard').andCallThrough();
+    spyOn(this.ElasticService, 'refresh').andCallThrough();
+    this.scope.relocateShard('0', 'index_name', 'node_id', 'node_id2');
+    expect(this.ElasticService.relocateShard).toHaveBeenCalledWith("0",
+        'index_name', 'node_id', 'node_id2', jasmine.any(Function), jasmine.any(Function));
+    expect(this.ElasticService.refresh).not.toHaveBeenCalled();
+    expect(this.scope.relocatingShard).toEqual(undefined);
+    expect(this.AlertService.error).toHaveBeenCalledWith('Error while moving shard', { ok : {  } });
+  });
+
 });
