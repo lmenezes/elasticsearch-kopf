@@ -95,6 +95,10 @@ h6 { color: #d0d0d0; font-variant:small-caps; font-weight: 500; }
 	background: #ECECEB;
 	color: #6B6969;
 }
+.shard-relocation-target {
+    border: 1px dotted;
+    background: #222;
+}
 
 /* selected pill color to grey */
 .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {

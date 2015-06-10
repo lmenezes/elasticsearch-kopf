@@ -530,6 +530,30 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     };
 
     /**
+     * Relocates a shard to a given node
+     * @param {Shard} shard - The shard to be relocated
+     * @param {Node} node- The target node
+     * @callback success
+     * @callback error
+     */
+    this.relocateShard = function(shard, node, success, error) {
+      var path = '/_cluster/reroute';
+      var body = {
+        commands: [
+          {
+            move: {
+              shard: shard.shard,
+              index: shard.index,
+              from_node: shard.node,
+              to_node: node.id
+            }
+          }
+        ]
+      };
+      this.clusterRequest('POST', path, {}, body, success, error);
+    };
+
+    /**
      * Executes cat api request
      * @callback success
      * @callback error

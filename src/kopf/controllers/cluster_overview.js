@@ -7,6 +7,8 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.nodes = [];
 
+    $scope.relocatingShard = undefined;
+
     $($window).resize(function() {
       $scope.$apply(function() {
         $scope.index_paginator.setPageSize($scope.getPageSize());
@@ -64,6 +66,10 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
     $scope.$watch('index_paginator', function(filter, previous) {
       $scope.setIndices(ElasticService.getIndices());
     }, true);
+
+    $scope.selectShardRelocation = function(shard) {
+      $scope.relocatingShard = shard;
+    };
 
     $scope.setNodes = function(nodes) {
       $scope.nodes = nodes.filter(function(node) {
@@ -272,6 +278,32 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
           },
           function(error) {
             AlertService.error('Error while loading shard stats', error);
+          }
+      );
+    };
+
+    $scope.relocateShard = function(shard, node) {
+      ElasticService.relocateShard(shard, node,
+          function(response) {
+            ElasticService.refresh();
+            $scope.relocatingShard = undefined;
+            AlertService.success('Relocation successfully executed', response);
+          },
+          function(error) {
+            $scope.relocatingShard = undefined;
+            AlertService.error('Error while moving shard', error);
+          }
+      );
+    };
+
+    $scope.promptRelocateShard = function(shard, node) {
+      ConfirmDialogService.open(
+          'are you sure you want relocate the shard?',
+          'Once the relocation finishes, the cluster will try to ' +
+          'rebalance itself to an even state',
+          'Relocate',
+          function() {
+            $scope.relocateShard(shard, node);
           }
       );
     };
