@@ -7,7 +7,7 @@
   <span id="{{shard.id}}" class="normal-action" ng-repeat="shard in cluster.getShards(node.id, index.name) track by $index">
     <span class="dropdown">
       <a data-toggle="dropdown" href="#" target="_self">
-        <span class="shard {{shard.primary ? 'shard-primary' : ''}} shard-{{shard.state.toLowerCase()}}">
+        <span class="shard {{shard.primary ? 'shard-primary' : ''}} shard-{{shard.state.toLowerCase()}} {{relocatingShard && relocatingShard.id === shard.id ? 'shard-relocation-source' : ''}}">
           {{shard.shard}}
         </span>
       </a>
@@ -17,9 +17,14 @@
             <i class="fa fa-fw fa-info-circle index-menu-icon"></i> show shard stats
           </a>
         </li>
-        <li role="presentation">
+        <li role="presentation" ng-hide="relocatingShard && relocatingShard.id === shard.id">
           <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="selectShardRelocation(shard)">
-            <i class="fa fa-fw fa-arrows"></i> relocate shard
+            <i class="fa fa-fw fa-arrows"></i> select for relocation
+          </a>
+        </li>
+        <li role="presentation" ng-show="relocatingShard && relocatingShard.id === shard.id">
+          <a class="cluster-map-header-index-action" role="menuitem" tabindex="-1" ng-click="selectShardRelocation()">
+            <i class="fa fa-fw fa-arrows"></i> unselect for relocation
           </a>
         </li>
       </ul>
