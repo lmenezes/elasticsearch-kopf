@@ -931,7 +931,15 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
-    $scope.promptRelocateShard = function(shard, index, fromNode, toNode) {
+    /**
+     * Prompts confirmation dialog for relocating currently selected shard
+     * to the given node
+     * @param {string} toNode - target node id
+     */
+    $scope.promptRelocateShard = function(toNode) {
+      var shard = $scope.relocatingShard.shard;
+      var index = $scope.relocatingShard.index;
+      var fromNode = $scope.relocatingShard.node;
       ConfirmDialogService.open(
           'are you sure you want relocate the shard?',
           'Once the relocation finishes, the cluster will try to ' +
@@ -941,6 +949,30 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
             $scope.relocateShard(shard, index, fromNode, toNode);
           }
       );
+    };
+
+    /**
+     * Evaluates if relocation target box should be displayed for the cell
+     * corresponding to the given index and node
+     *
+     * @param {Index} index - index
+     * @param {Node} node - target node
+     * @returns {boolean}
+     */
+    $scope.canReceiveShard = function(index, node) {
+      var shard = $scope.relocatingShard;
+      if (shard) {
+        if (shard.node !== node.id && shard.index === index.name) {
+          var shards = $scope.cluster.getShards(node.id, index.name);
+          var sameShard = function(s) {
+            return s.shard === shard.shard;
+          };
+          if (shards.filter(sameShard).length === 0) {
+            return true;
+          }
+        }
+      }
+      return false;
     };
 
   }
