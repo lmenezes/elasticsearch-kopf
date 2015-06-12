@@ -45,6 +45,34 @@ grunt server
 open http://localhost:9200/_plugin/kopf
 ```
 
+####Kopf behind a reverse proxy
+Example configuration for nginx:
+```
+server {
+  listen       8080;
+  server_name  localhost;
+
+  location ~ ^/es.*$ {
+    proxy_pass http://localhost:9200;
+    rewrite ^/es(.*) /$1 break;
+  }
+
+  location ~ ^/kopf/.*$ {
+    proxy_pass http://localhost:9200;
+    rewrite ^/kopf/(.*) /_plugin/kopf/$1 break;
+  }
+}
+```
+Example configuration for kopf(kopf_external_settings.json):
+```json
+{
+  "elasticsearch_root_path": "/es",
+  "with_credentials": false,
+  "theme": "dark",
+  "refresh_rate": 5000
+}
+```
+Access kopf at http://localhost:8080/kopf/
 ####Try it online:
 ```
 http://lmenezes.com/elasticsearch-kopf/?location=http://localhost:9200
