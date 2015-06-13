@@ -3,7 +3,8 @@ kopf.directive('ngPagination', ['$document', function($document) {
   return {
     scope: {
       paginator: '=paginator',
-      page: '=page'
+      page: '=page',
+      label: '=label'
     },
     templateUrl: './partials/directives/pagination.html',
     link: function(scope, element, attrs) {
