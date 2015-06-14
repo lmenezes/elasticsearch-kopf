@@ -719,11 +719,11 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptShutdownNode = function(nodeId, nodeName) {
       ConfirmDialogService.open(
-              'are you sure you want to shutdown node ' + nodeName + '?',
-              'Shutting down a node will make all data stored in this node ' +
-              'inaccessible, unless it\'s replicated across other nodes.' +
-              'Replicated shards will be promoted to primary if the primary ' +
-              'shard is no longer reachable.',
+          'are you sure you want to shutdown node ' + nodeName + '?',
+          'Shutting down a node will make all data stored in this node ' +
+          'inaccessible, unless it\'s replicated across other nodes.' +
+          'Replicated shards will be promoted to primary if the primary ' +
+          'shard is no longer reachable.',
           'Shutdown',
           function() {
             ElasticService.shutdownNode(nodeId);
@@ -744,10 +744,10 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptOptimizeIndex = function(index) {
       ConfirmDialogService.open(
-              'are you sure you want to optimize index ' + index + '?',
-              'Optimizing an index is a resource intensive operation and ' +
-              'should be done with caution. Usually, you will only want to ' +
-              'optimize an index when it will no longer receive updates',
+          'are you sure you want to optimize index ' + index + '?',
+          'Optimizing an index is a resource intensive operation and ' +
+          'should be done with caution. Usually, you will only want to ' +
+          'optimize an index when it will no longer receive updates',
           'Optimize',
           function() {
             $scope.optimizeIndex(index);
@@ -768,9 +768,9 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptDeleteIndex = function(index) {
       ConfirmDialogService.open(
-              'are you sure you want to delete index ' + index + '?',
-              'Deleting an index cannot be undone and all data for this ' +
-              'index will be lost',
+          'are you sure you want to delete index ' + index + '?',
+          'Deleting an index cannot be undone and all data for this ' +
+          'index will be lost',
           'Delete',
           function() {
             $scope.deleteIndex(index);
@@ -792,7 +792,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptClearCache = function(index) {
       ConfirmDialogService.open(
-              'are you sure you want to clear the cache for ' + index + '?',
+          'are you sure you want to clear the cache for ' + index + '?',
           'This will clear all caches for this index.',
           'Clear',
           function() {
@@ -814,9 +814,9 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptRefreshIndex = function(index) {
       ConfirmDialogService.open(
-              'are you sure you want to refresh index ' + index + '?',
-              'Refreshing an index makes all operations performed since the ' +
-              'last refresh available for search.',
+          'are you sure you want to refresh index ' + index + '?',
+          'Refreshing an index makes all operations performed since the ' +
+          'last refresh available for search.',
           'Refresh',
           function() {
             $scope.refreshIndex(index);
@@ -850,10 +850,10 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptCloseIndex = function(index) {
       ConfirmDialogService.open(
-              'are you sure you want to close index ' + index + '?',
-              'Closing an index will remove all it\'s allocated shards from ' +
-              'the cluster.  Both searches and updates will no longer be ' +
-              'accepted for the index. A closed index can be reopened.',
+          'are you sure you want to close index ' + index + '?',
+          'Closing an index will remove all it\'s allocated shards from ' +
+          'the cluster.  Both searches and updates will no longer be ' +
+          'accepted for the index. A closed index can be reopened.',
           'Close index',
           function() {
             ElasticService.closeIndex(index);
@@ -863,9 +863,9 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.promptOpenIndex = function(index) {
       ConfirmDialogService.open(
-              'are you sure you want to open index ' + index + '?',
-              'Opening an index will trigger the recovery process. ' +
-              'This process could take sometime depending on the index size.',
+          'are you sure you want to open index ' + index + '?',
+          'Opening an index will trigger the recovery process. ' +
+          'This process could take sometime depending on the index size.',
           'Open index',
           function() {
             ElasticService.openIndex(index);
