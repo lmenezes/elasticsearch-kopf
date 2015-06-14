@@ -238,6 +238,103 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       );
     };
 
+    $scope.promptCloseIndices = function() {
+      var indices = $scope.index_paginator.getResults().map(function(index) {
+        return index.name;
+      });
+      ConfirmDialogService.open(
+          'are you sure you want to close all selected indices?',
+          'Closing an index will remove all it\'s allocated shards from ' +
+          'the cluster.  Both searches and updates will no longer be ' +
+          'accepted for the index. A closed index can be reopened.\n\n' +
+          'Selected indices:\n' + indices.join('\n'),
+          'Close index',
+          function() {
+            ElasticService.closeIndex(indices.join(','));
+          }
+      );
+    };
+
+    $scope.promptOpenIndices = function() {
+      var indices = $scope.index_paginator.getResults().map(function(index) {
+        return index.name;
+      });
+      ConfirmDialogService.open(
+          'are you sure you want to open all selected indices?',
+          'Opening an index will trigger the recovery process. ' +
+          'This process could take sometime depending on the index size.\n\n' +
+          'Selected indices:\n' + indices.join('\n'),
+          'Open index',
+          function() {
+            ElasticService.openIndex(indices.join(','));
+          }
+      );
+    };
+
+    $scope.promptRefreshIndices = function() {
+      var indices = $scope.index_paginator.getResults().map(function(index) {
+        return index.name;
+      });
+      ConfirmDialogService.open(
+          'are you sure you want to refresh all selected indices?',
+          'Refreshing an index makes all operations performed since the ' +
+          'last refresh available for search.\n\n' +
+          'Selected indices:\n' + indices.join('\n'),
+          'Refresh',
+          function() {
+            $scope.refreshIndex(indices.join(','));
+          }
+      );
+    };
+
+    $scope.promptClearCaches = function() {
+      var indices = $scope.index_paginator.getResults().map(function(index) {
+        return index.name;
+      });
+      ConfirmDialogService.open(
+          'are you sure you want to clear the cache for all selected indices?',
+          'This will clear all caches for this index.\n\n' +
+          'Selected indices:\n' + indices.join('\n'),
+          'Clear',
+          function() {
+            $scope.clearCache(indices.join(','));
+          }
+      );
+    };
+
+    $scope.promptDeleteIndices = function() {
+      var indices = $scope.index_paginator.getResults().map(function(index) {
+        return index.name;
+      });
+      ConfirmDialogService.open(
+          'are you sure you want to delete all selected indices?',
+          'Deleting an index cannot be undone and all data for this ' +
+          'index will be lost.\n\n' +
+          'Selected indices:\n' + indices.join('\n'),
+          'Delete',
+          function() {
+            $scope.deleteIndex(indices.join(','));
+          }
+      );
+    };
+
+    $scope.promptOptimizeIndices = function() {
+      var indices = $scope.index_paginator.getResults().map(function(index) {
+        return index.name;
+      });
+      ConfirmDialogService.open(
+          'are you sure you want to optimize all selected indices?',
+          'Optimizing an index is a resource intensive operation and ' +
+          'should be done with caution. Usually, you will only want to ' +
+          'optimize an index when it will no longer receive updates.\n\n' +
+          'Selected indices:\n' + indices.join('\n'),
+          'Optimize',
+          function() {
+            $scope.optimizeIndex(indices.join(','));
+          }
+      );
+    };
+
     $scope.showIndexSettings = function(index) {
       ElasticService.getIndexMetadata(index,
           function(metadata) {

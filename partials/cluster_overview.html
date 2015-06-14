@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-lg-10" ng-include src="'partials/cluster_overview/filters.html'"></div>
   <div class="col-lg-2">
-    <ng-pagination page="page" paginator="index_paginator"></ng-pagination>
+    <ng-pagination page="page" paginator="index_paginator" label="'selected indices'"></ng-pagination>
   </div>
 </div>
 <table class="table table-bordered table-condensed table-rounded overview">
@@ -10,11 +10,6 @@
       <!-- cluster actions -->
       <th class="box cluster-map-header-cluster-actions">
         <div class="row">
-          <div class="col-lg-3 col-xs-6">
-            <a href="#!createIndex" class="cluster-map-header-cluster-action">
-              <i class="fa fa-plus-square-o" title="create new index"></i>
-            </a>
-          </div>
           <div class="col-lg-3 col-xs-6">
             <a class="cluster-map-header-cluster-action">
               <i class="fa fa-lock danger-action" ng-show="cluster.disableAllocation === 'true'" ng-click="enableAllocation()" title="enable shard allocation"></i>
@@ -31,6 +26,44 @@
               <i class="fa fa-sort-alpha-asc" title="sort ascending" ng-show="index_filter.asc" ng-click="index_filter.asc = false"></i>
               <i class="fa fa-sort-alpha-desc" title="sort descending" ng-hide="index_filter.asc" ng-click="index_filter.asc = true"></i>
             </a>
+          </div>
+          <div class="col-lg-3 col-xs-6">
+            <div class="dropdown">
+              <a data-toggle="dropdown" href="#" target="_self" class="cluster-map-header-cluster-action">
+                <i class="fa fa-caret-down"></i>
+              </a>
+              <ul class="dropdown-menu cluster-dropdown" role="menu">
+                <li role="presentation">
+                  <a data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptCloseIndices()">
+                    <i class="fa fa-fw fa-folder-open index-menu-icon"></i> close selected
+                  </a>
+                  <a data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" data-backdrop="static" role="menuitem" tabindex="-1" ng-click="promptOpenIndices()">
+                    <i class="fa fa-fw fa-folder index-menu-icon" title="open index"></i> open selected
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="promptOptimizeIndices()">
+                    <i class="fa fa-fw fa-wrench index-menu-icon"></i> optimize selected
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" title="refresh index" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="promptRefreshIndices()">
+                    <i class="fa fa-fw fa-refresh index-menu-icon"></i> refresh selected
+                  </a>
+                </li>
+                <li role="presentation">
+                  <a data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" role="menuitem" tabindex="-1" data-backdrop="static" data-keyboard="fa fa-fwlse" ng-click="promptClearCaches()">
+                    <i class="fa fa-fw fa-circle-o index-menu-icon"></i> clear selected caches
+                  </a>
+                </li>
+                <li role="presentation" class="divider"></li>
+                <li role="presentation">
+                  <a data-toggle="modal" href="#confirm_dialog" target="_self" class="cluster-map-header-index-action" title="delete index" role="menuitem" tabindex="-1" data-backdrop="static" ng-click="promptDeleteIndices()">
+                    <i class="fa fa-fw fa-trash-o danger-action index-menu-icon"></i> delete selected
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </th>

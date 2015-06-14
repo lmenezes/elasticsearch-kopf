@@ -197,6 +197,9 @@ a.cluster-map-node-action {
     right: 0;
     left: inherit;
 }
+.cluster-dropdown {
+    text-align: left;
+}
 
 .unassigned-row {
 	vertical-align: middle !important;
