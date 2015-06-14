@@ -538,4 +538,70 @@ describe('ClusterOverviewController', function() {
     expect(this.AlertService.error).toHaveBeenCalledWith('Error while moving shard', { ok : {  } });
   });
 
+  it('evaluate to false if not same index', function() {
+    this.scope.relocatingShard = new Shard({
+      primary: true,
+      state: 'STARTED',
+      node: 'someid',
+      index: 'someidx',
+      shard: '1'
+    });
+    var idx = {name: 'someidx2'};
+    var node = {id: 'someid'};
+    expect(this.scope.canReceiveShard(idx, node)).toEqual(false);
+  });
+
+  it('evaluate to false if same node', function() {
+    this.scope.relocatingShard = new Shard({
+      primary: true,
+      state: 'STARTED',
+      node: 'someid',
+      index: 'someidx',
+      shard: '1'
+    });
+    var idx = {name: 'someidx'};
+    var node = {id: 'someid'};
+    expect(this.scope.canReceiveShard(idx, node)).toEqual(false);
+  });
+
+  it('not fail if index is undefined', function() {
+    this.scope.relocatingShard = new Shard({
+      primary: true,
+      state: 'STARTED',
+      node: 'someid',
+      index: 'someidx',
+      shard: '1'
+    });
+    var node = {id: 'someid'};
+    expect(this.scope.canReceiveShard(undefined, node)).toEqual(false);
+  });
+
+  it('evaluate to false if same index different node but contains shard', function() {
+    this.scope.relocatingShard = new Shard({
+      primary: true,
+      state: 'STARTED',
+      node: 'someid',
+      index: 'someidx',
+      shard: '1'
+    });
+    var idx = {name: 'someidx'};
+    var node = {id: 'someid2'};
+    this.scope.cluster = { getShards: function(node, index) {
+      return [{shard: 1}];
+    }};
+    expect(this.scope.canReceiveShard(idx, node)).toEqual(true);
+  });
+
+  it('evaluate to true if same index different node and not contains shard', function() {
+    this.scope.relocatingShard = new Shard({
+      primary: true, state: 'STARTED', node: 'someid', index: 'someidx'
+    });
+    var idx = {name: 'someidx'};
+    var node = {id: 'someid2'};
+    this.scope.cluster = { getShards: function(node, index) {
+      return [{shard: 2}];
+    }};
+    expect(this.scope.canReceiveShard(idx, node)).toEqual(true);
+  });
+
 });

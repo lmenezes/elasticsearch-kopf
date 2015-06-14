@@ -423,7 +423,7 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
      */
     $scope.canReceiveShard = function(index, node) {
       var shard = $scope.relocatingShard;
-      if (shard) {
+      if (shard && index) { // in case num indices < num columns
         if (shard.node !== node.id && shard.index === index.name) {
           var shards = $scope.cluster.getShards(node.id, index.name);
           var sameShard = function(s) {
