@@ -59,7 +59,7 @@
             <i class="fa fa-fw fa-search" title="client node"></i>
           </div>
         </div>
-        <div>
+        <div class="node-info">
           <div class="dropdown">
             <a data-toggle="dropdown" href="#" target="_self" class="cluster-map-header-index-name">
               <i class="fa fa-fw fa-caret-down pull-right"></i>
@@ -77,6 +77,9 @@
                 </a>
               </li>
             </ul>
+          </div>
+          <div>
+            <span class="cluster-map-node-detail">{{node.host}}</span>
           </div>
           <div>
             <span class="cluster-map-node-detail">{{node.transportAddress}}</span>
