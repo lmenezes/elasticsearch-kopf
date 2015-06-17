@@ -4,7 +4,7 @@
     float: left;
 }
 .node-info {
-    overflow: hidden
+    margin-left: 20px;
 }
 .content-panel {
 	padding-top: 10px;
