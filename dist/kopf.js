@@ -644,6 +644,8 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
 
     $scope.relocatingShard = undefined;
 
+    $scope.expandedView = false;
+
     $($window).resize(function() {
       $scope.$apply(function() {
         $scope.index_paginator.setPageSize($scope.getPageSize());

@@ -29,13 +29,23 @@
         </ul>
       </div>
       <div>
-        <span class="cluster-map-node-detail">{{node.transportAddress}}</span>
+        <div>
+          <span class="cluster-map-node-detail">{{node.host}}</span>
+        </div>
+        <div ng-show="expandedView">
+          <span class="cluster-map-node-detail">{{node.transportAddress}}</span>
+        </div>
+        <div ng-show="expandedView">
+          <span class="node-label label-primary">JVM: {{node.jvmVersion}}</span>
+          <span class="node-label label-primary">ES: {{node.elasticVersion}}</span>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-xs-12 cluster-map-header-index-name">
     <div class="col-xs-3 node-progress-bar" title="used: {{node.heap_used}}&#013;max: {{node.heap_max}}">
       <span class="cluster-map-node-detail">heap</span>
+
       <div class="progress node-progress">
         <div class="progress-bar" ng-class="{'progress-bar-danger': node.heap_used_percent > 75}" role="progressbar" aria-valuenow="{{node.heap_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.heap_used_percent}}%;">
         </div>
@@ -43,6 +53,7 @@
     </div>
     <div class="col-xs-3 node-progress-bar" title="free: {{node.disk_free_in_bytes | bytes}}&#013;total: {{node.disk_total_in_bytes | bytes}}">
       <span class="cluster-map-node-detail">disk</span>
+
       <div class="progress node-progress">
         <div class="progress-bar" ng-class="{'progress-bar-danger': node.disk_used_percent > 75}" role="progressbar" aria-valuenow="{{node.disk_used_percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.disk_used_percent}}%;">
         </div>
@@ -50,6 +61,7 @@
     </div>
     <div class="col-xs-3 node-progress-bar" title="user: {{node.cpu_user}}%&#013;system: {{node.cpu_sys}}%">
       <span class="cluster-map-node-detail">cpu</span>
+
       <div class="progress node-progress">
         <div class="progress-bar" ng-class="{'progress-bar-danger': node.cpu_user + node.cpu_sys > 75}" role="progressbar" aria-valuenow="{{node.cpu_user}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_user}}%">
         </div>
@@ -59,11 +71,11 @@
     </div>
     <div class="col-xs-3 node-progress-bar" title="1min avg: {{node.load_average[0] | number:2}}&#013;5min avg: {{node.load_average[1] | number:2}}&#013;15min avg: {{node.load_average[2] | number:2}}">
       <span class="cluster-map-node-detail">load</span>
+
       <div class="progress node-progress">
         <div class="progress-bar" ng-class="{'progress-bar-danger': (node.minuteAverage / node.availableProcessors) > 0.75}" role="progressbar" aria-valuenow="{{node.minuteAverage}}" aria-valuemin="0" aria-valuemax="{{node.availableProcessors}}" style="width: {{(node.minuteAverage / node.availableProcessors) * 100}}%;">
         </div>
       </div>
     </div>
-  </div>
   </div>
 </div>

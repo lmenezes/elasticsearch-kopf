@@ -17,8 +17,9 @@
             </a>
           </div>
           <div class="col-lg-3 col-xs-6">
-            <a href="#!clusterSettings" class="cluster-map-header-cluster-action">
-              <i class="fa fa-cog" title="cluster settings"></i>
+            <a class="cluster-map-header-cluster-action" ng-click="expandedView = !expandedView">
+              <i class="fa fa-expand" title="expanded node view" ng-hide="expandedView"></i>
+              <i class="fa fa-compress" title="compact node view" ng-show="expandedView"></i>
             </a>
           </div>
           <div class="col-lg-3 col-xs-6">
