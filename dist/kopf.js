@@ -3459,7 +3459,7 @@ function AceEditor(target) {
     try {
       if (isDefined(content) && content.trim().length > 0) {
         this.error = null;
-        content = JSON.stringify(JSON.parse(content), undefined, 4);
+        content = JSON.stringify(JSON.parse(content), undefined, 2);
         this.editor.setValue(content, 0);
         this.editor.gotoLine(0, 0, false);
       }
