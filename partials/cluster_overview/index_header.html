@@ -65,14 +65,21 @@
       </div>
     </div>
     <!-- index info -->
-    <div class="row" ng-show="index.visibleAliases().length > 0">
+    <div class="row" ng-show="index.aliases.length > 0">
       <div class="col-lg-12">
         <div class="idx-alias" ng-class="{'closed-index': index.closed}">
-          <i class="fa fa-tag"></i> {{index.visibleAliases()[0]}}
-          <span ng-show="index.visibleAliases().length > 1">
-            (+{{index.visibleAliases().length - 1}})
+          <i class="fa fa-tag"></i> {{index.aliases[0]}}
+          <span ng-show="index.aliases.length > 1">
+            <span class="tooltiped" data-placement="bottom" title="{{index.aliases.join('\n')}}">
+              (+{{index.aliases.length }})
+            </span>
           </span>
         </div>
       </div>
     </div>
 </span>
+<script>
+  $(function() {
+    $(".tooltiped").tooltip();
+  });
+</script>

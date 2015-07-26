@@ -13,10 +13,6 @@ function Index(indexName, clusterState, indexStats, aliases) {
     }
   }
 
-  this.visibleAliases = function() {
-    return this.aliases.length > 5 ? this.aliases.slice(0, 5) : this.aliases;
-  };
-
   if (isDefined(clusterState)) {
     var routing = getProperty(clusterState, 'routing_table.indices');
     this.state = 'open';

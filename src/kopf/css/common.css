@@ -342,3 +342,7 @@ textarea {
         float: left;
     }
 }
+
+.tooltip {
+    white-space: pre-wrap !important;
+}

@@ -342,6 +342,10 @@ textarea {
         float: left;
     }
 }
+
+.tooltip {
+    white-space: pre-wrap !important;
+}
 .aliases-index-alias {
 	border: 1px solid;
 	border-radius: 2px 2px 2px 2px;
