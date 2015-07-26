@@ -251,8 +251,10 @@ describe("ElasticService", function() {
   // TESTS API Methods
   it("creates index", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     var body = {property: 'value'};
     elasticService.createIndex('name', body, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('name');
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', '/name', {}, body, 'success', 'error');
   });
@@ -290,6 +292,7 @@ describe("ElasticService", function() {
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(this.AlertService, 'success').andReturn(true);
     spyOn(elasticService, 'refresh').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.shutdownNode('node_id');
     var path = '/_cluster/nodes/node_id/_shutdown';
     expect(elasticService.clusterRequest).
@@ -299,6 +302,7 @@ describe("ElasticService", function() {
         'Node [node_id] was shutdown', 'response'
     );
     expect(elasticService.refresh).toHaveBeenCalled();
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('node_id');
   });
 
   it("failed shuting down node must alert error", function() {
@@ -308,6 +312,7 @@ describe("ElasticService", function() {
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(this.AlertService, 'error').andReturn(true);
     spyOn(elasticService, 'refresh').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.shutdownNode('node_id');
     var path = '/_cluster/nodes/node_id/_shutdown';
     expect(elasticService.clusterRequest).
@@ -317,6 +322,7 @@ describe("ElasticService", function() {
         'Error while shutting down node', 'response'
     );
     expect(elasticService.refresh).not.toHaveBeenCalled();
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('node_id');
   });
 
   it("successfuly opening an index must refresh and alert success", function() {
@@ -326,6 +332,7 @@ describe("ElasticService", function() {
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(this.AlertService, 'success').andReturn(true);
     spyOn(elasticService, 'refresh').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.openIndex('index_name');
     var path = '/index_name/_open';
     expect(elasticService.clusterRequest).
@@ -335,6 +342,7 @@ describe("ElasticService", function() {
         'Index was successfully opened', 'response'
     );
     expect(elasticService.refresh).toHaveBeenCalled();
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("failed opening an index must alert error", function() {
@@ -344,6 +352,7 @@ describe("ElasticService", function() {
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(this.AlertService, 'error').andReturn(true);
     spyOn(elasticService, 'refresh').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.openIndex('index_name');
     var path = '/index_name/_open';
     expect(elasticService.clusterRequest).
@@ -353,22 +362,27 @@ describe("ElasticService", function() {
         'Error while opening index', 'response'
     );
     expect(elasticService.refresh).not.toHaveBeenCalled();
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("optimizes an index", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.optimizeIndex('index_name', 'success', 'error');
     var path = '/index_name/_optimize';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("clears index cache", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.clearCache('index_name', 'success', 'error');
     var path = '/index_name/_cache/clear';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("successfuly closing an index must refresh and alert success", function() {
@@ -378,6 +392,7 @@ describe("ElasticService", function() {
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(this.AlertService, 'success').andReturn(true);
     spyOn(elasticService, 'refresh').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.closeIndex('index_name');
     var path = '/index_name/_close';
     expect(elasticService.clusterRequest).
@@ -387,6 +402,7 @@ describe("ElasticService", function() {
         'Index was successfully closed', 'response'
     );
     expect(elasticService.refresh).toHaveBeenCalled();
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("failed closing an index must alert error", function() {
@@ -396,6 +412,7 @@ describe("ElasticService", function() {
     spyOn(elasticService, 'clusterRequest').andCallThrough();
     spyOn(this.AlertService, 'error').andReturn(true);
     spyOn(elasticService, 'refresh').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.closeIndex('index_name');
     var path = '/index_name/_close';
     expect(elasticService.clusterRequest).
@@ -405,32 +422,39 @@ describe("ElasticService", function() {
         'Error while closing index', 'response'
     );
     expect(elasticService.refresh).not.toHaveBeenCalled();
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("refreshes an index", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.refreshIndex('index_name', 'success', 'error');
     var path = '/index_name/_refresh';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("deletes an index", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.deleteIndex('index_name', 'success', 'error');
     var path = '/index_name';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('DELETE', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("updates an index settings", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.updateIndexSettings('index_name', {setting: 'settingValue'},
         'success', 'error');
     var path = '/index_name/_settings';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, {setting: 'settingValue'}, 'success',
         'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('index_name');
   });
 
   it("updates the cluster settings", function() {
@@ -455,87 +479,112 @@ describe("ElasticService", function() {
 
   it("deletes a warmer", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     var warmer = new Warmer("warmerId", "indexName", {});
     elasticService.deleteWarmer(warmer, 'success', 'error');
     var path = '/' + warmer.index + '/_warmer/' + warmer.id;
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('DELETE', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('indexName');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('warmerId');
   });
 
   it("deletes a percolator", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.deletePercolatorQuery('indexName', 'percolatorId', 'success',
         'error');
-    var path = '/indexName/.percolator/percolatorId'
+    var path = '/indexName/.percolator/percolatorId';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('DELETE', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('indexName');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('percolatorId');
   });
 
   it("creates a percolator query", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     var percolator = new PercolateQuery({
       _index: 'indexName',
       _id: 'percolatorId',
       _source: {some: 'data'}
     });
     elasticService.createPercolatorQuery(percolator, 'success', 'error');
-    var path = '/indexName/.percolator/percolatorId'
+    var path = '/indexName/.percolator/percolatorId';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, {some: 'data'}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('indexName');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('percolatorId');
   });
 
   it("creates a repository", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.createRepository('repo', {set: 'tings'}, 'success', 'error');
-    var path = '/_snapshot/repo'
+    var path = '/_snapshot/repo';
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', path, {}, {set: 'tings'}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('repo');
   });
 
   it("deletes a repository", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.deleteRepository('repo', 'success', 'error');
     var path = '/_snapshot/repo'
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('DELETE', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('repo');
   });
 
   it("deletes a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.deleteSnapshot('repo', 'snap', 'success', 'error');
     var path = '/_snapshot/repo/snap'
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('DELETE', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('repo');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('snap');
   });
 
   it("restores a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'},
         'success', 'error');
     var path = '/_snapshot/repo/snap/_restore'
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', path, {}, {some: 'settings'}, 'success',
         'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('repo');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('snap');
   });
 
   it("restores a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.restoreSnapshot('repo', 'snap', {some: 'settings'},
         'success', 'error');
     var path = '/_snapshot/repo/snap/_restore'
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('POST', path, {}, {some: 'settings'}, 'success',
         'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('repo');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('snap');
   });
 
   it("creates a snapshot", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.createSnapshot('repo', 'snap', {some: 'settings'}, 'success',
         'error');
     var path = '/_snapshot/repo/snap'
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, {some: 'settings'}, 'success',
         'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('repo');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('snap');
   });
 
   it("executes a benchmark", function() {
@@ -549,20 +598,27 @@ describe("ElasticService", function() {
 
   it("registers a warmer query without types", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     var warmer = new Warmer("wId", "idx", {source: {}});
     elasticService.registerWarmer(warmer, 'success', 'error');
     var path = "/idx/_warmer/wId";
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('idx');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('wId');
   });
 
   it("registers a warmer query with types", function() {
     spyOn(elasticService, 'clusterRequest').andReturn(true);
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     var warmer = new Warmer("wId", "idx", {types: 'whatever', source: {}});
     elasticService.registerWarmer(warmer, 'success', 'error');
     var path = "/idx/whatever/_warmer/wId";
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, {}, 'success', 'error');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('idx');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('whatever');
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('wId');
   });
 
   it("updates aliases", function() {
@@ -624,11 +680,13 @@ describe("ElasticService", function() {
     elasticService.connection = new ESConnection('http://localhost:9200', false);
     var callbacks = { success: function(content) {} };
     spyOn(callbacks, 'success');
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.getShardStats('0', 'foo', 'nodeId', callbacks.success);
     $httpBackend.flush();
     expect(callbacks.success).toHaveBeenCalledWith(
         new ShardStats('0', 'foo', { routing : { node : 'nodeId' } })
     );
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('foo');
   });
 
   it("fetches shard stats for initializing shard", function() {
@@ -639,11 +697,13 @@ describe("ElasticService", function() {
     elasticService.connection = new ESConnection('http://localhost:9200', false);
     var callbacks = { success: function(content) {} };
     spyOn(callbacks, 'success');
+    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
     elasticService.getShardStats('0', 'foo', 'nodeId', callbacks.success);
     $httpBackend.flush();
     expect(callbacks.success).toHaveBeenCalledWith(
         new ShardStats('0', 'foo', { target : { id : 'nodeId' }, id : '0' })
     );
+    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('foo');
   });
 
   it("relocates a shard and executes success callback", function() {
