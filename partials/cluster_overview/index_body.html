@@ -8,7 +8,7 @@
     <span class="dropdown">
       <a data-toggle="dropdown" href="#" target="_self">
         <span class="shard {{shard.primary ? 'shard-primary' : ''}} shard-{{shard.state.toLowerCase()}} {{relocatingShard && relocatingShard.id === shard.id ? 'shard-relocation-source' : ''}}">
-          {{shard.shard}}
+          {{shard.primary ? 'P' : 'R'}}{{shard.shard}}
         </span>
       </a>
       <ul class="dropdown-menu index-dropdown" role="menu">
