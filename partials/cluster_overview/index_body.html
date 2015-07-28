@@ -9,6 +9,7 @@
       <a data-toggle="dropdown" href="#" target="_self">
         <span class="shard {{shard.primary ? 'shard-primary' : ''}} shard-{{shard.state.toLowerCase()}} {{relocatingShard && relocatingShard.id === shard.id ? 'shard-relocation-source' : ''}}">
           {{shard.shard}}
+          <span class="shard-type">{{shard.primary ? 'P' : 'R'}}</span>
         </span>
       </a>
       <ul class="dropdown-menu index-dropdown" role="menu">
