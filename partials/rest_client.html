@@ -40,8 +40,12 @@
 										</div>
 									</span>
 								</div>
+								<div class="from-group">
+									<label for="editorFontSize">Editor font size</label>
+									<input class="form-control" id="editorFontSize" type="number" ng-model="editorFontSize" ng-change="updateFontSize()">
+								</div>
 								<div class="content-panel">
-									<div id="rest-client-editor" class="kopf-ace-editor" style="height: 580px"></div>
+									<div id="rest-client-editor" class="kopf-ace-editor" style="height: 525px"></div>
 								</div>
 								<div class="content-panel action-buttons">
 									<span class="danger-action">{{editor.error}}</span>

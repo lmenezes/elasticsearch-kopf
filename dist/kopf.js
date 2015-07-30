@@ -1813,6 +1813,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     $scope.editor = null;
 
+    $scope.editorFontSize = parseInt(localStorage['kopf:rest-client-editor:font-size'], 10);
+
     $scope.loadHistory = function() {
       var history = [];
       var rawHistory = localStorage.getItem('kopf_request_history');
@@ -1903,6 +1905,10 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.initializeController = function() {
       $scope.initEditor();
       $scope.history = $scope.loadHistory();
+    };
+
+    $scope.updateFontSize = function() {
+      $scope.editor.setFontSize($scope.editorFontSize);
     };
 
   }
@@ -3429,10 +3435,15 @@ kopf.filter('timeInterval', function() {
 });
 
 function AceEditor(target) {
+  var self = this;
+  var getFontSize = function() {
+    return localStorage['kopf:' + target + ':font-size'] + 'px' || '10px';
+  };
+
   // ace editor
   ace.config.set('basePath', 'dist/');
   this.editor = ace.edit(target);
-  this.editor.setFontSize('10px');
+  this.editor.setFontSize(getFontSize());
   this.editor.setTheme('ace/theme/kopf');
   this.editor.getSession().setMode('ace/mode/json');
 
@@ -3467,6 +3478,11 @@ function AceEditor(target) {
 
   this.hasContent = function() {
     return this.editor.getValue().trim().length > 0;
+  };
+
+  this.setFontSize = function(fontSize) {
+    localStorage['kopf:' + target + ':font-size'] = fontSize;
+    self.editor.setFontSize(getFontSize());
   };
 }
 

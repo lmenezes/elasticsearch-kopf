@@ -1,8 +1,13 @@
 function AceEditor(target) {
+  var self = this;
+  var getFontSize = function() {
+    return localStorage['kopf:' + target + ':font-size'] + 'px' || '10px';
+  };
+
   // ace editor
   ace.config.set('basePath', 'dist/');
   this.editor = ace.edit(target);
-  this.editor.setFontSize('10px');
+  this.editor.setFontSize(getFontSize());
   this.editor.setTheme('ace/theme/kopf');
   this.editor.getSession().setMode('ace/mode/json');
 
@@ -37,5 +42,10 @@ function AceEditor(target) {
 
   this.hasContent = function() {
     return this.editor.getValue().trim().length > 0;
+  };
+
+  this.setFontSize = function(fontSize) {
+    localStorage['kopf:' + target + ':font-size'] = fontSize;
+    self.editor.setFontSize(getFontSize());
   };
 }
