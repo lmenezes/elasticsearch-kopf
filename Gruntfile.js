@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     clean: {
       dist: {
-        src: ['dist']
+        src: ['_site/dist']
       }
     },
     watch: {
@@ -22,37 +22,37 @@ module.exports = function(grunt) {
             expand: true,
             flatten: true,
             src: ['src/lib/ace/mode-json.js'],
-            dest: './dist/'
+            dest: './_site/dist/'
           },
           {
             expand: true,
             flatten: true,
             src: ['src/lib/ace/worker-json.js'],
-            dest: './dist/'
+            dest: './_site/dist/'
           },
           {
             expand: true,
             flatten: true,
             src: ['src/lib/angularjs/*.map'],
-            dest: './dist/'
+            dest: './_site/dist/'
           },
           {
             expand: true,
             flatten: true,
             src: ['src/kopf/theme-kopf.js'],
-            dest: './dist/'
+            dest: './_site/dist/'
           },
           {
             expand: true,
             flatten: true,
             src: ['src/kopf/css/dark_style.css'],
-            dest: './dist/'
+            dest: './_site/dist/'
           },
           {
             expand: true,
             flatten: true,
             src: ['src/kopf/css/light_style.css'],
-            dest: './dist/'
+            dest: './_site/dist/'
           }
         ]
       }
@@ -67,13 +67,13 @@ module.exports = function(grunt) {
           'src/lib/jsontree/jsontree.min.js',
           'src/lib/bootstrap/js/bootstrap.js'
         ],
-        dest: 'dist/lib.js'
+        dest: '_site/dist/lib.js'
       },
       vendorcss: {
         src: [
           'src/lib/bootstrap/css/bootstrap.css'
         ],
-        dest: 'dist/lib.css'
+        dest: '_site/dist/lib.css'
       },
       appjs: {
         src: [
@@ -81,7 +81,7 @@ module.exports = function(grunt) {
           'src/kopf/*/*.js',
           'src/kopf/util.js',
         ],
-        dest: 'dist/kopf.js'
+        dest: '_site/dist/kopf.js'
       },
       appcss: {
         src: [
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
           'src/kopf/css/nodes.css',
           'src/kopf/css/hotthreads.css'
         ],
-        dest: 'dist/kopf.css'
+        dest: '_site/dist/kopf.css'
       }
 
     },
