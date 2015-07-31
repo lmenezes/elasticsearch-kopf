@@ -801,9 +801,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var host = this.connection.host;
       var params = {};
       this.addAuth(params);
+      // FIXME: remove routing_table after 2.0 cut
       $q.all([
         $http.get(host +
-        '/_cluster/state/master_node,routing_table,blocks/', params),
+        '/_cluster/state/master_node,routing_table,routing_nodes,blocks/',
+            params),
         $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings', params),
@@ -825,6 +827,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                       aliases, nodes)
               );
             } catch (exception) {
+              console.log(exception);
               DebugService.debug('Error parsing cluster data:', exception);
               DebugService.debug('REST APIs output:', responses);
               error(exception);
