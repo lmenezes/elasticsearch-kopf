@@ -5003,12 +5003,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var aliases = responses[4].data;
               var health = responses[5].data;
               var nodes = responses[6].data;
-              success(
-                  new Cluster(health, state, indexStats, nodesStats, settings,
-                      aliases, nodes)
-              );
+              var cluster = new Cluster(health, state, indexStats, nodesStats,
+                  settings, aliases, nodes);
+              success(cluster);
             } catch (exception) {
-              console.log(exception);
               DebugService.debug('Error parsing cluster data:', exception);
               DebugService.debug('REST APIs output:', responses);
               error(exception);
@@ -5041,9 +5039,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var settings = responses[2].data;
               var health = responses[3].data;
               var nodes = responses[4].data;
-              success(
-                  new BrokenCluster(health, state, nodesStats, settings, nodes)
-              );
+              var cluster = new BrokenCluster(health, state, nodesStats,
+                  settings, nodes);
+              success(cluster);
             } catch (exception) {
               DebugService.debug('Error parsing cluster data:', exception);
               DebugService.debug('REST APIs output:', responses);
@@ -5108,6 +5106,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                   }
                 },
                 function(response) {
+                  AlertService.error('Error loading cluster data', response);
                   instance.cluster = undefined;
                 }
             );
@@ -5131,6 +5130,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
                     AlertService.error(message);
                     instance.setBrokenCluster(true);
                   } else {
+                    AlertService.error('Error loading cluster data', response);
                     instance.cluster = undefined;
                   }
                 }
