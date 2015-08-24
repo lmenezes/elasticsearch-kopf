@@ -22,6 +22,9 @@ if you don't want to get hacked.
 * `KOPF_BASIC_AUTH_LOGIN` basic auth login, if needed
 * `KOPF_BASIC_AUTH_PASSWORD` hashed basic auth password, if needed
 * `KOPF_NGINX_INCLUDE_FILE` file to include into main server of nginx (place allowed ips here)
+* `KOPF_WITH_CREDENTIALS` set the external setting with_credentials. Default: false
+* `KOPF_THEME` set the theme in external settings. Default: dark
+* `KOPF_REFRESH_RATE` set the external setting refresh_rate. Default: 5000
 
 ### Example
 
