@@ -1,28 +1,36 @@
-elasticsearch kopf
+kopf
 =======================
 
-kopf is a simple web administration tool for [ElasticSearch](http://elasticsearch.org) written in JavaScript + AngularJS + jQuery + Twitter bootstrap.
+kopf is a simple web administration tool for [elasticsearch](http://elastic.co) written in JavaScript + AngularJS + jQuery + Twitter bootstrap.
 
 It offers an easy way of performing common tasks on an elasticsearch cluster. Not every single API is covered by this plugin, but it does offer a REST client which allows you to explore the full potential of the ElasticSearch API.
 
 Versions
 ------------
 
-| elasticsearch version | kopf version |
-| --------------------- | ------------ |
-| 0.90.X                | v0.90        |
-| 1.X                   | master       |
+| elasticsearch version | branch | latest version  |
+| --------------------- | ------ | --------------- |
+| 0.90.X                | 0.90   | v0.90           |
+| 1.X                   | 1.0    | v1.5.7          |
+| 2.X                   | 2.0    | v2.0.0-SNAPSHOT |
 
 Installation
 ------------
+You can either install a specific version(using its release tag) or the most up to date version from a given branch.
 
+####Installing on an Elasticsearch instance:
+
+```bash
+./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{branch|version}
+open http://localhost:9200/_plugin/kopf
+```
 
 ####Run locally:
 
 ```bash
 git clone git://github.com/lmenezes/elasticsearch-kopf.git
 cd elasticsearch-kopf
-git checkout {version}
+git checkout {branch|version}
 open index.html
 ```
 
@@ -33,16 +41,9 @@ Alternatively you can run it via `connect` which should solve the `ng-include` i
 ```bash
 git clone git://github.com/lmenezes/elasticsearch-kopf.git
 cd elasticsearch-kopf
-git checkout {version}
+git checkout {branch|version}
 npm install
 grunt server
-```
-
-####Install on a ElasticSearch instance:
-
-```bash
-./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{version}
-open http://localhost:9200/_plugin/kopf
 ```
 
 ####Kopf behind a reverse proxy
