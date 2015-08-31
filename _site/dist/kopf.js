@@ -3094,7 +3094,7 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.jvmVersion = nodeInfo.jvm.version;
   this.availableProcessors = nodeInfo.os.available_processors;
   this.transportAddress = nodeInfo.transport_address;
-  this.host = nodeStats.host;
+  this.host = nodeInfo.host;
 
   var attributes = getProperty(nodeInfo, 'attributes', {});
   var master = attributes.master === 'false' ? false : true;
