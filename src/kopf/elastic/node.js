@@ -42,8 +42,6 @@ function Node(nodeId, nodeStats, nodeInfo) {
 
   this.load_average = getProperty(this.stats, 'os.load_average');
 
-  this.minuteAverage = this.load_average ? this.load_average[0] : 0;
-
   this.setCurrentMaster = function() {
     this.current_master = true;
   };

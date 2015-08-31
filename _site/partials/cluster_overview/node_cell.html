@@ -69,11 +69,11 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-3 node-progress-bar" title="1min avg: {{node.load_average[0] | number:2}}&#013;5min avg: {{node.load_average[1] | number:2}}&#013;15min avg: {{node.load_average[2] | number:2}}">
+    <div class="col-xs-3 node-progress-bar" title="1min avg: {{node.load_average | number:2}}">
       <span class="cluster-map-node-detail">load</span>
 
       <div class="progress node-progress">
-        <div class="progress-bar" ng-class="{'progress-bar-danger': (node.minuteAverage / node.availableProcessors) > 0.75}" role="progressbar" aria-valuenow="{{node.minuteAverage}}" aria-valuemin="0" aria-valuemax="{{node.availableProcessors}}" style="width: {{(node.minuteAverage / node.availableProcessors) * 100}}%;">
+        <div class="progress-bar" ng-class="{'progress-bar-danger': (node.load_average / node.availableProcessors) > 0.75}" role="progressbar" aria-valuenow="{{node.load_average}}" aria-valuemin="0" aria-valuemax="{{node.availableProcessors}}" style="width: {{(node.load_average / node.availableProcessors) * 100}}%;">
         </div>
       </div>
     </div>

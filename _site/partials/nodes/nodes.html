@@ -29,7 +29,7 @@
       <ng-sort-by property="name" text="name">name</ng-sort-by>
     </th>
     <th class="table-header box">
-      <ng-sort-by property="minuteAverage" text="load average"></ng-sort-by>
+      <ng-sort-by property="load_average" text="load average"></ng-sort-by>
     </th>
     <th class="table-header box">
       <ng-sort-by property="cpu" text="cpu %"></ng-sort-by>
@@ -93,11 +93,11 @@
       <td>
         <div ng-show="node.load_average">
           <span class="node-stat">
-            {{node.load_average[0] | number:1}}
+            {{node.load_average | number:1}}
           </span>
           <span class="node-stat-detail">
-            <div>3min: {{node.load_average[1] | number:1}}</div>
-            <div>5min: {{node.load_average[2] | number:1}}</div>
+            <div></div>
+            <div></div>
           </span>
         </div>
         <div ng-hide="node.load_average">
