@@ -1299,7 +1299,7 @@ kopf.controller('HotThreadsController', ['$scope', 'ElasticService',
 
     $scope.types = ['cpu', 'wait', 'block'];
 
-    $scope.interval = 500;
+    $scope.interval = '500ms';
 
     $scope.threads = 3;
 
