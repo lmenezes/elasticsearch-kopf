@@ -719,20 +719,6 @@ kopf.controller('ClusterOverviewController', ['$scope', '$window',
       $scope.page = $scope.index_paginator.getPage();
     };
 
-    $scope.promptShutdownNode = function(nodeId, nodeName) {
-      ConfirmDialogService.open(
-          'are you sure you want to shutdown node ' + nodeName + '?',
-          'Shutting down a node will make all data stored in this node ' +
-          'inaccessible, unless it\'s replicated across other nodes.' +
-          'Replicated shards will be promoted to primary if the primary ' +
-          'shard is no longer reachable.',
-          'Shutdown',
-          function() {
-            ElasticService.shutdownNode(nodeId);
-          }
-      );
-    };
-
     $scope.optimizeIndex = function(index) {
       ElasticService.optimizeIndex(index,
           function(response) {
@@ -1620,20 +1606,6 @@ kopf.controller('NodesController', ['$scope', 'ConfirmDialogService',
           },
           function(error) {
             AlertService.error('Error while loading node stats', error);
-          }
-      );
-    };
-
-    $scope.promptShutdownNode = function(nodeId, nodeName) {
-      ConfirmDialogService.open(
-          'are you sure you want to shutdown node ' + nodeName + '?',
-          'Shutting down a node will make all data stored in this node ' +
-          'inaccessible, unless it\'s replicated across other nodes.' +
-          'Replicated shards will be promoted to primary if the primary ' +
-          'shard is no longer reachable.',
-          'Shutdown',
-          function() {
-            ElasticService.shutdownNode(nodeId);
           }
       );
     };
@@ -4389,25 +4361,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       };
       this.clusterRequest('PUT', '/_cluster/settings', {}, body, success,
           error);
-    };
-
-    /**
-     * Shutdowns node
-     *
-     * @param {string} nodeId - id of node to be shutdown
-     * @callback success - invoked on success
-     * @callback error - invoked on error
-     */
-    this.shutdownNode = function(nodeId) {
-      var path = '/_cluster/nodes/' + encode(nodeId) + '/_shutdown';
-      var success = function(data) {
-        AlertService.success('Node [' + nodeId + '] was shutdown', data);
-        instance.refresh();
-      };
-      var error = function(error) {
-        AlertService.error('Error while shutting down node', error);
-      };
-      this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
     /**

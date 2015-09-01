@@ -285,46 +285,6 @@ describe("ElasticService", function() {
         toHaveBeenCalledWith('PUT', path, {}, body, 'success', 'error');
   });
 
-  it("successfully shuts down node must refresh and alert success", function() {
-    elasticService.clusterRequest = function(m, u, p, b, success, error) {
-      success('response');
-    };
-    spyOn(elasticService, 'clusterRequest').andCallThrough();
-    spyOn(this.AlertService, 'success').andReturn(true);
-    spyOn(elasticService, 'refresh').andReturn(true);
-    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
-    elasticService.shutdownNode('node_id');
-    var path = '/_cluster/nodes/node_id/_shutdown';
-    expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, {}, jasmine.any(Function),
-        jasmine.any(Function));
-    expect(this.AlertService.success).toHaveBeenCalledWith(
-        'Node [node_id] was shutdown', 'response'
-    );
-    expect(elasticService.refresh).toHaveBeenCalled();
-    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('node_id');
-  });
-
-  it("failed shuting down node must alert error", function() {
-    elasticService.clusterRequest = function(m, u, pr, b, success, error) {
-      error('response');
-    };
-    spyOn(elasticService, 'clusterRequest').andCallThrough();
-    spyOn(this.AlertService, 'error').andReturn(true);
-    spyOn(elasticService, 'refresh').andReturn(true);
-    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
-    elasticService.shutdownNode('node_id');
-    var path = '/_cluster/nodes/node_id/_shutdown';
-    expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, {}, jasmine.any(Function),
-        jasmine.any(Function));
-    expect(this.AlertService.error).toHaveBeenCalledWith(
-        'Error while shutting down node', 'response'
-    );
-    expect(elasticService.refresh).not.toHaveBeenCalled();
-    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('node_id');
-  });
-
   it("successfuly opening an index must refresh and alert success", function() {
     elasticService.clusterRequest = function(m, u, pr, b, success, error) {
       success('response');
