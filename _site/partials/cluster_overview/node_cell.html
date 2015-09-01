@@ -59,13 +59,11 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-3 node-progress-bar" title="user: {{node.cpu_user}}%&#013;system: {{node.cpu_sys}}%">
+    <div class="col-xs-3 node-progress-bar" title="process: {{node.cpu}}%">
       <span class="cluster-map-node-detail">cpu</span>
 
       <div class="progress node-progress">
-        <div class="progress-bar" ng-class="{'progress-bar-danger': node.cpu_user + node.cpu_sys > 75}" role="progressbar" aria-valuenow="{{node.cpu_user}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_user}}%">
-        </div>
-        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{node.cpu_sys}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_sys}}%">
+        <div class="progress-bar" ng-class="{'progress-bar-danger': node.cpu > 75}" role="progressbar" aria-valuenow="{{node.cpu}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu}}%">
         </div>
       </div>
     </div>
