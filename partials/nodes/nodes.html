@@ -109,11 +109,7 @@
       <td>
         <div>
           <span class="node-stat">
-            {{node.cpu_user + node.cpu_sys | number:1}}
-          </span>
-          <span class="node-stat-detail">
-            <div>user: {{node.cpu_user}}</div>
-            <div>sys: {{node.cpu_sys}}</div>
+            {{node.cpu | number:1}}
           </span>
         </div>
       </td>

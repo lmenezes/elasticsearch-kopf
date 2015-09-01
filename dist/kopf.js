@@ -3125,9 +3125,7 @@ function Node(nodeId, nodeStats, nodeInfo) {
   var usedRatio = (diskUsedInBytes / this.disk_total_in_bytes);
   this.disk_used_percent = Math.round(100 * usedRatio);
 
-  this.cpu_user = getProperty(this.stats, 'os.cpu.user');
-  this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
-  this.cpu = this.cpu_user + this.cpu_sys;
+  this.cpu = getProperty(this.stats, 'process.cpu.percent');
 
   this.load_average = getProperty(this.stats, 'os.load_average');
 
@@ -4982,7 +4980,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         '/_cluster/state/master_node,routing_table,routing_nodes,blocks/',
             params),
         $http.get(host + '/_stats/docs,store', params),
-        $http.get(host + '/_nodes/stats/jvm,fs,os', params),
+        $http.get(host + '/_nodes/stats/jvm,fs,os,process', params),
         $http.get(host + '/_cluster/settings', params),
         $http.get(host + '/_aliases', params),
         $http.get(host + '/_cluster/health', params),
