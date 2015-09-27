@@ -1,0 +1,7 @@
+.explanation-result-id {
+	font-weight:bold;
+}
+.explanation-result-header,  {
+	font-weight:normal;
+	border-bottom: 1px solid #dddddd;
+}

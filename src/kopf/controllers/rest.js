@@ -1,7 +1,7 @@
 kopf.controller('RestController', ['$scope', '$location', '$timeout',
-  'AlertService', 'AceEditorService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, AceEditorService,
-           ElasticService) {
+  'ExplainService', 'AlertService', 'AceEditorService', 'ElasticService',
+  function($scope, $location, $timeout,
+      ExplainService, AlertService, AceEditorService, ElasticService) {
 
     $scope.request = new Request('/_search', 'GET', '{}');
 
@@ -10,6 +10,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.history = [];
 
     $scope.editor = null;
+
+    $scope.explanationResults = [];
 
     $scope.loadHistory = function() {
       var history = [];
@@ -51,7 +53,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       }
     };
 
-    $scope.sendRequest = function() {
+    function doSendRequest(successCallback) {
       if (notEmpty($scope.request.path)) {
         $scope.request.body = $scope.editor.format();
         $('#rest-client-response').html('');
@@ -62,13 +64,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
         ElasticService.clusterRequest($scope.request.method,
             $scope.request.path, {}, $scope.request.body,
             function(response) {
-              var content = response;
-              try {
-                content = JSONTree.create(response);
-              } catch (error) {
-                // nothing to do
-              }
-              $('#rest-client-response').html(content);
+              successCallback(response);
               $scope.addToHistory(new Request($scope.request.path,
                   $scope.request.method, $scope.request.body));
             },
@@ -89,6 +85,28 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       } else {
         AlertService.warn('Path is empty');
       }
+    }
+
+    $scope.sendRequest = function() {
+      doSendRequest(function(response) {
+        var content = response;
+        try {
+          content = JSONTree.create(response);
+        } catch (error) {
+          // nothing to do
+        }
+        $('#rest-client-response').html(content);
+      });
+    };
+    $scope.explainRequest = function() {
+      if (!ExplainService.isExplainPath($scope.request.path)) {
+        AlertService.info('You are executing a request ' +
+          'without _explain nor ?explain=true');
+      }
+      doSendRequest(function(response) {
+        $scope.explanationResults =
+          ExplainService.normalizeExplainResponse(response);
+      });
     };
 
     $scope.initEditor = function() {
@@ -103,6 +121,19 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       $scope.history = $scope.loadHistory();
     };
 
+    $scope.explanationTreeConfig = {
+      expandOn: {
+        field: 'description',
+        titleClass: 'explanation-result-description'
+      },
+      columnDefs: [
+        {
+          field: 'value',
+          titleClass: 'explanation-result-header',
+          cellClass: 'text-right'
+        }
+      ]
+    };
   }
 
 ]);

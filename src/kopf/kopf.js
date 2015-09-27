@@ -1,4 +1,4 @@
-var kopf = angular.module('kopf', ['ngRoute']);
+var kopf = angular.module('kopf', ['ngRoute', 'ntt.TreeDnD']);
 
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
@@ -48,6 +48,10 @@ kopf.config(function($routeProvider, $locationProvider) {
       when('/analysis', {
         templateUrl: 'partials/analysis.html',
         controller: 'AnalysisController'
+      }).
+      when('/explain', {
+        templateUrl: 'partials/explain.html',
+        controller: 'RestController'
       }).
       when('/percolator', {
         templateUrl: 'partials/percolator.html',
