@@ -67,17 +67,27 @@
 					</div>
 					<div id="restResponse" class="panel-collapse collapse in" style="min-height: 691px">
 						<div class="panel-body">
+							<div ng-show="response">
+								<kopf-json-tree class="explain-response" style="min-height: 614px" kopf-bind="response"/>
+							</div>
 							<div class="explanation-result" ng-repeat="explanationResult in explanationResults track by explanationResult.documentId">
-								<div class="explanation-result-id">{{explanationResult.documentId}}</div>
-								<div ng-if="!explanationResult._explanation">
+								<div class="explanation-result-title">{{explanationResult.documentId}} {{explanationResult._score}}</div>
+								<div ng-hide="explanationResult._explanation">
 									This result has no score explanation.
 									Use <code>_search?explain=true</code> or <code>_explain</code>.
 								</div>
-								<tree-dnd tree-data="explanationResult.explanationTreeData"
-									expand-on = "explanationTreeConfig.expandOn"
-									column-defs = "explanationTreeConfig.columnDefs"/>
+								<div ng-show="explanationResult.explanationTreeData">
+									<tree-dnd tree-data="explanationResult.explanationTreeData"
+										expand-on = "explanationTreeConfig.expandOn"
+										column-defs = "explanationTreeConfig.columnDefs"/>
+								</div>
+ 								<div ng-show="explanationResult._source">
+									<kopf-json-tree class="explain-result-source" style="min-height: 614px" kopf-bind="explanationResult._source"/>
+								</tab>
+								<div ng-show="explanationResult.fields">
+									<kopf-json-tree class="explain-result-source" style="min-height: 614px" kopf-bind="explanationResult.fields"/>
+								</div>
 							</div>
-							<div id="rest-client-response"></div>
 						</div>
 					</div>
 				</div>

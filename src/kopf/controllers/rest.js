@@ -10,7 +10,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.history = [];
 
     $scope.editor = null;
-
+    $scope.response = '';
     $scope.explanationResults = [];
 
     $scope.loadHistory = function() {
@@ -56,7 +56,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     function doSendRequest(successCallback) {
       if (notEmpty($scope.request.path)) {
         $scope.request.body = $scope.editor.format();
-        $('#rest-client-response').html('');
+        $scope.response = '';
         if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
           AlertService.info('You are executing a GET request with body ' +
               'content. Maybe you meant to use POST or PUT?');
@@ -71,11 +71,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
             function(error, status) {
               if (status !== 0) {
                 AlertService.error('Request was not successful');
-                try {
-                  $('#rest-client-response').html(JSONTree.create(error));
-                } catch (invalidJsonError) {
-                  $('#rest-client-response').html(error);
-                }
+                $scope.response = error;
               } else {
                 var url = ElasticService.connection.host + $scope.request.path;
                 AlertService.error(url + ' is unreachable');
@@ -89,13 +85,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     $scope.sendRequest = function() {
       doSendRequest(function(response) {
-        var content = response;
-        try {
-          content = JSONTree.create(response);
-        } catch (error) {
-          // nothing to do
-        }
-        $('#rest-client-response').html(content);
+        $scope.response = response;
       });
     };
     $scope.explainRequest = function() {
@@ -103,6 +93,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
         AlertService.info('You are executing a request ' +
           'without _explain nor ?explain=true');
       }
+      $scope.explanationResults = [];
       doSendRequest(function(response) {
         $scope.explanationResults =
           ExplainService.normalizeExplainResponse(response);
