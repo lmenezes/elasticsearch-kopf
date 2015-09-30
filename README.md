@@ -31,7 +31,7 @@ open http://localhost:9200/_plugin/kopf
 git clone git://github.com/lmenezes/elasticsearch-kopf.git
 cd elasticsearch-kopf
 git checkout {branch|version}
-open index.html
+open _site/index.html
 ```
 
 ps: local execution doesn't work with Chrome(and maybe other browsers). See more [here](http://docs.angularjs.org/api/ng.directive:ngInclude).
