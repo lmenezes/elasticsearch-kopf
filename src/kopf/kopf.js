@@ -49,10 +49,6 @@ kopf.config(function($routeProvider, $locationProvider) {
         templateUrl: 'partials/analysis.html',
         controller: 'AnalysisController'
       }).
-      when('/explain', {
-        templateUrl: 'partials/explain.html',
-        controller: 'RestController'
-      }).
       when('/percolator', {
         templateUrl: 'partials/percolator.html',
         controller: 'PercolatorController'
