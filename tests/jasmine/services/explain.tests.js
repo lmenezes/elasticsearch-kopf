@@ -13,7 +13,7 @@ describe('ExplainService', function() {
     expect(service.isExplainPath('/_search')).toEqual(false);
     expect(service.isExplainPath('/_search?explain=true')).toEqual(true);
     expect(service.isExplainPath('/_search?pretty=true&explain=true')).toEqual(true);
-    expect(service.isExplainPath('/x/y/z/_explain')).toEqual(false);
+    expect(service.isExplainPath('/x/y/z/_explain')).toEqual(true);
   });
 
   it('should normalize search response', function() {
@@ -56,7 +56,7 @@ describe('ExplainService', function() {
     expect(normalizedResponse[0].documentId).toEqual('x/y/1');
     expect(normalizedResponse[0]._score).toEqual(1.0);
     expect(normalizedResponse[0].explanationTreeData).not.toBeUndefined();
-    expect(normalizedResponse[1].documentId).toEqual('x/y/1');
+    expect(normalizedResponse[1].documentId).toEqual('x/y/2');
     expect(normalizedResponse[1]._score).toEqual(0.5);
     expect(normalizedResponse[1].explanationTreeData).not.toBeUndefined();
   });

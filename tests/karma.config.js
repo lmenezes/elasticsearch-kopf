@@ -17,6 +17,7 @@ module.exports = function(config) {
       '../src/lib/jquery/jquery-1.10.2.min.js',
       '../src/lib/ace/*.js',
       '../src/lib/jsontree/*.js',
+      '../src/lib/angular-tree-dnd/*.js',
       '../src/kopf/*.js',
       '../src/kopf/**/*.js',
       'angular-mocks.js',
