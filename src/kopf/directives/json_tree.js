@@ -1,25 +1,27 @@
 (function(kopf, JSONTree) {
   "use strict";
-  kopf.directive('kopfJsonTree',function() {
+  kopf.directive('kopfJsonTree',function($sce) {
     var directive = {
       restrict: 'E',
-      template:'<div class="json-tree"></div>',
+      template:'<div class="json-tree" ng-bind-html="result"></div>',
+      scope: {
+        kopfBind: '='
+      },
       link: function(scope, element, attrs, requires){
-        var scopeAttr = attrs.kopfBind;
-        if(scopeAttr) {
-          scope.$watch(scopeAttr, function(value) {
+          scope.$watch('kopfBind', function(value) {
+            var result;
             if (value) {
               try {
-                value = JSONTree.create(value);
+                result = JSONTree.create(value);
               } catch (invalidJsonError) {
-                value = invalidJsonError;
+                result = invalidJsonError;
               }
             } else {
-              value = '';
+              result = '';
             }
-            element.html(value);
+
+            scope.result = $sce.trustAsHtml(result);
           });
-        }
       }
     };
     return directive;
