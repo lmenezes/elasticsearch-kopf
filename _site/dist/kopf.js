@@ -1530,10 +1530,12 @@ kopf.controller('NavbarController', ['$scope', '$location',
             $scope.clusterStatus = ElasticService.cluster.status;
             $scope.clusterName = ElasticService.cluster.name;
             $scope.fetchedAt = ElasticService.cluster.fetched_at;
+            $scope.nodeName = ElasticService.nodeName;
           } else {
             $scope.clusterStatus = undefined;
             $scope.clusterName = undefined;
             $scope.fetchedAt = undefined;
+            $scope.nodeName = undefined;
           }
         }
     );
@@ -4198,6 +4200,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     this.brokenCluster = false;
 
+    this.nodeName = undefined; // node running on target host
+
     this.encodeURIComponent = function(text) {
       return encodeURIComponent(text);
     };
@@ -4213,6 +4217,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
+      this.nodeName = undefined;
     };
 
     this.getIndices = function() {
@@ -4287,6 +4292,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               instance.connect(host + '/');
             } else {
               instance.setVersion(data.version.number);
+              instance.nodeName = data.name;
               instance.connected = true;
               if (!instance.autoRefreshStarted) {
                 instance.autoRefreshStarted = true;

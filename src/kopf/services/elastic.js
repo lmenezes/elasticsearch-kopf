@@ -17,6 +17,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     this.brokenCluster = false;
 
+    this.nodeName = undefined; // node running on target host
+
     this.encodeURIComponent = function(text) {
       return encodeURIComponent(text);
     };
@@ -32,6 +34,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
+      this.nodeName = undefined;
     };
 
     this.getIndices = function() {
@@ -106,6 +109,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               instance.connect(host + '/');
             } else {
               instance.setVersion(data.version.number);
+              instance.nodeName = data.name;
               instance.connected = true;
               if (!instance.autoRefreshStarted) {
                 instance.autoRefreshStarted = true;
