@@ -47,7 +47,7 @@ describe("ElasticService", function() {
             'getElasticsearchRootPath').andReturn('/testing');
         spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
         elasticService.clusterRequest = function(m, p, pr, d, success, f) {
-          success({version: {number: '1.9.13'}});
+          success({version: {number: '1.9.13'}, name: 'some node name'});
         };
         spyOn(elasticService, 'clusterRequest').andCallThrough();
         spyOn(elasticService, 'setVersion').andCallThrough();
@@ -61,6 +61,7 @@ describe("ElasticService", function() {
         expect(elasticService.connection.withCredentials).toEqual(true);
         expect(elasticService.setVersion).toHaveBeenCalledWith('1.9.13');
         expect(elasticService.connected).toEqual(true);
+        expect(elasticService.nodeName).toBe('some node name');
         expect(elasticService.autoRefreshStarted).toEqual(true);
         expect(elasticService.autoRefreshCluster).toHaveBeenCalled();
         expect(elasticService.reset).toHaveBeenCalled();
