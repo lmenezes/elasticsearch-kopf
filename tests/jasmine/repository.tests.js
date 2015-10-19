@@ -139,6 +139,7 @@ describe('SnapshotController', function() {
       "indices": ["idx-20140107", "idx-20140108"],
       "ignore_unavailable": false,
       "include_global_state": false,
+      "include_aliases": false,
       "rename_replacement": "-chicken-",
       "rename_pattern": "-",
       "snapshot": {"snapshot": "my_snap", "repository": "my_repo"}
@@ -147,6 +148,7 @@ describe('SnapshotController', function() {
     var expected = {
       "indices": "idx-20140107,idx-20140108",
       "include_global_state": false,
+      "include_aliases": false,
       "ignore_unavailable": false,
       "rename_replacement": "-chicken-",
       "rename_pattern": "-"
@@ -175,6 +177,7 @@ describe('SnapshotController', function() {
       "indices": ["idx-20140107", "idx-20140108"],
       "ignore_unavailable": false,
       "include_global_state": false,
+      "include_aliases": false,
       "rename_replacement": "-chicken-",
       "rename_pattern": "-",
       "snapshot": {"snapshot": "my_snap", "repository": "my_repo"}
@@ -183,6 +186,7 @@ describe('SnapshotController', function() {
     var expected = {
       "indices": "idx-20140107,idx-20140108",
       "include_global_state": false,
+      "include_aliases": false,
       "ignore_unavailable": false,
       "rename_replacement": "-chicken-",
       "rename_pattern": "-"
