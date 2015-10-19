@@ -22,7 +22,7 @@ describe('HotThreadsController', function() {
     expect(scope.nodes).toEqual([]);
     expect(scope.type).toEqual('cpu');
     expect(scope.types).toEqual(['cpu', 'wait', 'block']);
-    expect(scope.interval).toEqual(500);
+    expect(scope.interval).toEqual("500ms");
     expect(scope.threads).toEqual(3);
     expect(scope.ignoreIdleThreads).toEqual(true);
     expect(scope.nodesHotThreads).toEqual(undefined);
