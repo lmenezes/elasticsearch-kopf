@@ -1,7 +1,7 @@
 kopf.controller('RestController', ['$scope', '$location', '$timeout',
-  'AlertService', 'AceEditorService', 'ElasticService',
-  function($scope, $location, $timeout, AlertService, AceEditorService,
-           ElasticService) {
+  'ExplainService', 'AlertService', 'AceEditorService', 'ElasticService',
+  function($scope, $location, $timeout,
+      ExplainService, AlertService, AceEditorService, ElasticService) {
 
     $scope.request = new Request('/_search', 'GET', '{}');
 
@@ -10,6 +10,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.history = [];
 
     $scope.editor = null;
+    $scope.response = '';
+    $scope.explanationResults = [];
 
     $scope.loadHistory = function() {
       var history = [];
@@ -51,10 +53,10 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       }
     };
 
-    $scope.sendRequest = function() {
+    function doSendRequest(successCallback) {
       if (notEmpty($scope.request.path)) {
         $scope.request.body = $scope.editor.format();
-        $('#rest-client-response').html('');
+        $scope.response = '';
         if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
           AlertService.info('You are executing a GET request with body ' +
               'content. Maybe you meant to use POST or PUT?');
@@ -62,24 +64,14 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
         ElasticService.clusterRequest($scope.request.method,
             $scope.request.path, {}, $scope.request.body,
             function(response) {
-              var content = response;
-              try {
-                content = JSONTree.create(response);
-              } catch (error) {
-                // nothing to do
-              }
-              $('#rest-client-response').html(content);
+              successCallback(response);
               $scope.addToHistory(new Request($scope.request.path,
                   $scope.request.method, $scope.request.body));
             },
             function(error, status) {
               if (status !== 0) {
                 AlertService.error('Request was not successful');
-                try {
-                  $('#rest-client-response').html(JSONTree.create(error));
-                } catch (invalidJsonError) {
-                  $('#rest-client-response').html(error);
-                }
+                $scope.response = error;
               } else {
                 var url = ElasticService.connection.host + $scope.request.path;
                 AlertService.error(url + ' is unreachable');
@@ -89,6 +81,28 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       } else {
         AlertService.warn('Path is empty');
       }
+    }
+
+    $scope.sendRequest = function() {
+      doSendRequest(function(response) {
+        $scope.response = response;
+      });
+    };
+    $scope.isExplain = function() {
+      var isSearch = $scope.request.path.indexOf('_search') > 0;
+      return ($scope.request.method === "GET" && ($scope.request.path.indexOf('_explain') || isSearch)) ||
+        ($scope.request.method === "POST" && isSearch);
+    };
+    $scope.explainRequest = function() {
+      if (!ExplainService.isExplainPath($scope.request.path)) {
+        AlertService.info('You are executing a request ' +
+          'without _explain nor ?explain=true');
+      }
+      $scope.explanationResults = [];
+      doSendRequest(function(response) {
+        $scope.explanationResults =
+          ExplainService.normalizeExplainResponse(response);
+      });
     };
 
     $scope.initEditor = function() {
@@ -103,6 +117,19 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       $scope.history = $scope.loadHistory();
     };
 
+    $scope.explanationTreeConfig = {
+      expandOn: {
+        field: 'description',
+        titleClass: 'explanation-result-description'
+      },
+      columnDefs: [
+        {
+          field: 'value',
+          titleClass: 'explanation-result-header',
+          cellClass: 'text-right'
+        }
+      ]
+    };
   }
 
 ]);
