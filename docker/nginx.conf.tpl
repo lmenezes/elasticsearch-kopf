@@ -17,8 +17,8 @@ http {
   include /etc/nginx/mime.types;
   default_type application/octet-stream;
 
-  access_log /var/log/nginx/access.log;
-  error_log /var/log/nginx/error.log;
+  access_log /dev/stdout;
+  error_log /dev/stderr;
 
   upstream es {
     {% for server in KOPF_ES_SERVERS.split(",") %}
