@@ -2,7 +2,7 @@
 
 set -e
 
-envtpl /etc/nginx/nginx.conf.tpl
+envtpl --keep-template /etc/nginx/nginx.conf.tpl
 
 if [ ! -z "${KOPF_BASIC_AUTH_LOGIN}" ]; then
     echo "${KOPF_BASIC_AUTH_LOGIN}:${KOPF_BASIC_AUTH_PASSWORD}" > /etc/nginx/kopf.htpasswd
