@@ -4107,8 +4107,8 @@ kopf.factory('AlertService', function() {
   return this;
 });
 
-kopf.factory('ClipboardService', ['AlertService', '$compile', '$document',
-  '$window', function(AlertService, $compile, $document, $window) {
+kopf.factory('ClipboardService', ['AlertService', '$document', '$window',
+  function(AlertService, $document, $window) {
     var textarea = angular.element($document[0].createElement('textarea'));
     textarea.css({
       position: 'absolute',
