@@ -22,6 +22,7 @@ describe('RestController', function() {
     this.AlertService = $injector.get('AlertService');
     this.AceEditorService = $injector.get('AceEditorService');
     this.ElasticService = $injector.get('ElasticService');
+    this.ClipboardService = $injector.get('ClipboardService');
     this.createController = function() {
       return $controller('RestController', {$scope: this.scope}, $location,
           $timeout, this.AlertService, this.AceEditorService,
@@ -158,5 +159,49 @@ describe('RestController', function() {
         'content. Maybe you meant to use POST or PUT?');
   });
 
+  it('correctly copies curl request with body to clipboard', function() {
+    this.scope.request = new Request("/test_rest/_search", "POST", "whatever");
+    this.scope.editor = { getValue: function() { return "{'uno': 'dos'}"; } };
+    this.ElasticService.getHost = function() { return 'http://curly_host:9200 '; };
+    this.ClipboardService.copy = function(text, success, failure) { success() };
+    spyOn(this.AlertService, 'info').andReturn(true);
+    spyOn(this.scope.editor, 'getValue').andCallThrough();
+    spyOn(this.ElasticService, 'getHost').andCallThrough();
+    spyOn(this.ClipboardService, 'copy').andCallThrough();
+    this.scope.copyAsCURLCommand();
+    expect(this.ElasticService.getHost).toHaveBeenCalled();
+    expect(this.ClipboardService.copy).toHaveBeenCalledWith('curl -XPOST \'http://curly_host:9200 /test_rest/_search\' -d \'{\'uno\': \'dos\'}\'', jasmine.any(Function), jasmine.any(Function));
+    expect(this.AlertService.info).toHaveBeenCalledWith('cURL request successfully copied to clipboard');
+  });
+
+  it('correctly copies curl request without body to clipboard', function() {
+    this.scope.request = new Request("/test_rest/_search", "GET", "whatever");
+    this.scope.editor = { getValue: function() { return "{'uno': 'dos'}"; } };
+    this.ElasticService.getHost = function() { return 'http://curly_host:9200 '; };
+    this.ClipboardService.copy = function(text, success, failure) { success() };
+    spyOn(this.AlertService, 'info').andReturn(true);
+    spyOn(this.scope.editor, 'getValue').andCallThrough();
+    spyOn(this.ElasticService, 'getHost').andCallThrough();
+    spyOn(this.ClipboardService, 'copy').andCallThrough();
+    this.scope.copyAsCURLCommand();
+    expect(this.ElasticService.getHost).toHaveBeenCalled();
+    expect(this.ClipboardService.copy).toHaveBeenCalledWith('curl -XGET \'http://curly_host:9200 /test_rest/_search\'', jasmine.any(Function), jasmine.any(Function));
+    expect(this.AlertService.info).toHaveBeenCalledWith('cURL request successfully copied to clipboard');
+  });
+
+  it('alerts when copying to clipboard fails', function() {
+    this.scope.request = new Request("/test_rest/_search", "GET", "whatever");
+    this.scope.editor = { getValue: function() { return "{'uno': 'dos'}"; } };
+    this.ElasticService.getHost = function() { return 'http://curly_host:9200 '; };
+    this.ClipboardService.copy = function(text, success, failure) { failure() };
+    spyOn(this.AlertService, 'error').andReturn(true);
+    spyOn(this.scope.editor, 'getValue').andCallThrough();
+    spyOn(this.ElasticService, 'getHost').andCallThrough();
+    spyOn(this.ClipboardService, 'copy').andCallThrough();
+    this.scope.copyAsCURLCommand();
+    expect(this.ElasticService.getHost).toHaveBeenCalled();
+    expect(this.ClipboardService.copy).toHaveBeenCalledWith('curl -XGET \'http://curly_host:9200 /test_rest/_search\'', jasmine.any(Function), jasmine.any(Function));
+    expect(this.AlertService.error).toHaveBeenCalledWith('Error while copying request to clipboard');
+  });
 
 });

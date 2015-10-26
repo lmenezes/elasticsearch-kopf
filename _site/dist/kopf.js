@@ -1803,9 +1803,9 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
 ]);
 
 kopf.controller('RestController', ['$scope', '$location', '$timeout',
-  'AlertService', 'AceEditorService', 'ElasticService',
+  'AlertService', 'AceEditorService', 'ElasticService', 'ClipboardService',
   function($scope, $location, $timeout, AlertService, AceEditorService,
-           ElasticService) {
+           ElasticService, ClipboardService) {
 
     $scope.request = new Request('/_search', 'GET', '{}');
 
@@ -1814,6 +1814,26 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.history = [];
 
     $scope.editor = null;
+
+    $scope.copyAsCURLCommand = function() {
+      var method = $scope.request.method;
+      var host = ElasticService.getHost();
+      var path = $scope.request.path;
+      var body = $scope.editor.getValue();
+      var curl = 'curl -X' + method + ' \'' + host + path + '\'';
+      if (['POST', 'PUT'].indexOf(method) >= 0) {
+        curl += ' -d \'' + body + '\'';
+      }
+      ClipboardService.copy(
+          curl,
+          function() {
+            AlertService.info('cURL request successfully copied to clipboard');
+          },
+          function() {
+            AlertService.error('Error while copying request to clipboard');
+          }
+      );
+    };
 
     $scope.loadHistory = function() {
       var history = [];
