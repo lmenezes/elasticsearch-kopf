@@ -3419,6 +3419,11 @@ function AceEditor(target) {
   this.editor.setFontSize('10px');
   this.editor.setTheme('ace/theme/kopf');
   this.editor.getSession().setMode('ace/mode/json');
+  this.editor.setOptions({
+    fontFamily: 'monospace',
+    fontSize: '13px',
+    fontWeight: '400'
+  });
 
   // validation error
   this.error = null;
