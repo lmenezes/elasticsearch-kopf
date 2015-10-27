@@ -93,7 +93,6 @@ module.exports = function(grunt) {
           'src/kopf/css/cluster_health.css',
           'src/kopf/css/cluster_overview.css',
           'src/kopf/css/gist_share.css',
-          'src/kopf/css/json_tree.css',
           'src/kopf/css/navbar.css',
           'src/kopf/css/rest_client.css',
           'src/kopf/css/warmers.css',
