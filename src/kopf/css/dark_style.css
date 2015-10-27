@@ -272,9 +272,11 @@ thead.overview {
 /* JSON TREE CSS */
 .jstValue {
     white-space: pre-wrap;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 400;
-    font-family: "Lucida Console", Monaco, monospace;
+    font-family: monospace;
+	line-height: normal;
+	display: block;
 }
 .jstComma {
     white-space: pre-wrap;
