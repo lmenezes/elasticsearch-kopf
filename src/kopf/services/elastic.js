@@ -786,10 +786,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var host = this.connection.host;
       var params = {};
       this.addAuth(params);
-      // FIXME: remove routing_table after 2.0 cut
       $q.all([
-        $http.get(host +
-        '/_cluster/state/master_node,routing_table,routing_nodes,blocks/',
+        $http.get(host + '/_cluster/state/master_node,routing_table,blocks/',
             params),
         $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os,process', params),
