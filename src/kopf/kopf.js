@@ -1,4 +1,4 @@
-var kopf = angular.module('kopf', ['ngRoute']);
+var kopf = angular.module('kopf', ['ngRoute', 'ntt.TreeDnD']);
 
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
