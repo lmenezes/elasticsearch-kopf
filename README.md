@@ -21,7 +21,7 @@ You can either install a specific version(using its release tag) or the most up 
 ####Installing on an Elasticsearch instance:
 
 ```bash
-./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{branch|version}
+./elasticsearch/bin/plugin install lmenezes/elasticsearch-kopf/{branch|version}
 open http://localhost:9200/_plugin/kopf
 ```
 
