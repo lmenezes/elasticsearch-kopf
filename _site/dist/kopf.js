@@ -1516,12 +1516,12 @@ kopf.controller('NavbarController', ['$scope', '$location',
             $scope.clusterStatus = ElasticService.cluster.status;
             $scope.clusterName = ElasticService.cluster.name;
             $scope.fetchedAt = ElasticService.cluster.fetched_at;
-            $scope.nodeName = ElasticService.nodeName;
+            $scope.clientName = ElasticService.cluster.clientName;
           } else {
             $scope.clusterStatus = undefined;
             $scope.clusterName = undefined;
             $scope.fetchedAt = undefined;
-            $scope.nodeName = undefined;
+            $scope.clientName = undefined;
           }
         }
     );
@@ -2508,8 +2508,12 @@ function CatResult(result) {
   this.lines = values;
 }
 
-function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
+function Cluster(health, state, stats, nodesStats, settings, aliases, nodes,
+                 main) {
   this.created_at = new Date().getTime();
+
+  // main -> GET /
+  this.clientName = main.name;
 
   // Cluster Health(/_cluster/health)
   this.status = health.status;
@@ -4218,8 +4222,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     this.brokenCluster = false;
 
-    this.nodeName = undefined; // node running on target host
-
     this.encodeURIComponent = function(text) {
       return encodeURIComponent(text);
     };
@@ -4235,7 +4237,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
-      this.nodeName = undefined;
     };
 
     this.getIndices = function() {
@@ -4310,7 +4311,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               instance.connect(host + '/');
             } else {
               instance.setVersion(data.version.number);
-              instance.nodeName = data.name;
               instance.connected = true;
               if (!instance.autoRefreshStarted) {
                 instance.autoRefreshStarted = true;
@@ -4996,6 +4996,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host + '/_aliases', params),
         $http.get(host + '/_cluster/health', params),
         $http.get(host + '/_nodes/_all/os,jvm', params),
+        $http.get(host, params),
       ]).then(
           function(responses) {
             try {
@@ -5006,8 +5007,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var aliases = responses[4].data;
               var health = responses[5].data;
               var nodes = responses[6].data;
+              var main = responses[7].data;
               var cluster = new Cluster(health, state, indexStats, nodesStats,
-                  settings, aliases, nodes);
+                  settings, aliases, nodes, main);
               success(cluster);
             } catch (exception) {
               DebugService.debug('Error parsing cluster data:', exception);
