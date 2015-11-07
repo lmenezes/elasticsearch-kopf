@@ -32,12 +32,12 @@ kopf.controller('NavbarController', ['$scope', '$location',
             $scope.clusterStatus = ElasticService.cluster.status;
             $scope.clusterName = ElasticService.cluster.name;
             $scope.fetchedAt = ElasticService.cluster.fetched_at;
-            $scope.nodeName = ElasticService.nodeName;
+            $scope.clientName = ElasticService.cluster.clientName;
           } else {
             $scope.clusterStatus = undefined;
             $scope.clusterName = undefined;
             $scope.fetchedAt = undefined;
-            $scope.nodeName = undefined;
+            $scope.clientName = undefined;
           }
         }
     );

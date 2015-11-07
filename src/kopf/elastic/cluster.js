@@ -1,5 +1,9 @@
-function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
+function Cluster(health, state, stats, nodesStats, settings, aliases, nodes,
+                 main) {
   this.created_at = new Date().getTime();
+
+  // main -> GET /
+  this.clientName = main.name;
 
   // Cluster Health(/_cluster/health)
   this.status = health.status;
