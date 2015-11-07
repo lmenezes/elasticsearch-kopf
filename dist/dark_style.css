@@ -272,9 +272,9 @@ thead.overview {
 /* JSON TREE CSS */
 .jstValue {
     white-space: pre-wrap;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 400;
-    font-family: monospace;
+	font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
 	line-height: normal;
 	display: block;
 }
