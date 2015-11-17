@@ -1790,7 +1790,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.copyAsCURLCommand = function() {
       var method = $scope.request.method;
       var host = ElasticService.getHost();
-      var path = $scope.request.path;
+      var path = encodeURI($scope.request.path);
       var body = $scope.editor.getValue();
       var curl = 'curl -X' + method + ' \'' + host + path + '\'';
       if (['POST', 'PUT'].indexOf(method) >= 0) {
@@ -1823,7 +1823,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     };
 
     $scope.loadFromHistory = function(request) {
-      $scope.request.path = request.path;
+      $scope.request.path = encodeURI(request.path);
       $scope.request.body = request.body;
       $scope.request.method = request.method;
       $scope.editor.setValue(request.body);
@@ -1849,6 +1849,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     $scope.sendRequest = function() {
       if (notEmpty($scope.request.path)) {
+        var path = encodeURI($scope.request.path);
         $scope.request.body = $scope.editor.format();
         $('#rest-client-response').html('');
         if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
@@ -1856,7 +1857,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
               'content. Maybe you meant to use POST or PUT?');
         }
         ElasticService.clusterRequest($scope.request.method,
-            $scope.request.path, {}, $scope.request.body,
+            path, {}, $scope.request.body,
             function(response) {
               var content = response;
               try {
@@ -1865,7 +1866,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
                 // nothing to do
               }
               $('#rest-client-response').html(content);
-              $scope.addToHistory(new Request($scope.request.path,
+              $scope.addToHistory(new Request(path,
                   $scope.request.method, $scope.request.body));
             },
             function(error, status) {
@@ -1877,7 +1878,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
                   $('#rest-client-response').html(error);
                 }
               } else {
-                var url = ElasticService.connection.host + $scope.request.path;
+                var url = ElasticService.connection.host + path;
                 AlertService.error(url + ' is unreachable');
               }
             }
@@ -5380,8 +5381,7 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
       if (name !== this.clusterName) {
         if (name) {
           $rootScope.title = 'kopf[' + name + ']';
-        }
-        else {
+        } else {
           $rootScope.title = 'kopf - no connection';
         }
         this.clusterName = name;
