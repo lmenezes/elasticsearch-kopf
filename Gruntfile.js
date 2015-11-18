@@ -65,7 +65,9 @@ module.exports = function(grunt) {
           'src/lib/angularjs/angular-route.min.js',
           'src/lib/ace/ace.js',
           'src/lib/jsontree/jsontree.min.js',
-          'src/lib/bootstrap/js/bootstrap.js'
+          'src/lib/bootstrap/js/bootstrap.js',
+          'src/lib/csv/csv.js',
+          'src/lib/csv/jquery.csv.js'
         ],
         dest: '_site/dist/lib.js'
       },
