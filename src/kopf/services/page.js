@@ -33,8 +33,7 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
       if (name !== this.clusterName) {
         if (name) {
           $rootScope.title = 'kopf[' + name + ']';
-        }
-        else {
+        } else {
           $rootScope.title = 'kopf - no connection';
         }
         this.clusterName = name;
