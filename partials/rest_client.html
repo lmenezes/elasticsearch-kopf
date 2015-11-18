@@ -70,12 +70,17 @@
 							<a data-toggle="collapse" data-parent="#restResponseAccordion" target="_self" href="#restResponse">response</a>
 						</h4>
 					</div>
-					<div id="restResponse" class="panel-collapse collapse in" style="min-height: 691px">
+					<div id="restResponse" class="content-panel panel-collapse collapse in" style="min-height: 691px">
 						<div class="panel-body">
 							<div id="rest-client-response" style="min-height: 614px"></div>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="content-panel action-buttons">
+				<button type="button" class="btn btn-default input-sm" ng-click="exportAsCSV()">
+					<i class="fa"></i> Export as CSV
+				</button>
 			</div>
 		</div>
 	</div>
