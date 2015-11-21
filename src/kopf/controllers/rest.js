@@ -3,7 +3,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
   'ClipboardService',
   function($scope, $location, $timeout, ExplainService, AlertService,
            AceEditorService, ElasticService, ClipboardService) {
-    $scope.request = new Request('/_search', 'GET', '{}');
+    $scope.request = new Request('', 'GET', '{}');
 
     $scope.validation_error = null;
 
@@ -12,6 +12,16 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.editor = null;
     $scope.response = '';
     $scope.explanationResults = [];
+
+    $scope.mapping = undefined;
+    $scope.options = [];
+
+    $scope.updateOptions = function(text) {
+      if ($scope.mapping) {
+        var autocomplete = new URLAutocomplete($scope.mapping);
+        $scope.options = autocomplete.getAlternatives(text);
+      }
+    };
 
     $scope.copyAsCURLCommand = function() {
       var method = $scope.request.method;
@@ -79,7 +89,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     function doSendRequest(successCallback) {
       if (notEmpty($scope.request.path)) {
-        var path = encodeURI($scope.request.path);
+        var path = encodeURI('/' + $scope.request.path);
         $scope.request.body = $scope.editor.format();
         $scope.response = '';
         $scope.explanationResults = [];
@@ -151,6 +161,15 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.initializeController = function() {
       $scope.initEditor();
       $scope.history = $scope.loadHistory();
+      ElasticService.getClusterMapping(
+          function(mapping) {
+            $scope.mapping = mapping;
+            $scope.updateOptions($scope.request.path);
+          },
+          function(error) {
+            AlertService.error('Error while loading cluster mappings', error);
+          }
+      );
     };
 
     $scope.explanationTreeConfig = {

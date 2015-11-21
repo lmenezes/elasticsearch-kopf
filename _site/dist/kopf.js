@@ -1,4 +1,5 @@
-var kopf = angular.module('kopf', ['ngRoute', 'ntt.TreeDnD']);
+var kopf = angular.module('kopf', ['ngRoute', 'ntt.TreeDnD', 'ngAnimate',
+  'ui.bootstrap']);
 
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
@@ -1779,7 +1780,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
   'ClipboardService',
   function($scope, $location, $timeout, ExplainService, AlertService,
            AceEditorService, ElasticService, ClipboardService) {
-    $scope.request = new Request('/_search', 'GET', '{}');
+    $scope.request = new Request('', 'GET', '{}');
 
     $scope.validation_error = null;
 
@@ -1788,6 +1789,16 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.editor = null;
     $scope.response = '';
     $scope.explanationResults = [];
+
+    $scope.mapping = undefined;
+    $scope.options = [];
+
+    $scope.updateOptions = function(text) {
+      if ($scope.mapping) {
+        var autocomplete = new URLAutocomplete($scope.mapping);
+        $scope.options = autocomplete.getAlternatives(text);
+      }
+    };
 
     $scope.copyAsCURLCommand = function() {
       var method = $scope.request.method;
@@ -1855,7 +1866,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     function doSendRequest(successCallback) {
       if (notEmpty($scope.request.path)) {
-        var path = encodeURI($scope.request.path);
+        var path = encodeURI('/' + $scope.request.path);
         $scope.request.body = $scope.editor.format();
         $scope.response = '';
         $scope.explanationResults = [];
@@ -1927,6 +1938,15 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.initializeController = function() {
       $scope.initEditor();
       $scope.history = $scope.loadHistory();
+      ElasticService.getClusterMapping(
+          function(mapping) {
+            $scope.mapping = mapping;
+            $scope.updateOptions($scope.request.path);
+          },
+          function(error) {
+            AlertService.error('Error while loading cluster mappings', error);
+          }
+      );
     };
 
     $scope.explanationTreeConfig = {
@@ -2892,6 +2912,19 @@ function ClusterHealth(health) {
   this.fetched_at = getTimeString(new Date());
 }
 
+function ClusterMapping(data) {
+
+  this.getIndices = function() {
+    return Object.keys(data);
+  };
+
+  this.getTypes = function(index) {
+    var indexMapping = getProperty(data, index + '.mappings', {});
+    return Object.keys(indexMapping);
+  };
+
+}
+
 function ClusterSettings(settings) {
   // FIXME: 0.90/1.0 check
   var valid = [
@@ -3457,6 +3490,24 @@ kopf.filter('bytes', function() {
     return stringify(bytes);
   };
 
+});
+
+kopf.filter('startsWith', function() {
+
+  function strStartsWith(str, prefix) {
+    return (str + '').indexOf(prefix) === 0;
+  }
+
+  return function(elements, prefix) {
+    var filtered = [];
+    angular.forEach(elements, function(element) {
+      if (strStartsWith(element, prefix)) {
+        filtered.push(element);
+      }
+    });
+
+    return filtered;
+  };
 });
 
 kopf.filter('timeInterval', function() {
@@ -4087,6 +4138,139 @@ function SnapshotFilter() {
   this.matches = function(snapshot) {
     return true;
   };
+
+}
+
+function URLAutocomplete(mappings) {
+
+  var PATHS = [
+    // Suggest
+    '_suggest',
+    '{index}/_suggest',
+    // Multi Search
+    '_msearch',
+    '{index}/_msearch',
+    '{index}/{type}/_msearch',
+    '_msearch/template',
+    '{index}/_msearch/template',
+    '{index}/{type}/_msearch/template',
+    // Search
+    '_search',
+    '{index}/_search',
+    '{index}/{type}/_search',
+    '_search/template',
+    '{index}/_search/template',
+    '{index}/{type}/_search/template',
+    '_search/exists',
+    '{index}/_search/exists',
+    '{index}/{type}/_search/exists'
+  ];
+
+  var format = function(previousTokens, suggestedToken) {
+    if (previousTokens.length > 1) {
+      var prefix = previousTokens.slice(0, -1).join('/');
+      if (prefix.length > 0) {
+        return prefix + '/' + suggestedToken;
+      } else {
+        return suggestedToken;
+      }
+    } else {
+      return suggestedToken;
+    }
+  };
+
+  this.getAlternatives = function(path) {
+    var pathTokens = path.split('/');
+    var suggestedTokenIndex = pathTokens.length - 1;
+
+    /**
+     * Replaces the variables on suggestedPathTokens({index}, {type}...) for
+     * actual values extracted from pathTokens
+     * @param {Array} pathTokens tokens for the path to be suggested
+     * @param {Array} suggestedPathTokens tokens for the suggested path
+     * @returns {Array} a new array with the variables from suggestedPathTokens
+     * replaced by the actual values from pathTokens
+     */
+    var replaceVariables = function(pathTokens, suggestedPathTokens) {
+      var replaced = suggestedPathTokens.map(function(token, position) {
+        if (position < pathTokens.length - 1 && token.indexOf('{') === 0) {
+          return pathTokens[position];
+        } else {
+          return token;
+        }
+      });
+      return replaced;
+    };
+
+    /**
+     * Checks if a given path matches the definition and current state of
+     * the path to be autocompleted
+     *
+     * @param {Array} pathTokens tokens of path to be autocompleted
+     * @param {Array} suggestedPathTokens tokens of possible suggestion
+     * @returns {boolean} if suggestion is valid
+     */
+    var isValidSuggestion = function(pathTokens, suggestedPathTokens) {
+      var valid = true;
+      suggestedPathTokens.forEach(function(token, index) {
+        if (valid && index < pathTokens.length - 1) {
+          switch (token) {
+            case '{index}':
+              valid = mappings.getIndices().indexOf(pathTokens[index]) >= 0;
+              break;
+            case '{type}':
+              valid = mappings.getTypes(pathTokens[index - 1]).
+                      indexOf(pathTokens[index]) >= 0;
+              break;
+            default:
+              valid = pathTokens[index] === token;
+          }
+        }
+      });
+      return valid;
+    };
+
+    var alternatives = [];
+
+    var addIfNotPresent = function(collection, element) {
+      if (collection.indexOf(element) === -1) {
+        collection.push(element);
+      }
+    };
+
+    PATHS.forEach(function(suggestedPath) {
+      var suggestedPathTokens = suggestedPath.split('/');
+      if (suggestedPathTokens.length > suggestedTokenIndex &&
+          isValidSuggestion(pathTokens, suggestedPathTokens)) {
+        suggestedPathTokens = replaceVariables(
+            pathTokens,
+            suggestedPathTokens
+        );
+        var suggestedToken = suggestedPathTokens[suggestedTokenIndex];
+        switch (suggestedToken) {
+          case '{index}':
+            mappings.getIndices().forEach(function(index) {
+              addIfNotPresent(alternatives, format(pathTokens, index));
+            });
+            break;
+          case '{type}':
+            var pathIndex = pathTokens[suggestedTokenIndex - 1];
+            mappings.getTypes(pathIndex).forEach(function(type) {
+              addIfNotPresent(alternatives, format(pathTokens, type));
+            });
+            break;
+          default:
+            addIfNotPresent(alternatives, format(pathTokens, suggestedToken));
+        }
+      }
+    });
+
+    return alternatives.sort(function(a, b) {
+      return a.localeCompare(b);
+    });
+  };
+
+  return this;
 
 }
 
@@ -4864,6 +5048,20 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         success(threads);
       };
       this.clusterRequest('GET', path, params, {}, parseHotThreads, error);
+    };
+
+    /**
+     * Retrieve comples cluster mapping
+     *
+     * @callback success
+     * @callback error
+     */
+    this.getClusterMapping = function(success, error) {
+      var transformed = function(response) {
+        success(new ClusterMapping(response));
+      };
+      var path = '/_mapping';
+      this.clusterRequest('GET', path, {}, {}, transformed, error);
     };
 
     this.getIndexMetadata = function(name, success, error) {

@@ -588,6 +588,20 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('GET', path, params, {}, parseHotThreads, error);
     };
 
+    /**
+     * Retrieve comples cluster mapping
+     *
+     * @callback success
+     * @callback error
+     */
+    this.getClusterMapping = function(success, error) {
+      var transformed = function(response) {
+        success(new ClusterMapping(response));
+      };
+      var path = '/_mapping';
+      this.clusterRequest('GET', path, {}, {}, transformed, error);
+    };
+
     this.getIndexMetadata = function(name, success, error) {
       var transformed = function(response) {
         success(new IndexMetadata(name, response.metadata.indices[name]));

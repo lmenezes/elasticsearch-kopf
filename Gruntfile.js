@@ -68,7 +68,9 @@ module.exports = function(grunt) {
           'src/lib/bootstrap/js/bootstrap.js',
           'src/lib/csv/csv.js',
           'src/lib/csv/jquery.csv.js',
-          'src/lib/angular-tree-dnd/ng-tree-dnd.js'
+          'src/lib/angular-tree-dnd/ng-tree-dnd.js',
+          'src/lib/angularjs/angular-animate.min.js',
+          'src/lib/typeahead/typeahead.js'
         ],
         dest: '_site/dist/lib.js'
       },
