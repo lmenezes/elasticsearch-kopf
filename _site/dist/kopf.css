@@ -1,3 +1,25 @@
+.typeahead-demo .custom-popup-wrapper {
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+}
+
+.typeahead-demo .custom-popup-wrapper > .message {
+    border-bottom: 1px solid #ddd;
+    color: #868686;
+}
+
+.typeahead-demo .custom-popup-wrapper > .dropdown-menu {
+    position: static;
+    float: none;
+    display: block;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    margin-left: 0px;
+}
+
 .node-badges {
     width: 20px;
     display: inline-block;

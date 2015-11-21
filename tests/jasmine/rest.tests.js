@@ -7,9 +7,22 @@ describe('RestController', function() {
 
   beforeEach(function() {
     module('kopf');
-    var mock = {isConnected: function() {
-      return true;
-    }};
+    var mock = {
+      isConnected: function() {
+        return true;
+      },
+      getClusterMapping: function(success, failure) {
+        success(new ClusterMapping(
+            {
+              foo: {
+                mappings: {
+                  bar: {}
+                }
+              }
+            }
+        ));
+      }
+    };
     module(function($provide) {
       $provide.value('ElasticService', mock);
     });
@@ -33,11 +46,13 @@ describe('RestController', function() {
 
   it('initial values are set', function() {
     expect(this.scope.editor).toEqual(null);
-    expect(this.scope.request.path).toEqual("/_search");
+    expect(this.scope.request.path).toEqual("");
     expect(this.scope.request.method).toEqual("GET");
     expect(this.scope.request.body).toEqual("{}");
     expect(this.scope.validation_error).toEqual(null);
     expect(this.scope.history).toEqual([]);
+    expect(this.scope.options).toEqual([]);
+    expect(this.scope.mapping).toEqual(undefined);
   });
 
   it('correctly instantiates components when tab is first laoded', function() {
@@ -46,6 +61,7 @@ describe('RestController', function() {
     spyOn(this.AceEditorService, 'init').andReturn(mockEditor);
     spyOn(mockEditor, 'setValue').andReturn(true);
     spyOn(this.scope, 'loadHistory').andReturn([ '1', '2']);
+    spyOn(this.ElasticService, 'getClusterMapping').andCallThrough();
 
     this.scope.initializeController();
 
@@ -55,6 +71,24 @@ describe('RestController', function() {
     expect(mockEditor.setValue).toHaveBeenCalledWith('{}');
     expect(this.scope.loadHistory).toHaveBeenCalled();
     expect(this.scope.history).toEqual(['1', '2']);
+    expect(this.ElasticService.getClusterMapping).toHaveBeenCalled();
+    expect(this.scope.mapping.getIndices()).toEqual(['foo']);
+    expect(this.scope.mapping.getTypes('foo')).toEqual(['bar']);
+    expect(this.scope.options).toEqual(['_msearch', '_search', '_suggest', 'foo']);
+  });
+
+  it('updates autocomplete options', function() {
+    this.scope.mapping = new ClusterMapping(
+        {
+          foo: {
+            mappings: {
+              bar: {}
+            }
+          }
+        }
+    );
+    this.scope.updateOptions('foo/');
+    expect(this.scope.options).toEqual(['foo/_msearch', 'foo/_search', 'foo/_suggest', 'foo/bar']);
   });
 
   it('load a previous request', function() {
@@ -62,10 +96,10 @@ describe('RestController', function() {
     this.scope.editor = mockEditor;
     spyOn(this.scope.editor, 'setValue').andReturn(true);
 
-    var request = new Request("/test_rest/_search", "POST", "{'uno': 'dos'}");
+    var request = new Request("test_rest/_search", "POST", "{'uno': 'dos'}");
     this.scope.loadFromHistory(request);
 
-    expect(this.scope.request.path).toEqual("/test_rest/_search");
+    expect(this.scope.request.path).toEqual("test_rest/_search");
     expect(this.scope.request.method).toEqual("POST");
     expect(this.scope.request.body).toEqual("{'uno': 'dos'}");
     expect(this.scope.editor.setValue).toHaveBeenCalledWith("{'uno': 'dos'}");
@@ -128,7 +162,7 @@ describe('RestController', function() {
   });
 
   it('executes a correct request', function() {
-    this.scope.request = new Request("/test_rest/_search", "POST", "{'uno': 'dos'}");
+    this.scope.request = new Request("test_rest/_search", "POST", "{'uno': 'dos'}");
     this.ElasticService.clusterRequest = function() {};
     this.scope.editor = { format: function() { return "{'uno': 'dos'}"; } };
     spyOn(this.AlertService, 'warn').andReturn(true);
@@ -147,7 +181,7 @@ describe('RestController', function() {
   });
 
   it('executes a GET request with non empty body', function() {
-    this.scope.request = new Request("/test_rest/_search", "GET", "{'uno': 'dos'}");
+    this.scope.request = new Request("test_rest/_search", "GET", "{'uno': 'dos'}");
     this.ElasticService.clusterRequest = function() {};
     this.scope.editor = { format: function() { return "{'uno': 'dos'}"; } };
     spyOn(this.AlertService, 'info').andReturn(true);
