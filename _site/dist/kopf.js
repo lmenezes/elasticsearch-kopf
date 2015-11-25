@@ -1,4 +1,4 @@
-var kopf = angular.module('kopf', ['ngRoute']);
+var kopf = angular.module('kopf', ['ngRoute', 'ntt.TreeDnD']);
 
 // manages behavior of confirmation dialog
 kopf.factory('ConfirmDialogService', function() {
@@ -1775,10 +1775,10 @@ kopf.controller('PercolatorController', ['$scope', 'ConfirmDialogService',
 ]);
 
 kopf.controller('RestController', ['$scope', '$location', '$timeout',
-  'AlertService', 'AceEditorService', 'ElasticService', 'ClipboardService',
-  function($scope, $location, $timeout, AlertService, AceEditorService,
-           ElasticService, ClipboardService) {
-
+  'ExplainService', 'AlertService', 'AceEditorService', 'ElasticService',
+  'ClipboardService',
+  function($scope, $location, $timeout, ExplainService, AlertService,
+           AceEditorService, ElasticService, ClipboardService) {
     $scope.request = new Request('/_search', 'GET', '{}');
 
     $scope.validation_error = null;
@@ -1786,8 +1786,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
     $scope.history = [];
 
     $scope.editor = null;
-
-    $scope.ESResponse = '';
+    $scope.response = '';
+    $scope.explanationResults = [];
 
     $scope.copyAsCURLCommand = function() {
       var method = $scope.request.method;
@@ -1849,24 +1849,16 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       }
     };
 
-    function _handleResponse(maybeJSON) {
-      // Store the response in scope in case we need it later
-      $scope.ESResponse = maybeJSON;
-      var content;
-      try {
-        content = JSONTree.create(maybeJSON);
-      } catch (invalidJsonError) {
-        content = maybeJSON;
-      } finally {
-        $('#rest-client-response').html(content);
-      }
+    function _handleResponse(data) {
+      $scope.response = data;
     }
 
-    $scope.sendRequest = function() {
+    function doSendRequest(successCallback) {
       if (notEmpty($scope.request.path)) {
         var path = encodeURI($scope.request.path);
         $scope.request.body = $scope.editor.format();
-        $('#rest-client-response').html('');
+        $scope.response = '';
+        $scope.explanationResults = [];
         if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
           AlertService.info('You are executing a GET request with body ' +
               'content. Maybe you meant to use POST or PUT?');
@@ -1874,8 +1866,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
         ElasticService.clusterRequest($scope.request.method,
             path, {}, $scope.request.body,
             function(response) {
-              _handleResponse(response);
-              $('#rest-client-response').html(content);
+              successCallback(response);
               $scope.addToHistory(new Request(path,
                   $scope.request.method, $scope.request.body));
             },
@@ -1892,10 +1883,33 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       } else {
         AlertService.warn('Path is empty');
       }
+    }
+
+    $scope.sendRequest = function() {
+      doSendRequest(function(response) {
+        _handleResponse(response);
+      });
+    };
+    $scope.isExplain = function() {
+      var isSearch = $scope.request.path.indexOf('_search') > 0;
+      var isExplain = $scope.request.path.indexOf('_explain') > 0;
+      return ($scope.request.method === 'GET' && (isExplain || isSearch)) ||
+        ($scope.request.method === 'POST' && isSearch);
+    };
+    $scope.explainRequest = function() {
+      if (!ExplainService.isExplainPath($scope.request.path)) {
+        AlertService.info('You are executing a request ' +
+          'without _explain nor ?explain=true');
+      }
+      doSendRequest(function(response) {
+        $scope.explanationResults =
+          ExplainService.normalizeExplainResponse(response);
+        $scope.response = response;
+      });
     };
 
     $scope.exportAsCSV = function() {
-      var csv = doCSV($scope.ESResponse);
+      var csv = doCSV($scope.response);
       var blob = new Blob([csv], {type:'data:text/csv;charset=utf-8;'});
       var downloadLink = angular.element('<a></a>');
       downloadLink.attr('href', window.URL.createObjectURL(blob));
@@ -1915,6 +1929,19 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       $scope.history = $scope.loadHistory();
     };
 
+    $scope.explanationTreeConfig = {
+      expandOn: {
+        field: 'description',
+        titleClass: 'explanation-result-description'
+      },
+      columnDefs: [
+        {
+          field: 'value',
+          titleClass: 'explanation-result-header',
+          cellClass: 'text-right'
+        }
+      ]
+    };
   }
 
 ]);
@@ -2260,6 +2287,36 @@ kopf.controller('WarmersController', [
 
   }
 ]);
+
+(function(kopf, JSONTree) {
+  'use strict';
+  kopf.directive('kopfJsonTree', function($sce) {
+    var directive = {
+      restrict: 'E',
+      template:'<div class="json-tree" ng-bind-html="result"></div>',
+      scope: {
+        kopfBind: '='
+      },
+      link: function(scope, element, attrs, requires) {
+        scope.$watch('kopfBind', function(value) {
+          var result;
+          if (value) {
+            try {
+              result = JSONTree.create(value);
+            } catch (invalidJsonError) {
+              result = invalidJsonError;
+            }
+          } else {
+            result = '';
+          }
+
+          scope.result = $sce.trustAsHtml(result);
+        });
+      }
+    };
+    return directive;
+  });
+})(kopf, JSONTree);
 
 kopf.directive('ngNavbarSection', ['$location', 'ElasticService',
   function($location, ElasticService) {
@@ -5200,6 +5257,54 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     return this;
 
+  }]);
+
+kopf.factory('ExplainService', ['$TreeDnDConvert',
+  function($TreeDnDConvert) {
+    function containsString(value, searched) {
+      return value.indexOf(searched) >= 0;
+    }
+    this.isExplainPath = function(path) {
+      return path &&
+           (containsString(path, '_explain') ||
+            containsString(path, '?explain') ||
+            containsString(path, 'explain=true'));
+    };
+    /**
+     * Normalize Get document by id and Document search responses.
+     * Build explanation tree for TreeDnd directive.
+     */
+    this.normalizeExplainResponse = function(response) {
+      var lHits;
+      if (response.hits) {
+        // Explain query
+        lHits = response.hits.hits;
+        // Remove hits from main response
+        delete response.hits.hits;
+      } else {
+        // Explain document
+        lHits = [response];
+      }
+      lHits.forEach(function(lHit) {
+        // Sometimes ._explanation, .sometimes explanation, let's normalize it
+        if (lHit.explanation) {
+          var lExplanation = lHit.explanation;
+          delete response.explanation;
+          response._explanation = lExplanation;
+        }
+        lHit.documentId = lHit._index + '/' + lHit._type + '/' + lHit._id;
+        if (lHit._explanation) {
+          if (!lHit._score) {
+            lHit._score = lHit._explanation.value;
+          }
+          lHit.explanationTreeData =
+            $TreeDnDConvert.tree2tree([lHit._explanation], 'details');
+        }
+      });
+      return lHits;
+    };
+
+    return this;
   }]);
 
 kopf.factory('ExternalSettingsService', ['DebugService',
