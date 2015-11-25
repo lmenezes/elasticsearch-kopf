@@ -11,6 +11,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
 
     $scope.editor = null;
 
+    $scope.ESResponse = '';
+
     $scope.copyAsCURLCommand = function() {
       var method = $scope.request.method;
       var host = ElasticService.getHost();
@@ -71,6 +73,19 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       }
     };
 
+    function _handleResponse(maybeJSON) {
+      // Store the response in scope in case we need it later
+      $scope.ESResponse = maybeJSON;
+      var content;
+      try {
+        content = JSONTree.create(maybeJSON);
+      } catch (invalidJsonError) {
+        content = maybeJSON;
+      } finally {
+        $('#rest-client-response').html(content);
+      }
+    }
+
     $scope.sendRequest = function() {
       if (notEmpty($scope.request.path)) {
         var path = encodeURI($scope.request.path);
@@ -83,12 +98,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
         ElasticService.clusterRequest($scope.request.method,
             path, {}, $scope.request.body,
             function(response) {
-              var content = response;
-              try {
-                content = JSONTree.create(response);
-              } catch (error) {
-                // nothing to do
-              }
+              _handleResponse(response);
               $('#rest-client-response').html(content);
               $scope.addToHistory(new Request(path,
                   $scope.request.method, $scope.request.body));
@@ -96,11 +106,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
             function(error, status) {
               if (status !== 0) {
                 AlertService.error('Request was not successful');
-                try {
-                  $('#rest-client-response').html(JSONTree.create(error));
-                } catch (invalidJsonError) {
-                  $('#rest-client-response').html(error);
-                }
+                _handleResponse(error);
               } else {
                 var url = ElasticService.connection.host + path;
                 AlertService.error(url + ' is unreachable');
@@ -110,6 +116,15 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       } else {
         AlertService.warn('Path is empty');
       }
+    };
+
+    $scope.exportAsCSV = function() {
+      var csv = doCSV($scope.ESResponse);
+      var blob = new Blob([csv], {type:'data:text/csv;charset=utf-8;'});
+      var downloadLink = angular.element('<a></a>');
+      downloadLink.attr('href', window.URL.createObjectURL(blob));
+      downloadLink.attr('download', 'data.csv');
+      downloadLink[0].click();
     };
 
     $scope.initEditor = function() {
