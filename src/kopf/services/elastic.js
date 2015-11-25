@@ -17,8 +17,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     this.brokenCluster = false;
 
-    this.nodeName = undefined; // node running on target host
-
     this.encodeURIComponent = function(text) {
       return encodeURIComponent(text);
     };
@@ -34,7 +32,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.connection = undefined;
       this.connected = false;
       this.cluster = undefined;
-      this.nodeName = undefined;
     };
 
     this.getIndices = function() {
@@ -109,7 +106,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               instance.connect(host + '/');
             } else {
               instance.setVersion(data.version.number);
-              instance.nodeName = data.name;
               instance.connected = true;
               if (!instance.autoRefreshStarted) {
                 instance.autoRefreshStarted = true;
@@ -786,10 +782,8 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       var host = this.connection.host;
       var params = {};
       this.addAuth(params);
-      // FIXME: remove routing_table after 2.0 cut
       $q.all([
-        $http.get(host +
-        '/_cluster/state/master_node,routing_table,routing_nodes,blocks/',
+        $http.get(host + '/_cluster/state/master_node,routing_table,blocks/',
             params),
         $http.get(host + '/_stats/docs,store', params),
         $http.get(host + '/_nodes/stats/jvm,fs,os,process', params),
@@ -797,6 +791,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host + '/_aliases', params),
         $http.get(host + '/_cluster/health', params),
         $http.get(host + '/_nodes/_all/os,jvm', params),
+        $http.get(host, params),
       ]).then(
           function(responses) {
             try {
@@ -807,8 +802,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
               var aliases = responses[4].data;
               var health = responses[5].data;
               var nodes = responses[6].data;
+              var main = responses[7].data;
               var cluster = new Cluster(health, state, indexStats, nodesStats,
-                  settings, aliases, nodes);
+                  settings, aliases, nodes, main);
               success(cluster);
             } catch (exception) {
               DebugService.debug('Error parsing cluster data:', exception);

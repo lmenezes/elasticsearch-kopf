@@ -61,7 +61,6 @@ describe("ElasticService", function() {
         expect(elasticService.connection.withCredentials).toEqual(true);
         expect(elasticService.setVersion).toHaveBeenCalledWith('1.9.13');
         expect(elasticService.connected).toEqual(true);
-        expect(elasticService.nodeName).toBe('some node name');
         expect(elasticService.autoRefreshStarted).toEqual(true);
         expect(elasticService.autoRefreshCluster).toHaveBeenCalled();
         expect(elasticService.reset).toHaveBeenCalled();

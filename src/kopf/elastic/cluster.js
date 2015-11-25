@@ -1,5 +1,9 @@
-function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
+function Cluster(health, state, stats, nodesStats, settings, aliases, nodes,
+                 main) {
   this.created_at = new Date().getTime();
+
+  // main -> GET /
+  this.clientName = main.name;
 
   // Cluster Health(/_cluster/health)
   this.status = health.status;
@@ -54,10 +58,10 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
 
   this.number_of_nodes = this.nodes.length;
 
-  var iRoutingTable = state.routing_table.indices;
+  var indicesNames = Object.keys(state.routing_table.indices);
   var specialIndices = 0;
   var closedIndices = 0;
-  this.indices = Object.keys(iRoutingTable).map(function(indexName) {
+  this.indices = indicesNames.map(function(indexName) {
     var indexStats = stats.indices[indexName];
     var indexAliases = aliases[indexName];
     var index = new Index(indexName, state, indexStats, indexAliases);
@@ -161,25 +165,29 @@ function Cluster(health, state, stats, nodesStats, settings, aliases, nodes) {
   };
 
   var shards = {};
-
-  for (var node in state.routing_nodes.nodes) {
-    for (var idx in state.routing_nodes.nodes[node]) {
-      var shard = new Shard(state.routing_nodes.nodes[node][idx]);
-      var key = shard.node + '_' + shard.index;
-      if (!isDefined(shards[key])) {
-        shards[key] = [];
-      }
-      shards[key].push(shard);
-    }
-  }
-
   var unassignedShards = {};
 
-  state.routing_nodes.unassigned.forEach(function(shard) {
-    if (!isDefined(unassignedShards[shard.index])) {
-      unassignedShards[shard.index] = [];
-    }
-    unassignedShards[shard.index].push(new Shard(shard));
+  var indicesRouting = state.routing_table.indices;
+  indicesNames.forEach(function(indexName) {
+    var totalShards = Object.keys(indicesRouting[indexName].shards);
+
+    totalShards.forEach(function(shardNum) {
+      indicesRouting[indexName].shards[shardNum].forEach(function(shardData) {
+        if (shardData.state === 'UNASSIGNED') {
+          if (!isDefined(unassignedShards[shardData.index])) {
+            unassignedShards[shardData.index] = [];
+          }
+          unassignedShards[shardData.index].push(new Shard(shardData));
+        } else {
+          var shard = new Shard(shardData);
+          var key = shard.node + '_' + shard.index;
+          if (!isDefined(shards[key])) {
+            shards[key] = [];
+          }
+          shards[key].push(shard);
+        }
+      });
+    });
   });
 
   this.getShards = function(nodeId, indexName) {

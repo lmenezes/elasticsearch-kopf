@@ -12,7 +12,7 @@ Versions
 | --------------------- | ------ | --------------- |
 | 0.90.X                | 0.90   | v0.90           |
 | 1.X                   | 1.0    | v1.5.8          |
-| 2.X                   | 2.0    | v2.0.0          |
+| 2.X                   | 2.0    | v2.0.1          |
 
 Installation
 ------------
@@ -21,7 +21,7 @@ You can either install a specific version(using its release tag) or the most up 
 ####Installing on an Elasticsearch instance:
 
 ```bash
-./elasticsearch/bin/plugin --install lmenezes/elasticsearch-kopf/{branch|version}
+./elasticsearch/bin/plugin install lmenezes/elasticsearch-kopf/{branch|version}
 open http://localhost:9200/_plugin/kopf
 ```
 

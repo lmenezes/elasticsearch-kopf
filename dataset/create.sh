@@ -29,7 +29,7 @@ curl -s XGET http://localhost:9200/_refresh >> /dev/null
 sleep 1
 
 echo -n "var state = JSON.parse('";
-curl -XGET http://localhost:9200/_cluster/state/master_node,nodes,routing_table,routing_nodes,blocks/
+curl -XGET http://localhost:9200/_cluster/state/master_node,nodes,routing_table,blocks/
 echo -ne "');\n"
 echo -n "var indexStats = JSON.parse('";
 curl -XGET http://localhost:9200/_stats/docs,store
