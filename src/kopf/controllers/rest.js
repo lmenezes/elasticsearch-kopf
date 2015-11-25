@@ -77,6 +77,7 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       if (notEmpty($scope.request.path)) {
         $scope.request.body = $scope.editor.format();
         $scope.response = '';
+        $scope.explanationResults = [];
         if ($scope.request.method == 'GET' && '{}' !== $scope.request.body) {
           AlertService.info('You are executing a GET request with body ' +
               'content. Maybe you meant to use POST or PUT?');
@@ -119,10 +120,10 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
         AlertService.info('You are executing a request ' +
           'without _explain nor ?explain=true');
       }
-      $scope.explanationResults = [];
       doSendRequest(function(response) {
         $scope.explanationResults =
           ExplainService.normalizeExplainResponse(response);
+        $scope.response = response;
       });
     };
 

@@ -18,6 +18,8 @@ kopf.factory('ExplainService', ['$TreeDnDConvert',
       if (response.hits) {
         // Explain query
         lHits = response.hits.hits;
+        // Remove hits from main response
+        delete response.hits.hits;
       } else {
         // Explain document
         lHits = [response];
