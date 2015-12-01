@@ -1869,7 +1869,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       $scope.editor.setValue(request.body);
     };
 
-    $scope.addToHistory = function(request) {
+    $scope.addToHistory = function(path, method, body) {
+      var request = new Request(path, method, body);
       var exists = false;
       for (var i = 0; i < $scope.history.length; i++) {
         if ($scope.history[i].equals(request)) {
@@ -1913,8 +1914,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
             path, {}, $scope.request.body,
             function(response) {
               _handleResponse(response);
-              $scope.addToHistory(new Request(path,
-                  $scope.request.method, $scope.request.body));
+              $scope.addToHistory($scope.request.path,
+                  $scope.request.method, $scope.request.body);
             },
             function(error, status) {
               if (status !== 0) {

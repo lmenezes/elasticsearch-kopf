@@ -138,39 +138,43 @@ describe('RestController', function() {
   });
 
   it('to not add duplicates to request to history', function() {
-    var request = new Request("/test_rest/_search", "POST", "{'uno': 'dos'}");
     expect(this.scope.history.length).toEqual(0);
-    this.scope.addToHistory(request);
+    this.scope.addToHistory("/test_rest/_search", "POST", "{'uno': 'dos'}");
     expect(this.scope.history.length).toEqual(1);
     spyOn(localStorage, 'setItem').andReturn(true);
-    this.scope.addToHistory(request);
+    this.scope.addToHistory("/test_rest/_search", "POST", "{'uno': 'dos'}");
     expect(this.scope.history.length).toEqual(1);
     expect(localStorage.setItem).not.toHaveBeenCalled();
   });
 
   it('limit history request to 30', function() {
-    var request = new Request("/test_rest/_search", "POST", "{'uno': 'dos'}");
     var history = [];
     for (var i = 0; i < 30; i++) {
       history.push(new Request("/test_rest/_search", "POST", "{'uno': '" + i + " '}"));
     }
     this.scope.history = history;
     expect(this.scope.history.length).toEqual(30);
-    this.scope.addToHistory(request);
+    this.scope.addToHistory("/test_rest/_search", "POST", "{'uno': 'dos'}");
     expect(this.scope.history.length).toEqual(30);
-    expect(this.scope.history[0].equals(request)).toEqual(true);
+    expect(this.scope.history[0].path).toEqual("/test_rest/_search");
+    expect(this.scope.history[0].method).toEqual("POST");
+    expect(this.scope.history[0].body).toEqual("{'uno': 'dos'}");
   });
 
   it('executes a correct request', function() {
     this.scope.request = new Request("test_rest/_search", "POST", "{'uno': 'dos'}");
-    this.ElasticService.clusterRequest = function() {};
+    this.ElasticService.clusterRequest = function(m, p, h, b, success, failure) {
+      success(new ClusterMapping({}));
+    };
     this.scope.editor = { format: function() { return "{'uno': 'dos'}"; } };
     spyOn(this.AlertService, 'warn').andReturn(true);
     spyOn(this.scope.editor, 'format').andCallThrough();
-    spyOn(this.ElasticService, 'clusterRequest').andReturn(true);
+    spyOn(this.ElasticService, 'clusterRequest').andCallThrough();
+    spyOn(this.scope, 'addToHistory').andReturn();
     this.scope.sendRequest();
     expect(this.ElasticService.clusterRequest).toHaveBeenCalledWith("POST", "/test_rest/_search", {}, "{'uno': 'dos'}", jasmine.any(Function), jasmine.any(Function));
     expect(this.AlertService.warn).not.toHaveBeenCalled();
+    expect(this.scope.addToHistory).toHaveBeenCalledWith("test_rest/_search", "POST", "{'uno': 'dos'}");
   });
 
   it('executes a request without path', function() {
