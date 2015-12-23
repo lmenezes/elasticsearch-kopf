@@ -84,7 +84,7 @@ describe('AnalysisController', function() {
     this.scope.field_text = 'blah blah';
     spyOn(this.ElasticService, "analyzeByField").andReturn(true);
     this.scope.analyzeByField();
-    expect(this.ElasticService.analyzeByField).toHaveBeenCalledWith('a', 'type',
+    expect(this.ElasticService.analyzeByField).toHaveBeenCalledWith('a',
         'field', 'blah blah', jasmine.any(Function), jasmine.any(Function));
   });
 
