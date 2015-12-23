@@ -350,7 +350,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
       if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
         $scope.field_tokens = null;
         ElasticService.analyzeByField($scope.field_index.name,
-            $scope.field_type, $scope.field_field, $scope.field_text,
+            $scope.field_field, $scope.field_text,
             function(response) {
               $scope.field_tokens = response;
             },
@@ -5157,27 +5157,23 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       this.clusterRequest('GET', '/_aliases', {}, {}, createAliases, error);
     };
 
-    this.analyzeByField = function(index, type, field, text, success, error) {
+    function analyze(index, body, success, error) {
       var buildTokens = function(response) {
         var tokens = response.tokens.map(function(t) {
           return new Token(t.token, t.start_offset, t.end_offset, t.position);
         });
         success(tokens);
       };
-      var path = '/' + encode(index) + '/_analyze?field=';
-      path += encode(type) + '.' + encode(field);
-      this.clusterRequest('POST', path, {}, text, buildTokens, error);
+      var path = '/' + encode(index) + '/_analyze';
+      instance.clusterRequest('POST', path, {}, body, buildTokens, error);
+    }
+
+    this.analyzeByField = function(index, field, text, success, error) {
+      analyze(index, {text: text, field: field}, success, error);
     };
 
     this.analyzeByAnalyzer = function(index, analyzer, text, success, error) {
-      var buildTokens = function(response) {
-        var tokens = response.tokens.map(function(t) {
-          return new Token(t.token, t.start_offset, t.end_offset, t.position);
-        });
-        success(tokens);
-      };
-      var path = '/' + encode(index) + '/_analyze?analyzer=' + encode(analyzer);
-      this.clusterRequest('POST', path, {}, text, buildTokens, error);
+      analyze(index, {text: text, analyzer: analyzer}, success, error);
     };
 
     this.getIndexWarmers = function(index, warmer, success, error) {
