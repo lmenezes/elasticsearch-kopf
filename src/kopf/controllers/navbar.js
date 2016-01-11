@@ -4,7 +4,7 @@ kopf.controller('NavbarController', ['$scope', '$location',
   function($scope, $location, ExternalSettingsService, ElasticService,
            AlertService, HostHistoryService) {
 
-    $scope.new_refresh = ExternalSettingsService.getRefreshRate();
+    $scope.new_refresh = '' + ExternalSettingsService.getRefreshRate();
     $scope.theme = ExternalSettingsService.getTheme();
     $scope.new_host = '';
     $scope.current_host = ElasticService.getHost();
