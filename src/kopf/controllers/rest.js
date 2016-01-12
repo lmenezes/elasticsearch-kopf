@@ -3,7 +3,11 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
   'ClipboardService',
   function($scope, $location, $timeout, ExplainService, AlertService,
            AceEditorService, ElasticService, ClipboardService) {
-    $scope.request = new Request('', 'GET', '{}');
+    $scope.request = new Request(
+        $location.search().path || '',
+        $location.search().method || 'GET',
+        $location.search().body || '{}'
+    );
 
     $scope.validation_error = null;
 
