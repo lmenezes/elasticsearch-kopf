@@ -243,3 +243,63 @@ describe('RestController', function() {
   });
 
 });
+
+
+describe('RestController loading params from URL', function() {
+  var scope, createController;
+
+  beforeEach(angular.mock.module('kopf'));
+
+  beforeEach(function() {
+    module('kopf');
+    var mock = {
+      isConnected: function() {
+        return true;
+      },
+      getClusterMapping: function(success, failure) {
+        success(new ClusterMapping(
+            {
+              foo: {
+                mappings: {
+                  bar: {}
+                }
+              }
+            }
+        ));
+      }
+    };
+    module(function($provide) {
+      $provide.value('ElasticService', mock);
+    });
+  });
+
+  beforeEach(angular.mock.inject(function($rootScope, $controller, $injector) {
+    this.scope = $rootScope.$new();
+    var $timeout = $injector.get('$timeout');
+    var $location = $injector.get('$location');
+    $location.search('method', 'PUT');
+    $location.search('path', '_search');
+    $location.search('body', '{"query": {"match_all":{}}}');
+    this.AlertService = $injector.get('AlertService');
+    this.AceEditorService = $injector.get('AceEditorService');
+    this.ElasticService = $injector.get('ElasticService');
+    this.ClipboardService = $injector.get('ClipboardService');
+    this.createController = function() {
+      return $controller('RestController', {$scope: this.scope}, $location,
+          $timeout, this.AlertService, this.AceEditorService,
+          this.ElasticService);
+    };
+    this._controller = this.createController();
+  }));
+
+  it('initial values are set', function() {
+    expect(this.scope.editor).toEqual(null);
+    expect(this.scope.request.path).toEqual("_search");
+    expect(this.scope.request.method).toEqual("PUT");
+    expect(this.scope.request.body).toEqual('{"query": {"match_all":{}}}');
+    expect(this.scope.validation_error).toEqual(null);
+    expect(this.scope.history).toEqual([]);
+    expect(this.scope.options).toEqual([]);
+    expect(this.scope.mapping).toEqual(undefined);
+  });
+});
