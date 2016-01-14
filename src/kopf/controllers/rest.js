@@ -4,9 +4,9 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
   function($scope, $location, $timeout, ExplainService, AlertService,
            AceEditorService, ElasticService, ClipboardService) {
     $scope.request = new Request(
-        $location.search().path || '',
-        $location.search().method || 'GET',
-        $location.search().body || '{}'
+        decodeURIComponent($location.search().path || ''),
+        decodeURIComponent($location.search().method || 'GET'),
+        decodeURIComponent($location.search().body || '{}')
     );
 
     $scope.validation_error = null;
