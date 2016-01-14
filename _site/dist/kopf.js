@@ -1907,8 +1907,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       });
     };
     $scope.isExplain = function() {
-      var isSearch = $scope.request.path.indexOf('_search') > 0;
-      var isExplain = $scope.request.path.indexOf('_explain') > 0;
+      var isSearch = $scope.request.path.indexOf('_search') >= 0;
+      var isExplain = $scope.request.path.indexOf('_explain') >= 0;
       return ($scope.request.method === 'GET' && (isExplain || isSearch)) ||
         ($scope.request.method === 'POST' && isSearch);
     };
