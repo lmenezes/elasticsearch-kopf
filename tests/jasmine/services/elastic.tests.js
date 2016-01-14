@@ -135,10 +135,10 @@ describe("ElasticService", function() {
 
   it("Should set version when setVersion is called", function() {
     elasticService.setVersion('1.2.3');
-    expect(elasticService.version.major).toEqual(1);
-    expect(elasticService.version.minor).toEqual(2);
-    expect(elasticService.version.build).toEqual(3);
-    expect(elasticService.version.str).toEqual('1.2.3');
+    expect(elasticService.version.getMajor()).toEqual(1);
+    expect(elasticService.version.getMinor()).toEqual(2);
+    expect(elasticService.version.getPatch()).toEqual(3);
+    expect(elasticService.version.getValue()).toEqual('1.2.3');
   });
 
   it("Should throw exception if setVersion is called with incorrect format",
@@ -155,7 +155,7 @@ describe("ElasticService", function() {
       });
 
   it("Should correcty validate version check", function() {
-    elasticService.version = {str: '1.2.3', major: 1, minor: 2, build: 3};
+    elasticService.version = new Version('1.2.3');
     expect(elasticService.versionCheck('1.2.2')).toEqual(true);
     expect(elasticService.versionCheck('1.2.3')).toEqual(true);
     expect(elasticService.versionCheck('1.2.4')).toEqual(false);
@@ -628,7 +628,7 @@ describe("ElasticService", function() {
     expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
     expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
     expect(elasticService.connection.host).toEqual('http://localhost:9200/');
-    expect(elasticService.version.str).toEqual('1.5.1');
+    expect(elasticService.version.getValue()).toEqual('1.5.1');
     expect(elasticService.connected).toEqual(true);
   });
 
