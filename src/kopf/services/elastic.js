@@ -3,8 +3,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
   function($http, $q, $timeout, $location, ExternalSettingsService,
            DebugService, AlertService) {
 
-    var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
-
     var instance = this;
 
     this.connection = undefined;
@@ -137,15 +135,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     };
 
     this.setVersion = function(version) {
-      this.version = {'str': version};
-      if (!checkVersion.test(version)) {
+      this.version = new Version(version);
+      if (!this.version.isValid()) {
         DebugService.debug('Invalid Elasticsearch version[' + version + ']');
         throw 'Invalid Elasticsearch version[' + version + ']';
       }
-      var parts = checkVersion.exec(version);
-      this.version.major = parseInt(parts[1]);
-      this.version.minor = parseInt(parts[2]);
-      this.version.build = parseInt(parts[3]);
     };
 
     this.getHost = function() {
@@ -153,24 +147,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     };
 
     this.versionCheck = function(version) {
-      if (isDefined(version)) {
-        var parts = checkVersion.exec(version);
-        var major = parseInt(parts[1]);
-        var minor = parseInt(parts[2]);
-        var build = parseInt(parts[3]);
-        var v = this.version;
-        var higherMajor = v.major > major;
-        var higherMinor = v.major == major && v.minor > minor;
-        var higherBuild = (
-        v.major == major &&
-        v.minor == minor &&
-        v.build >= build
-        );
-        return (higherMajor || higherMinor || higherBuild);
+      if (isDefined(this.version.isValid())) {
+        return this.version.isGreater(new Version(version));
       } else {
         return true;
       }
-
     };
 
     /**

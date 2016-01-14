@@ -2348,8 +2348,7 @@ kopf.directive('ngNavbarSection', ['$location', 'ElasticService',
 
     return {
       template: function(elem, attrs) {
-        var visible = ElasticService.versionCheck(attrs.version);
-        if (visible) {
+        if (!attrs.version || ElasticService.versionCheck(attrs.version)) {
           var target = attrs.target;
           var text = attrs.text;
           var icon = attrs.icon;
@@ -3471,6 +3470,55 @@ function Token(token, startOffset, endOffset, position) {
   this.position = position;
 }
 
+function Version(version) {
+  var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
+  var major;
+  var minor;
+  var patch;
+  var value = version;
+  var valid = false;
+
+  if (checkVersion.test(value)) {
+    valid = true;
+    var parts = checkVersion.exec(version);
+    major = parseInt(parts[1]);
+    minor = parseInt(parts[2]);
+    patch = parseInt(parts[3]);
+  }
+
+  this.isValid = function() {
+    return valid;
+  };
+
+  this.getMajor = function() {
+    return major;
+  };
+
+  this.getMinor = function() {
+    return minor;
+  };
+
+  this.getPatch = function() {
+    return patch;
+  };
+
+  this.getValue = function() {
+    return value;
+  };
+
+  this.isGreater = function(other) {
+    var higherMajor = major > other.getMajor();
+    var higherMinor = major == other.getMajor() && minor > other.getMinor();
+    var higherPatch = (
+        major == other.getMajor() &&
+        minor == other.getMinor() &&
+        patch >= other.getPatch()
+    );
+    return (higherMajor || higherMinor || higherPatch);
+  };
+
+}
+
 function Warmer(id, index, body) {
   this.id = id;
   this.index = index;
@@ -4470,8 +4518,6 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
   function($http, $q, $timeout, $location, ExternalSettingsService,
            DebugService, AlertService) {
 
-    var checkVersion = new RegExp('(\\d)\\.(\\d)\\.(\\d)\\.*');
-
     var instance = this;
 
     this.connection = undefined;
@@ -4604,15 +4650,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     };
 
     this.setVersion = function(version) {
-      this.version = {'str': version};
-      if (!checkVersion.test(version)) {
+      this.version = new Version(version);
+      if (!this.version.isValid()) {
         DebugService.debug('Invalid Elasticsearch version[' + version + ']');
         throw 'Invalid Elasticsearch version[' + version + ']';
       }
-      var parts = checkVersion.exec(version);
-      this.version.major = parseInt(parts[1]);
-      this.version.minor = parseInt(parts[2]);
-      this.version.build = parseInt(parts[3]);
     };
 
     this.getHost = function() {
@@ -4620,24 +4662,11 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
     };
 
     this.versionCheck = function(version) {
-      if (isDefined(version)) {
-        var parts = checkVersion.exec(version);
-        var major = parseInt(parts[1]);
-        var minor = parseInt(parts[2]);
-        var build = parseInt(parts[3]);
-        var v = this.version;
-        var higherMajor = v.major > major;
-        var higherMinor = v.major == major && v.minor > minor;
-        var higherBuild = (
-        v.major == major &&
-        v.minor == minor &&
-        v.build >= build
-        );
-        return (higherMajor || higherMinor || higherBuild);
+      if (isDefined(this.version.isValid())) {
+        return this.version.isGreater(new Version(version));
       } else {
         return true;
       }
-
     };
 
     /**

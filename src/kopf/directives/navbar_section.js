@@ -3,8 +3,7 @@ kopf.directive('ngNavbarSection', ['$location', 'ElasticService',
 
     return {
       template: function(elem, attrs) {
-        var visible = ElasticService.versionCheck(attrs.version);
-        if (visible) {
+        if (!attrs.version || ElasticService.versionCheck(attrs.version)) {
           var target = attrs.target;
           var text = attrs.text;
           var icon = attrs.icon;
