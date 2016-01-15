@@ -1239,6 +1239,24 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
 
     $scope.modal = new ModalControls();
 
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(newValue, oldValue) {
+          var version = ElasticService.getVersion();
+          if (version && version.isValid()) {
+            var major = version.getMajor();
+            if (major != parseInt($scope.version.charAt(0))) {
+              AlertService.warn(
+                  'This version of kopf is not compatible with your ES version',
+                  'Upgrading to newest supported version is recommeded'
+              );
+            }
+          }
+        }
+    );
+
     $scope.getTheme = function() {
       return ExternalSettingsService.getTheme();
     };
@@ -4624,6 +4642,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         DebugService.debug('Invalid Elasticsearch version[' + version + ']');
         throw 'Invalid Elasticsearch version[' + version + ']';
       }
+    };
+
+    this.getVersion = function() {
+      return this.version;
     };
 
     this.getHost = function() {

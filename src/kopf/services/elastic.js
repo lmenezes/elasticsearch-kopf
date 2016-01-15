@@ -142,6 +142,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       }
     };
 
+    this.getVersion = function() {
+      return this.version;
+    };
+
     this.getHost = function() {
       return this.isConnected() ? this.connection.host : '';
     };
