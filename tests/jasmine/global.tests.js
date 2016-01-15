@@ -108,4 +108,25 @@ describe('GlobalController', function() {
         expect(this.ElasticService.connect).toHaveBeenCalledWith('http://thishost:4321');
       });
 
+  it('should warn if not supported version is found', function() {
+    this.ElasticService.getVersion = function(){};
+    spyOn(this.ElasticService, 'getVersion').andReturn(new Version('1.0.0'));
+    spyOn(this.AlertService, 'warn').andReturn('');
+    this.ElasticService.cluster = '';
+    this.scope.$digest();
+    expect(this.AlertService.warn).toHaveBeenCalledWith(
+        'This version of kopf is not compatible with your ES version',
+        'Upgrading to newest supported version is recommeded'
+    );
+  });
+
+  it('should NOT warn if supported version is found', function() {
+    this.ElasticService.getVersion = function(){};
+    spyOn(this.ElasticService, 'getVersion').andReturn(new Version('2.0.0'));
+    spyOn(this.AlertService, 'warn').andReturn('');
+    this.ElasticService.cluster = '';
+    this.scope.$digest();
+    expect(this.AlertService.warn).not.toHaveBeenCalledWith();
+  });
+
 });
