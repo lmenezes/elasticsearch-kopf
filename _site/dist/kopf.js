@@ -1237,7 +1237,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
             if (major != parseInt($scope.version.charAt(0))) {
               AlertService.warn(
                   'This version of kopf is not compatible with your ES version',
-                  'Upgrading to newest supported version is recommeded'
+                  'Upgrading to newest supported version is recommended'
               );
             }
           }
