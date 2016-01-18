@@ -728,7 +728,7 @@ describe("ElasticService", function() {
     expect(callbacks.error).toHaveBeenCalledWith({notreallyusingtheresponse:{}});
   });
 
-  it("should return the correct versiom", function() {
+  it("should return the correct version", function() {
     elasticService.setVersion('1.2.0');
     expect(elasticService.getVersion().getValue()).toEqual('1.2.0');
   });
