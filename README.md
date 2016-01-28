@@ -8,10 +8,11 @@ It offers an easy way of performing common tasks on an elasticsearch cluster. No
 Versions
 ------------
 
-| elasticsearch version | kopf version |
-| --------------------- | ------------ |
-| 0.90.X                | v0.90        |
-| 1.X                   | master       |
+| elasticsearch version | branch | latest version  |
+| --------------------- | ------ | --------------- |
+| 0.90.X                | 0.90   | see [master branch README](https://github.com/lmenezes/elasticsearch-kopf/blob/master/README.md) |
+| 1.X                   | 1.0    | see [master branch README](https://github.com/lmenezes/elasticsearch-kopf/blob/master/README.md) |
+| 2.X                   | 2.0    | see [master branch README](https://github.com/lmenezes/elasticsearch-kopf/blob/master/README.md) |
 
 Installation
 ------------
