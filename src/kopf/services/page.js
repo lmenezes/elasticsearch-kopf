@@ -54,7 +54,6 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
           context.globalCompositeOperation = 'source-in';
           context.fillStyle = color;
           context.fillRect(0, 0, 32, 32);
-          context.fill();
           this.link.type = 'image/x-icon';
           this.link.href = canvas.toDataURL();
         } catch (exception) {
