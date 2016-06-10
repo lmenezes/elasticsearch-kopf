@@ -1,42 +1,34 @@
 kopf.controller('statsController', ['$scope', 'ElasticService',
-    'AlertService',
-    function ($scope, ElasticService, AlertService) {
-        // injection
-        $scope.Math = window.Math;
-        
-        $scope.logged = false;
-        $scope.ix_logged = false;
-        
-        $scope.nodes = [];
-        $scope.indieces = [];
-        $scope.recoveries = {};
+  function ($scope, ElasticService) {
 
-        $scope.$watch(
+    $scope.nodes = [];
+    $scope.indieces = [];
+    $scope.all_stats = [];
+
+    $scope.$watch(
             function () {
-                return ElasticService.cluster;
+              return ElasticService.cluster;
             },
             function (current, previous) {
-                $scope.refresh();
+              $scope.refresh();
             },
             true
-        );
+            );
 
-        $scope.initializeController = function () {
-            $scope.nodes = ElasticService.getNodes();
-            $scope.indices = ElasticService.getIndices();
-        };
+    $scope.initializeController = function () {
+      $scope.nodes = ElasticService.getNodes();
+      $scope.indices = ElasticService.getIndices();
+    };
 
-        $scope.refresh = function () {
-            $scope.nodes = ElasticService.getNodes();
-            $scope.indices = ElasticService.getIndices();
-            if ($scope.nodes.length > 0 && !$scope.logged){
-                $scope.logged = true;
-            }
-            if ($scope.indices.length > 0 && !$scope.ix_logged){
-                $scope.ix_logged = true;
-            }
-        };
+    $scope.refresh = function () {
+      $scope.nodes = ElasticService.getNodes();
+      $scope.indices = ElasticService.getIndices();
+      $scope.all_stats = [];
 
-    }
-
+      for (i = 0; i < $scope.nodes.length; i++) {
+        $scope.all_stats.push(
+                new Stats($scope.nodes[i], $scope.indices[i]));
+      }
+    };
+  }
 ]);

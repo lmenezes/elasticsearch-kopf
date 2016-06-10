@@ -1,80 +1,75 @@
 <h1>Stats</h1>
 
-<div class="row">
-    <div class="col-sm-4">
-        <table class="table table-bordered table-condensed table-rounded overview">
-            <thead>
-                <tr><th colspan="{{ nodes.length + 1}}">FILE SYSTEM</th></tr>
-            </thead>
-            <tbody>
-                <tr><th>NODE</th><th ng-repeat="node in nodes">{{node.name}}</th></tr>
-                <tr><th>Store Size</th><td ng-repeat="node in nodes">{{node.stats.indices.store.size_in_bytes}}</td></tr>
-                <tr><th>Documents</th><td ng-repeat="node in nodes">{{node.stats.indices.docs.count}}</td></tr>
-                <tr><th>Documents Deleted</th><td ng-repeat="node in nodes">{{node.stats.indices.docs.deleted}}</td></tr>
-                <tr><th>Merge Size</th><td ng-repeat="node in nodes">{{node.stats.indices.merges.total_size_in_bytes}}</td></tr>
-                <tr><th>Merge Time</th><td ng-repeat="node in nodes">{{node.stats.indices.merges.total_time_in_millis}}</td></tr>
-                <tr><th>File Descriptors</th><td ng-repeat="node in nodes">{{node.stats.process.open_file_descriptors}}</td></tr>
-                <tr><th>Disk space used</th><td ng-repeat="node in nodes">{{node.disk_used_percent}} %</td></tr>
-                <tr>
-                    <th>Disk space free</th>
-                    <td ng-repeat="node in nodes">
-                        {{Math.round((node.stats.fs.total.free_in_bytes / Math.pow(1024, 3)) * 100) / 100}} GB
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-    </div>
-    
-    <div class="col-sm-4">
-        <table class="table table-bordered table-condensed table-rounded overview">
-            <thead>
-                <tr><th colspan="{{ nodes.length + 1}}">INDEX ACTIVITY</th></tr>
-            </thead>
-            <tbody>
-                <tr><th>NODE</th><th ng-repeat="node in nodes">{{node.name}}</th></tr>
-                <tr><th>Indexing - Index</th><td class="navbar-cluster-status-green" ng-repeat="node in nodes">{{ node.stats.indices.indexing.index_time_in_millis / node.stats.indices.indexing.index_total}}</td></tr>
-                <tr><th>Indexing - Delete</th><td class="navbar-cluster-status-red" ng-repeat="node in nodes">{{ node.stats.indices.indexing.delete_time_in_millis / node.stats.indices.indexing.delete_total}}</td></tr>
-                <tr><th>Search - Query</th><td class="navbar-cluster-status-yellow" ng-repeat="node in nodes">{{node.stats.indices.search.query_time_in_millis / node.stats.indices.search.query_total}}</td></tr>
-                <tr><th>Search - Fetch</th><td ng-repeat="node in nodes">{{node.stats.indices.search.fetch_time_in_millis / node.stats.indices.search.fetch_total}}</td></tr>
-                <tr><th>Get - Total</th><td ng-repeat="node in nodes">{{node.stats.indices.get.time_in_millis / node.stats.indices.get.total}}</td></tr>
-                <tr><th>Get - Exists</th><td ng-repeat="node in nodes">{{node.stats.indices.get.exists_time_in_millis / node.stats.indices.get.exists_total}}</td></tr>
-                <tr><th>Get - Missing</th><td ng-repeat="node in nodes">{{node.stats.indices.get.missing_time_in_millis / node.stats.indices.get.missing_total}}</td></tr>
-                <tr><th>Refresh</th><td ng-repeat="node in nodes">{{node.stats.indices.refresh.total_time_in_millis / node.stats.indices.refresh.total}}</td></tr>
-                <tr><th>Flush</th><td ng-repeat="node in nodes">{{ node.stats.indices.flush.total_time_in_millis / node.stats.indices.flush.total}}</td></tr>
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-    </div>
-    
-    <div class="col-sm-4">
-        <table class="table table-bordered table-condensed table-rounded overview">
-            <thead>
-                <tr><th colspan="{{ nodes.length + 1}}">CACHE ACTIVITY</th></tr>
-            </thead>
-            <tbody>
-                <tr><th>NODE</th><th ng-repeat="node in nodes">{{node.name}}</th></tr>
-                <tr><th>Field Size</th><td ng-repeat="node in nodes">{{node.stats.indices.fielddata.memory_size_in_bytes}}</td></tr>
-                <tr><th>Field Evictions</th><td ng-repeat="node in nodes">{{ node.stats.indices.fielddata.evictions}}</td></tr>
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-    </div>
-    
-    <div class="col-sm-4">
-        <table class="table table-bordered table-condensed table-rounded overview">
-            <thead>
-                <tr><th colspan="{{ nodes.length + 1}}">MEMORY</th></tr>
-            </thead>
-            <tbody>
-                <tr><th>NODE</th><th ng-repeat="node in nodes">{{node.name}}</th></tr>
-                <tr><th>Total Memory</th><td ng-repeat="node in nodes">{{(node.stats.os.mem.actual_used_in_bytes + node.stats.os.mem.actual_free_in_bytes ) / Math.pow(1024,3) }} GB</td></tr>
-                <tr><th>Heap Size</th><td ng-repeat="node in nodes">{{Math.round((node.stats.jvm.mem.heap_committed_in_bytes / (Math.pow(1024, 3))) * 100) /100 }} GB</td></tr>
-                <tr><th>Heap % of RAM</th><td ng-repeat="node in nodes">{{node.stats.jvm.mem.heap_committed_in_bytes / ( node.stats.os.mem.actual_used_in_bytes + node.stats.os.mem.actual_free_in_bytes)}} %</td></tr>
-                <tr><th>% Heap Used</th><td ng-repeat="node in nodes">{{Math.round((node.stats.jvm.mem.heap_used_in_bytes / node.stats.jvm.mem.heap_committed_in_bytes) * 1000) / 10 }} %</td></tr>
-                <tr><th>Swap Space</th><td ng-repeat="node in nodes">{{node.stats.os.swap.used_in_bytes / Math.pow(1024, 2)}} MB</td></tr>
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-    </div>
+<div class="row-fluid">
+  <table class="table table-bordered table-condensed table-rounded overview">
+    <thead>
+      <tr><th colspan="{{ all_stats.length + 1}}">FILE SYSTEM</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>NODE</th><th ng-repeat="stats in all_stats">{{stats.node_name}}</th></tr>
+      <tr><th>Store Size</th><td ng-repeat="stats in all_stats">{{stats.store_size}}</td></tr>
+      <tr><th>Documents</th><td ng-repeat="stats in all_stats">{{stats.documents}}</td></tr>
+      <tr><th>Documents Deleted</th><td ng-repeat="stats in all_stats">{{stats.documents_deleted}}</td></tr>
+      <tr><th>Merge Size</th><td ng-repeat="stats in all_stats">{{stats.merge_size}}</td></tr>
+      <tr><th>Merge Time</th><td ng-repeat="stats in all_stats">{{stats.merge_time}}</td></tr>
+      <tr><th>File Descriptors</th><td ng-repeat="stats in all_stats">{{stats.file_descriptors}}</td></tr>
+      <tr><th>Disk space used</th><td ng-repeat="stats in all_stats">{{stats.disk_space_used}} %</td></tr>
+      <tr><th>Disk space free</th><td ng-repeat="stats in all_stats">{{stats.disk_space_free}} GB</td></tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
 </div>
+
+<div class="row-fluid">
+  <table class="table table-bordered table-condensed table-rounded overview">
+    <thead>
+      <tr><th colspan="{{ all_stats.length + 1}}">INDEX ACTIVITY</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>NODE</th><th ng-repeat="stats in all_stats">{{stats.node_name}}</th></tr>
+      <tr><th>Indexing - Index</th><td ng-repeat="stats in all_stats">{{ stats.indexing.index}}</td></tr>
+      <tr><th>Indexing - Delete</th><td ng-repeat="stats in all_stats">{{ stats.indexing.delete}}</td></tr>
+      <tr><th>Search - Query</th><td ng-repeat="stats in all_stats">{{stats.search.query}}</td></tr>
+      <tr><th>Search - Fetch</th><td ng-repeat="stats in all_stats">{{stats.search.fetch}}</td></tr>
+      <tr><th>Get - Total</th><td ng-repeat="stats in all_stats">{{stats.get.total}}</td></tr>
+      <tr><th>Get - Exists</th><td ng-repeat="stats in all_stats">{{stats.get.exists}}</td></tr>
+      <tr><th>Get - Missing</th><td ng-repeat="stats in all_stats">{{stats.get.missing}}</td></tr>
+      <tr><th>Refresh</th><td ng-repeat="stats in all_stats">{{stats.refresh}}</td></tr>
+      <tr><th>Flush</th><td ng-repeat="stats in all_stats">{{stats.flush}}</td></tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
+</div>
+
+<div class="row-fluid">
+  <table class="table table-bordered table-condensed table-rounded overview">
+    <thead>
+      <tr><th colspan="{{ all_stats.length + 1}}">CACHE ACTIVITY</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>NODE</th><th ng-repeat="stats in all_stats">{{stats.node_name}}</th></tr>
+      <tr><th>Field Size</th><td ng-repeat="stats in all_stats">{{stats.field_size}}</td></tr>
+      <tr><th>Field Evictions</th><td ng-repeat="stats in all_stats">{{stats.field_evictions}}</td></tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
+</div>
+
+<div class="row-fluid">
+  <table class="table table-bordered table-condensed table-rounded overview">
+    <thead>
+      <tr><th colspan="{{ all_stats.length + 1}}">MEMORY</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>NODE</th><th ng-repeat="stats in all_stats">{{node.name}}</th></tr>
+      <tr><th>Total Memory</th><td ng-repeat="stats in all_stats">{{stats.total_memory}} GB</td></tr>
+      <tr><th>Heap Size</th><td ng-repeat="stats in all_stats">{{stats.heap_size}} GB</td></tr>
+      <tr><th>Heap % of RAM</th><td ng-repeat="stats in all_stats">{{stats.heap_porcent_ram}} %</td></tr>
+      <tr><th>% Heap Used</th><td ng-repeat="stats in all_stats">{{stats.heap_usage_porcent}} %</td></tr>
+      <tr><th>Swap Space</th><td ng-repeat="stats in all_stats">{{stats.swap_space}} MB</td></tr>
+    </tbody>
+    <tfoot></tfoot>
+  </table>
+</div>
+
+<!-- <td class="navbar-cluster-status-green" -->
