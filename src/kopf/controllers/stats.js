@@ -30,11 +30,9 @@ kopf.controller('statsController', ['$scope', 'ElasticService',
             $scope.nodes = ElasticService.getNodes();
             $scope.indices = ElasticService.getIndices();
             if ($scope.nodes.length > 0 && !$scope.logged){
-                console.log($scope.nodes);
                 $scope.logged = true;
             }
             if ($scope.indices.length > 0 && !$scope.ix_logged){
-                console.log($scope.indices);
                 $scope.ix_logged = true;
             }
         };
