@@ -3,6 +3,8 @@ kopf.factory('ExternalSettingsService', ['DebugService',
 
     var KEY = 'kopfSettings';
 
+    var ES_HOST = 'location';
+
     var ES_ROOT_PATH = 'elasticsearch_root_path';
 
     var WITH_CREDENTIALS = 'with_credentials';
@@ -52,6 +54,10 @@ kopf.factory('ExternalSettingsService', ['DebugService',
         };
       });
       return settings;
+    };
+
+    this.getElasticsearchHost = function() {
+      return this.getSettings()[ES_HOST];
     };
 
     this.getElasticsearchRootPath = function() {
