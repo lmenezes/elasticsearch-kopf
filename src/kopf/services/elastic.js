@@ -786,7 +786,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host + '/_aliases', params),
         $http.get(host + '/_cluster/health', params),
         $http.get(host + '/_nodes/_all/os,jvm', params),
-        $http.get(host, params),
+        $http.get(host + '/', params),
       ]).then(
           function(responses) {
             try {
