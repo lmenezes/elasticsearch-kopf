@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="form-group col-xs-6">
+    <div class="form-group col-lg-4">
       <label class="form-label">ignore_unavailable</label>
 
       <div class="row">
@@ -42,7 +42,21 @@
         </div>
       </div>
     </div>
-    <div class="form-group col-xs-6">
+    <div class="form-group col-lg-4">
+      <label class="form-label">include_aliases</label>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <label class="cluster-map-node-type">
+            <input type="checkbox" ng-model="restore_snap.include_aliases" ng-true-value="true"> True
+          </label>
+          <label class="cluster-map-node-type">
+            <input type="checkbox" ng-model="restore_snap.include_aliases" ng-true-value="false"> False
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group col-lg-4">
       <label class="form-label">include_global_state</label>
 
       <div class="row">

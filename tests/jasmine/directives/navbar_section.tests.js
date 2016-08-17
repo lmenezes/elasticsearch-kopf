@@ -3,6 +3,17 @@ describe('ngNavbarSection', function() {
 
   beforeEach(module('kopf'));
 
+  beforeEach(function() {
+    module('kopf');
+    module(function($provide) {
+      $provide.value('ElasticService', {
+        versionCheck: function() {
+          return true;
+        }
+      });
+    });
+  });
+
   beforeEach(inject(function(_$compile_, _$rootScope_, _$location_) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;

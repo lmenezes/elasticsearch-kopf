@@ -3,9 +3,27 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
   function($scope, $location, $sce, $window, AlertService, ElasticService,
            ExternalSettingsService, PageService) {
 
-    $scope.version = '1.5.7';
+    $scope.version = '2.0.1';
 
     $scope.modal = new ModalControls();
+
+    $scope.$watch(
+        function() {
+          return ElasticService.cluster;
+        },
+        function(newValue, oldValue) {
+          var version = ElasticService.getVersion();
+          if (version && version.isValid()) {
+            var major = version.getMajor();
+            if (major != parseInt($scope.version.charAt(0))) {
+              AlertService.warn(
+                  'This version of kopf is not compatible with your ES version',
+                  'Upgrading to newest supported version is recommended'
+              );
+            }
+          }
+        }
+    );
 
     $scope.getTheme = function() {
       return ExternalSettingsService.getTheme();

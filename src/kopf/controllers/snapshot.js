@@ -95,10 +95,8 @@ kopf.controller('SnapshotController', ['$scope', 'ConfirmDialogService',
         body.indices = $scope.restore_snap.indices.join(',');
       }
 
-      if (angular.isDefined($scope.restore_snap.include_global_state)) {
-        body.include_global_state = $scope.restore_snap.include_global_state;
-      }
-
+      $scope.optionalParam(body, $scope.restore_snap, 'include_global_state');
+      $scope.optionalParam(body, $scope.restore_snap, 'include_aliases');
       $scope.optionalParam(body, $scope.restore_snap, 'ignore_unavailable');
       $scope.optionalParam(body, $scope.restore_snap, 'rename_replacement');
       $scope.optionalParam(body, $scope.restore_snap, 'rename_pattern');

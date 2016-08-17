@@ -76,7 +76,7 @@ kopf.controller('AnalysisController', ['$scope', '$location', '$timeout',
       if ($scope.field_field.length > 0 && $scope.field_text.length > 0) {
         $scope.field_tokens = null;
         ElasticService.analyzeByField($scope.field_index.name,
-            $scope.field_type, $scope.field_field, $scope.field_text,
+            $scope.field_field, $scope.field_text,
             function(response) {
               $scope.field_tokens = response;
             },

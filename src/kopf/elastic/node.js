@@ -4,8 +4,8 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.elasticVersion = nodeInfo.version;
   this.jvmVersion = nodeInfo.jvm.version;
   this.availableProcessors = nodeInfo.os.available_processors;
-  this.transportAddress = parseAddress(nodeInfo.transport_address);
-  this.host = nodeStats.host;
+  this.transportAddress = nodeInfo.transport_address;
+  this.host = nodeInfo.host;
 
   var attributes = getProperty(nodeInfo, 'attributes', {});
   var master = attributes.master === 'false' ? false : true;
@@ -36,13 +36,9 @@ function Node(nodeId, nodeStats, nodeInfo) {
   var usedRatio = (diskUsedInBytes / this.disk_total_in_bytes);
   this.disk_used_percent = Math.round(100 * usedRatio);
 
-  this.cpu_user = getProperty(this.stats, 'os.cpu.user');
-  this.cpu_sys = getProperty(this.stats, 'os.cpu.sys');
-  this.cpu = this.cpu_user + this.cpu_sys;
+  this.cpu = getProperty(this.stats, 'process.cpu.percent');
 
   this.load_average = getProperty(this.stats, 'os.load_average');
-
-  this.minuteAverage = this.load_average ? this.load_average[0] : 0;
 
   this.setCurrentMaster = function() {
     this.current_master = true;
@@ -51,9 +47,5 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.equals = function(node) {
     return node.id === this.id;
   };
-
-  function parseAddress(address) {
-    return address.substring(address.indexOf('/') + 1, address.length - 1);
-  }
 
 }

@@ -1,3 +1,25 @@
+.typeahead-demo .custom-popup-wrapper {
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+}
+
+.typeahead-demo .custom-popup-wrapper > .message {
+    border-bottom: 1px solid #ddd;
+    color: #868686;
+}
+
+.typeahead-demo .custom-popup-wrapper > .dropdown-menu {
+    position: static;
+    float: none;
+    display: block;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    margin-left: 0px;
+}
+
 .node-badges {
     width: 20px;
     display: inline-block;
@@ -390,6 +412,26 @@ textarea {
 	overflow: hidden;
 	display: block;
 }
+.explanation-result {
+    border: 1px solid #444;
+		border-radius: 4px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.explanation-result-title {
+	font-size: 14px;
+	padding: 5px;
+}
+.explanation-result table {
+	border-top: none;
+	border-left: none;
+	border-right: none;
+}
+
+.explanation-result .table thead > tr > th {
+  border-bottom: 1px solid #444;
+}
+
 .cluster-health-top-actions {
 	text-align: right;
 }
@@ -648,28 +690,6 @@ a.cluster-map-node-action {
     height: 14px;
 }
 
-.json-content {
-	font-size: 10px;
-	font-weight: 400;
-	color: #d0d0d0;
-	font-family: "Lucida Console", Monaco, monospace;
-}
-/* json property name style */
-.json-property {
-	font-weight: 500;
-}
-/* json object */
-.json-object {
-	padding-left: 2em;
-}
-/* visible object */
-.json-visible {
-	height: auto;
-}
-/* collapsed object */
-.json-collapsed {
-	display: none;
-}
 .dropdown-menu {
 	margin-top: 0px;
 	margin-left: 25px;

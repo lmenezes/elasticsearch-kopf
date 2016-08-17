@@ -21,11 +21,6 @@
               <i class="fa fa-fw fa-info-circle index-menu-icon"></i> view node stats
             </a>
           </li>
-          <li role="presentation">
-            <a data-toggle="modal" target="_self" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-header-index-action" ng-click="promptShutdownNode(node.id,node.name)">
-              <i class="fa fa-fw fa-power-off danger-action index-menu-icon"></i> shutdown node
-            </a>
-          </li>
         </ul>
       </div>
       <div>
@@ -59,21 +54,19 @@
         </div>
       </div>
     </div>
-    <div class="col-xs-3 node-progress-bar" title="user: {{node.cpu_user}}%&#013;system: {{node.cpu_sys}}%">
+    <div class="col-xs-3 node-progress-bar" title="process: {{node.cpu}}%">
       <span class="cluster-map-node-detail">cpu</span>
 
       <div class="progress node-progress">
-        <div class="progress-bar" ng-class="{'progress-bar-danger': node.cpu_user + node.cpu_sys > 75}" role="progressbar" aria-valuenow="{{node.cpu_user}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_user}}%">
-        </div>
-        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{node.cpu_sys}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu_sys}}%">
+        <div class="progress-bar" ng-class="{'progress-bar-danger': node.cpu > 75}" role="progressbar" aria-valuenow="{{node.cpu}}" aria-valuemin="0" aria-valuemax="100" style="width: {{node.cpu}}%">
         </div>
       </div>
     </div>
-    <div class="col-xs-3 node-progress-bar" title="1min avg: {{node.load_average[0] | number:2}}&#013;5min avg: {{node.load_average[1] | number:2}}&#013;15min avg: {{node.load_average[2] | number:2}}">
+    <div class="col-xs-3 node-progress-bar" title="1min avg: {{node.load_average | number:2}}">
       <span class="cluster-map-node-detail">load</span>
 
       <div class="progress node-progress">
-        <div class="progress-bar" ng-class="{'progress-bar-danger': (node.minuteAverage / node.availableProcessors) > 0.75}" role="progressbar" aria-valuenow="{{node.minuteAverage}}" aria-valuemin="0" aria-valuemax="{{node.availableProcessors}}" style="width: {{(node.minuteAverage / node.availableProcessors) * 100}}%;">
+        <div class="progress-bar" ng-class="{'progress-bar-danger': (node.load_average / node.availableProcessors) > 0.75}" role="progressbar" aria-valuenow="{{node.load_average}}" aria-valuemin="0" aria-valuemax="{{node.availableProcessors}}" style="width: {{(node.load_average / node.availableProcessors) * 100}}%;">
         </div>
       </div>
     </div>

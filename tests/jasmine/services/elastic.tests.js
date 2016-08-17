@@ -47,7 +47,7 @@ describe("ElasticService", function() {
             'getElasticsearchRootPath').andReturn('/testing');
         spyOn(this.ExternalSettingsService, 'withCredentials').andReturn(true);
         elasticService.clusterRequest = function(m, p, pr, d, success, f) {
-          success({version: {number: '1.9.13'}});
+          success({version: {number: '1.9.13'}, name: 'some node name'});
         };
         spyOn(elasticService, 'clusterRequest').andCallThrough();
         spyOn(elasticService, 'setVersion').andCallThrough();
@@ -135,10 +135,10 @@ describe("ElasticService", function() {
 
   it("Should set version when setVersion is called", function() {
     elasticService.setVersion('1.2.3');
-    expect(elasticService.version.major).toEqual(1);
-    expect(elasticService.version.minor).toEqual(2);
-    expect(elasticService.version.build).toEqual(3);
-    expect(elasticService.version.str).toEqual('1.2.3');
+    expect(elasticService.version.getMajor()).toEqual(1);
+    expect(elasticService.version.getMinor()).toEqual(2);
+    expect(elasticService.version.getPatch()).toEqual(3);
+    expect(elasticService.version.getValue()).toEqual('1.2.3');
   });
 
   it("Should throw exception if setVersion is called with incorrect format",
@@ -155,7 +155,7 @@ describe("ElasticService", function() {
       });
 
   it("Should correcty validate version check", function() {
-    elasticService.version = {str: '1.2.3', major: 1, minor: 2, build: 3};
+    elasticService.version = new Version('1.2.3');
     expect(elasticService.versionCheck('1.2.2')).toEqual(true);
     expect(elasticService.versionCheck('1.2.3')).toEqual(true);
     expect(elasticService.versionCheck('1.2.4')).toEqual(false);
@@ -283,46 +283,6 @@ describe("ElasticService", function() {
     };
     expect(elasticService.clusterRequest).
         toHaveBeenCalledWith('PUT', path, {}, body, 'success', 'error');
-  });
-
-  it("successfully shuts down node must refresh and alert success", function() {
-    elasticService.clusterRequest = function(m, u, p, b, success, error) {
-      success('response');
-    };
-    spyOn(elasticService, 'clusterRequest').andCallThrough();
-    spyOn(this.AlertService, 'success').andReturn(true);
-    spyOn(elasticService, 'refresh').andReturn(true);
-    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
-    elasticService.shutdownNode('node_id');
-    var path = '/_cluster/nodes/node_id/_shutdown';
-    expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, {}, jasmine.any(Function),
-        jasmine.any(Function));
-    expect(this.AlertService.success).toHaveBeenCalledWith(
-        'Node [node_id] was shutdown', 'response'
-    );
-    expect(elasticService.refresh).toHaveBeenCalled();
-    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('node_id');
-  });
-
-  it("failed shuting down node must alert error", function() {
-    elasticService.clusterRequest = function(m, u, pr, b, success, error) {
-      error('response');
-    };
-    spyOn(elasticService, 'clusterRequest').andCallThrough();
-    spyOn(this.AlertService, 'error').andReturn(true);
-    spyOn(elasticService, 'refresh').andReturn(true);
-    spyOn(elasticService, 'encodeURIComponent').andCallThrough();
-    elasticService.shutdownNode('node_id');
-    var path = '/_cluster/nodes/node_id/_shutdown';
-    expect(elasticService.clusterRequest).
-        toHaveBeenCalledWith('POST', path, {}, {}, jasmine.any(Function),
-        jasmine.any(Function));
-    expect(this.AlertService.error).toHaveBeenCalledWith(
-        'Error while shutting down node', 'response'
-    );
-    expect(elasticService.refresh).not.toHaveBeenCalled();
-    expect(elasticService.encodeURIComponent).toHaveBeenCalledWith('node_id');
   });
 
   it("successfuly opening an index must refresh and alert success", function() {
@@ -668,7 +628,7 @@ describe("ElasticService", function() {
     expect(this.ExternalSettingsService.getElasticsearchRootPath).toHaveBeenCalled();
     expect(this.ExternalSettingsService.withCredentials).toHaveBeenCalled();
     expect(elasticService.connection.host).toEqual('http://localhost:9200/');
-    expect(elasticService.version.str).toEqual('1.5.1');
+    expect(elasticService.version.getValue()).toEqual('1.5.1');
     expect(elasticService.connected).toEqual(true);
   });
 
@@ -726,6 +686,11 @@ describe("ElasticService", function() {
     elasticService.relocateShard('1', 'some_index', 'from_nd', 'to_nd', undefined, callbacks.error);
     $httpBackend.flush();
     expect(callbacks.error).toHaveBeenCalledWith({notreallyusingtheresponse:{}});
+  });
+
+  it("should return the correct versiom", function() {
+    elasticService.setVersion('1.2.0');
+    expect(elasticService.getVersion().getValue()).toEqual('1.2.0');
   });
 
 });

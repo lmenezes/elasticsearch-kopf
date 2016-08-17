@@ -1,3 +1,24 @@
+<script type="text/ng-template" id="customTemplate.html">
+	<a>
+		<span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
+	</a>
+</script>
+
+<script type="text/ng-template" id="customPopupTemplate.html">
+	<div class="custom-popup-wrapper"
+			 ng-style="{top: position().top+'px', left: position().left+'px'}"
+			 style="display: block;"
+			 ng-show="isOpen() && !moveInProgress"
+			 aria-hidden="{{!isOpen()}}">
+		<ul class="dropdown-menu" role="listbox">
+			<li ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }"
+					ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)" role="option" id="{{::match.id}}">
+				<div uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl"></div>
+			</li>
+		</ul>
+	</div>
+</script>
+
 <div>
 	<div class="row">
 		<div class="col-md-6 content-panel">
@@ -22,8 +43,16 @@
 											<option value="POST">POST</option>
 											<option value="DELETE">DELETE</option>
 										</select>
-										<span class="rest-client-request-url">
-											<input type="text" ng-model="request.path" class="form-control input-sm" placeholder="path relative to connected node (e.g.: /index/type/_search)">
+										<span class="rest-client-request-url typeahead-demo">
+											<input type="text"
+														 ng-model="request.path"
+														 ng-change="updateOptions(request.path)"
+														 typeahead-wait-ms="20"
+														 placeholder="path relative to connected node (e.g.: _search or index/type/_search)"
+														 uib-typeahead="url for url in options | startsWith:$viewValue | limitTo:10"
+														 typeahead-popup-template-url="customPopupTemplate.html"
+														 typeahead-template-url="customTemplate.html"
+														 class="form-control input-sm">
 										</span>
 										<div id="restHistory" class="panel-collapse collapse" style="margin-right: 30px">
 											<a data-toggle="collapse" data-parent="#restAccordion" target="_self" href="#restHistory">
@@ -45,8 +74,14 @@
 								</div>
 								<div class="content-panel action-buttons">
 									<span class="danger-action">{{editor.error}}</span>
+									<button type="button" class="btn btn-default input-sm" ng-click="copyAsCURLCommand()">
+										<i class="fa fa-clipboard"></i> cURL
+									</button>
 									<button type="button" class="btn btn-default input-sm" ng-click="editor.format()">
 										<i class="fa fa-align-left"></i> format
+									</button>
+									<button type="button" class="btn btn-default input-sm" ng-click="explainRequest()" ng-show="isExplain()">
+										<i class="fa fa-sort-amount-desc"></i> explain
 									</button>
 									<button type="submit" class="btn btn-primary input-sm" ng-click="sendRequest()">
 										<i class="fa fa-bolt"></i> send
@@ -69,10 +104,35 @@
 					</div>
 					<div id="restResponse" class="panel-collapse collapse in" style="min-height: 691px">
 						<div class="panel-body">
-							<div id="rest-client-response" style="min-height: 614px"></div>
+							<div ng-show="response">
+								<kopf-json-tree class="explain-response" style="min-height: 614px" kopf-bind="response"/>
+							</div>
+							<div class="explanation-result" ng-repeat="explanationResult in explanationResults track by explanationResult.documentId">
+								<div class="explanation-result-title">{{explanationResult.documentId}} {{explanationResult._score}}</div>
+								<div ng-hide="explanationResult._explanation">
+									This result has no score explanation.
+									Use <code>_search?explain=true</code> or <code>_explain</code>.
+								</div>
+								<div ng-show="explanationResult.explanationTreeData">
+									<tree-dnd tree-data="explanationResult.explanationTreeData"
+										expand-on = "explanationTreeConfig.expandOn"
+										column-defs = "explanationTreeConfig.columnDefs"/>
+								</div>
+								<div ng-show="explanationResult._source">
+									<kopf-json-tree class="explain-result-source" style="min-height: 614px" kopf-bind="explanationResult._source"/>
+								</tab>
+								<div ng-show="explanationResult.fields">
+									<kopf-json-tree class="explain-result-source" style="min-height: 614px" kopf-bind="explanationResult.fields"/>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="content-panel action-buttons">
+				<button type="button" class="btn btn-default input-sm" ng-click="exportAsCSV()">
+					<i class="fa"></i> Export as CSV
+				</button>
 			</div>
 		</div>
 	</div>

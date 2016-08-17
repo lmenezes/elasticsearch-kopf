@@ -29,7 +29,7 @@
       <ng-sort-by property="name" text="name">name</ng-sort-by>
     </th>
     <th class="table-header box">
-      <ng-sort-by property="minuteAverage" text="load average"></ng-sort-by>
+      <ng-sort-by property="load_average" text="load average"></ng-sort-by>
     </th>
     <th class="table-header box">
       <ng-sort-by property="cpu" text="cpu %"></ng-sort-by>
@@ -71,11 +71,6 @@
                   <i class="fa fa-fw fa-info-circle index-menu-icon"></i> view node stats
                 </a>
               </li>
-              <li role="presentation">
-                <a data-toggle="modal" target="_self" href="#confirm_dialog" data-backdrop="static" data-keyboard="false" class="cluster-map-header-index-action" ng-click="promptShutdownNode(node.id,node.name)">
-                  <i class="fa fa-fw fa-power-off danger-action index-menu-icon"></i> shutdown node
-                </a>
-              </li>
             </ul>
           </div>
           <div>
@@ -93,11 +88,11 @@
       <td>
         <div ng-show="node.load_average">
           <span class="node-stat">
-            {{node.load_average[0] | number:1}}
+            {{node.load_average | number:1}}
           </span>
           <span class="node-stat-detail">
-            <div>3min: {{node.load_average[1] | number:1}}</div>
-            <div>5min: {{node.load_average[2] | number:1}}</div>
+            <div></div>
+            <div></div>
           </span>
         </div>
         <div ng-hide="node.load_average">
@@ -109,11 +104,7 @@
       <td>
         <div>
           <span class="node-stat">
-            {{node.cpu_user + node.cpu_sys | number:1}}
-          </span>
-          <span class="node-stat-detail">
-            <div>user: {{node.cpu_user}}</div>
-            <div>sys: {{node.cpu_sys}}</div>
+            {{node.cpu | number:1}}
           </span>
         </div>
       </td>

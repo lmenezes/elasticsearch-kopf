@@ -38,7 +38,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}} navbar-right visible-lg">
         <li class="connection-info" ng-show="clusterName">
-          {{clusterName}} @ {{current_host}}
+          {{clusterName}} @ {{clientName || current_host}}
         </li>
         <li>
           <a target="_self" href="#" data-toggle="dropdown" class="dropdown-toggle">
@@ -60,11 +60,10 @@
                 </div>
                 <div class="col-xs-7">
                   <select ng-model="new_refresh" class="form-control input-sm" ng-change="changeRefresh()">
-                    <option value="1000">every 1s</option>
-                    <option value="3000">every 3s</option>
                     <option value="5000">every 5s</option>
                     <option value="10000">every 10s</option>
                     <option value="15000">every 15s</option>
+                    <option value="30000">every 30s</option>
                     <option value="60000">every 1m</option>
                   </select>
                 </div>

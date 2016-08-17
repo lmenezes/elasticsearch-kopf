@@ -33,8 +33,7 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
       if (name !== this.clusterName) {
         if (name) {
           $rootScope.title = 'kopf[' + name + ']';
-        }
-        else {
+        } else {
           $rootScope.title = 'kopf - no connection';
         }
         this.clusterName = name;
@@ -55,7 +54,6 @@ kopf.factory('PageService', ['ElasticService', 'DebugService', '$rootScope',
           context.globalCompositeOperation = 'source-in';
           context.fillStyle = color;
           context.fillRect(0, 0, 32, 32);
-          context.fill();
           this.link.type = 'image/x-icon';
           this.link.href = canvas.toDataURL();
         } catch (exception) {
