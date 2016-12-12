@@ -14,8 +14,8 @@ ADD nginx.conf.tpl /etc/nginx/nginx.conf.tpl
 ADD ./run.sh ./run.sh
 
 # kopf
-ENV KOPF_VERSION 2.0.1
-RUN curl -s -L "https://github.com/lmenezes/elasticsearch-kopf/archive/v${KOPF_VERSION}.tar.gz" | \
+ENV KOPF_VERSION 5.0.0
+RUN curl -s -L "https://github.com/g6n/elasticsearch-kopf/archive/v${KOPF_VERSION}.tar.gz" | \
     tar xz -C /tmp && mv "/tmp/elasticsearch-kopf-${KOPF_VERSION}" /kopf
 
 # logs
