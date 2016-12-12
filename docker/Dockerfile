@@ -3,7 +3,7 @@ FROM nginx:1.9.4
 # upgrade
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends python-pip curl && \
+    apt-get install -y --force-yes --no-install-recommends python-pip curl && \
     rm -rf /var/lib/apt/lists/* && \
     pip install envtpl
 
