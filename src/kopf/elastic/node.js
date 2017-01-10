@@ -8,8 +8,8 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.host = nodeInfo.host;
 
   var attributes = getProperty(nodeInfo, 'attributes', {});
-  var master = attributes.master === 'false' ? false : true;
-  var data = attributes.data === 'false' ? false : true;
+  var master = nodeInfo.roles.indexOf('master') < 0 ? false : true;
+  var data = nodeInfo.roles.indexOf('data') < 0 ? false : true;
   var client = attributes.client === 'true' ? true : false;
   this.master = master && !client;
   this.data = data && !client;
