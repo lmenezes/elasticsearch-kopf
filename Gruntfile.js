@@ -51,6 +51,12 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
+            src: ['src/kopf/css/fess_style.css'],
+            dest: './_site/dist/'
+          },
+          {
+            expand: true,
+            flatten: true,
             src: ['src/kopf/css/light_style.css'],
             dest: './_site/dist/'
           }

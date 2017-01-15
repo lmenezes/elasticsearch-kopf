@@ -6,11 +6,13 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
+<!--
       <span class="navbar-brand navbar-cluster-status-{{clusterStatus}}">
         <i class="fa fa-fw fa-circle navbar-logo-action">
           <span style="display:block; margin-top: -24px; font-size: 26px; font-weight: 500" class="navbar-cluster-status-{{clusterStatus}}-nav">K</span>
         </i>
       </span>
+-->
     </div>
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}}">
@@ -38,13 +40,14 @@
       </ul>
       <ul class="nav navbar-nav navbar-cluster-status-{{clusterStatus}} navbar-right visible-lg">
         <li class="connection-info" ng-show="clusterName">
-          {{clusterName}} @ {{clientName || current_host}}
+          {{clusterName}}<!-- @ {{clientName || current_host}} -->
         </li>
         <li>
           <a target="_self" href="#" data-toggle="dropdown" class="dropdown-toggle">
             <i class="fa fa-fw fa-cog"></i><i class="fa fa-fw fa-caret-down"></i>
           </a>
           <ul class="dropdown-menu form-horizontal navbar-app-settings">
+<!--
             <li>
               <div class="row">
                 <div class="col-lg-12">
@@ -53,6 +56,7 @@
               </div>
             </li>
             <li class="divider"></li>
+-->
             <li class="navbar-menu-section">
               <div class="row">
                 <div class="col-xs-5">
@@ -76,6 +80,7 @@
                 </div>
                 <div class="col-xs-7">
                   <select ng-model="theme" class="form-control input-sm" ng-change="changeTheme()">
+                    <option value="fess">fess</option>
                     <option value="light">light</option>
                     <option value="dark">dark</option>
                   </select>
@@ -83,6 +88,7 @@
               </div>
             </li>
             <li class="divider"></li>
+<!--
             <li>
               <div class="row">
                 <div class="col-lg-12">
@@ -110,6 +116,7 @@
                 </div>
               </div>
             </li>
+-->
           </ul>
         </li>
       </ul>
