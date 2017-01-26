@@ -228,7 +228,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      * @callback error - invoked on error
      */
     this.optimizeIndex = function(index, success, error) {
-      var path = '/' + encode(index) + '/_optimize';
+      var path = '/' + encode(index) + '/_forcemerge';
       this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
