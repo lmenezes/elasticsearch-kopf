@@ -3229,13 +3229,10 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.transportAddress = nodeInfo.transport_address;
   this.host = nodeInfo.host;
 
-  var attributes = getProperty(nodeInfo, 'attributes', {});
-  var master = attributes.master === 'false' ? false : true;
-  var data = attributes.data === 'false' ? false : true;
-  var client = attributes.client === 'true' ? true : false;
-  this.master = master && !client;
-  this.data = data && !client;
-  this.client = client || !master && !data;
+  var roles = getProperty(nodeInfo, 'roles', []);
+  this.master = roles.indexOf('master') < 0 ? false : true;
+  this.data = roles.indexOf('data') < 0 ? false : true;
+  this.client = !this.master && !this.data;
   this.current_master = false;
 
   this.stats = nodeStats;
