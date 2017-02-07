@@ -2551,6 +2551,8 @@ function Alias(alias, index, filter, indexRouting, searchRouting) {
     if (isDefined(this.filter)) {
       if (typeof this.filter == 'string' && notEmpty(this.filter)) {
         info.filter = JSON.parse(this.filter);
+      } else if (!notEmpty(this.filter)) {
+        info.filter = {};
       } else {
         info.filter = this.filter;
       }
