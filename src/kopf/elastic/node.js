@@ -38,7 +38,8 @@ function Node(nodeId, nodeStats, nodeInfo) {
 
   this.cpu = getProperty(this.stats, 'process.cpu.percent');
 
-  this.load_average = getProperty(this.stats, 'os.load_average');
+  var loadAverage = getProperty(this.stats, 'os.cpu.load_average');
+  this.load_average = loadAverage['1m'];
 
   this.setCurrentMaster = function() {
     this.current_master = true;

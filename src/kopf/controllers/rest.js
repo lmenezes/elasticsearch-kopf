@@ -31,9 +31,9 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       var method = $scope.request.method;
       var host = ElasticService.getHost();
       var path = encodeURI($scope.request.path);
-	  if(path.substring(0,1) !== '/') {
-		  path = '/' + path;
-	  }
+      if(path.substring(0,1) !== '/') {
+          path = '/' + path;
+      }
       var body = $scope.editor.getValue();
       var curl = 'curl -X' + method + ' \'' + host + path + '\'';
       if (['POST', 'PUT'].indexOf(method) >= 0) {

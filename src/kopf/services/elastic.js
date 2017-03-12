@@ -168,7 +168,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      */
     this.createIndex = function(name, settings, success, error) {
       var path = '/' + encode(name);
-      this.clusterRequest('POST', path, {}, settings, success, error);
+      this.clusterRequest('PUT', path, {}, settings, success, error);
     };
 
     /**
