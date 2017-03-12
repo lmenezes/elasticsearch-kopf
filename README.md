@@ -5,6 +5,10 @@ kopf is a simple web administration tool for [elasticsearch](http://elastic.co) 
 
 It offers an easy way of performing common tasks on an elasticsearch cluster. Not every single API is covered by this plugin, but it does offer a REST client which allows you to explore the full potential of the ElasticSearch API.
 
+## Important:
+
+Kopf is no longer maintained. A replacement(cerebro) has been developed and is currently maintained at [https://github.com/lmenezes/cerebro](https://github.com/lmenezes/cerebro). At this point, cerebro should be pretty much feature equivalent of kopf, with a few new features on top.
+
 Versions
 ------------
 
