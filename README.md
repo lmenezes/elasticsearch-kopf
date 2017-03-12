@@ -18,6 +18,8 @@ Versions
 | 1.X                   | 1.0    | v1.6.1          |
 | 2.X                   | 2.0    | v2.1.1          |
 
+Kopf will not work with elasticsearch 5, instead have a look at [cerebro](https://github.com/lmenezes/cerebro).
+
 Installation
 ------------
 You can either install a specific version(using its release tag) or the most up to date version from a given branch.
