@@ -2551,8 +2551,6 @@ function Alias(alias, index, filter, indexRouting, searchRouting) {
     if (isDefined(this.filter)) {
       if (typeof this.filter == 'string' && notEmpty(this.filter)) {
         info.filter = JSON.parse(this.filter);
-      } else if (!notEmpty(this.filter)) {
-        info.filter = {};
       } else {
         info.filter = this.filter;
       }
@@ -4997,7 +4995,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         data.actions.push({add: a.info()});
       });
       remove.forEach(function(a) {
-        data.actions.push({remove: a.info()});
+        var info = a.info();
+        delete info['filter'];
+        data.actions.push({remove: info});
       });
       this.clusterRequest('POST', '/_aliases', {}, data, success, error);
     };

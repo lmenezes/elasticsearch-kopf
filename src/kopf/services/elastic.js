@@ -459,7 +459,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         data.actions.push({add: a.info()});
       });
       remove.forEach(function(a) {
-        data.actions.push({remove: a.info()});
+        var info = a.info();
+        delete info['filter'];
+        data.actions.push({remove: info});
       });
       this.clusterRequest('POST', '/_aliases', {}, data, success, error);
     };
