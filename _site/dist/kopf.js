@@ -5361,10 +5361,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host +
             '/_cluster/state/master_node,blocks?local=true',
             params),
-        $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
+        $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings?local=true', params),
         $http.get(host + '/_cluster/health?local=true', params),
-        $http.get(host + '/_nodes/_all/os,jvm?local=true', params)
+        $http.get(host + '/_nodes/_all/os,jvm', params)
       ]).then(
           function(responses) {
             try {
