@@ -32,6 +32,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('alias-filter-editor');
       }
+      $scope.editor.setValue('{}');
     };
 
     $scope.addAlias = function() {

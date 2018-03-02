@@ -228,7 +228,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      * @callback error - invoked on error
      */
     this.optimizeIndex = function(index, success, error) {
-      var path = '/' + encode(index) + '/_optimize';
+      var path = '/' + encode(index) + '/_forcemerge';
       this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
@@ -459,7 +459,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         data.actions.push({add: a.info()});
       });
       remove.forEach(function(a) {
-        data.actions.push({remove: a.info()});
+        var info = a.info();
+        delete info['filter'];
+        data.actions.push({remove: info});
       });
       this.clusterRequest('POST', '/_aliases', {}, data, success, error);
     };
@@ -822,10 +824,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host +
             '/_cluster/state/master_node,blocks?local=true',
             params),
-        $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
+        $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings?local=true', params),
         $http.get(host + '/_cluster/health?local=true', params),
-        $http.get(host + '/_nodes/_all/os,jvm?local=true', params)
+        $http.get(host + '/_nodes/_all/os,jvm', params)
       ]).then(
           function(responses) {
             try {

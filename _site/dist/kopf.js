@@ -149,6 +149,7 @@ kopf.controller('AliasesController', ['$scope', 'AlertService',
       if (!angular.isDefined($scope.editor)) {
         $scope.editor = AceEditorService.init('alias-filter-editor');
       }
+      $scope.editor.setValue('{}');
     };
 
     $scope.addAlias = function() {
@@ -1261,7 +1262,8 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
           var location = $scope.readParameter('location');
           var url = $location.absUrl();
           if (isDefined(location) ||
-              isDefined(location = ExternalSettingsService.getElasticsearchHost())) {
+              isDefined(location = ExternalSettingsService
+                .getElasticsearchHost())) {
             host = location;
           } else if (url.indexOf('/_plugin/kopf') > -1) {
             host = url.substring(0, url.indexOf('/_plugin/kopf'));
@@ -1827,8 +1829,8 @@ kopf.controller('RestController', ['$scope', '$location', '$timeout',
       var method = $scope.request.method;
       var host = ElasticService.getHost();
       var path = encodeURI($scope.request.path);
-      if(path.substring(0,1) !== '/') {
-          path = '/' + path;
+      if (path.substring(0, 1) !== '/') {
+        path = '/' + path;
       }
       var body = $scope.editor.getValue();
       var curl = 'curl -X' + method + ' \'' + host + path + '\'';
@@ -3257,7 +3259,7 @@ function Node(nodeId, nodeStats, nodeInfo) {
   this.cpu = getProperty(this.stats, 'process.cpu.percent');
 
   var loadAverage = getProperty(this.stats, 'os.cpu.load_average');
-  this.load_average = loadAverage['1m'];
+  this.load_average = loadAverage === undefined ? 0 : loadAverage['1m'];
 
   this.setCurrentMaster = function() {
     this.current_master = true;
@@ -4763,7 +4765,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
      * @callback error - invoked on error
      */
     this.optimizeIndex = function(index, success, error) {
-      var path = '/' + encode(index) + '/_optimize';
+      var path = '/' + encode(index) + '/_forcemerge';
       this.clusterRequest('POST', path, {}, {}, success, error);
     };
 
@@ -4994,7 +4996,9 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         data.actions.push({add: a.info()});
       });
       remove.forEach(function(a) {
-        data.actions.push({remove: a.info()});
+        var info = a.info();
+        delete info['filter'];
+        data.actions.push({remove: info});
       });
       this.clusterRequest('POST', '/_aliases', {}, data, success, error);
     };
@@ -5357,10 +5361,10 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
         $http.get(host +
             '/_cluster/state/master_node,blocks?local=true',
             params),
-        $http.get(host + '/_nodes/stats/jvm,fs,os?local=true', params),
+        $http.get(host + '/_nodes/stats/jvm,fs,os', params),
         $http.get(host + '/_cluster/settings?local=true', params),
         $http.get(host + '/_cluster/health?local=true', params),
-        $http.get(host + '/_nodes/_all/os,jvm?local=true', params)
+        $http.get(host + '/_nodes/_all/os,jvm', params)
       ]).then(
           function(responses) {
             try {
