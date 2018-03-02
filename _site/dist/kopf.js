@@ -4997,7 +4997,7 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
       });
       remove.forEach(function(a) {
         var info = a.info();
-        delete info['filter'];
+        delete info.filter;
         data.actions.push({remove: info});
       });
       this.clusterRequest('POST', '/_aliases', {}, data, success, error);
