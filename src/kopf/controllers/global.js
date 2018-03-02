@@ -15,7 +15,7 @@ kopf.controller('GlobalController', ['$scope', '$location', '$sce', '$window',
           var version = ElasticService.getVersion();
           if (version && version.isValid()) {
             var major = version.getMajor();
-            if (major != parseInt($scope.version.charAt(0))) {
+            if (major < 5 || major > 6) {
               AlertService.warn(
                   'This version of kopf is not compatible with your ES version',
                   'Upgrading to newest supported version is recommended'
