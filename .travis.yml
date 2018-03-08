@@ -3,4 +3,15 @@ node_js:
   - "7"
 script:
   - npm install
-  - grunt buils
+  - grunt build
+  - tar cfz site.tgz -C _site .
+
+deploy:
+  provider: releases
+  api_key:
+    secure: UjNb4B0XQTN4ogFmposMbLjHr4q4MUt2yTgJNYK8OQ+gp3nsO5QDrU0mflGdNEv5ZZWOpyX/rewdigz2YxBv9q+nQ9ut/uyzx3dnVxRgxvXkfXJ5+SSow+eq9bT1Ds+Zx8MCEYITxZwWb1BnJyPSXzdIj8MDU5sCWrnIadG+MBGd4HsF9GcEin2UuEfTQHO2gPilcy4HBOiAVvYJVI1ks+RoUrTmAvjy7jbjkO/yckWvg0Y9eyQevdJFg+mha98I9SRuGKb+nDnZlUPB3Ss/wHobT8DHda87swIk19NKJA4n81sG6kH4oVqmqlUC31Ma7MHG/f+6m/4u7XmrUhmnmNPw04JU5eltNHYkwdw26CLi7KXm2nOEYPESzuIBPf08f83Bd0Sgfvb0is/mceCUc6nqyXUSweet47Ozvz2cWF6s/A/ybRCnnYlkcp6w8pZEDkWv9tKJWvo7SrEvqp1CyBmCzcl7AI+wP7CUPSZ12RbPAL2m2CVTFKCkgixcVX1Bm1FKokZ1ylCgxokU1nbhrJyqDnHg4X3V2aOZZL5kvRpipm+x1pLPXJOvQxQSbVsVlTgbH9fcxgzEvlUfD+Jzp2BYRIUV1K7ORfoPCQKJBZ8BjJaFsw9cg1UZlUIxAxYII15ZGx2kW9YXbsKC2nAK3o3CsM6IJoPrarWhQpoz47U=
+  file: site.tgz
+  skip_cleanup: true
+  on:
+    repo: micw/elasticsearch-kopf
+    tags: true
