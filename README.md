@@ -8,12 +8,13 @@ It offers an easy way of performing common tasks on an elasticsearch cluster. No
 Versions
 ------------
 
-| elasticsearch version | branch | latest version  |
-| --------------------- | ------ | --------------- |
+| elasticsearch version | branch | latest version  | docker image 
+| --------------------- | ------ | --------------- | -------------
 | 0.90.X                | 0.90   | v0.90           |
-| 1.X                   | 1.0    | v1.6.1          |
-| 2.X                   | 2.0    | v2.1.1          |
-| 5.X,6.X               | master | v6.0.1          |
+| 1.X                   | 1.0    | v1.6.1          | micwy/elasticsearch-kopf:1.x
+| 2.X                   | 2.0    | v2.1.1          | micwy/elasticsearch-kopf:2.x
+| 5.X,6.X               | master | v6.0.1          | micwy/elasticsearch-kopf:6.x
+| 5.X,6.X               | dev    | v6.0.2-alpha    | micwy/elasticsearch-kopf:dev
 
 Installation
 ------------
