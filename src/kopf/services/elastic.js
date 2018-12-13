@@ -756,7 +756,13 @@ kopf.factory('ElasticService', ['$http', '$q', '$timeout', '$location',
 
     this.clusterRequest = function(method, path, params, data, success, error) {
       var url = this.connection.host + path;
-      var config = {method: method, url: url, data: data, params: params};
+      var config = {
+        method: method,
+        url: url,
+        data: data,
+        params: params,
+        headers: {'Content-Type' : 'application/json'}
+      };
       this.addAuth(config);
       $http(config).
           success(function(data, status, headers, config) {
