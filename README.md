@@ -12,14 +12,20 @@ Kopf is no longer maintained. A replacement(cerebro) has been developed and is c
 Versions
 ------------
 
-| elasticsearch version | branch | latest version  |
-| --------------------- | ------ | --------------- |
+| elasticsearch version | branch | latest version  | docker image 
+| --------------------- | ------ | --------------- | -------------
 | 0.90.X                | 0.90   | v0.90           |
-| 1.X                   | 1.0    | v1.6.1          |
-| 2.X                   | 2.0    | v2.1.1          |
+| 1.X                   | 1.0    | v1.6.1          | micwy/elasticsearch-kopf:1.x
+| 2.X                   | 2.0    | v2.1.1          | micwy/elasticsearch-kopf:2.x
+| 5.X                   | master | v6.0.2          | micwy/elasticsearch-kopf:5.x
+| 6.X                   | master | v6.0.2          | micwy/elasticsearch-kopf:6.x
+| 5.X,6.X               | dev    | v6.0.3-alpha    | micwy/elasticsearch-kopf:dev
 
 Installation
 ------------
+
+Starting with v6.0.1, the _site directory is removed from git and releases are available under the "releases" section.
+
 You can either install a specific version(using its release tag) or the most up to date version from a given branch.
 
 ####Installing on an Elasticsearch instance:
